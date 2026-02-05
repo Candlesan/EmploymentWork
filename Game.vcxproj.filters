@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="External">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="External\imgui-docking">
+      <UniqueIdentifier>{c85446c9-90d2-4441-add5-5aac511d95ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ImGuizmo">
+      <UniqueIdentifier>{5f7002dc-627e-48c5-9e59-33cef80467f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\SphereCast">
+      <UniqueIdentifier>{febe62f4-6eb6-44d0-8434-1fd681194144}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Shader">
+      <UniqueIdentifier>{4916c947-8a1d-423f-a903-5a45aae62a40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Camera">
+      <UniqueIdentifier>{515625fb-af2c-4374-9925-561e7a17d5c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System">
+      <UniqueIdentifier>{a78d2f38-31a5-4e50-81a2-873f4054df09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Model">
+      <UniqueIdentifier>{b08f22d7-11eb-4186-bd35-419418f25cce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{9f64f4ff-d9e0-43d7-88e1-13e6d3656a89}</UniqueIdentifier>
+      <Extensions>hlsl;hlsli</Extensions>
+    </Filter>
+    <Filter Include="Source\Scene">
+      <UniqueIdentifier>{a61f1707-ba55-493a-a3b7-7f331afd5e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Sprite">
+      <UniqueIdentifier>{1bb0c0bb-9cd2-49a8-80b6-5f76293f2308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Stage">
+      <UniqueIdentifier>{c40c4fd8-a1ac-4a03-8350-a988c806dd05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Input">
+      <UniqueIdentifier>{52dac426-6358-4dd7-94e3-5a33d1801a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Character">
+      <UniqueIdentifier>{514717f4-f937-4345-a82c-926a1b92083f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Framework.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imconfig.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imgui.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imgui_impl_dx11.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imgui_impl_win32.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imgui_internal.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imstb_rectpack.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imstb_textedit.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imstb_truetype.h">
+      <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\ImCurveEdit.h">
+      <Filter>External\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\ImGradient.h">
+      <Filter>External\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\ImGuizmo.h">
+      <Filter>External\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\ImSequencer.h">
+      <Filter>External\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="External\SphereCast\Include\SphereCast.h">
+      <Filter>External\SphereCast</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BasicShader.h">
+      <Filter>Source\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LambertShader.h">
+      <Filter>Source\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader.h">
+      <Filter>Source\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FreeCameraController.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Model.h">
+      <Filter>Source\System\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ModelRenderer.h">
+      <Filter>Source\System\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PrimitiveRenderer.h">
+      <Filter>Source\System\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ShapeRenderer.h">
+      <Filter>Source\System\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RenderState.h">
+      <Filter>Source\System\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Dialog.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GLTFImporter.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GpuResourceUtils.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HighResolutionTimer.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGuiRenderer.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Misc.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TransformUtils.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sprite.h">
+      <Filter>Source\System\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RenderContext.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Light.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneGame.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stage.h">
+      <Filter>Source\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneManager.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePad.h">
+      <Filter>Source\System\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Input.h">
+      <Filter>Source\System\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mouse.h">
+      <Filter>Source\System\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Character.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Player.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Framework.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui_demo.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui_draw.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui_impl_dx11.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui_impl_win32.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui_widgets.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGuizmo\ImCurveEdit.cpp">
+      <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGuizmo\ImGradient.cpp">
+      <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp">
+      <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGuizmo\ImSequencer.cpp">
+      <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BasicShader.cpp">
+      <Filter>Source\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LambertShader.cpp">
+      <Filter>Source\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\FreeCameraController.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Model.cpp">
+      <Filter>Source\System\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ModelRenderer.cpp">
+      <Filter>Source\System\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PrimitiveRenderer.cpp">
+      <Filter>Source\System\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ShapeRenderer.cpp">
+      <Filter>Source\System\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RenderState.cpp">
+      <Filter>Source\System\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Dialog.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GLTFImporter.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GpuResourceUtils.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ImGuiRenderer.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TransformUtils.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sprite.cpp">
+      <Filter>Source\System\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneGame.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Stage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneManager.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePad.cpp">
+      <Filter>Source\System\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Input.cpp">
+      <Filter>Source\System\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mouse.cpp">
+      <Filter>Source\System\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Character.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\Sprite.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\ShapeRenderer.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Skinning.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PrimitiveRenderer.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Basic.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Lambert.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Scene.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shader\SpriteVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\SpritePS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\ShapeRendererVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\ShapeRendererPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PrimitiveRendererVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PrimitiveRendererPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\BasicPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\BasicVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\LambertPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\LambertVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

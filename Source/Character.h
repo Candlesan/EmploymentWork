@@ -1,0 +1,135 @@
+#pragma once
+#include <DirectXMath.h>
+#include "ModelRenderer.h"
+#include "ShapeRenderer.h"
+
+class Character
+{
+public:
+	Character() {}
+	virtual ~Character() = 0;
+
+	// 行列更新
+	void UpdateTransform();
+
+	// デバックプリミティブ描画
+	virtual void RenderDebugPrimitive(ShapeRenderer* renderer);
+
+	// 位置取得
+	const DirectX::XMFLOAT3& GetPosition()const { return position; }
+
+	// 位置設定
+	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
+
+	// 回転取得
+	const DirectX::XMFLOAT3& GetAngle()const { return angle; }
+
+	// 回転設定
+	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
+
+	// スケール取得
+	const DirectX::XMFLOAT3& GetScale()const { return scale; }
+
+	// スケール取得
+	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
+
+	// 行列取得
+	const DirectX::XMFLOAT4X4& GetTransform() const { return transform; }
+
+	// 行列設定
+	void Set_Transform(DirectX::XMFLOAT4X4 new_transform) { this->transform = new_transform; }
+
+	// 速力取得
+	const DirectX::XMFLOAT3& GetVelocity() const { return velocity; }
+
+	// 速力設定
+	void SetVelocity(const DirectX::XMFLOAT3& v) { velocity = v; }
+
+	// 半径取得
+	float GetRadius() const { return radius; }
+
+	// 高さ取得
+	float GetHeight() const { return height; }
+
+	// 地面に接地しているか
+	bool IsGround() const { return isGround; }
+
+	// 接地フラグ取得
+	bool SetIsGround(bool flag) { return isGround = flag; }
+
+	// ダメージを与える
+	virtual bool ApplyDamage(float damage, float invincibleTime);
+
+	// 移動処理
+	void Move(float vx, float vz, float speed);
+
+	// 旋回処理
+	void Turn(float elapsedTime, float vx, float vz, float speed);
+
+	// カプセルの方向取得
+	DirectX::XMFLOAT3 GetCapsuleDirection() const
+	{ return DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f); }
+
+private:
+	// 水平速力更新処理
+	void UpdateHorizontalVelocity(float elapsedTime);
+
+	// 水平移動更新処理
+	void UpdateHorizontalMove(float elapsedTime);
+
+	//垂直速力更新処理
+	void UpdateVerticalVelocity(float elapsedTime);
+
+	//垂直移動更新処理
+	void UpdateVerticalMove(float elapsedTime);
+
+protected:
+
+	// ジャンプ処理
+	void Jump(float speed);
+
+	// 速力処理更新
+	void UpdateVelocity(float elapsedTime);
+
+	// 着地したときに呼ばれる
+	virtual void OnLanding() {}
+
+	// ダメージを受けた時に呼ばれる
+	virtual void OnDamage() {}
+
+	// 死亡した時に呼ばれる
+	virtual void OnDead() {}
+
+	// 無敵時間更新
+	void UpdateInvincibleTimer(float elapsedTime);
+
+protected:
+	DirectX::XMFLOAT3 position = { 0,0,0 };
+	DirectX::XMFLOAT3 angle = { 0,0,0 };
+	DirectX::XMFLOAT3 scale = { 1,1,1 };
+	DirectX::XMFLOAT4X4 transform = {
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};
+
+	DirectX::XMFLOAT3 velocity = { 0, 0, 0 }; 
+
+	float maxMoveSpeed = 5.0f; // 最大速度
+	float moveVecX = 0.0f; // 移動ベクトル（X軸方向）
+	float moveVecZ = 0.0f; // 移動ベクトル（Z軸方向）
+
+	float friction = 15.0f; // 摩擦力
+	float acceleration = 50.0f; // 加速度
+	float gravity = -60; // 重力
+
+	//当たり判定関係
+	float radius = 0.5f; // 半径
+	float height = 2.0f; // 高さ
+
+	bool isGround = false; // 地面と接地してるか
+
+	float health = 10; // 体力
+	float invincibleTimer = 1.0f; // 無敵時間
+};
