@@ -7,6 +7,8 @@
 #include "PrimitiveRenderer.h"
 #include "ShapeRenderer.h"
 #include "ModelRenderer.h"
+#include "ShadowMap.h"
+
 
 // グラフィックス
 class Graphics
@@ -62,6 +64,10 @@ public:
 	// モデルレンダラ取得
 	ModelRenderer* GetModelRenderer() const { return modelRenderer.get(); }
 
+	LightManager* GetLightManager() const { return lightManager.get(); }
+
+	// シャドウマップ取得
+	ShadowMap* GetShadowMap() const { return shadowMap.get(); }
 private:
 	HWND											hWnd = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11Device>			device;
@@ -78,4 +84,6 @@ private:
 	std::unique_ptr<PrimitiveRenderer>				primitiveRenderer;
 	std::unique_ptr<ShapeRenderer>					shapeRenderer;
 	std::unique_ptr<ModelRenderer>					modelRenderer;
+	std::unique_ptr<LightManager> lightManager;
+	std::unique_ptr<ShadowMap> shadowMap;
 };

@@ -129,7 +129,9 @@ void Graphics::Initialize(HWND hWnd)
 	primitiveRenderer = std::make_unique<PrimitiveRenderer>(device.Get());
 	shapeRenderer = std::make_unique<ShapeRenderer>(device.Get());
 	modelRenderer = std::make_unique<ModelRenderer>(device.Get());
+	lightManager = std::make_unique<LightManager>();
 
+	shadowMap = std::make_unique<ShadowMap>(device.Get());
 }
 
 // ÉNÉäÉA

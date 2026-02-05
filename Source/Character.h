@@ -7,13 +7,13 @@ class Character
 {
 public:
 	Character() {}
-	virtual ~Character() = 0;
+	virtual ~Character() = 0 {};
 
 	// 行列更新
 	void UpdateTransform();
 
 	// デバックプリミティブ描画
-	virtual void RenderDebugPrimitive(ShapeRenderer* renderer);
+	//virtual void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 	// 位置取得
 	const DirectX::XMFLOAT3& GetPosition()const { return position; }

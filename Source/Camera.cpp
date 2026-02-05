@@ -57,3 +57,50 @@ void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ
 	DirectX::XMMATRIX Projection = DirectX::XMMatrixPerspectiveFovLH(fovY, aspect, nearZ, farZ);
 	DirectX::XMStoreFloat4x4(&projection, Projection);
 }
+
+//正射影設定
+void Camera::SetOrthographic(float width, float height, float nearZ, float farZ)
+{
+	// 幅・高さ・クリップ距離から正射影行列を作成
+	DirectX::XMMATRIX Ortho = DirectX::XMMatrixOrthographicLH(width, height, nearZ, farZ);
+	DirectX::XMStoreFloat4x4(&projection, Ortho);
+
+	// パラメーターだけ保存 
+	this->nearZ = nearZ;
+	this->farZ = farZ;
+
+	this->fovY = fovY;
+	this->aspect = aspect;
+}
+
+// 現在のカメラの状態を保存
+void Camera::SaveCamera()
+{
+	saveView = view;
+	saveProjection = projection;
+	savedEye = eye;
+	savedFocus = focus;
+	savedUp = up;
+	savedFront = front;
+	savedRight = right;
+	savedNearZ = nearZ;
+	savedFarZ = farZ;
+	savedFovY = fovY;
+	savedAspect = aspect;
+}
+
+// カメラの状態を元に戻す
+void Camera::ResetCamera()
+{
+	view = saveView;
+	projection = saveProjection;
+	eye = savedEye;
+	focus = savedFocus;
+	up = savedUp;
+	front = savedFront;
+	right = savedRight;
+	nearZ = savedNearZ;
+	farZ = savedFarZ;
+	fovY = savedFovY;
+	aspect = savedAspect;
+}

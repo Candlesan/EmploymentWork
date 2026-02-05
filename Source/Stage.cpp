@@ -21,5 +21,5 @@ void Stage::Update(float elapsedTime)
 void Stage::Render(const RenderContext& rc, ModelRenderer* renderer)
 {
 	// ƒQ[ƒvƒV‚ÍDraw‚Å•`‰æ‚ð‚½‚ß‚ÄRender‚Å•`‰æ‚·‚é
-	renderer->Draw(ShaderId::Lambert, stage);
+	renderer->Draw(ShaderId::PBR, stage);
 }
