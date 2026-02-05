@@ -1,5 +1,5 @@
 #include "Stage.h"
-#include "Graphics.h"
+#include "System/Graphic/Graphics.h"
 
 // コンストラクタ
 Stage::Stage()

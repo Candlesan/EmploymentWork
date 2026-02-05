@@ -1,6 +1,6 @@
 #include "SceneGame.h"
-#include "Graphics.h"
-#include "Camera.h"
+#include "System/Graphic/Graphics.h"
+#include "Gameplay/Object/Camera/Camera.h"
 #include "SceneManager.h"
 
 // ‰Šú‰»

@@ -1,13 +1,13 @@
-#include "Misc.h"
+#include "Core/Misc.h"
 #include "GpuResourceUtils.h"
-#include "BasicShader.h"
+#include "LambertShader.h"
 
-BasicShader::BasicShader(ID3D11Device* device)
+LambertShader::LambertShader(ID3D11Device* device)
 {
 	// 頂点シェーダー
 	GpuResourceUtils::LoadVertexShader(
 		device,
-		"Data/Shader/BasicVS.cso",
+		"Data/Shader/LambertVS.cso",
 		Model::InputElementDescs.data(),
 		static_cast<UINT>(Model::InputElementDescs.size()),
 		inputLayout.GetAddressOf(),
@@ -16,7 +16,7 @@ BasicShader::BasicShader(ID3D11Device* device)
 	// ピクセルシェーダー
 	GpuResourceUtils::LoadPixelShader(
 		device,
-		"Data/Shader/BasicPS.cso",
+		"Data/Shader/LambertPS.cso",
 		pixelShader.GetAddressOf());
 
 	// メッシュ用定数バッファ
@@ -27,7 +27,7 @@ BasicShader::BasicShader(ID3D11Device* device)
 }
 
 // 開始処理
-void BasicShader::Begin(const RenderContext& rc)
+void LambertShader::Begin(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
@@ -45,7 +45,7 @@ void BasicShader::Begin(const RenderContext& rc)
 }
 
 // 更新処理
-void BasicShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
+void LambertShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
@@ -63,7 +63,7 @@ void BasicShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
 }
 
 // 描画終了
-void BasicShader::End(const RenderContext& rc)
+void LambertShader::End(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
@@ -77,6 +77,6 @@ void BasicShader::End(const RenderContext& rc)
 	dc->PSSetConstantBuffers(1, _countof(cbs), cbs);
 
 	// シェーダーリソースビュー設定解除
-	ID3D11ShaderResourceView* srvs[] = { nullptr };
+	ID3D11ShaderResourceView* srvs[] = { nullptr, nullptr };
 	dc->PSSetShaderResources(0, _countof(srvs), srvs);
 }

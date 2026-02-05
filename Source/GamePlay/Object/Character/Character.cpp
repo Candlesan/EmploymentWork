@@ -1,5 +1,4 @@
-#include "Character.h"
-#include "Player.h"
+#include "Gameplay/Object/Character/Character.h"
 
 void Character::UpdateTransform()
 {

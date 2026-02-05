@@ -4,9 +4,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_MSC_SECURE_CRT
 
-#include "Misc.h"
-#include "GpuResourceUtils.h"
-#include "GLTFImporter.h"
+#include "System/Core/Misc.h"
+#include "System/Graphic/GpuResourceUtils.h"
+#include "System/Resource/Model/GLTFImporter.h"
 
 bool LoadImageData(tinygltf::Image*, const int, std::string*,
 	std::string*, int, int,

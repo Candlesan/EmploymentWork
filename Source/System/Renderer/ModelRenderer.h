@@ -5,8 +5,8 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include "Model.h"
-#include "Shader.h"
+#include "System/Resource/Model/Model.h"
+#include "System/Renderer/Shader/Shader.h"
 
 enum class ShaderId
 {

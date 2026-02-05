@@ -1,10 +1,10 @@
 #pragma once
 #include "Scene.h"
-#include "FreeCameraController.h"
+#include "Gameplay/Object/Camera/FreeCameraController.h"
 #include <memory>
 
 // モデル
-#include "Stage.h"
+#include "Gameplay/Object/Stage/Stage.h"
 
 // ゲームシーン
 class SceneGame : public Scene

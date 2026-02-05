@@ -4,9 +4,9 @@
 #include <wrl.h>
 #include <memory>
 #include "RenderState.h"
-#include "PrimitiveRenderer.h"
-#include "ShapeRenderer.h"
-#include "ModelRenderer.h"
+#include "System/Renderer/PrimitiveRenderer.h"
+#include "System/Renderer/ShapeRenderer.h"
+#include "System/Renderer/ModelRenderer.h"
 
 // グラフィックス
 class Graphics

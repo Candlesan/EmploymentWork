@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Camera.h"
+#include "GamePlay/Object/Camera/Camera.h"
 #include "RenderState.h"
 #include "Light.h"
 

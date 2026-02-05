@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RenderContext.h"
-#include "Model.h"
+#include "System/Graphic/RenderContext.h"
+#include "System/Resource/Model/Model.h"
 
 class Shader
 {

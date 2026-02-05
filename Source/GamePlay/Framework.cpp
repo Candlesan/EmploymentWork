@@ -3,13 +3,13 @@
 #include <imgui.h>
 
 #include "Framework.h"
-#include "Graphics.h"
-#include "ImGuiRenderer.h"
-#include "Input.h"
+#include "System/Graphic/Graphics.h"
+#include "System/Renderer/ImGuiRenderer.h"
+#include "System/Core/Input/Input.h"
 
 // ƒV[ƒ“
-#include "SceneManager.h"
-#include "SceneGame.h"
+#include "Gameplay/Scene/SceneManager.h"
+#include "Gameplay/Scene/SceneGame.h"
 
 // ‚’¼“¯ŠúŠÔŠuİ’è
 static const int syncInterval = 1;

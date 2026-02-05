@@ -46,11 +46,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,37 +126,36 @@
     <ClInclude Include="External\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="External\ImGuizmo\ImSequencer.h" />
     <ClInclude Include="External\SphereCast\Include\SphereCast.h" />
-    <ClInclude Include="Source\BasicShader.h" />
-    <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\Character.h" />
-    <ClInclude Include="Source\Dialog.h" />
-    <ClInclude Include="Source\Framework.h" />
-    <ClInclude Include="Source\FreeCameraController.h" />
-    <ClInclude Include="Source\GamePad.h" />
-    <ClInclude Include="Source\Input.h" />
-    <ClInclude Include="Source\Light.h" />
-    <ClInclude Include="Source\ModelRenderer.h" />
-    <ClInclude Include="Source\LambertShader.h" />
-    <ClInclude Include="Source\Mouse.h" />
-    <ClInclude Include="Source\Player.h" />
-    <ClInclude Include="Source\SceneGame.h" />
-    <ClInclude Include="Source\SceneManager.h" />
-    <ClInclude Include="Source\ShapeRenderer.h" />
-    <ClInclude Include="Source\GLTFImporter.h" />
-    <ClInclude Include="Source\GpuResourceUtils.h" />
-    <ClInclude Include="Source\Graphics.h" />
-    <ClInclude Include="Source\HighResolutionTimer.h" />
-    <ClInclude Include="Source\ImGuiRenderer.h" />
-    <ClInclude Include="Source\Misc.h" />
-    <ClInclude Include="Source\Model.h" />
-    <ClInclude Include="Source\PrimitiveRenderer.h" />
-    <ClInclude Include="Source\RenderContext.h" />
-    <ClInclude Include="Source\RenderState.h" />
-    <ClInclude Include="Source\Scene.h" />
-    <ClInclude Include="Source\Shader.h" />
-    <ClInclude Include="Source\Sprite.h" />
-    <ClInclude Include="Source\Stage.h" />
-    <ClInclude Include="Source\TransformUtils.h" />
+    <ClInclude Include="Source\GamePlay\Framework.h" />
+    <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
+    <ClInclude Include="Source\GamePlay\Object\Camera\FreeCameraController.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
+    <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h" />
+    <ClInclude Include="Source\GamePlay\Scene\Scene.h" />
+    <ClInclude Include="Source\GamePlay\Scene\SceneGame.h" />
+    <ClInclude Include="Source\GamePlay\Scene\SceneManager.h" />
+    <ClInclude Include="Source\System\Core\HighResolutionTimer.h" />
+    <ClInclude Include="Source\System\Core\Input\GamePad.h" />
+    <ClInclude Include="Source\System\Core\Input\Input.h" />
+    <ClInclude Include="Source\System\Core\Input\Mouse.h" />
+    <ClInclude Include="Source\System\Core\Misc.h" />
+    <ClInclude Include="Source\System\Core\TransformUtils.h" />
+    <ClInclude Include="Source\System\Graphic\GpuResourceUtils.h" />
+    <ClInclude Include="Source\System\Graphic\Graphics.h" />
+    <ClInclude Include="Source\System\Graphic\RenderContext.h" />
+    <ClInclude Include="Source\System\Graphic\RenderState.h" />
+    <ClInclude Include="Source\System\Renderer\ImGuiRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\Light.h" />
+    <ClInclude Include="Source\System\Renderer\ModelRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\PrimitiveRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\BasicShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\LambertShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
+    <ClInclude Include="Source\System\Renderer\ShapeRenderer.h" />
+    <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
+    <ClInclude Include="Source\System\Resource\Model\Model.h" />
+    <ClInclude Include="Source\System\Resource\Sprite\Sprite.h" />
+    <ClInclude Include="Source\System\UI\Dialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp" />
@@ -167,32 +168,32 @@
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
-    <ClCompile Include="Source\BasicShader.cpp" />
-    <ClCompile Include="Source\Camera.cpp" />
-    <ClCompile Include="Source\Character.cpp" />
-    <ClCompile Include="Source\Dialog.cpp" />
-    <ClCompile Include="Source\Framework.cpp" />
-    <ClCompile Include="Source\FreeCameraController.cpp" />
-    <ClCompile Include="Source\GamePad.cpp" />
-    <ClCompile Include="Source\Input.cpp" />
-    <ClCompile Include="Source\ModelRenderer.cpp" />
-    <ClCompile Include="Source\LambertShader.cpp" />
-    <ClCompile Include="Source\Mouse.cpp" />
-    <ClCompile Include="Source\SceneGame.cpp" />
-    <ClCompile Include="Source\SceneManager.cpp" />
-    <ClCompile Include="Source\ShapeRenderer.cpp" />
-    <ClCompile Include="Source\GLTFImporter.cpp" />
-    <ClCompile Include="Source\GpuResourceUtils.cpp" />
-    <ClCompile Include="Source\Graphics.cpp" />
-    <ClCompile Include="Source\ImGuiRenderer.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Model.cpp" />
-    <ClCompile Include="Source\PrimitiveRenderer.cpp" />
-    <ClCompile Include="Source\RenderState.cpp" />
-    <ClCompile Include="Source\Scene.cpp" />
-    <ClCompile Include="Source\Sprite.cpp" />
-    <ClCompile Include="Source\Stage.cpp" />
-    <ClCompile Include="Source\TransformUtils.cpp" />
+    <ClCompile Include="Source\GamePlay\Framework.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Camera\FreeCameraController.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp" />
+    <ClCompile Include="Source\GamePlay\Scene\Scene.cpp" />
+    <ClCompile Include="Source\GamePlay\Scene\SceneGame.cpp" />
+    <ClCompile Include="Source\GamePlay\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\System\Core\Input\GamePad.cpp" />
+    <ClCompile Include="Source\System\Core\Input\Input.cpp" />
+    <ClCompile Include="Source\System\Core\Input\Mouse.cpp" />
+    <ClCompile Include="Source\System\Core\Main.cpp" />
+    <ClCompile Include="Source\System\Core\TransformUtils.cpp" />
+    <ClCompile Include="Source\System\Graphic\GpuResourceUtils.cpp" />
+    <ClCompile Include="Source\System\Graphic\Graphics.cpp" />
+    <ClCompile Include="Source\System\Graphic\RenderState.cpp" />
+    <ClCompile Include="Source\System\Renderer\ImGuiRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\BasicShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\LambertShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp" />
+    <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
+    <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
+    <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
+    <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Basic.hlsli" />
