@@ -1,0 +1,2 @@
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\team_Free\External\DirectXTex\Bin\Desktop_2022\x64\Debug\DirectXTex.lib
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\External\DirectXTex\Bin\Desktop_2022\x64\Debug\DirectXTex.lib

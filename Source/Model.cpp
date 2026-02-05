@@ -270,63 +270,6 @@ Model::Model(ID3D11Device* device, const char* filename, float sampleRate)
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			}
 		}
-
-		if (material.emissiveMap == nullptr)
-		{
-			if (material.emissiveTextureFileName.empty())
-			{
-				// エミッシブダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
-					material.emissiveMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-			else
-			{
-				// エミッシブのテクスチャ読み込み
-				std::filesystem::path texturePath(dirpath / material.emissiveTextureFileName);
-				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
-					material.emissiveMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-		}
-
-		if (material.occlusionMap == nullptr)
-		{
-			if (material.occlusionTextureFileName.empty())
-			{
-				// オクルージョンダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
-					material.occlusionMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-			else
-			{
-				// オクルージョンのテクスチャ読み込み
-				std::filesystem::path texturePath(dirpath / material.occlusionTextureFileName);
-				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
-					material.occlusionMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-		}
-
-		if (material.metalnessRoughnessMap == nullptr)
-		{
-			if (material.metalnessRoughnessTextureFileName.empty())
-			{
-				// メタルネスラフネステクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
-					material.metalnessRoughnessMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-			else
-			{
-				// メタルネスラフネスのテクスチャ読み込み
-				std::filesystem::path texturePath(dirpath / material.metalnessRoughnessTextureFileName);
-				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
-					material.metalnessRoughnessMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-		}
 	}
 
 	// ノード構築
@@ -558,41 +501,6 @@ void Model::ComputeAnimation(int animationIndex, float time, std::vector<NodePos
 	for (size_t nodeIndex = 0; nodeIndex < nodePoses.size(); ++nodeIndex)
 	{
 		ComputeAnimation(animationIndex, static_cast<int>(nodeIndex), time, nodePoses.at(nodeIndex));
-	}
-}
-
-// アニメーション補間処理
-void Model::BlendAnimations(
-	const std::vector<NodePose>& animation0,
-	const std::vector<NodePose>& animation1,
-	float blendRate, std::vector<NodePose>& result)
-{
-	size_t nodeCount = animation0.size();
-	result.resize(nodeCount);
-
-	for (size_t i = 0; i < nodeCount; ++i)
-	{
-		const Model::NodePose& pose0 = animation0[i];
-		const Model::NodePose& pose1 = animation1[i];
-		Model::NodePose& blendedPose = result[i];
-
-		// 位置の線形補間
-		DirectX::XMVECTOR pos0 = DirectX::XMLoadFloat3(&pose0.position);
-		DirectX::XMVECTOR pos1 = DirectX::XMLoadFloat3(&pose1.position);
-		DirectX::XMVECTOR blendedPos = DirectX::XMVectorLerp(pos0, pos1, blendRate);
-		DirectX::XMStoreFloat3(&blendedPose.position, blendedPos);
-
-		// 回転のスフィア線形補間
-		DirectX::XMVECTOR rot0 = DirectX::XMLoadFloat4(&pose0.rotation);
-		DirectX::XMVECTOR rot1 = DirectX::XMLoadFloat4(&pose1.rotation);
-		DirectX::XMVECTOR blendedRot = DirectX::XMQuaternionSlerp(rot0, rot1, blendRate);
-		DirectX::XMStoreFloat4(&blendedPose.rotation, blendedRot);
-
-		// スケールの線形補間
-		DirectX::XMVECTOR scale0 = DirectX::XMLoadFloat3(&pose0.scale);
-		DirectX::XMVECTOR scale1 = DirectX::XMLoadFloat3(&pose1.scale);
-		DirectX::XMVECTOR blendedScale = DirectX::XMVectorLerp(scale0, scale1, blendRate);
-		DirectX::XMStoreFloat3(&blendedPose.scale, blendedScale);
 	}
 }
 

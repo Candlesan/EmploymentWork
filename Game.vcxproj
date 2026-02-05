@@ -60,7 +60,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -68,8 +68,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;SphereCast.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\External\SphereCast\lib\vs2022\$(PlatformTarget)\MT\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -89,7 +89,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -99,8 +99,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;SphereCast.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\External\SphereCast\lib\vs2022\$(PlatformTarget)\MT\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -124,35 +124,21 @@
     <ClInclude Include="External\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="External\ImGuizmo\ImSequencer.h" />
     <ClInclude Include="External\SphereCast\Include\SphereCast.h" />
-    <ClInclude Include="Source\ActionBase.h" />
-    <ClInclude Include="Source\ActionDerive.h" />
     <ClInclude Include="Source\BasicShader.h" />
-    <ClInclude Include="Source\BehaviorData.h" />
-    <ClInclude Include="Source\BehaviorTree.h" />
-    <ClInclude Include="Source\bloom.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Character.h" />
     <ClInclude Include="Source\Dialog.h" />
-    <ClInclude Include="Source\Enemy.h" />
-    <ClInclude Include="Source\FrameBuffer.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\FreeCameraController.h" />
-    <ClInclude Include="Source\fullscreen_quad.h" />
     <ClInclude Include="Source\GamePad.h" />
     <ClInclude Include="Source\Input.h" />
-    <ClInclude Include="Source\JudgmentBase.h" />
-    <ClInclude Include="Source\JudgmentDerive.h" />
     <ClInclude Include="Source\Light.h" />
-    <ClInclude Include="Source\Mathf.h" />
     <ClInclude Include="Source\ModelRenderer.h" />
     <ClInclude Include="Source\LambertShader.h" />
     <ClInclude Include="Source\Mouse.h" />
-    <ClInclude Include="Source\NodeBase.h" />
-    <ClInclude Include="Source\PBRShader.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\SceneGame.h" />
     <ClInclude Include="Source\SceneManager.h" />
-    <ClInclude Include="Source\ShadowMap.h" />
     <ClInclude Include="Source\ShapeRenderer.h" />
     <ClInclude Include="Source\GLTFImporter.h" />
     <ClInclude Include="Source\GpuResourceUtils.h" />
@@ -166,7 +152,6 @@
     <ClInclude Include="Source\RenderState.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Shader.h" />
-    <ClInclude Include="Source\SkyMap.h" />
     <ClInclude Include="Source\Sprite.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\TransformUtils.h" />
@@ -182,32 +167,19 @@
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Source\ActionDerive.cpp" />
     <ClCompile Include="Source\BasicShader.cpp" />
-    <ClCompile Include="Source\BehaviorData.cpp" />
-    <ClCompile Include="Source\BehaviorTree.cpp" />
-    <ClCompile Include="Source\bloom.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Character.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
-    <ClCompile Include="Source\Enemy.cpp" />
-    <ClCompile Include="Source\FrameBuffer.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\FreeCameraController.cpp" />
-    <ClCompile Include="Source\fullscreen_quad.cpp" />
     <ClCompile Include="Source\GamePad.cpp" />
     <ClCompile Include="Source\Input.cpp" />
-    <ClCompile Include="Source\JudgmentDerive.cpp" />
-    <ClCompile Include="Source\Mathf.cpp" />
     <ClCompile Include="Source\ModelRenderer.cpp" />
     <ClCompile Include="Source\LambertShader.cpp" />
     <ClCompile Include="Source\Mouse.cpp" />
-    <ClCompile Include="Source\NodeBase.cpp" />
-    <ClCompile Include="Source\PBRShader.cpp" />
     <ClCompile Include="Source\SceneGame.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
-    <ClCompile Include="Source\ShadowMap.cpp" />
     <ClCompile Include="Source\ShapeRenderer.cpp" />
     <ClCompile Include="Source\GLTFImporter.cpp" />
     <ClCompile Include="Source\GpuResourceUtils.cpp" />
@@ -218,25 +190,17 @@
     <ClCompile Include="Source\PrimitiveRenderer.cpp" />
     <ClCompile Include="Source\RenderState.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
-    <ClCompile Include="Source\SkyMap.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
     <ClCompile Include="Source\Stage.cpp" />
     <ClCompile Include="Source\TransformUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Basic.hlsli" />
-    <None Include="Shader\bloom.hlsli" />
-    <None Include="Shader\fullscreen_quad.hlsli" />
     <None Include="Shader\Lambert.hlsli" />
-    <None Include="Shader\PBRShader.hlsli" />
-    <None Include="Shader\physical_based_rendering_functions.hlsli" />
     <None Include="Shader\Scene.hlsli" />
-    <None Include="Shader\shading_functions.hlsli" />
-    <None Include="Shader\ShadowmapFunction.hlsli" />
     <None Include="Shader\ShapeRenderer.hlsli" />
     <None Include="Shader\PrimitiveRenderer.hlsli" />
     <None Include="Shader\Skinning.hlsli" />
-    <None Include="Shader\SkyMap.hlsli" />
     <None Include="Shader\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
@@ -248,55 +212,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\final_pass_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\fullscreen_quad_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\fullscreen_quad_vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_downsampling_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_horizontal_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_upsampling_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_vertical_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\glow_extraction_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
     <FxCompile Include="Shader\LambertPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\LambertVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\PBRShader_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\PBRShader_vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\Shadow_Caster_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
@@ -313,14 +233,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\PrimitiveRendererVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\SkyMap_PS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shader\SkyMap_VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

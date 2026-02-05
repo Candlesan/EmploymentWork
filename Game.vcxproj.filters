@@ -49,60 +49,6 @@
     <Filter Include="Source\Character">
       <UniqueIdentifier>{514717f4-f937-4345-a82c-926a1b92083f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader\BasicShader">
-      <UniqueIdentifier>{ec9521e8-cd0e-483a-bd9d-84daa1b40d34}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\LambertShader">
-      <UniqueIdentifier>{1051d9e6-d68c-4458-9c47-befe801c457f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\PrimitiveRender">
-      <UniqueIdentifier>{be2352bb-2deb-42ab-9a2f-7a9e779f1c31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\Common">
-      <UniqueIdentifier>{ae369293-8db8-494b-af8d-49e394116cf8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\ShapeRender">
-      <UniqueIdentifier>{305cc82c-c97f-42a0-8fe7-f43c74d94bbf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\Sprite">
-      <UniqueIdentifier>{6b8afd37-e38e-466b-8140-c38ad8b13356}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\PBR">
-      <UniqueIdentifier>{479fc93d-0ef0-4020-a652-98836fcda589}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Shader\BasicShader">
-      <UniqueIdentifier>{662b0413-43cc-4612-9645-10e822dcaf49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Shader\LambertShader">
-      <UniqueIdentifier>{01149479-5035-4757-9baa-0be4de638e05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Shader\PBRShader">
-      <UniqueIdentifier>{b0979ddd-de84-4c1a-984e-adc2754b44f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\SkyMap">
-      <UniqueIdentifier>{d98ecb70-d05f-48dc-a4b0-0be713236c4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Shader\SkyMap">
-      <UniqueIdentifier>{5afd89d1-32e9-493f-91cf-d154d11cf0e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\ShadowMap">
-      <UniqueIdentifier>{1cb5a448-e9f4-4fac-af03-4084be4eeee5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Shader\ShadowMap">
-      <UniqueIdentifier>{10a3f49e-7099-4011-adf1-2b98526f3900}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Enemy">
-      <UniqueIdentifier>{d14a1325-d41b-4293-a523-fe99e9250229}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Enemy\Tree">
-      <UniqueIdentifier>{4862c9eb-ba6e-41f7-b1b8-b4a67ad705b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Shader\Bloom">
-      <UniqueIdentifier>{9f63a283-6575-4051-8066-24f8d24d6109}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\Bloom">
-      <UniqueIdentifier>{a53fd371-f551-4085-9fa8-2634e01d5214}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework.h">
@@ -146,6 +92,12 @@
     </ClInclude>
     <ClInclude Include="External\SphereCast\Include\SphereCast.h">
       <Filter>External\SphereCast</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BasicShader.h">
+      <Filter>Source\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LambertShader.h">
+      <Filter>Source\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Shader.h">
       <Filter>Source\Shader</Filter>
@@ -231,57 +183,6 @@
     <ClInclude Include="Source\Player.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BasicShader.h">
-      <Filter>Source\Shader\BasicShader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\LambertShader.h">
-      <Filter>Source\Shader\LambertShader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PBRShader.h">
-      <Filter>Source\Shader\PBRShader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SkyMap.h">
-      <Filter>Source\Shader\SkyMap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ShadowMap.h">
-      <Filter>Source\Shader\ShadowMap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Enemy.h">
-      <Filter>Source\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionBase.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionDerive.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BehaviorData.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BehaviorTree.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Mathf.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\NodeBase.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentBase.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentDerive.h">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FrameBuffer.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\fullscreen_quad.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\bloom.h">
-      <Filter>Source\Shader\Bloom</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework.cpp">
@@ -316,6 +217,12 @@
     </ClCompile>
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp">
       <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BasicShader.cpp">
+      <Filter>Source\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LambertShader.cpp">
+      <Filter>Source\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\Camera.cpp">
       <Filter>Source\Camera</Filter>
@@ -365,6 +272,12 @@
     <ClCompile Include="Source\Sprite.cpp">
       <Filter>Source\System\Sprite</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SceneGame.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Stage.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="Source\SceneManager.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
@@ -380,174 +293,60 @@
     <ClCompile Include="Source\Character.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Stage.cpp">
-      <Filter>Source\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SceneGame.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BasicShader.cpp">
-      <Filter>Source\Shader\BasicShader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\LambertShader.cpp">
-      <Filter>Source\Shader\LambertShader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PBRShader.cpp">
-      <Filter>Source\Shader\PBRShader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SkyMap.cpp">
-      <Filter>Source\Shader\SkyMap</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ShadowMap.cpp">
-      <Filter>Source\Shader\ShadowMap</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Enemy.cpp">
-      <Filter>Source\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ActionDerive.cpp">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BehaviorData.cpp">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BehaviorTree.cpp">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Mathf.cpp">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\NodeBase.cpp">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\JudgmentDerive.cpp">
-      <Filter>Source\Enemy\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FrameBuffer.cpp">
-      <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\fullscreen_quad.cpp">
-      <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\bloom.cpp">
-      <Filter>Source\Shader\Bloom</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\Basic.hlsli">
-      <Filter>Shader\BasicShader</Filter>
-    </None>
-    <None Include="Shader\Lambert.hlsli">
-      <Filter>Shader\LambertShader</Filter>
-    </None>
-    <None Include="Shader\PrimitiveRenderer.hlsli">
-      <Filter>Shader\PrimitiveRender</Filter>
-    </None>
-    <None Include="Shader\Scene.hlsli">
-      <Filter>Shader\Common</Filter>
-    </None>
-    <None Include="Shader\Skinning.hlsli">
-      <Filter>Shader\Common</Filter>
+    <None Include="Shader\Sprite.hlsli">
+      <Filter>Shader</Filter>
     </None>
     <None Include="Shader\ShapeRenderer.hlsli">
-      <Filter>Shader\ShapeRender</Filter>
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\Sprite.hlsli">
-      <Filter>Shader\Sprite</Filter>
+    <None Include="Shader\Skinning.hlsli">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\shading_functions.hlsli">
-      <Filter>Shader\Common</Filter>
+    <None Include="Shader\PrimitiveRenderer.hlsli">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\PBRShader.hlsli">
-      <Filter>Shader\PBR</Filter>
+    <None Include="Shader\Basic.hlsli">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\physical_based_rendering_functions.hlsli">
-      <Filter>Shader\PBR</Filter>
+    <None Include="Shader\Lambert.hlsli">
+      <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\SkyMap.hlsli">
-      <Filter>Shader\SkyMap</Filter>
-    </None>
-    <None Include="Shader\ShadowmapFunction.hlsli">
-      <Filter>Shader\ShadowMap</Filter>
-    </None>
-    <None Include="Shader\bloom.hlsli">
-      <Filter>Shader\Bloom</Filter>
-    </None>
-    <None Include="Shader\fullscreen_quad.hlsli">
-      <Filter>Shader\Bloom</Filter>
+    <None Include="Shader\Scene.hlsli">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader\BasicPS.hlsl">
-      <Filter>Shader\BasicShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\BasicVS.hlsl">
-      <Filter>Shader\BasicShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\LambertPS.hlsl">
-      <Filter>Shader\LambertShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\LambertVS.hlsl">
-      <Filter>Shader\LambertShader</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\PrimitiveRendererPS.hlsl">
-      <Filter>Shader\PrimitiveRender</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\PrimitiveRendererVS.hlsl">
-      <Filter>Shader\PrimitiveRender</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\ShapeRendererPS.hlsl">
-      <Filter>Shader\ShapeRender</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\ShapeRendererVS.hlsl">
-      <Filter>Shader\ShapeRender</Filter>
+    <FxCompile Include="Shader\SpriteVS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="Shader\SpritePS.hlsl">
-      <Filter>Shader\Sprite</Filter>
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\SpriteVS.hlsl">
-      <Filter>Shader\Sprite</Filter>
+    <FxCompile Include="Shader\ShapeRendererVS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\PBRShader_ps.hlsl">
-      <Filter>Shader\PBR</Filter>
+    <FxCompile Include="Shader\ShapeRendererPS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\PBRShader_vs.hlsl">
-      <Filter>Shader\PBR</Filter>
+    <FxCompile Include="Shader\PrimitiveRendererVS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\SkyMap_PS.hlsl">
-      <Filter>Shader\SkyMap</Filter>
+    <FxCompile Include="Shader\PrimitiveRendererPS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\SkyMap_VS.hlsl">
-      <Filter>Shader\SkyMap</Filter>
+    <FxCompile Include="Shader\BasicPS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Shadow_Caster_vs.hlsl">
-      <Filter>Shader\ShadowMap</Filter>
+    <FxCompile Include="Shader\BasicVS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\final_pass_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
+    <FxCompile Include="Shader\LambertPS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\fullscreen_quad_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\fullscreen_quad_vs.hlsl">
-      <Filter>Shader\Bloom</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_downsampling_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_horizontal_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_upsampling_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\gaussian_blur_vertical_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
-    </FxCompile>
-    <FxCompile Include="Shader\glow_extraction_ps.hlsl">
-      <Filter>Shader\Bloom</Filter>
+    <FxCompile Include="Shader\LambertVS.hlsl">
+      <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

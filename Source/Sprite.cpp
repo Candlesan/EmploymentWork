@@ -82,75 +82,6 @@ Sprite::Sprite(ID3D11Device* device, const char* filename)
 	}
 }
 
-// シェーダーリソースで作るテクスチャ
-Sprite::Sprite(ID3D11Device* device, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view)
-{
-	HRESULT hr{ S_OK };
-
-	// 頂点バッファの生成
-	{
-		// 頂点バッファを作成するための設定オプション
-		D3D11_BUFFER_DESC buffer_desc = {};
-		buffer_desc.ByteWidth = sizeof(Vertex) * 4;
-		buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-		buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		buffer_desc.MiscFlags = 0;
-		buffer_desc.StructureByteStride = 0;
-		// 頂点バッファオブジェクトの生成
-		hr = device->CreateBuffer(&buffer_desc, nullptr, vertexBuffer.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
-
-
-	// 頂点シェーダー
-	{
-		// 入力レイアウト
-		D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-		hr = GpuResourceUtils::LoadVertexShader(
-			device,
-			"Data/Shader/SpriteVS.cso",
-			inputElementDesc,
-			ARRAYSIZE(inputElementDesc),
-			inputLayout.GetAddressOf(),
-			vertexShader.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-	}
-
-	// ピクセルシェーダー
-	{
-		hr = GpuResourceUtils::LoadPixelShader(
-			device,
-			"Data/Shader/SpritePS.cso",
-			pixelShader.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-	}
-
-	// テクスチャの生成	
-	if (shader_resource_view)
-	{
-		isLoadFile = false;
-		//shader_resource_view.Get()->AddRef();
-		this->shaderResourceView = shader_resource_view;
-
-		Microsoft::WRL::ComPtr<ID3D11Resource> resource;
-		this->shaderResourceView->GetResource(resource.GetAddressOf());
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
-		hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		texture2d->GetDesc(&texture2d_desc);
-
-		this->textureWidth = static_cast<float>(texture2d_desc.Width);
-		this->textureHeight = static_cast<float>(texture2d_desc.Height);
-	}
-}
-
 // 描画実行
 void Sprite::Render(ID3D11DeviceContext* dc,
 	float dx, float dy,					// 左上位置
@@ -160,7 +91,7 @@ void Sprite::Render(ID3D11DeviceContext* dc,
 	float sw, float sh,					// 画像切り抜きサイズ
 	float angle,						// 角度
 	float r, float g, float b, float a	// 色
-) const
+	) const
 {
 	// 頂点座標
 	DirectX::XMFLOAT2 positions[] = {
@@ -265,122 +196,8 @@ void Sprite::Render(ID3D11DeviceContext* dc,
 	float dz,							// 奥行
 	float dw, float dh,					// 幅、高さ
 	float angle,						// 角度
-	float r, float g, float b, float a,	// 色
-	ID3D11PixelShader* ps_override,
-	ID3D11VertexShader* vs_override) const
+	float r, float g, float b, float a	// 色
+	) const
 {
-	Render(dc, dx, dy, dz, dw, dh, 0, 0, textureWidth, textureHeight, angle, r, g, b, a, ps_override, vs_override);
-}
-
-void Sprite::Render(ID3D11DeviceContext* dc,
-	float dx, float dy,
-	float dz,
-	float dw, float dh,
-	float sx, float sy,
-	float sw, float sh,
-	float angle,
-	float r, float g, float b, float a,
-	ID3D11PixelShader* ps_override,
-	ID3D11VertexShader* vs_override) const
-{
-	// 頂点座標
-	DirectX::XMFLOAT2 positions[] = {
-		DirectX::XMFLOAT2(dx,      dy),			// 左上
-		DirectX::XMFLOAT2(dx + dw, dy),			// 右上
-		DirectX::XMFLOAT2(dx,      dy + dh),	// 左下
-		DirectX::XMFLOAT2(dx + dw, dy + dh),	// 右下
-	};
-
-	// テクスチャ座標
-	DirectX::XMFLOAT2 texcoords[] = {
-		DirectX::XMFLOAT2(sx,      sy),			// 左上
-		DirectX::XMFLOAT2(sx + sw, sy),			// 右上
-		DirectX::XMFLOAT2(sx,      sy + sh),	// 左下
-		DirectX::XMFLOAT2(sx + sw, sy + sh),	// 右下
-	};
-
-	// スプライトの中心で回転させるために４頂点の中心位置が
-	// 原点(0, 0)になるように一旦頂点を移動させる。
-	float mx = dx + dw * 0.5f;
-	float my = dy + dh * 0.5f;
-	for (auto& p : positions)
-	{
-		p.x -= mx;
-		p.y -= my;
-	}
-
-	// 頂点を回転させる
-	float theta = DirectX::XMConvertToRadians(angle);
-	float c = cosf(theta);
-	float s = sinf(theta);
-	for (auto& p : positions)
-	{
-		DirectX::XMFLOAT2 r = p;
-		p.x = c * r.x + -s * r.y;
-		p.y = s * r.x + c * r.y;
-	}
-
-	// 回転のために移動させた頂点を元の位置に戻す
-	for (auto& p : positions)
-	{
-		p.x += mx;
-		p.y += my;
-	}
-
-	// 現在設定されているビューポートからスクリーンサイズを取得する。
-	D3D11_VIEWPORT viewport;
-	UINT numViewports = 1;
-	dc->RSGetViewports(&numViewports, &viewport);
-	float screenWidth = viewport.Width;
-	float screenHeight = viewport.Height;
-
-	// スクリーン座標系からNDC座標系へ変換する。
-	for (DirectX::XMFLOAT2& p : positions)
-	{
-		p.x = 2.0f * p.x / screenWidth - 1.0f;
-		p.y = 1.0f - 2.0f * p.y / screenHeight;
-	}
-
-	// 頂点バッファの内容の編集を開始する。
-	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-	HRESULT hr = dc->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
-	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-	// 頂点バッファの内容を編集
-	Vertex* v = static_cast<Vertex*>(mappedSubresource.pData);
-	for (int i = 0; i < 4; ++i)
-	{
-		v[i].position.x = positions[i].x;
-		v[i].position.y = positions[i].y;
-		v[i].position.z = dz;
-
-		v[i].color.x = r;
-		v[i].color.y = g;
-		v[i].color.z = b;
-		v[i].color.w = a;
-
-		v[i].texcoord.x = texcoords[i].x / textureWidth;
-		v[i].texcoord.y = texcoords[i].y / textureHeight;
-	}
-
-	// 頂点バッファの内容の編集を終了する。
-	dc->Unmap(vertexBuffer.Get(), 0);
-
-	// GPUに描画するためのデータを渡す
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	dc->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-	dc->IASetInputLayout(inputLayout.Get());
-	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-	ID3D11VertexShader* vs_to_use = vs_override ? vs_override : vertexShader.Get();
-	dc->VSSetShader(vs_to_use, nullptr, 0);
-
-	ID3D11PixelShader* ps_to_use = ps_override ? ps_override : pixelShader.Get();
-	dc->PSSetShader(ps_to_use, nullptr, 0);
-
-	dc->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
-
-	// 描画
-	dc->Draw(4, 0);
+	Render(dc, dx, dy, dz, dw, dh, 0, 0, textureWidth, textureHeight, angle, r, g, b, a);
 }

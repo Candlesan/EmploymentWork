@@ -12,8 +12,6 @@ enum class ShaderId
 {
 	Basic,
 	Lambert,
-	PBR,
-	SkyMap,
 
 	EnumCount
 };
@@ -30,10 +28,7 @@ public:
 	// •`‰æÀs
 	void Render(const RenderContext& rc);
 
-	//Shader* GetShader(ShaderId id) const { return shaders[static_cast<int>(id)].get(); }
-
-	template <typename T>
-T* GetShader(ShaderId id) const { return dynamic_cast<T*>(shaders[static_cast<int>(id)].get()); }private:
+private:
 	struct CbScene
 	{
 		DirectX::XMFLOAT4X4		viewProjection;
@@ -56,7 +51,7 @@ T* GetShader(ShaderId id) const { return dynamic_cast<T*>(shaders[static_cast<in
 	struct TransparencyDrawInfo
 	{
 		ShaderId				shaderId;
-		const Model::Mesh* mesh;
+		const Model::Mesh*		mesh;
 		float					distance;
 	};
 
