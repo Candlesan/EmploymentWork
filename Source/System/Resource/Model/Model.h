@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <d3d11.h>
+#include <filesystem>
 
 class Model
 {
@@ -193,6 +194,15 @@ private:
 
 	// デシリアライズ
 	void Deserialize(const char* filename);
+
+	// マテリアル構築
+	void BuildMaterials(ID3D11Device* device, const std::filesystem::path& dirpath);
+
+	// ノード構築
+	void BuildNodes();
+
+	// メッシュ構築
+	void BuildMeshes(ID3D11Device* device);
 
 private:
 

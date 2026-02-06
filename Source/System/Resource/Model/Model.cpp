@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <fstream>
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
@@ -230,114 +229,14 @@ Model::Model(ID3D11Device* device, const char* filename, float sampleRate)
 		_ASSERT_EXPR_A(false, "found not model file");
 	}
 
-	// マテリアル構築
-	for (Material& material : materials)
-	{
-		if (material.baseMap == nullptr)
-		{
-			if (material.baseTextureFileName.empty())
-			{
-				// ダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF,
-					material.baseMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-			else
-			{
-				// ベーステクスチャ読み込み
-				std::filesystem::path diffuseTexturePath(dirpath / material.baseTextureFileName);
-				HRESULT hr = GpuResourceUtils::LoadTexture(device, diffuseTexturePath.string().c_str(),
-					material.baseMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-		}
-
-		if (material.normalMap == nullptr)
-		{
-			if (material.normalTextureFileName.empty())
-			{
-				// 法線ダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
-					material.normalMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-			else
-			{
-				// 法線テクスチャ読み込み
-				std::filesystem::path texturePath(dirpath / material.normalTextureFileName);
-				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
-					material.normalMap.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-			}
-		}
-	}
+	// テクスチャ構築
+	BuildMaterials(device, dirpath);
 
 	// ノード構築
-	for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)
-	{
-		Node& node = nodes.at(nodeIndex);
-
-		// 親子関係を構築
-		node.parent = node.parentIndex >= 0 ? &nodes.at(node.parentIndex) : nullptr;
-		if (node.parent != nullptr)
-		{
-			node.parent->children.emplace_back(&node);
-		}
-	}
+	BuildNodes();
 
 	// メッシュ構築
-	for (Mesh& mesh : meshes)
-	{
-		// 参照マテリアル設定
-		mesh.material = &materials.at(mesh.materialIndex);
-
-		// 参照ノード設定
-		mesh.node = &nodes.at(mesh.nodeIndex);
-
-		// 頂点バッファ
-		{
-			D3D11_BUFFER_DESC bufferDesc = {};
-			D3D11_SUBRESOURCE_DATA subresourceData = {};
-
-			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * mesh.vertices.size());
-			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-			bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = 0;
-			subresourceData.pSysMem = mesh.vertices.data();
-			subresourceData.SysMemPitch = 0;
-			subresourceData.SysMemSlicePitch = 0;
-
-			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.vertexBuffer.GetAddressOf());
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		}
-
-		// インデックスバッファ
-		{
-			D3D11_BUFFER_DESC bufferDesc = {};
-			D3D11_SUBRESOURCE_DATA subresourceData = {};
-
-			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * mesh.indices.size());
-			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-			bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = 0;
-			subresourceData.pSysMem = mesh.indices.data();
-			subresourceData.SysMemPitch = 0;
-			subresourceData.SysMemSlicePitch = 0;
-			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.indexBuffer.GetAddressOf());
-			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-		}
-
-		// ボーン構築
-		for (Bone& bone : mesh.bones)
-		{
-			// 参照ノード設定
-			bone.node = &nodes.at(bone.nodeIndex);
-		}
-	}
+	BuildMeshes(device);
 
 	// 行列初期化
 	DirectX::XMFLOAT4X4 worldTransform;
@@ -585,5 +484,181 @@ void Model::Deserialize(const char* filename)
 	else
 	{
 		_ASSERT_EXPR_A(false, "Model File not found.");
+	}
+}
+
+// マテリアル構築
+void Model::BuildMaterials(ID3D11Device* device, const std::filesystem::path& dirpath)
+{
+	for (Material& material : materials)
+	{
+		if (material.baseMap == nullptr)
+		{
+			if (material.baseTextureFileName.empty())
+			{
+				// ダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF,
+					material.baseMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// ベーステクスチャ読み込み
+				std::filesystem::path diffuseTexturePath(dirpath / material.baseTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, diffuseTexturePath.string().c_str(),
+					material.baseMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+		}
+
+		if (material.normalMap == nullptr)
+		{
+			if (material.normalTextureFileName.empty())
+			{
+				// 法線ダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+					material.normalMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// 法線テクスチャ読み込み
+				std::filesystem::path texturePath(dirpath / material.normalTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
+					material.normalMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+		}
+
+		if (material.emissiveMap == nullptr)
+		{
+			if (material.emissiveTextureFileName.empty())
+			{
+				// エミッシブダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+					material.emissiveMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// エミッシブのテクスチャ読み込み
+				std::filesystem::path texturePath(dirpath / material.emissiveTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
+					material.emissiveMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+		}
+
+		if (material.occlusionMap == nullptr)
+		{
+			if (material.occlusionTextureFileName.empty())
+			{
+				// エミッシブダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+					material.occlusionMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// エミッシブのテクスチャ読み込み
+				std::filesystem::path texturePath(dirpath / material.occlusionTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
+					material.occlusionMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+		}
+
+		if (material.metalnessRoughnessMap == nullptr)
+		{
+			if (material.metalnessRoughnessTextureFileName.empty())
+			{
+				// エミッシブダミーテクスチャ作成
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+					material.metalnessRoughnessMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+			else
+			{
+				// エミッシブのテクスチャ読み込み
+				std::filesystem::path texturePath(dirpath / material.metalnessRoughnessTextureFileName);
+				HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.string().c_str(),
+					material.metalnessRoughnessMap.GetAddressOf());
+				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			}
+		}
+
+	}
+}
+
+// ノード構築
+void Model::BuildNodes()
+{
+	for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)
+	{
+		Node& node = nodes.at(nodeIndex);
+
+		// 親子関係を構築
+		node.parent = node.parentIndex >= 0 ? &nodes.at(node.parentIndex) : nullptr;
+		if (node.parent != nullptr)
+		{
+			node.parent->children.emplace_back(&node);
+		}
+	}
+}
+
+// メッシュ構築
+void Model::BuildMeshes(ID3D11Device* device)
+{
+	for (Mesh& mesh : meshes)
+	{
+		// 参照マテリアル設定
+		mesh.material = &materials.at(mesh.materialIndex);
+
+		// 参照ノード設定
+		mesh.node = &nodes.at(mesh.nodeIndex);
+
+		// 頂点バッファ
+		{
+			D3D11_BUFFER_DESC bufferDesc = {};
+			D3D11_SUBRESOURCE_DATA subresourceData = {};
+
+			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * mesh.vertices.size());
+			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+			bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = 0;
+			bufferDesc.StructureByteStride = 0;
+			subresourceData.pSysMem = mesh.vertices.data();
+			subresourceData.SysMemPitch = 0;
+			subresourceData.SysMemSlicePitch = 0;
+
+			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.vertexBuffer.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
+
+		// インデックスバッファ
+		{
+			D3D11_BUFFER_DESC bufferDesc = {};
+			D3D11_SUBRESOURCE_DATA subresourceData = {};
+
+			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * mesh.indices.size());
+			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+			bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = 0;
+			bufferDesc.StructureByteStride = 0;
+			subresourceData.pSysMem = mesh.indices.data();
+			subresourceData.SysMemPitch = 0;
+			subresourceData.SysMemSlicePitch = 0;
+			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.indexBuffer.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
+
+		// ボーン構築
+		for (Bone& bone : mesh.bones)
+		{
+			// 参照ノード設定
+			bone.node = &nodes.at(bone.nodeIndex);
+		}
 	}
 }

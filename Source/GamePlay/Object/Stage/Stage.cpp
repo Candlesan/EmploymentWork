@@ -8,7 +8,7 @@ Stage::Stage()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// ステージモデル読み込み
-	stage = std::make_shared<Model>(device, "Data/Model/Stage/ExampleStage.glb");
+	stage = std::make_shared<Model>(device, "Data/Model/Stage/ExampleStage.gltf");
 }
 
 // 更新処理
