@@ -4,9 +4,9 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
-#include "Core/Misc.h"
-#include "GLTFImporter.h"
-#include "GpuResourceUtils.h"
+#include "System/Core/Misc.h"
+#include "System/Resource/Model/GLTFImporter.h"
+#include "System/Graphic/GpuResourceUtils.h"
 #include "Model.h"
 
 const std::vector<D3D11_INPUT_ELEMENT_DESC> Model::InputElementDescs =

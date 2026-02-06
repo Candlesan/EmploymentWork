@@ -32,6 +32,10 @@ void SceneGame::Initialize()
 
 	// ステージ初期化
 	stage = std::make_unique<Stage>();
+
+	// プレイヤー初期化
+	player = std::make_unique<Player>();
+	player->Initialize();
 }
 
 // 更新処理
@@ -44,7 +48,11 @@ void SceneGame::Update(float elapsedTime)
 	cameraController->Update();
 	cameraController->SyncControllerToCamera(camera);
 
+	// ステージ更新
 	stage->Update(elapsedTime);
+
+	// プレイヤー更新
+	player->Update(elapsedTime);
 }
 
 // 描画処理
@@ -74,6 +82,9 @@ void SceneGame::Render()
 	{
 		// ステージ描画
 		stage->Render(rc, modelRenderer);
+
+		// プレイヤー描画
+		player->Render(rc, modelRenderer);
 		modelRenderer->Render(rc);
 	}
 }
@@ -81,4 +92,5 @@ void SceneGame::Render()
 // GUI描画
 void SceneGame::DrawGUI()
 {
+	player->DrawGUI();
 }

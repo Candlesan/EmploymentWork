@@ -5,6 +5,7 @@
 
 // モデル
 #include "Gameplay/Object/Stage/Stage.h"
+#include "GamePlay/Object/Character/Player/Player.h"
 
 // ゲームシーン
 class SceneGame : public Scene
@@ -30,6 +31,7 @@ public:
 
 private:
 	std::unique_ptr<Stage> stage;
+	std::unique_ptr<Player> player;
 	std::unique_ptr<FreeCameraController> cameraController;
 	LightManager lightManager;
 };

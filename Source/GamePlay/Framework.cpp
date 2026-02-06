@@ -10,7 +10,6 @@
 // シーン
 #include "Gameplay/Scene/SceneManager.h"
 #include "Gameplay/Scene/SceneGame.h"
-
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 
@@ -54,7 +53,7 @@ void Framework::Render(float elapsedTime)
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 
 	// 画面クリア
-	Graphics::Instance().Clear(0.5f, 0.5f, 0.5f, 1);
+	Graphics::Instance().Clear(0.5f, 0.5f, 1.0f, 1);
 
 	// レンダーターゲット設定
 	Graphics::Instance().SetRenderTargets();
