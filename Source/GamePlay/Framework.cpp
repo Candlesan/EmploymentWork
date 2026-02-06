@@ -23,6 +23,9 @@ Framework::Framework(HWND hWnd)
 	// IMGUI初期化
 	ImGuiRenderer::Initialize(hWnd, Graphics::Instance().GetDevice(), Graphics::Instance().GetDeviceContext());
 
+	// 入力初期化
+	Input::Instance().Initialize(hWnd);
+
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneGame);
 }
@@ -42,6 +45,9 @@ void Framework::Update(float elapsedTime)
 {
 	// IMGUIフレーム開始処理	
 	ImGuiRenderer::NewFrame();
+
+	// 入力初期化
+	Input::Instance().Update();
 
 	// シーン更新処理
 	SceneManager::Instance().Update(elapsedTime);

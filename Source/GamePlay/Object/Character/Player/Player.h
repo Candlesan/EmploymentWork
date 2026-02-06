@@ -15,5 +15,14 @@ public:
 	void DrawGUI();
 
 private:
+	// スティック入力値から移動ベクトルを取得
+	DirectX::XMFLOAT3 GetMoveVec() const;
+
+	// 入力処理
+	void InputMove(float elapsedTime);
+private:
 	std::shared_ptr<Model> player;
+
+	float moveSpeed = 5.0f;
+	float turnSpeed = DirectX::XMConvertToRadians(720);
 };

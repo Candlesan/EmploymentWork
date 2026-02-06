@@ -223,7 +223,7 @@ Model::Model(ID3D11Device* device, const char* filename, float sampleRate)
 		importer.LoadAnimations(animations, nodes, sampleRate);
 
 		// 独自形式のモデルファイルを保存
-		//Serialize(filepath.string().c_str());
+		Serialize(filepath.string().c_str());
 	}
 	else
 	{
