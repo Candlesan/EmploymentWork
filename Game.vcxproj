@@ -62,7 +62,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;.\External\nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -91,7 +91,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;.\External\nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -129,6 +129,8 @@
     <ClInclude Include="Source\GamePlay\Framework.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\FreeCameraController.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h" />
@@ -172,6 +174,7 @@
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\FreeCameraController.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp" />
@@ -198,6 +201,7 @@
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Shader\Basic.hlsli" />
     <None Include="Shader\Lambert.hlsli" />
     <None Include="Shader\Scene.hlsli" />
@@ -254,5 +258,13 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets" Condition="Exists('packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.12.0\build\native\nlohmann.json.targets'))" />
+  </Target>
 </Project>

@@ -73,6 +73,9 @@
     <Filter Include="Source\GamepPlay\Object\Character\Player">
       <UniqueIdentifier>{259a220e-5749-460e-aaa4-679caa579695}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Animation">
+      <UniqueIdentifier>{56bad046-c9d1-4976-80e9-b652f34524e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -207,6 +210,12 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.h">
+      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h">
+      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -320,6 +329,9 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Sprite.hlsli">
@@ -343,6 +355,7 @@
     <None Include="Shader\Scene.hlsli">
       <Filter>Shader</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\SpriteVS.hlsl">
