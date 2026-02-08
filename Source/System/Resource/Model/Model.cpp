@@ -403,6 +403,41 @@ void Model::ComputeAnimation(int animationIndex, float time, std::vector<NodePos
 	}
 }
 
+// アニメーション補間処理
+void Model::BlendAnimations(
+	const std::vector<NodePose>& animation0,
+	const std::vector<NodePose>& animation1,
+	float blendRate, std::vector<NodePose>& result)
+{
+	size_t nodeCount = animation0.size();
+	result.resize(nodeCount);
+
+	for (size_t i = 0; i < nodeCount; ++i)
+	{
+		const Model::NodePose& pose0 = animation0[i];
+		const Model::NodePose& pose1 = animation1[i];
+		Model::NodePose& blendedPose = result[i];
+
+		// 位置の線形補間
+		DirectX::XMVECTOR pos0 = DirectX::XMLoadFloat3(&pose0.position);
+		DirectX::XMVECTOR pos1 = DirectX::XMLoadFloat3(&pose1.position);
+		DirectX::XMVECTOR blendedPos = DirectX::XMVectorLerp(pos0, pos1, blendRate);
+		DirectX::XMStoreFloat3(&blendedPose.position, blendedPos);
+
+		// 回転のスフィア線形補間
+		DirectX::XMVECTOR rot0 = DirectX::XMLoadFloat4(&pose0.rotation);
+		DirectX::XMVECTOR rot1 = DirectX::XMLoadFloat4(&pose1.rotation);
+		DirectX::XMVECTOR blendedRot = DirectX::XMQuaternionSlerp(rot0, rot1, blendRate);
+		DirectX::XMStoreFloat4(&blendedPose.rotation, blendedRot);
+
+		// スケールの線形補間
+		DirectX::XMVECTOR scale0 = DirectX::XMLoadFloat3(&pose0.scale);
+		DirectX::XMVECTOR scale1 = DirectX::XMLoadFloat3(&pose1.scale);
+		DirectX::XMVECTOR blendedScale = DirectX::XMVectorLerp(scale0, scale1, blendRate);
+		DirectX::XMStoreFloat3(&blendedPose.scale, blendedScale);
+	}
+}
+
 // ノードポーズ設定
 void Model::SetNodePoses(const std::vector<NodePose>& nodePoses)
 {

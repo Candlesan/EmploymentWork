@@ -129,8 +129,6 @@
     <ClInclude Include="Source\GamePlay\Framework.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\FreeCameraController.h" />
-    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.h" />
-    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h" />
@@ -174,7 +172,6 @@
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\FreeCameraController.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp" />

@@ -210,12 +210,6 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.h">
-      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h">
-      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -328,9 +322,6 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationMapper.cpp">
-      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

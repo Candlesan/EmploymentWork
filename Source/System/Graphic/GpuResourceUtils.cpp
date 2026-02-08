@@ -1,8 +1,8 @@
 #include <filesystem>
 #include <wrl.h>
 #include <DirectXTex.h>
-#include "Core/Misc.h"
-#include "GpuResourceUtils.h"
+#include "System/Core/Misc.h"
+#include "System/Graphic/GpuResourceUtils.h"
 
 // 頂点シェーダー読み込み
 HRESULT GpuResourceUtils::LoadVertexShader(
