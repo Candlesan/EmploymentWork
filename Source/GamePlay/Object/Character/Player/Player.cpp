@@ -53,19 +53,19 @@ void Player::DrawGUI()
 	// トランスフォーム情報
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::InputFloat3("Position", &position.x);
+		ImGui::DragFloat3("Position", &position.x);
 
 		DirectX::XMFLOAT3 a;
 		a.x = DirectX::XMConvertToDegrees(angle.x);
 		a.y = DirectX::XMConvertToDegrees(angle.y);
 		a.z = DirectX::XMConvertToDegrees(angle.z);
-		ImGui::InputFloat3("Angle", &a.x);
+		ImGui::DragFloat3("Angle", &a.x);
 		// 表示用に度数法に変換した後、再度ラジアンで戻す処理
 		angle.x = DirectX::XMConvertToRadians(a.x);
 		angle.y = DirectX::XMConvertToRadians(a.y);
 		angle.z = DirectX::XMConvertToRadians(a.z);
 
-		ImGui::InputFloat3("Scale", &scale.x);
+		ImGui::DragFloat3("Scale", &scale.x);
 	}
 
 	ImGui::SliderFloat("Move Speed:", &moveSpeed, 0, 10);
@@ -128,15 +128,7 @@ void Player::InputMove(float elapsedTime)
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
 	// 移動処理
-	if (!useRootMotion && !useRootMotionEx)
-	{
-		Move(moveVec.x, moveVec.z, moveSpeed);
-	}
-	else
-	{
-		// ルートモーション中は移動値を0にする
-		Move(0.0f, 0.0f, 0.0f);
-	}
+	Move(moveVec.x, moveVec.z, moveSpeed);
 
 	// 回転処理
 	Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);

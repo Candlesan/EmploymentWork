@@ -36,6 +36,10 @@ void SceneGame::Initialize()
 	// プレイヤー初期化
 	player = std::make_unique<Player>();
 	player->Initialize();
+
+	// エネミー初期化
+	enemy = std::make_unique<Enemy>();
+	enemy->Initialize();
 }
 
 // 更新処理
@@ -53,6 +57,9 @@ void SceneGame::Update(float elapsedTime)
 
 	// プレイヤー更新
 	player->Update(elapsedTime);
+
+	// プレイヤー更新
+	enemy->Update(elapsedTime);
 }
 
 // 描画処理
@@ -85,6 +92,11 @@ void SceneGame::Render()
 
 		// プレイヤー描画
 		player->Render(rc, modelRenderer);
+
+		// エネミー描画
+		enemy->Render(rc, modelRenderer);
+
+		// 全モデル描画
 		modelRenderer->Render(rc);
 	}
 }
@@ -93,4 +105,5 @@ void SceneGame::Render()
 void SceneGame::DrawGUI()
 {
 	player->DrawGUI();
+	enemy->DrawGUI();
 }

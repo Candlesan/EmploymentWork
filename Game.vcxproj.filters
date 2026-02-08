@@ -76,6 +76,9 @@
     <Filter Include="Source\GamepPlay\Object\Character\Animation">
       <UniqueIdentifier>{56bad046-c9d1-4976-80e9-b652f34524e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Enemy">
+      <UniqueIdentifier>{ed310e6f-2c06-40cd-a27a-37906066e814}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -210,6 +213,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -322,6 +328,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
