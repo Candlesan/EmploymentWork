@@ -1,6 +1,7 @@
 #include "SceneGame.h"
 #include "System/Graphic/Graphics.h"
 #include "Gameplay/Object/Camera/Camera.h"
+#include "GamePlay/Object/Collision/Collision.h"
 #include "SceneManager.h"
 
 // 初期化
@@ -58,8 +59,11 @@ void SceneGame::Update(float elapsedTime)
 	// プレイヤー更新
 	player->Update(elapsedTime);
 
-	// プレイヤー更新
+	// エネミー更新
 	enemy->Update(elapsedTime);
+
+	// 当たり判定更新
+	CollisonPlayervsEnemy();
 }
 
 // 描画処理
@@ -69,6 +73,7 @@ void SceneGame::Render()
 	RenderState* renderState = Graphics::Instance().GetRenderState();
 	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
 	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
+	ShapeRenderer* shapeRenderer = Graphics::Instance().GetShapeRenderer();
 
 	// レンダーステート設定
 	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
@@ -99,6 +104,15 @@ void SceneGame::Render()
 		// 全モデル描画
 		modelRenderer->Render(rc);
 	}
+
+	// デバック描画
+	{
+		player->RenderDebugPrimitive(shapeRenderer);
+		enemy->RenderDebugPrimitive(shapeRenderer);
+
+		// シェイプレンダラ描画
+		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
+	}
 }
 
 // GUI描画
@@ -106,4 +120,25 @@ void SceneGame::DrawGUI()
 {
 	player->DrawGUI();
 	enemy->DrawGUI();
+}
+
+// プレイヤーと敵の当たり判定
+void SceneGame::CollisonPlayervsEnemy()
+{
+	DirectX::XMFLOAT3 outPositionB;
+	if (Collision::IntersectCapsuleVsCapsule(
+		player->GetPosition(),
+		player->GetCapsuleDirection(),
+		player->GetHeight(),
+		player->GetRadius(),
+		enemy->GetPosition(),
+		enemy->GetCapsuleDirection(),
+		enemy->GetHeight(),
+		enemy->GetRadius(),
+		outPositionB
+	))
+	{
+		// 押し出し処理
+		enemy->SetPosition(outPositionB);
+	}
 }

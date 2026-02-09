@@ -18,12 +18,6 @@ void Character::UpdateTransform()
 	DirectX::XMStoreFloat4x4(&transform, W);
 }
 
-//デバックプリミティブ描画
-//void Character::RenderDebugPrimitive(ShapeRenderer* renderer)
-//{
-//	renderer->DrawCylinder(position, radius, height, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-//}
-
 //移動処理
 void Character::Move(float vx, float vz, float speed)
 {

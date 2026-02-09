@@ -12,9 +12,6 @@ public:
 	// 行列更新
 	void UpdateTransform();
 
-	// デバックプリミティブ描画
-	//virtual void RenderDebugPrimitive(ShapeRenderer* renderer);
-
 	// 位置取得
 	const DirectX::XMFLOAT3& GetPosition()const { return position; }
 

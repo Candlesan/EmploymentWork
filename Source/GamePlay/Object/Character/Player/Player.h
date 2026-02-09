@@ -13,6 +13,7 @@ public:
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
+	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 private:
 	// スティック入力値から移動ベクトルを取得
@@ -29,6 +30,7 @@ private:
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
+	// アニメーション関係
 	enum class State
 	{
 		Idle = 0,
@@ -53,5 +55,4 @@ private:
 	DirectX::XMFLOAT3 rootMotionPosition = { 0, 0, 0 }; // ルートモーションによる位置
 
 	DirectX::XMFLOAT4X4					worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-
 };

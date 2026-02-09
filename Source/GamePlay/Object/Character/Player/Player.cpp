@@ -14,6 +14,7 @@ void Player::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
+	// プレイヤーモデル初期化
 	player = std::make_shared<Model>(device, "Data/Model/Player/Map_Robot3.gltf");
 
 	// アニメーション設定
@@ -53,24 +54,41 @@ void Player::DrawGUI()
 	// トランスフォーム情報
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::DragFloat3("Position", &position.x);
+		ImGui::DragFloat3("Position", &position.x); // 位置
 
 		DirectX::XMFLOAT3 a;
 		a.x = DirectX::XMConvertToDegrees(angle.x);
 		a.y = DirectX::XMConvertToDegrees(angle.y);
 		a.z = DirectX::XMConvertToDegrees(angle.z);
-		ImGui::DragFloat3("Angle", &a.x);
+		ImGui::DragFloat3("Angle", &a.x); // 回転
 		// 表示用に度数法に変換した後、再度ラジアンで戻す処理
 		angle.x = DirectX::XMConvertToRadians(a.x);
 		angle.y = DirectX::XMConvertToRadians(a.y);
 		angle.z = DirectX::XMConvertToRadians(a.z);
 
-		ImGui::DragFloat3("Scale", &scale.x);
+		ImGui::DragFloat3("Scale", &scale.x); // スケール
 	}
 
-	ImGui::SliderFloat("Move Speed:", &moveSpeed, 0, 10);
+	// 当たり判定情報
+	if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
+		ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
+	}
+
+	// パラメーター
+	if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat("Move Speed:", &moveSpeed, 1.0f, 0, 10); // 移動速度
+	}
 
 	ImGui::End();
+}
+
+// デバックプリミティブ描画
+void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
+{
+	renderer->DrawCapsule(GetTransform(), radius, height, { 0, 1, 0, 1 });
 }
 
 // スティック入力値から移動ベクトルを取得

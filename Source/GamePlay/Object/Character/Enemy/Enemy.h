@@ -13,6 +13,7 @@ public:
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
+	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 private:
 	// アニメーション更新処理

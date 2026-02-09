@@ -30,6 +30,9 @@ public:
 	// GUI•`‰æ
 	void DrawGUI() override;
 
+	// ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è
+	void CollisonPlayervsEnemy();
+
 private:
 	std::unique_ptr<Stage> stage;
 	std::unique_ptr<Player> player;

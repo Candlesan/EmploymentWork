@@ -68,6 +68,12 @@ void Enemy::DrawGUI()
 	ImGui::End();
 }
 
+// デバックプリミティブ描画
+void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
+{
+	renderer->DrawCapsule(GetTransform(), radius, height, { 1, 1, 0, 1 });
+}
+
 // アニメーション更新処理
 void Enemy::UpdateAnimations(float elapsedTime)
 {
