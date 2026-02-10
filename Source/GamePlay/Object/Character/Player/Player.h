@@ -24,6 +24,9 @@ private:
 
 	// アニメーション更新処理
 	void UpdateAnimations(float elapsedTime);
+
+	// 武器のアタッチメント処理
+	void WeaponAttachment();
 private:
 	std::shared_ptr<Model> player;
 
@@ -55,6 +58,23 @@ private:
 	DirectX::XMFLOAT3 rootMotionPosition = { 0, 0, 0 }; // ルートモーションによる位置
 
 	DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+
+	// 武器のアタッチメント関係
+	struct Weapon
+	{
+		std::shared_ptr<Model> model;
+		DirectX::XMFLOAT3 position = { 0,0,0 };
+		DirectX::XMFLOAT3 angle = { 0,0,0 };
+		DirectX::XMFLOAT3 scale = { 1,1,1 };
+		DirectX::XMFLOAT4X4 transform = {
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		};
+		DirectX::XMFLOAT3 weaponHitOffset = { 0, 0, 0 };
+	};
+	Weapon weapon;
 
 	// 当たり判定関係
 	float debugOffset = 0.5;

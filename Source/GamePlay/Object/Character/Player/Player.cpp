@@ -14,13 +14,23 @@ void Player::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	// プレイヤーモデル初期化
+	// プレイヤーモデル読み込み
 	player = std::make_shared<Model>(device, "Data/Model/Player/Map_Robot3.gltf");
 
+	// 武器モデル読み込み
+	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/SM_GreatSword.gltf");
+
+	 // プレイヤーパラメーター初期化
+	moveSpeed = 2.0f;
+
+	// 当たり判定パラメーター初期化
 	weight = 0.5f;
 	height = 1.0f;
 	debugOffset = 0.8;
 
+	// 武器のパラメーター初期化
+	weapon.position = { 0.07, 0.17, 0.02 };
+	weapon.angle = { -1.62, 5.22, 2.89 };
 
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
@@ -37,6 +47,9 @@ void Player::Update(float elapsedTime)
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
+	// 武器のアタッチメント処理
+	WeaponAttachment();
+
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
 
@@ -49,6 +62,7 @@ void Player::Update(float elapsedTime)
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::Lambert, player); 
+	renderer->Draw(ShaderId::Lambert, weapon.model);
 }
 
 // GUI描画
@@ -82,6 +96,16 @@ void Player::DrawGUI()
 		ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
 	}
 
+	// 武器のアタッチメント情報
+	if (ImGui::CollapsingHeader("Weapon Attachment", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat3("Position##1", &weapon.position.x, 0.01f);
+		ImGui::DragFloat3("Angle##1", &weapon.angle.x, 0.01f);
+		ImGui::DragFloat3("Scale##1", &weapon.scale.x, 0.01f);
+
+		ImGui::DragFloat3("Weapon HitOffset", &weapon.weaponHitOffset.x, 0.1f);
+	}
+
 	// パラメーター
 	if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -94,12 +118,27 @@ void Player::DrawGUI()
 // デバックプリミティブ描画
 void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	DirectX::XMFLOAT4X4 capsuleTransform;
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
-	DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
+	// プレイヤーの当たり判定
+	{
+		DirectX::XMFLOAT4X4 capsuleTransform;
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
+		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
-	renderer->DrawCapsule(capsuleTransform, radius, height, { 0, 1, 0, 1 });
+		renderer->DrawCapsule(capsuleTransform, radius, height, { 0, 1, 0, 1 });
+	}
+
+	// 武器の当たり判定
+	{
+		DirectX::XMFLOAT4X4 weaponTransform;
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
+			weapon.position.x + weapon.weaponHitOffset.x,
+			weapon.position.y + weapon.weaponHitOffset.y,
+			weapon.position.z + weapon.weaponHitOffset.z);
+		DirectX::XMStoreFloat4x4(&weaponTransform, S * R * T);
+	}
 }
 
 // スティック入力値から移動ベクトルを取得
@@ -404,5 +443,32 @@ void Player::UpdateAnimations(float elapsedTime)
 
 		//姿勢更新
 		player->SetNodePoses(nodePoses);
+	}
+}
+
+// 武器のアタッチメント処理
+void Player::WeaponAttachment()
+{
+	const char* rightHandName = "hand_r";
+
+	// 武器のローカル行列を計算する
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon.scale.x, weapon.scale.y, weapon.scale.z);
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon.position.x, weapon.position.y, weapon.position.z);
+	DirectX::XMMATRIX weaponLocal = S * R * T;
+
+	// キャラクターモデルから右手ノードを検索する
+	for (const Model::Node& node : player->GetNodes())
+	{
+		if (strcmp(node.name.c_str(), rightHandName) == 0)
+		{
+			// 右手ノードと武器のローカル行列から武器のワールド行列を求める
+			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
+			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
+			DirectX::XMStoreFloat4x4(&weapon.transform, weaponWorld);
+			weapon.model->UpdateTransform(weapon.transform);
+			break;
+		}
 	}
 }

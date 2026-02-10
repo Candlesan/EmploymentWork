@@ -1,2 +1,9 @@
-﻿  Collision.cpp
+﻿  Player.cpp
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(25,16): warning C4305: '=': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(28,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(28,28): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(28,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(29,32): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(29,26): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(29,19): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
   Game.vcxproj -> C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\bin\x64\Debug\Game.exe
