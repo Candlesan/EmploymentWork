@@ -17,6 +17,11 @@ void Player::Initialize()
 	// プレイヤーモデル初期化
 	player = std::make_shared<Model>(device, "Data/Model/Player/Map_Robot3.gltf");
 
+	weight = 0.5f;
+	height = 1.0f;
+	debugOffset = 0.8;
+
+
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
@@ -74,6 +79,7 @@ void Player::DrawGUI()
 	{
 		ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
 		ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
+		ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
 	}
 
 	// パラメーター
@@ -88,7 +94,12 @@ void Player::DrawGUI()
 // デバックプリミティブ描画
 void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	renderer->DrawCapsule(GetTransform(), radius, height, { 0, 1, 0, 1 });
+	DirectX::XMFLOAT4X4 capsuleTransform;
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
+	DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
+
+	renderer->DrawCapsule(capsuleTransform, radius, height, { 0, 1, 0, 1 });
 }
 
 // スティック入力値から移動ベクトルを取得

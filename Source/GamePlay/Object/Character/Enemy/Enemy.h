@@ -49,5 +49,6 @@ private:
 
 	DirectX::XMFLOAT4X4					worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
+	// “–‚½‚è”»’èŠÖŒW
+	float debugOffset = 0.5;
 };
-#pragma once

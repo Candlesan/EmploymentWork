@@ -39,5 +39,7 @@ private:
 	std::unique_ptr<Enemy> enemy;
 	std::unique_ptr<FreeCameraController> cameraController;
 	LightManager lightManager;
+
+	float debugOffset = 0.5;
 };
 

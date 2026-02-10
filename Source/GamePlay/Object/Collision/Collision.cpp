@@ -37,16 +37,24 @@ bool Collision::IntersectCapsuleVsCapsule(
     const DirectX::XMFLOAT3& directionA,
     float heightA,
     float radiusA,
+    float weightA,
     const DirectX::XMFLOAT3& positionB,
     const DirectX::XMFLOAT3& directionB,
     float heightB,
     float radiusB,
+    float weightB,
+    DirectX::XMFLOAT3& outPositionA,
     DirectX::XMFLOAT3& outPositionB)
 {
     using namespace DirectX;
 
     // カプセルAの線分の端点を計算
     XMVECTOR PosA = XMLoadFloat3(&positionA);
+
+    //// カプセルの「下端」が足元にくるように、中心を「高さの半分 + 半径」分だけ上にずらす
+    //XMVECTOR OffsetA = XMVectorSet(0.0f, heightA * 0.5f + radiusA, 0.0f, 0.0f);
+    //PosA = XMVectorAdd(PosA, OffsetA);
+
     XMVECTOR DirA = XMLoadFloat3(&directionA);
     XMVECTOR HalfHeightA = XMVectorScale(DirA, heightA * 0.5f);
 
@@ -56,6 +64,10 @@ bool Collision::IntersectCapsuleVsCapsule(
 
     // カプセルBの線分の端点を計算
     XMVECTOR PosB = XMLoadFloat3(&positionB);
+
+    //XMVECTOR OffsetB = XMVectorSet(0.0f, heightB * 0.5f + radiusB, 0.0f, 0.0f);
+    //XMVECTOR CalcPosB = XMVectorAdd(PosB, OffsetB);
+
     XMVECTOR DirB = XMLoadFloat3(&directionB);
     XMVECTOR HalfHeightB = XMVectorScale(DirB, heightB * 0.5f);
 
@@ -91,14 +103,26 @@ bool Collision::IntersectCapsuleVsCapsule(
             pushDir = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
         }
 
-        // カプセルBを押し出す
-        XMVECTOR PushVec = XMVectorScale(pushDir, overlap);
-        XMVECTOR NewPosB = XMVectorAdd(PosB, PushVec);
-        XMStoreFloat3(&outPositionB, NewPosB);
+        // 2つのカプセルの重さから押し出し比率を求める
+        float totalWeight = weightA + weightB;
+        float raiotA = weightB / totalWeight;
+        float raiotB = weightA / totalWeight;
+
+        // 座標を更新
+        XMVECTOR pushVecA = XMVectorScale(pushDir, -overlap * raiotA);
+        XMVECTOR pushVecB = XMVectorScale(pushDir, overlap * raiotB);
+
+        //// 調整済み中心座標から足元座標に戻す
+        //XMVECTOR newPosA = XMVectorSubtract(XMVectorAdd(PosA, pushVecA), OffsetA);
+        //XMVECTOR newPosB = XMVectorSubtract(XMVectorAdd(PosB, pushVecB), OffsetB);
+
+        XMStoreFloat3(&outPositionA, XMVectorAdd(PosA, pushVecA));
+        XMStoreFloat3(&outPositionB, XMVectorAdd(PosB, pushVecB));
 
         return true;
     }
 
+    outPositionA = positionA;
     outPositionB = positionB;
     return false;
 }

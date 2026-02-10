@@ -125,20 +125,24 @@ void SceneGame::DrawGUI()
 // プレイヤーと敵の当たり判定
 void SceneGame::CollisonPlayervsEnemy()
 {
-	DirectX::XMFLOAT3 outPositionB;
+	DirectX::XMFLOAT3 outPositionA, outPositionB;
 	if (Collision::IntersectCapsuleVsCapsule(
 		player->GetPosition(),
 		player->GetCapsuleDirection(),
 		player->GetHeight(),
 		player->GetRadius(),
+		player->GetWeight(),
 		enemy->GetPosition(),
 		enemy->GetCapsuleDirection(),
 		enemy->GetHeight(),
 		enemy->GetRadius(),
+		enemy->GetWeight(),
+		outPositionA,
 		outPositionB
 	))
 	{
 		// 押し出し処理
+		player->SetPosition(outPositionA);
 		enemy->SetPosition(outPositionB);
 	}
 }

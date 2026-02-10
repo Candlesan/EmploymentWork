@@ -54,5 +54,8 @@ private:
 	bool bakeTranslationY = true; // Y軸移動を無視するか
 	DirectX::XMFLOAT3 rootMotionPosition = { 0, 0, 0 }; // ルートモーションによる位置
 
-	DirectX::XMFLOAT4X4					worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+	DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+
+	// 当たり判定関係
+	float debugOffset = 0.5;
 };

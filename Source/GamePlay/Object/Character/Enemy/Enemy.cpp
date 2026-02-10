@@ -18,6 +18,9 @@ void Enemy::Initialize()
 
 	position = { 0, 0, 10 };
 	angle = {0, 3, 0};
+	weight = 100.0f;
+	height = 1.0f;
+	debugOffset = 0.8;
 
 	// アニメーション設定
 	enemy->GetNodePoses(nodePoses);
@@ -65,13 +68,26 @@ void Enemy::DrawGUI()
 		ImGui::DragFloat3("Scale", &scale.x);
 	}
 
+	// 当たり判定情報
+	if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
+		ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
+		ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
+	}
+
 	ImGui::End();
 }
 
 // デバックプリミティブ描画
 void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	renderer->DrawCapsule(GetTransform(), radius, height, { 1, 1, 0, 1 });
+	DirectX::XMFLOAT4X4 capsuleTransform;
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
+	DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
+
+	renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
 }
 
 // アニメーション更新処理

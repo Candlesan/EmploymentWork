@@ -16,16 +16,19 @@ public:
 		DirectX::XMFLOAT3& outPositionB
 	);
 
-	// カプセルとカプセルの交差判定
+	// カプセルとカプセルの交差判定(重み有りバージョン)
 	static bool IntersectCapsuleVsCapsule(
 		const DirectX::XMFLOAT3& positionA,
 		const DirectX::XMFLOAT3& directionA,
 		float heightA,
 		float radiusA,
+		float weightA,
 		const DirectX::XMFLOAT3& positionB,
 		const DirectX::XMFLOAT3& directionB,
 		float heightB,
 		float radiusB,
+		float weightB,
+		DirectX::XMFLOAT3& outPositionA,
 		DirectX::XMFLOAT3& outPositionB
 	);
 private:

@@ -48,6 +48,9 @@ public:
 	// 高さ取得
 	float GetHeight() const { return height; }
 
+	// 重さ取得
+	float GetWeight() const { return weight; }
+
 	// 地面に接地しているか
 	bool IsGround() const { return isGround; }
 
@@ -124,6 +127,7 @@ protected:
 	//当たり判定関係
 	float radius = 0.5f; // 半径
 	float height = 2.0f; // 高さ
+	float weight = 0.5f; // 重さ
 
 	bool isGround = false; // 地面と接地してるか
 
