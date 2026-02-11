@@ -62,8 +62,11 @@ void SceneGame::Update(float elapsedTime)
 	// エネミー更新
 	enemy->Update(elapsedTime);
 
-	// 当たり判定更新
+	// プレイヤーと敵の当たり判定
 	CollisonPlayervsEnemy();
+
+	// プレイヤーの武器と敵の当たり判定
+	CollisionPlayerWeaponVsEnemy();
 }
 
 // 描画処理
@@ -144,5 +147,29 @@ void SceneGame::CollisonPlayervsEnemy()
 		// 押し出し処理
 		player->SetPosition(outPositionA);
 		enemy->SetPosition(outPositionB);
+	}
+}
+
+// 武器と敵の当たり判定
+void SceneGame::CollisionPlayerWeaponVsEnemy()
+{
+	DirectX::XMFLOAT3 outPositionA, outPositionB;
+	if (Collision::IntersectCapsuleVsCapsule(
+		player->GetWeaponPosition(),
+		player->GetWeaponDirection(),
+		player->GetWeaponHeight(),
+		player->GetWeaponRadius(),
+		1.0f, // 武器の重さ(適当に設定)
+		enemy->GetPosition(),
+		enemy->GetCapsuleDirection(),
+		enemy->GetHeight(),
+		enemy->GetRadius(),
+		enemy->GetWeight(),
+		outPositionA,
+		outPositionB
+	))
+	{
+		// 押し出し処理
+		enemy->ApplyDamage(1.0f, 0.5f);
 	}
 }

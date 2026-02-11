@@ -15,6 +15,11 @@ public:
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
+	// 武器の当たり判定情報
+	DirectX::XMFLOAT3 GetWeaponPosition() const;
+	DirectX::XMFLOAT3 GetWeaponDirection() const;
+	float GetWeaponRadius() const { return weapon.weaponRadius; }
+	float GetWeaponHeight() const { return weapon.weaponHeight; }
 private:
 	// スティック入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 GetMoveVec() const;
@@ -25,8 +30,12 @@ private:
 	// アニメーション更新処理
 	void UpdateAnimations(float elapsedTime);
 
+	// アニメーションが終了したか
+	bool IsFinshedAnimation();
+
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
+
 private:
 	std::shared_ptr<Model> player;
 
@@ -38,6 +47,7 @@ private:
 	{
 		Idle = 0,
 		Walk,
+		Attack,
 	};
 	State state = State::Idle;
 
@@ -73,6 +83,9 @@ private:
 			0, 0, 0, 1
 		};
 		DirectX::XMFLOAT3 weaponHitOffset = { 0, 0, 0 };
+		DirectX::XMFLOAT3 weaponAngleOffset = { 0, 0, 0 };
+		float weaponRadius = 0.5f;
+		float weaponHeight = 1.0f;
 	};
 	Weapon weapon;
 

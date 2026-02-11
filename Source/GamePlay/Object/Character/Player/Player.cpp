@@ -27,6 +27,10 @@ void Player::Initialize()
 	weight = 0.5f;
 	height = 1.0f;
 	debugOffset = 0.8;
+	weapon.weaponHitOffset = { -0.05, -0.15, 1 };
+	weapon.weaponAngleOffset = { 0.06, 1.3, 0.03 };
+	weapon.weaponRadius = 0.25;
+	weapon.weaponHeight = 1.5f;
 
 	// 武器のパラメーター初期化
 	weapon.position = { 0.07, 0.17, 0.02 };
@@ -49,6 +53,9 @@ void Player::Update(float elapsedTime)
 
 	// 武器のアタッチメント処理
 	WeaponAttachment();
+
+	// 無敵時間更新
+	UpdateInvincibleTimer(elapsedTime);
 
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
@@ -104,6 +111,9 @@ void Player::DrawGUI()
 		ImGui::DragFloat3("Scale##1", &weapon.scale.x, 0.01f);
 
 		ImGui::DragFloat3("Weapon HitOffset", &weapon.weaponHitOffset.x, 0.1f);
+		ImGui::DragFloat3("Weapon AngleOffset", &weapon.weaponAngleOffset.x, 0.1f);
+		ImGui::DragFloat("Weapon Collision Radius", &weapon.weaponRadius, 0.1f);
+		ImGui::DragFloat("Weapon Collision Height", &weapon.weaponHeight, 0.1f);
 	}
 
 	// パラメーター
@@ -131,14 +141,67 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	// 武器の当たり判定
 	{
 		DirectX::XMFLOAT4X4 weaponTransform;
+
+		DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
+
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+			weapon.angle.x + weapon.weaponAngleOffset.x,
+			weapon.angle.y + weapon.weaponAngleOffset.y,
+			weapon.angle.z + weapon.weaponAngleOffset.z);
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
 			weapon.position.x + weapon.weaponHitOffset.x,
 			weapon.position.y + weapon.weaponHitOffset.y,
 			weapon.position.z + weapon.weaponHitOffset.z);
-		DirectX::XMStoreFloat4x4(&weaponTransform, S * R * T);
+		DirectX::XMMATRIX WorldWeapon = S * R * T * weaponWorld;
+		DirectX::XMStoreFloat4x4(&weaponTransform, WorldWeapon);
+
+		renderer->DrawCapsule(weaponTransform, weapon.weaponRadius, weapon.weaponHeight, { 1, 0, 0, 1 });
 	}
+}
+
+//　武器の位置を取得
+DirectX::XMFLOAT3 Player::GetWeaponPosition() const
+{
+	// transformから位置を取得する
+	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
+
+	// オフセットを適用する
+	DirectX::XMMATRIX offset = DirectX::XMMatrixTranslation(
+		weapon.weaponHitOffset.x,
+		weapon.weaponHitOffset.y,
+		weapon.weaponHitOffset.z
+		);
+
+	DirectX::XMMATRIX finalMatrix = offset * weaponWorld;
+	DirectX::XMFLOAT3 position;
+	position.x = finalMatrix.r[3].m128_f32[0];
+	position.y = finalMatrix.r[3].m128_f32[1];
+	position.z = finalMatrix.r[3].m128_f32[2];
+
+	return position;
+}
+
+// 武器の向きを取得
+DirectX::XMFLOAT3 Player::GetWeaponDirection() const
+{
+	// transformから上方向ベクトルを取得する
+	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
+
+	// 回転値オフセットを適用
+	DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(
+		weapon.weaponAngleOffset.x,
+		weapon.weaponAngleOffset.y,
+		weapon.weaponAngleOffset.z
+	);
+
+	DirectX::XMMATRIX finalMatrix = rotation * weaponWorld;
+	DirectX::XMFLOAT3 Direction;
+	Direction.x = finalMatrix.r[1].m128_f32[0]; // Y軸方向
+	Direction.y = finalMatrix.r[1].m128_f32[1];
+	Direction.z = finalMatrix.r[1].m128_f32[2];
+
+	return Direction;
 }
 
 // スティック入力値から移動ベクトルを取得
@@ -211,6 +274,8 @@ void Player::UpdateAnimations(float elapsedTime)
 
 	int newAnimationIndex = animationIndex;
 
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
 	switch (state)
 	{
 	case State::Idle:
@@ -222,6 +287,11 @@ void Player::UpdateAnimations(float elapsedTime)
 		if (moveLength > 0.0f)
 		{
 			state = State::Walk;
+		}
+
+		if (gamePad.GetButtonDown() & GamePad::BTN_A)
+		{
+			state = State::Attack;
 		}
 
 		break;
@@ -236,7 +306,27 @@ void Player::UpdateAnimations(float elapsedTime)
 			state = State::Idle;
 		}
 
+		if (gamePad.GetButtonDown() & GamePad::BTN_A)
+		{
+			state = State::Attack;
+		}
+
 		break;
+	case State::Attack:
+		animationLoop = false;
+		useRootMotion = false;
+		useRootMotionEx = true;
+		newAnimationIndex = player->GetAnimationIndex("Attack_Right");
+
+		if (moveLength > 0.0f)
+		{
+			state = State::Walk;
+		}
+
+		if (IsFinshedAnimation())
+		{
+			state = State::Idle;
+		}
 	}
 
 
@@ -444,6 +534,17 @@ void Player::UpdateAnimations(float elapsedTime)
 		//姿勢更新
 		player->SetNodePoses(nodePoses);
 	}
+}
+
+// アニメーションが終了したか
+bool Player::IsFinshedAnimation()
+{
+	if (animationIndex < 0) return false;
+
+	const Model::Animation& animation = player->GetAnimations().at(animationIndex);
+	return animationSeconds >= animation.secondsLength;
+
+	return false;
 }
 
 // 武器のアタッチメント処理

@@ -132,5 +132,5 @@ protected:
 	bool isGround = false; // ’n–Ê‚ÆÚ’n‚µ‚Ä‚é‚©
 
 	float health = 10; // ‘Ì—Í
-	float invincibleTimer = 1.0f; // –³“GŠÔ
+	float invincibleTimer = 0.0f; // –³“GŠÔ
 };

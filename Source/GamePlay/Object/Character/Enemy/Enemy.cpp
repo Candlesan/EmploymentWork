@@ -21,6 +21,8 @@ void Enemy::Initialize()
 	weight = 100.0f;
 	height = 1.0f;
 	debugOffset = 0.8;
+	health = 5;
+	invincibleTimer = 0.0f;
 
 	// アニメーション設定
 	enemy->GetNodePoses(nodePoses);
@@ -49,6 +51,8 @@ void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 void Enemy::DrawGUI()
 {
 	ImGui::Begin("Enemy");
+
+	ImGui::Text("Health: %f.0", health);
 
 	// トランスフォーム情報
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))

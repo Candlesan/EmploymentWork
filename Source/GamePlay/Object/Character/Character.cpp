@@ -107,26 +107,26 @@ bool Character::ApplyDamage(float damage, float invincibleTime)
 	if (damage <= 0) return false;
 
 	// 死亡している場合は体力を変更しない
-	if (health <= 0) return false;
+	if (this->health <= 0) return false;
 
 	// 無敵時間中はダメージを受けない
-	if (invincibleTimer > 0.0f) return false;
+	if (this->invincibleTimer > 0.0f) return false;
 
 	// 無敵時間設定
-	invincibleTimer = invincibleTime;
+	this->invincibleTimer = invincibleTime;
 
 	// ダメージ処理
-	health -= damage;
+	this->health -= damage;
 
 	// 死亡通知 
-	if (health <= 0)
+	if (this->health <= 0)
 	{
-		OnDead();
+		this->OnDead();
 	}
 	// ダメージ通知
 	else
 	{
-		OnDamage();
+		this->OnDamage();
 	}
 
 	// 体力が変更した場合はtrueを返す

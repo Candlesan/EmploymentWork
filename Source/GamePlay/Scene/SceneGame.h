@@ -33,6 +33,9 @@ public:
 	// ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è
 	void CollisonPlayervsEnemy();
 
+	// •Ší‚Æ“G‚Ì“–‚½‚è”»’è
+	void CollisionPlayerWeaponVsEnemy();
+
 private:
 	std::unique_ptr<Stage> stage;
 	std::unique_ptr<Player> player;
