@@ -4,6 +4,8 @@
 #include "GamePlay/Object/Collision/Collision.h"
 #include "SceneManager.h"
 
+#include <imgui.h>
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -27,9 +29,12 @@ void SceneGame::Initialize()
 		{ 0, 1, 0 }			// 上ベクトル
 	);
 
-	// カメラコントローラー初期化
-	cameraController = std::make_unique<FreeCameraController>();
-	cameraController->SyncCameraToController(camera);
+	// ゲーム用のカメラを初期化
+	gameCamera = std::make_unique<GameCamera>();
+
+	// デバック用のカメラを初期化
+	debugCamera = std::make_unique<DebugCamera>();
+	debugCamera->SyncCameraToController(camera);
 
 	// ステージ初期化
 	stage = std::make_unique<Stage>();
@@ -49,9 +54,21 @@ void SceneGame::Update(float elapsedTime)
 	// カメラ取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 
-	// カメラ更新処理
-	cameraController->Update();
-	cameraController->SyncControllerToCamera(camera);
+	// GUIの操作でゲーム用とデバック用のカメラを切り替え
+	if (cameraMode == CameraMode::Game)
+	{
+		// ゲーム用のカメラ更新
+		DirectX::XMFLOAT3 target = player->GetPosition();
+		target.y += 1.0f; // 注視点を少し上にあげる
+		gameCamera->SetTarget(target);
+		gameCamera->Update(elapsedTime);
+	}
+	else
+	{
+		// デバック用のカメラ更新
+		debugCamera->Update();
+		debugCamera->SyncControllerToCamera(camera);
+	}
 
 	// ステージ更新
 	stage->Update(elapsedTime);
@@ -121,6 +138,21 @@ void SceneGame::Render()
 // GUI描画
 void SceneGame::DrawGUI()
 {
+	ImGui::Begin("Camera System");
+
+	// モード切り替え用のラジオボタン
+	int mode = static_cast<int>(cameraMode);
+	if (ImGui::RadioButton("Game (3rd Person)", &mode, 0)) {
+		cameraMode = CameraMode::Game;
+	}
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Debug (Free)", &mode, 1)) {
+		cameraMode = CameraMode::Debug;
+		// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
+		debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
+	}
+
+	ImGui::End();
 	player->DrawGUI();
 	enemy->DrawGUI();
 }

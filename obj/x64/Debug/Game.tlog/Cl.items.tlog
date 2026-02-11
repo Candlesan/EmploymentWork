@@ -10,7 +10,8 @@ C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\E
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\External\ImGuizmo\ImSequencer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ImSequencer.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Framework.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Framework.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Camera\Camera.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Camera.obj
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Camera\FreeCameraController.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\FreeCameraController.obj
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\DebugCamera.obj
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\GameCamera.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Character.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Enemy\Enemy.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Enemy.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Player.obj

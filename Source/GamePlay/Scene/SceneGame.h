@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
-#include "Gameplay/Object/Camera/FreeCameraController.h"
+#include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
+#include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
 #include <memory>
 
 // モデル
@@ -37,10 +38,23 @@ public:
 	void CollisionPlayerWeaponVsEnemy();
 
 private:
+	// 3Dモデル
 	std::unique_ptr<Stage> stage;
 	std::unique_ptr<Player> player;
 	std::unique_ptr<Enemy> enemy;
-	std::unique_ptr<FreeCameraController> cameraController;
+
+	// カメラ
+	std::unique_ptr<GameCamera> gameCamera;
+	std::unique_ptr<DebugCamera> debugCamera;
+
+	// カメラのモード定義
+	enum class CameraMode 
+	{
+		Game,   // 三人称視点
+		Debug   // フリーカメラ
+	};
+	CameraMode cameraMode = CameraMode::Game; // 初期状態はゲーム用
+
 	LightManager lightManager;
 
 	float debugOffset = 0.5;

@@ -128,7 +128,8 @@
     <ClInclude Include="External\SphereCast\Include\SphereCast.h" />
     <ClInclude Include="Source\GamePlay\Framework.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
-    <ClInclude Include="Source\GamePlay\Object\Camera\FreeCameraController.h" />
+    <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h" />
+    <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
@@ -173,7 +174,8 @@
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Camera\FreeCameraController.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />

@@ -82,6 +82,12 @@
     <Filter Include="Source\GamepPlay\Object\Collision">
       <UniqueIdentifier>{e64da4c0-b24b-4ae5-aae2-87104605ccef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Camera\DebugCamera">
+      <UniqueIdentifier>{bf03ea5a-6a6d-4d8b-bf59-d311145693ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Camera\GameCamera">
+      <UniqueIdentifier>{2e50e81b-cf63-4282-bb7b-b88e94cae8cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -124,9 +130,6 @@
       <Filter>External\SphereCast</Filter>
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h">
-      <Filter>Source\GamepPlay\Object\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Camera\FreeCameraController.h">
       <Filter>Source\GamepPlay\Object\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h">
@@ -222,6 +225,12 @@
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h">
       <Filter>Source\GamepPlay\Object\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h">
+      <Filter>Source\GamepPlay\Object\Camera\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h">
+      <Filter>Source\GamepPlay\Object\Camera\GameCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -255,9 +264,6 @@
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp">
-      <Filter>Source\GamepPlay\Object\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Camera\FreeCameraController.cpp">
       <Filter>Source\GamepPlay\Object\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp">
@@ -340,6 +346,12 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp">
       <Filter>Source\GamepPlay\Object\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp">
+      <Filter>Source\GamepPlay\Object\Camera\DebugCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp">
+      <Filter>Source\GamepPlay\Object\Camera\GameCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
