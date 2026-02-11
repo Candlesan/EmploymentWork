@@ -54,9 +54,6 @@ void Player::Update(float elapsedTime)
 	// 武器のアタッチメント処理
 	WeaponAttachment();
 
-	// 無敵時間更新
-	UpdateInvincibleTimer(elapsedTime);
-
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
 

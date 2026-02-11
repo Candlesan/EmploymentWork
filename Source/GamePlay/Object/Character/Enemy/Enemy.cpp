@@ -36,6 +36,9 @@ void Enemy::Update(float elapsedTime)
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
 
+	// 無敵時間更新
+	UpdateInvincibleTimer(elapsedTime);
+
 	// モデル更新処理
 	UpdateTransform();
 	enemy->UpdateTransform(transform);
