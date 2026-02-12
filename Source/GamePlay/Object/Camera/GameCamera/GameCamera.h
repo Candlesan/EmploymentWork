@@ -10,8 +10,12 @@ public:
 
 	// ターゲット位置設定
 	void SetTarget(const DirectX::XMFLOAT3& target) { this->target = target; }
+
+	void SetRange(float r) { range = r; }
+	void SetAngle(DirectX::XMFLOAT3 A) { angle = A; }
 private:
 	DirectX::XMFLOAT3 target = { 0, 0, 0 }; // 注視点
+	DirectX::XMFLOAT3 currentTarget = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 }; // 回転角度
 	float rollSpeed = DirectX::XMConvertToRadians(90); // 回転速度
 	float range = 10.0f; // 距離

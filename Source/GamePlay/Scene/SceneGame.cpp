@@ -31,6 +31,8 @@ void SceneGame::Initialize()
 
 	// ゲーム用のカメラを初期化
 	gameCamera = std::make_unique<GameCamera>();
+	gameCamera->SetRange(cameraRange);
+	gameCamera->SetAngle({ 0.4, 0.0, 0.0 });
 
 	// デバック用のカメラを初期化
 	debugCamera = std::make_unique<DebugCamera>();
@@ -151,6 +153,9 @@ void SceneGame::DrawGUI()
 		// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
 		debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
 	}
+
+	ImGui::DragFloat("Distance", &cameraRange, 0.1f);
+	gameCamera->SetRange(cameraRange);
 
 	ImGui::End();
 	player->DrawGUI();

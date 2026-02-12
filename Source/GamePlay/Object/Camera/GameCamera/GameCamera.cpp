@@ -15,6 +15,13 @@ void GameCamera::Update(float elapsedTime)
 	angle.x += ay * speed;
 	angle.y += ax * speed;
 
+	// 線形補間でターゲットをジワジワ追跡させる
+	// 10.0f の値を小さくするほど、揺れに対して鈍感（滑らか）になります
+	float lerpSpeed = 5.0f;
+	currentTarget.x += (target.x - currentTarget.x) * lerpSpeed * elapsedTime;
+	currentTarget.y += (target.y - currentTarget.y) * lerpSpeed * elapsedTime;
+	currentTarget.z += (target.z - currentTarget.z) * lerpSpeed * elapsedTime;
+
 	// カメラ回転値を回転行列に変換
 	DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
 
@@ -25,11 +32,11 @@ void GameCamera::Update(float elapsedTime)
 
 	// 注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
 	DirectX::XMFLOAT3 eye;
-	eye.x = target.x - front.x * range;
-	eye.y = target.y - front.y * range;
-	eye.z = target.z - front.z * range;
+	eye.x = currentTarget.x - front.x * range;
+	eye.y = currentTarget.y - front.y * range;
+	eye.z = currentTarget.z - front.z * range;
 
 	// カメラの視点と注視点を設定
 	Camera& camera = CameraManager::Instance().GetMainCamera();
-	camera.SetLookAt(eye, target, DirectX::XMFLOAT3(0, 1, 0));
+	camera.SetLookAt(eye, currentTarget, DirectX::XMFLOAT3(0, 1, 0));
 }

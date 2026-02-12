@@ -1,2 +1,4 @@
-﻿  SceneGame.cpp
+﻿  Framework.cpp
+  SceneGame.cpp
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(35,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
   Game.vcxproj -> C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\bin\x64\Debug\Game.exe
