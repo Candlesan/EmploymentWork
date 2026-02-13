@@ -110,6 +110,8 @@ void SceneGame::Render()
 	rc.deviceContext = dc;
 	rc.renderState = renderState;
 	rc.camera = &camera;
+	rc.pbrMetalness = this->pbrMetalness;
+	rc.pbrRoughness = this->pbrRoughness;
 	rc.lightManager = &lightManager;
 
 	// 3Dモデル描画
@@ -153,6 +155,27 @@ void SceneGame::DrawGUI()
 		// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
 		debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
 	}
+
+	ImGui::Begin("Shader");
+	{
+		if (ImGui::CollapsingHeader("light", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			DirectionalLight& light = lightManager.GetDirectionalLight();
+			// 並行光源
+			ImGui::DragFloat3("light", &light.direction.x, 0.01f, -1.0, 1.0);
+			ImGui::ColorEdit3("light color", &light.color.x);
+			lightManager.SetDirectionalLight(light);
+		}
+
+		if (ImGui::CollapsingHeader("PBR", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat("Adjust Metalness", &pbrMetalness, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat("Adjust Roughness", &pbrRoughness, 0.01f, -1.0f, 1.0f);
+		}
+
+	}
+	ImGui::End();
+
 
 	ImGui::DragFloat("Distance", &cameraRange, 0.1f);
 	gameCamera->SetRange(cameraRange);

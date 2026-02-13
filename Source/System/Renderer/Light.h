@@ -16,6 +16,7 @@ public:
 
 	// ディレクショナルライト取得
 	const DirectionalLight& GetDirectionalLight() const { return directionalLight; }
+	DirectionalLight& GetDirectionalLight() { return directionalLight; }
 
 private:
 	DirectionalLight	directionalLight;

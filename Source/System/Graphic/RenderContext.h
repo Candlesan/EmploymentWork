@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GamePlay/Object/Camera/Camera.h"
-#include "RenderState.h"
-#include "Light.h"
+#include "System/Graphic/RenderState.h"
+#include "System/Renderer/Light.h"
 
 struct RenderContext
 {
@@ -10,4 +10,8 @@ struct RenderContext
 	const RenderState*		renderState;
 	const Camera*			camera;
 	const LightManager*		lightManager = nullptr;
+
+	// PBR—p
+	float pbrMetalness = 0.0f;
+	float pbrRoughness = 0.0f;
 };

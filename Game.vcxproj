@@ -46,13 +46,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(ProjectDir)Source;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Source;$(ProjectDir)Shader;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(ProjectDir)Source;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Source;$(ProjectDir)Shader;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -152,8 +152,9 @@
     <ClInclude Include="Source\System\Renderer\Light.h" />
     <ClInclude Include="Source\System\Renderer\ModelRenderer.h" />
     <ClInclude Include="Source\System\Renderer\PrimitiveRenderer.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\BasicShader.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\LambertShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\Basic\BasicShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
     <ClInclude Include="Source\System\Renderer\ShapeRenderer.h" />
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
+    <ClCompile Include="PBRShader.cpp" />
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />
@@ -195,8 +197,8 @@
     <ClCompile Include="Source\System\Renderer\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\BasicShader.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\LambertShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp" />
     <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp" />
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
     <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
@@ -205,52 +207,63 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Shader\Basic.hlsli" />
-    <None Include="Shader\Lambert.hlsli" />
-    <None Include="Shader\Scene.hlsli" />
-    <None Include="Shader\ShapeRenderer.hlsli" />
-    <None Include="Shader\PrimitiveRenderer.hlsli" />
-    <None Include="Shader\Skinning.hlsli" />
-    <None Include="Shader\Sprite.hlsli" />
+    <None Include="Shader\Basic\Basic.hlsli" />
+    <None Include="Shader\Common\physical_based_rendering_functions.hlsli" />
+    <None Include="Shader\Common\Scene.hlsli" />
+    <None Include="Shader\Common\shading_functions.hlsli" />
+    <None Include="Shader\Common\Skinning.hlsli" />
+    <None Include="Shader\Lambert\Lambert.hlsli" />
+    <None Include="Shader\PBR\PBRShader.hlsli" />
+    <None Include="Shader\PrimitiveRenderer\PrimitiveRenderer.hlsli" />
+    <None Include="Shader\ShapeRenderer\ShapeRenderer.hlsli" />
+    <None Include="Shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader\BasicPS.hlsl">
+    <FxCompile Include="Shader\Basic\BasicPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\BasicVS.hlsl">
+    <FxCompile Include="Shader\Basic\BasicVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\LambertPS.hlsl">
+    <FxCompile Include="Shader\Lambert\LambertPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\LambertVS.hlsl">
+    <FxCompile Include="Shader\Lambert\LambertVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\ShapeRendererPS.hlsl">
+    <FxCompile Include="Shader\PBR\PBRShader_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\ShapeRendererVS.hlsl">
+    <FxCompile Include="Shader\PBR\PBRShader_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\PrimitiveRendererPS.hlsl">
+    <FxCompile Include="Shader\PrimitiveRenderer\PrimitiveRendererPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\PrimitiveRendererVS.hlsl">
+    <FxCompile Include="Shader\PrimitiveRenderer\PrimitiveRendererVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\SpritePS.hlsl">
+    <FxCompile Include="Shader\ShapeRenderer\ShapeRendererPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shader\SpriteVS.hlsl">
+    <FxCompile Include="Shader\ShapeRenderer\ShapeRendererVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Sprite\SpritePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Sprite\SpriteVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

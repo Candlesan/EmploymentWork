@@ -2,8 +2,9 @@
 #include "System/Core/Misc.h"
 #include "System/Graphic/GpuResourceUtils.h"
 #include "System/Renderer/ModelRenderer.h"
-#include "Shader/BasicShader.h"
-#include "Shader/LambertShader.h"
+#include "Shader/Basic/BasicShader.h"
+#include "Shader/Lambert/LambertShader.h"
+#include "Shader/PBR/PBRShader.h"
 
 // コンストラクタ
 ModelRenderer::ModelRenderer(ID3D11Device* device)
@@ -23,6 +24,7 @@ ModelRenderer::ModelRenderer(ID3D11Device* device)
 	// シェーダー生成
 	shaders[static_cast<int>(ShaderId::Basic)] = std::make_unique<BasicShader>(device);
 	shaders[static_cast<int>(ShaderId::Lambert)] = std::make_unique<LambertShader>(device);
+	shaders[static_cast<int>(ShaderId::PBR)] = std::make_unique<PBRShader>(device);
 }
 
 // 箱描画

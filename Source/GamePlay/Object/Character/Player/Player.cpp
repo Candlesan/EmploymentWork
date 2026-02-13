@@ -65,8 +65,8 @@ void Player::Update(float elapsedTime)
 // •`‰æˆ—
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
-	renderer->Draw(ShaderId::Lambert, player); 
-	renderer->Draw(ShaderId::Lambert, weapon.model);
+	renderer->Draw(ShaderId::PBR, player); 
+	renderer->Draw(ShaderId::PBR, weapon.model);
 }
 
 // GUI•`‰æ

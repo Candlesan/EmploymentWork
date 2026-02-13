@@ -88,6 +88,36 @@
     <Filter Include="Source\GamepPlay\Object\Camera\GameCamera">
       <UniqueIdentifier>{2e50e81b-cf63-4282-bb7b-b88e94cae8cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Renderer\Shader\Basic">
+      <UniqueIdentifier>{20868d74-3e20-4f11-8768-8393fd2d2689}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\Shader\Lambert">
+      <UniqueIdentifier>{46bae322-cc75-4ecc-b98b-b4252f4bbbc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\Shader\PBR">
+      <UniqueIdentifier>{191d4d5b-9553-4c07-b594-dbe6f6328ea6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Basic">
+      <UniqueIdentifier>{2a9ec1c8-9ced-4eb2-b88c-4e15f8b77a87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Lambert">
+      <UniqueIdentifier>{998c3cdf-c10e-4b71-be3b-fb789e303271}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\PrimitiveRenderer">
+      <UniqueIdentifier>{cf8777e6-27a7-4716-97e2-f055c3a9bf8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Common">
+      <UniqueIdentifier>{e4472cc8-bc40-4641-a31f-8e68f3dc6ad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\ShapeRenderer">
+      <UniqueIdentifier>{785a26a5-ca6e-4f2c-818b-fe95ecb49ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Sprite">
+      <UniqueIdentifier>{070f632e-99aa-45e7-a7a2-11ba3131ce02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\PBR">
+      <UniqueIdentifier>{40b5617b-06d3-4424-9d44-1c6c34e8d427}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -177,12 +207,6 @@
     <ClInclude Include="Source\System\Graphic\RenderState.h">
       <Filter>Source\System\Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\BasicShader.h">
-      <Filter>Source\System\Renderer\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\LambertShader.h">
-      <Filter>Source\System\Renderer\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\System\Renderer\Shader\Shader.h">
       <Filter>Source\System\Renderer\Shader</Filter>
     </ClInclude>
@@ -230,6 +254,15 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h">
       <Filter>Source\GamepPlay\Object\Camera\GameCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\Basic\BasicShader.h">
+      <Filter>Source\System\Renderer\Shader\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h">
+      <Filter>Source\System\Renderer\Shader\Lambert</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h">
+      <Filter>Source\System\Renderer\Shader\PBR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -305,12 +338,6 @@
     <ClCompile Include="Source\System\Graphic\RenderState.cpp">
       <Filter>Source\System\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\BasicShader.cpp">
-      <Filter>Source\System\Renderer\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\LambertShader.cpp">
-      <Filter>Source\System\Renderer\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\System\Renderer\ImGuiRenderer.cpp">
       <Filter>Source\System\Renderer</Filter>
     </ClCompile>
@@ -353,61 +380,85 @@
     <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp">
       <Filter>Source\GamepPlay\Object\Camera\GameCamera</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp">
+      <Filter>Source\System\Renderer\Shader\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp">
+      <Filter>Source\System\Renderer\Shader\Lambert</Filter>
+    </ClCompile>
+    <ClCompile Include="PBRShader.cpp">
+      <Filter>Source\System\Renderer\Shader\PBR</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\Sprite.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\ShapeRenderer.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Skinning.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\PrimitiveRenderer.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Basic.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Lambert.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Scene.hlsli">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="Shader\Lambert\Lambert.hlsli">
+      <Filter>Shader\Lambert</Filter>
+    </None>
+    <None Include="Shader\Common\physical_based_rendering_functions.hlsli">
+      <Filter>Shader\Common</Filter>
+    </None>
+    <None Include="Shader\Common\shading_functions.hlsli">
+      <Filter>Shader\Common</Filter>
+    </None>
+    <None Include="Shader\Common\Skinning.hlsli">
+      <Filter>Shader\Common</Filter>
+    </None>
+    <None Include="Shader\Sprite\Sprite.hlsli">
+      <Filter>Shader\Sprite</Filter>
+    </None>
+    <None Include="Shader\ShapeRenderer\ShapeRenderer.hlsli">
+      <Filter>Shader\ShapeRenderer</Filter>
+    </None>
+    <None Include="Shader\PrimitiveRenderer\PrimitiveRenderer.hlsli">
+      <Filter>Shader\PrimitiveRenderer</Filter>
+    </None>
+    <None Include="Shader\Basic\Basic.hlsli">
+      <Filter>Shader\Basic</Filter>
+    </None>
+    <None Include="Shader\Common\Scene.hlsli">
+      <Filter>Shader\Common</Filter>
+    </None>
+    <None Include="Shader\PBR\PBRShader.hlsli">
+      <Filter>Shader\PBR</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shader\SpriteVS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\Basic\BasicPS.hlsl">
+      <Filter>Shader\Basic</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\SpritePS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\Basic\BasicVS.hlsl">
+      <Filter>Shader\Basic</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\ShapeRendererVS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\Lambert\LambertPS.hlsl">
+      <Filter>Shader\Lambert</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\ShapeRendererPS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\Lambert\LambertVS.hlsl">
+      <Filter>Shader\Lambert</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\PrimitiveRendererVS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\Sprite\SpritePS.hlsl">
+      <Filter>Shader\Sprite</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\PrimitiveRendererPS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\Sprite\SpriteVS.hlsl">
+      <Filter>Shader\Sprite</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\BasicPS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\ShapeRenderer\ShapeRendererPS.hlsl">
+      <Filter>Shader\ShapeRenderer</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\BasicVS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\ShapeRenderer\ShapeRendererVS.hlsl">
+      <Filter>Shader\ShapeRenderer</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\LambertPS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\PrimitiveRenderer\PrimitiveRendererPS.hlsl">
+      <Filter>Shader\PrimitiveRenderer</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\LambertVS.hlsl">
-      <Filter>Shader</Filter>
+    <FxCompile Include="Shader\PrimitiveRenderer\PrimitiveRendererVS.hlsl">
+      <Filter>Shader\PrimitiveRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PBR\PBRShader_vs.hlsl">
+      <Filter>Shader\PBR</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PBR\PBRShader_ps.hlsl">
+      <Filter>Shader\PBR</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,71 @@
-﻿  Framework.cpp
+﻿  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\BasicPS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\BasicVS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\LambertPS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\LambertVS.cso
+C:\Users\2240032\OneDrive - yamaguchigakuen\�`E??�N�g�b�v\Employment work\Shader\PBR\PBRShader_ps.hlsl(62,16-77): warning X3206: implicit truncation of vector type
+  
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\PBRShader_ps.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\PBRShader_vs.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\PrimitiveRendererPS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\PrimitiveRendererVS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\ShapeRendererPS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\ShapeRendererVS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\SpritePS.cso
+  compilation object save succeeded; see C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Data\Shader\SpriteVS.cso
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_dx11.cpp
+  imgui_impl_win32.cpp
+  imgui_widgets.cpp
+  ImCurveEdit.cpp
+  ImGradient.cpp
+  ImGuizmo.cpp
+  ImSequencer.cpp
+  PBRShader.cpp
+  Framework.cpp
+  Camera.cpp
+  DebugCamera.cpp
+  GameCamera.cpp
+  Character.cpp
+  Enemy.cpp
+  Player.cpp
+  Collision.cpp
+  Stage.cpp
+  Scene.cpp
   SceneGame.cpp
+  SceneManager.cpp
+  GamePad.cpp
+  Input.cpp
+  Mouse.cpp
+  Main.cpp
+  TransformUtils.cpp
+  GpuResourceUtils.cpp
+  Graphics.cpp
+  RenderState.cpp
+  ImGuiRenderer.cpp
+  ModelRenderer.cpp
+  PrimitiveRenderer.cpp
+  BasicShader.cpp
+  LambertShader.cpp
+  ShapeRenderer.cpp
+  GLTFImporter.cpp
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.cpp(54,12): warning C4244: '初期化中': 'double' から 'float' への変換です。データが失われる可能性があります。
+  Model.cpp
+  Sprite.cpp
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Enemy\Enemy.cpp(23,16): warning C4305: '=': 'double' から 'float' へ切り詰めます。
+  Dialog.cpp
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(29,16): warning C4305: '=': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(30,36): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(30,29): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,42): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,37): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,31): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(36,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(36,28): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(36,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(37,32): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(37,26): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(37,19): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(35,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
   Game.vcxproj -> C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\bin\x64\Debug\Game.exe

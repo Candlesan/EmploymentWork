@@ -8,6 +8,7 @@ C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\E
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\External\ImGuizmo\ImGradient.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ImGradient.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\External\ImGuizmo\ImGuizmo.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ImGuizmo.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\External\ImGuizmo\ImSequencer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ImSequencer.obj
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\PBRShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\PBRShader.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Framework.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Framework.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Camera\Camera.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Camera.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\DebugCamera.obj
@@ -31,8 +32,8 @@ C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\S
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\ImGuiRenderer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ImGuiRenderer.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\ModelRenderer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ModelRenderer.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\PrimitiveRenderer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\PrimitiveRenderer.obj
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\BasicShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\BasicShader.obj
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\LambertShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\LambertShader.obj
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\Basic\BasicShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\BasicShader.obj
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\Lambert\LambertShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\LambertShader.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\ShapeRenderer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ShapeRenderer.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Resource\Model\GLTFImporter.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\GLTFImporter.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Resource\Model\Model.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Model.obj

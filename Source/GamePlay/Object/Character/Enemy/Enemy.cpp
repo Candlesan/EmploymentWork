@@ -47,7 +47,7 @@ void Enemy::Update(float elapsedTime)
 // •`‰æˆ—
 void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 {
-	renderer->Draw(ShaderId::Lambert, enemy);
+	renderer->Draw(ShaderId::PBR, enemy);
 }
 
 // GUI•`‰æ

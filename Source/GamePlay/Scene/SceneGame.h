@@ -60,5 +60,9 @@ private:
 	LightManager lightManager;
 
 	float debugOffset = 0.5;
+
+	// PBR’²®—p
+	float pbrMetalness = 0.6f;
+	float pbrRoughness = 1.0f;
 };
 
