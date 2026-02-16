@@ -34,6 +34,7 @@ C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\S
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\PrimitiveRenderer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\PrimitiveRenderer.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\Basic\BasicShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\BasicShader.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\Lambert\LambertShader.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\LambertShader.obj
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\Shader\SkyMap\SkyMap.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\SkyMap.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Renderer\ShapeRenderer.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\ShapeRenderer.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Resource\Model\GLTFImporter.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\GLTFImporter.obj
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\System\Resource\Model\Model.cpp;C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\obj\x64\Debug\Model.obj

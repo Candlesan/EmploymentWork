@@ -82,6 +82,75 @@ Sprite::Sprite(ID3D11Device* device, const char* filename)
 	}
 }
 
+// シェーダーリソースで作るテクスチャ
+Sprite::Sprite(ID3D11Device* device, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view)
+{
+	HRESULT hr{ S_OK };
+
+	// 頂点バッファの生成
+	{
+		// 頂点バッファを作成するための設定オプション
+		D3D11_BUFFER_DESC buffer_desc = {};
+		buffer_desc.ByteWidth = sizeof(Vertex) * 4;
+		buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+		buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		buffer_desc.MiscFlags = 0;
+		buffer_desc.StructureByteStride = 0;
+		// 頂点バッファオブジェクトの生成
+		hr = device->CreateBuffer(&buffer_desc, nullptr, vertexBuffer.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+
+
+	// 頂点シェーダー
+	{
+		// 入力レイアウト
+		D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+		hr = GpuResourceUtils::LoadVertexShader(
+			device,
+			"Data/Shader/SpriteVS.cso",
+			inputElementDesc,
+			ARRAYSIZE(inputElementDesc),
+			inputLayout.GetAddressOf(),
+			vertexShader.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	}
+
+	// ピクセルシェーダー
+	{
+		hr = GpuResourceUtils::LoadPixelShader(
+			device,
+			"Data/Shader/SpritePS.cso",
+			pixelShader.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+
+	// テクスチャの生成	
+	if (shader_resource_view)
+	{
+		isLoadFile = false;
+		//shader_resource_view.Get()->AddRef();
+		this->shaderResourceView = shader_resource_view;
+
+		Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+		this->shaderResourceView->GetResource(resource.GetAddressOf());
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
+		hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		texture2d->GetDesc(&texture2d_desc);
+
+		this->textureWidth = static_cast<float>(texture2d_desc.Width);
+		this->textureHeight = static_cast<float>(texture2d_desc.Height);
+	}
+}
+
 // 描画実行
 void Sprite::Render(ID3D11DeviceContext* dc,
 	float dx, float dy,					// 左上位置

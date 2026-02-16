@@ -76,7 +76,7 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
         final_metalness *= sampled.r;
     }
 
-#if 01 // 確認用のコードなので本体は不要
+#if 0 // 確認用のコードなので本体は不要
     final_roughness = clamp(final_roughness + adjustroughness, 0.0001f, 1.0f);
     final_metalness = clamp(final_metalness + adjustmetalness, 0.0001f, 1.0f);
 #endif
@@ -128,9 +128,9 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     }
     
     // IBL処理
-    //float3 ambient = ambient_color.rgb * ambient_color.a;
-    //total_diffuse += ambient * DiffuseIBL(N, V, roughness, diffuse_reflectance, F0, diffuse_iem, samplerLinear);
-    //total_specular += ambient * SpecularIBL(N, V, roughness, F0, lut_ggx, specular_pmrem, samplerLinear);
+    float3 ambient = ambient_color.rgb * ambient_color.a;
+    total_diffuse += ambient * DiffuseIBL(N, V, roughness, diffuse_reflectance, F0, diffuse_iem, samplerLinear);
+    total_specular += ambient * SpecularIBL(N, V, roughness, F0, lut_ggx, specular_pmrem, samplerLinear);
 
     // 遮蔽処理
     total_diffuse = lerp(total_diffuse, total_diffuse /** occlusion_factor*/, occlusionStrength);

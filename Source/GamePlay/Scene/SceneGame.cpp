@@ -4,6 +4,9 @@
 #include "GamePlay/Object/Collision/Collision.h"
 #include "SceneManager.h"
 
+// シェーダー
+#include "System/Renderer/Shader/SkyMap/SkyMap.h"
+
 #include <imgui.h>
 
 // 初期化
@@ -127,6 +130,12 @@ void SceneGame::Render()
 
 		// 全モデル描画
 		modelRenderer->Render(rc);
+	}
+
+	// 2Dスプライト描画
+	{
+		// スカイマップ描画
+		modelRenderer->GetShader<SkyMap>(ShaderId::SkyMap)->Draw(rc);
 	}
 
 	// デバック描画

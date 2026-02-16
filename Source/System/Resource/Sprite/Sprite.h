@@ -10,6 +10,7 @@ class Sprite
 public:
 	Sprite(ID3D11Device* device);
 	Sprite(ID3D11Device* device, const char* filename);
+	Sprite(ID3D11Device* device, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view);
 
 	// 頂点データ
 	struct Vertex
@@ -39,14 +40,22 @@ public:
 		float r, float g, float b, float a	// 色
 	) const;
 
+	//　外部からシェーダーを変更する関数
+	void SetSpriteVS(Microsoft::WRL::ComPtr<ID3D11VertexShader> vs) { vertexShader = vs; }
+	void SetSpritePS(Microsoft::WRL::ComPtr<ID3D11PixelShader> ps) { pixelShader = ps; }
+
 private:
+	// デフォルトシェーダー
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader>			pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout>			inputLayout;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer>				vertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	shaderResourceView;
+	D3D11_TEXTURE2D_DESC texture2d_desc;
 
 	float textureWidth = 0;
 	float textureHeight = 0;
+
+	bool isLoadFile = true;	//	UNIT.09
 };

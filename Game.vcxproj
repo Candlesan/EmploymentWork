@@ -156,6 +156,7 @@
     <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h" />
     <ClInclude Include="Source\System\Renderer\ShapeRenderer.h" />
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
     <ClInclude Include="Source\System\Resource\Model\Model.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp" />
     <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp" />
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
     <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
@@ -216,6 +218,7 @@
     <None Include="Shader\PBR\PBRShader.hlsli" />
     <None Include="Shader\PrimitiveRenderer\PrimitiveRenderer.hlsli" />
     <None Include="Shader\ShapeRenderer\ShapeRenderer.hlsli" />
+    <None Include="Shader\SkyMap\SkyMap.hlsli" />
     <None Include="Shader\Sprite\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +259,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\ShapeRenderer\ShapeRendererVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\SkyMap\SkyMap_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\SkyMap\SkyMap_VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

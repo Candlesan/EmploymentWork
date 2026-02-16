@@ -118,6 +118,12 @@
     <Filter Include="Shader\PBR">
       <UniqueIdentifier>{40b5617b-06d3-4424-9d44-1c6c34e8d427}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Renderer\Shader\SkyMap">
+      <UniqueIdentifier>{6991e4cf-4b26-4fbe-aa3d-8a436bcbe812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\SkyMap">
+      <UniqueIdentifier>{1c2c9147-fa5f-4f58-bd2c-76c9e0691bc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -264,6 +270,9 @@
     <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h">
       <Filter>Source\System\Renderer\Shader\PBR</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h">
+      <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -389,6 +398,9 @@
     <ClCompile Include="PBRShader.cpp">
       <Filter>Source\System\Renderer\Shader\PBR</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp">
+      <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -421,6 +433,9 @@
     </None>
     <None Include="Shader\PBR\PBRShader.hlsli">
       <Filter>Shader\PBR</Filter>
+    </None>
+    <None Include="Shader\SkyMap\SkyMap.hlsli">
+      <Filter>Shader\SkyMap</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -459,6 +474,12 @@
     </FxCompile>
     <FxCompile Include="Shader\PBR\PBRShader_ps.hlsl">
       <Filter>Shader\PBR</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\SkyMap\SkyMap_VS.hlsl">
+      <Filter>Shader\SkyMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\SkyMap\SkyMap_PS.hlsl">
+      <Filter>Shader\SkyMap</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
