@@ -51,6 +51,21 @@ void SceneGame::Initialize()
 	// エネミー初期化
 	enemy = std::make_unique<Enemy>();
 	enemy->Initialize();
+
+	// ライト設定
+	DirectionalLight light;
+	// ここに ImGui で決めた数値をそのまま入れる
+	light.direction = { 0.288, -0.472f, 0.833f }; // 例：斜め上から
+	light.color = { 1.0f, 1.0f, 1.0f }; // 白色
+
+	DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
+	DirectX::XMStoreFloat3(&light.direction, DirectX::XMVector3Normalize(vDir));
+
+	lightManager.SetDirectionalLight(light);
+
+	// シャドウマップのパラメータ設定
+	shadowAttenuation = 0.125f;
+	shadowBias = 0.002f;
 }
 
 // 更新処理
@@ -108,6 +123,10 @@ void SceneGame::Render()
 	// カメラ取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 
+	// シャドウマップ取得
+	Graphics& graphics = Graphics::Instance();
+	ShadowMap* shadowMap = graphics.GetShadowMap();
+
 	// 描画コンテキスト設定
 	RenderContext rc;
 	rc.deviceContext = dc;
@@ -116,6 +135,22 @@ void SceneGame::Render()
 	rc.pbrMetalness = this->pbrMetalness;
 	rc.pbrRoughness = this->pbrRoughness;
 	rc.lightManager = &lightManager;
+
+	// シャドウマップ準備
+	//RenderContextに対してシャドウマップの情報を格納する
+	ShadowMapData shadowData;
+	shadowData.shadowMap = shadowMap->GetShaderResourceView();
+	shadowData.shadowSampler = shadowMap->GetSamplerState();
+	shadowData.lightViewProjection = lightViewProjection;
+	shadowData.shadowColor = DirectX::XMFLOAT4(0, 0, 0, 0.1);
+	shadowData.shadowBias = shadowBias;
+	shadowData.shadowAttenuation = shadowAttenuation;
+	rc.shadowMapData = &shadowData;
+
+	// シャドウマップ描画
+	RenderShadowMap();
+
+	Graphics::Instance().SetRenderTargets();
 
 	// 3Dモデル描画
 	{
@@ -148,6 +183,94 @@ void SceneGame::Render()
 	}
 }
 
+// シャドウマップ描画
+void SceneGame::RenderShadowMap()
+{
+	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+	RenderState* renderState = Graphics::Instance().GetRenderState();
+	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
+	ShapeRenderer* shapeRenderer = Graphics::Instance().GetShapeRenderer();
+	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	Graphics& graphics = Graphics::Instance();
+	ShadowMap* shadowMap = graphics.GetShadowMap();
+
+	// レンダーステート設定
+	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
+	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+
+	// 描画コンテキスト設定
+	RenderContext rc;
+	rc.deviceContext = dc;
+	rc.renderState = renderState;
+	rc.camera = &camera;
+	rc.lightManager = &lightManager;
+
+	//１カメラをライトから見た情報に変更
+	{
+		// 最初のカメラの情報を保存する
+		camera.SaveCamera();
+
+		// ライト方向を取得
+		DirectX::XMFLOAT3 lightDir = lightManager.GetDirectionalLight().direction;
+
+		// ライトビュー行列を計算
+		// ライト方向の反対側にライトを配置
+		DirectX::XMFLOAT3 lightPos = { -lightDir.x * 50.0f, -lightDir.y * 50.0f, -lightDir.z * 50.0f };
+		DirectX::XMFLOAT3 lightTarget = { 0, 0, 0 }; // 原点を向くようにする
+		DirectX::XMFLOAT3 lightEyeUp = { 0, 1, 0 }; // 上方向を向く
+
+		// ★追加：ライトが真上または真下（Y軸とほぼ平行）を向いているかチェック
+		// 内積に近い判定。0.99f 以上の場合はほぼ重なっているとみなす
+		if (fabsf(lightDir.y) > 0.999f) {
+			// 真上・真下を向いているときは、仮の上方向を「前」にする
+			lightEyeUp = { 0, 0, 1 };
+		}
+
+		camera.SetLookAt(lightPos, lightTarget, lightEyeUp);
+
+		// ライトプロジェクション行列を計算
+		//※調節する時近平面と遠平面の差が大きいとジャギが出やすい。
+		//※ジャギを抑えるには解像度を上げる・バイアスを小さくするなど
+		camera.SetOrthographic(
+			35.0,   // 横幅
+			35.0,   // 高さ
+			20.0f,    // 近平面
+			100.0f // 遠平面
+		);
+
+		DirectX::XMFLOAT4X4 view = camera.GetView();
+		DirectX::XMFLOAT4X4 projaection = camera.GetProjection();
+		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
+		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projaection);
+
+		// ライトビュープロジェクション行列を計算して保存
+		// シャドウマップ用の情報に入れる
+		DirectX::XMMATRIX lightViewProjection_M = DirectX::XMMatrixMultiply(V, P);
+		DirectX::XMStoreFloat4x4(&lightViewProjection, lightViewProjection_M);
+	}
+
+	shadowMap->Active(dc);
+	{
+		// ステージ描画
+		stage->Render(rc, modelRenderer);
+
+		// プレイヤー描画
+		player->Render(rc, modelRenderer);
+
+		// エネミー描画
+		enemy->Render(rc, modelRenderer);
+
+		// 全モデル描画
+		modelRenderer->Render(rc);
+	}
+	shadowMap->Deactive(dc);
+
+	//２変更したカメラの情報を元に戻すこと
+	camera.ResetCamera();
+}
+
 // GUI描画
 void SceneGame::DrawGUI()
 {
@@ -170,9 +293,29 @@ void SceneGame::DrawGUI()
 		if (ImGui::CollapsingHeader("light", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectionalLight& light = lightManager.GetDirectionalLight();
-			// 並行光源
-			ImGui::DragFloat3("light", &light.direction.x, 0.01f, -1.0, 1.0);
+
+			// 1. GUIで値を操作
+			if (ImGui::DragFloat3("light direction", &light.direction.x, 0.01f, -1.0f, 1.0f))
+			{
+				// 2. 値が変更されたら、ベクトルを数学的に正しい状態（長さ1）に直す
+				DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
+
+				// ベクトルの長さがほぼ0（全要素0など）でないかチェック
+				if (DirectX::XMVector3LengthSq(vDir).m128_f32[0] > 0.0001f)
+				{
+					vDir = DirectX::XMVector3Normalize(vDir);
+					DirectX::XMStoreFloat3(&light.direction, vDir);
+				}
+				else
+				{
+					// もし完全に0になったらデフォルトの向き（真下など）に戻す安全策
+					light.direction = { 0.0f, -1.0f, 0.0f };
+				}
+			}
+
 			ImGui::ColorEdit3("light color", &light.color.x);
+
+			// 3. 補正した値をマネージャーにセット
 			lightManager.SetDirectionalLight(light);
 		}
 
@@ -182,6 +325,18 @@ void SceneGame::DrawGUI()
 			ImGui::DragFloat("Adjust Roughness", &pbrRoughness, 0.01f, -1.0f, 1.0f);
 		}
 
+		if (ImGui::CollapsingHeader("ShadowMap", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			Graphics& graphics = Graphics::Instance();
+			ShadowMap* shadowMap = graphics.GetShadowMap();
+			RenderContext rc;
+
+			ImGui::SliderFloat("Shadow Attenuation", &shadowAttenuation, 0.0f, 1.0f);
+			ImGui::SliderFloat("Shadow Bias", &shadowBias, 0.0f, 0.01f);
+
+			ImGui::Text("texture");
+			ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+		}
 	}
 	ImGui::End();
 

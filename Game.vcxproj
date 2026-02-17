@@ -156,6 +156,7 @@
     <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h" />
     <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h" />
     <ClInclude Include="Source\System\Renderer\ShapeRenderer.h" />
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
@@ -174,7 +175,6 @@
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
-    <ClCompile Include="PBRShader.cpp" />
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />
@@ -200,6 +200,8 @@
     <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\PBR\PBRShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp" />
     <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp" />
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
@@ -259,6 +261,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\ShapeRenderer\ShapeRendererVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\SkyMap\Shadow_Caster_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

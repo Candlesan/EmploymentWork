@@ -28,6 +28,9 @@ public:
 	// 描画処理
 	void Render() override;
 
+	// シャドウマップ描画
+	void RenderShadowMap();
+
 	// GUI描画
 	void DrawGUI() override;
 
@@ -64,5 +67,11 @@ private:
 	// PBR調整用
 	float pbrMetalness = 0.6f;
 	float pbrRoughness = 1.0f;
+
+	// シャドウマップ調整用
+	float shadowAttenuation = 0.125f;
+	float shadowBias = 0.002f;
+	DirectX::XMFLOAT4X4 lightViewProjection;
+
 };
 

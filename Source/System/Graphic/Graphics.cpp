@@ -130,6 +130,7 @@ void Graphics::Initialize(HWND hWnd)
 	shapeRenderer = std::make_unique<ShapeRenderer>(device.Get());
 	modelRenderer = std::make_unique<ModelRenderer>(device.Get());
 
+	shadowMap = std::make_unique<ShadowMap>(device.Get());
 }
 
 // ƒNƒŠƒA

@@ -81,13 +81,11 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     final_metalness = clamp(final_metalness + adjustmetalness, 0.0001f, 1.0f);
 #endif
 
-        // 光の遮蔽値を取得
+     // 光の遮蔽値を取得
     float occlusion_factor = 1.0f;
     if (hasOcclusionTexture > 0)
     {
         occlusion_factor = occlusionTexture.Sample(samplerLinear, pin.texcoord).r;
-        //float4 sampled = occlusionTexture.Sample(samplerLinear, pin.texcoord);
-        //occlusion_factor *= sampled.r;
     }
     const float occlusion_strength = occlusionStrength;
     
@@ -114,13 +112,14 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
             DirectBRDF(diffuse_reflectance, F0, N, V, L, LC, final_roughness, diffuse, specular);
 
             // 平行光源用シャドウマップ
-            //float depth = shadow_map.Sample(shadow_sampler_state, pin.shadow_texcoord.xy).r;
-            // 深度値を比較して壁かどうかを判定する
-            //if (pin.shadow_texcoord.z - depth > shadow_bias)
-            //{
-            //    diffuse *= shadow_attenuation;
-            //    specular *= shadow_attenuation;
-            //}
+            float depth = shadow_map.Sample(shadow_sampler_state, pin.shadow_texcoord.xy).r;
+            //深度値を比較して壁かどうかを判定する
+
+            if (pin.shadow_texcoord.z - depth > shadow_bias)
+            {
+                diffuse *= shadow_attenuation;
+                specular *= shadow_attenuation;
+            }
             
             total_diffuse += diffuse;
             total_specular += specular;
@@ -133,8 +132,8 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     total_specular += ambient * SpecularIBL(N, V, roughness, F0, lut_ggx, specular_pmrem, samplerLinear);
 
     // 遮蔽処理
-    total_diffuse = lerp(total_diffuse, total_diffuse /** occlusion_factor*/, occlusionStrength);
-    total_specular = lerp(total_specular, total_specular /** occlusion_factor*/, occlusionStrength);
+    total_diffuse = lerp(total_diffuse, total_diffuse * occlusion_factor, occlusionStrength);
+    total_specular = lerp(total_specular, total_specular * occlusion_factor, occlusionStrength);
       
     // 色生成
     float3 color = total_diffuse + total_specular + emisive_color;

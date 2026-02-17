@@ -124,6 +124,9 @@
     <Filter Include="Shader\SkyMap">
       <UniqueIdentifier>{1c2c9147-fa5f-4f58-bd2c-76c9e0691bc9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\ShadowMap">
+      <UniqueIdentifier>{83b296cb-ed95-4292-91b1-f7de053c0ee7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -273,6 +276,9 @@
     <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h">
       <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h">
+      <Filter>Source\System\Renderer\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -395,11 +401,14 @@
     <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp">
       <Filter>Source\System\Renderer\Shader\Lambert</Filter>
     </ClCompile>
-    <ClCompile Include="PBRShader.cpp">
-      <Filter>Source\System\Renderer\Shader\PBR</Filter>
-    </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp">
       <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\PBR\PBRShader.cpp">
+      <Filter>Source\System\Renderer\Shader\PBR</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -480,6 +489,9 @@
     </FxCompile>
     <FxCompile Include="Shader\SkyMap\SkyMap_PS.hlsl">
       <Filter>Shader\SkyMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\SkyMap\Shadow_Caster_vs.hlsl">
+      <Filter>Shader\ShadowMap</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

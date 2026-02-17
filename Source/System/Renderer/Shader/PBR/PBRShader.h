@@ -46,6 +46,23 @@ private:
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        inputLayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer>            meshConstantBuffer;
 
+    // シャドウマップ
+    struct shadowmap_constants
+    {
+        DirectX::XMFLOAT4X4    light_view_projection;
+        DirectX::XMFLOAT4     shadow_color;
+        float                shadow_attenuation;
+        float                shadow_bias;
+        DirectX::XMFLOAT2    shadow_dummy;
+    };
+    Microsoft::WRL::ComPtr<ID3D11Buffer> shadowmap_constant_buffer;
+
+    // シャドウマップ関係
+    Microsoft::WRL::ComPtr<ID3D11Buffer> shadowmap_scene_constant_buffer;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> shadowmap_depth_stencil_view;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowmap_shader_resource_view;
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> shadowmap_sampler_state;
+
     // IBL用のテクスチャ
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuse_iem_shader_resource_view;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> specular_pmrem_shader_resource_view;

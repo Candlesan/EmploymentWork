@@ -8,7 +8,7 @@ struct VS_OUT
     float3 w_normal : NORMAL;
     float4 w_tangent : TANGENT;
     float2 texcoord : TEXCOORD;
-    //float3 shadow_texcoord : TEXCOORD1;
+    float3 shadow_texcoord : TEXCOORD1;
 };
 
 cbuffer MATERIAL_CONSTANT_BUFFER : register(b13)
@@ -35,14 +35,15 @@ cbuffer MATERIAL_CONSTANT_BUFFER : register(b13)
     int hasNormalTexture;
     float pad1;
 };
-//cbuffer SHADOWMAP_CONSTANT_BUFFER : register(b5)
-//{
-//    row_major float4x4 light_view_projection;
-//    float4 shadow_color;
-//    float shadow_attenuation;
-//    float shadow_bias;
-//    float2 shadow_dummy;
-//};
+
+cbuffer SHADOWMAP_CONSTANT_BUFFER : register(b5)
+{
+    row_major float4x4 light_view_projection;
+    float4 shadow_color;
+    float shadow_attenuation;
+    float shadow_bias;
+    float2 shadow_dummy;
+};
 
 #include "../Common/shading_functions.hlsli"
 #include "../Common/physical_based_rendering_functions.hlsli"
