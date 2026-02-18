@@ -13,7 +13,6 @@ enum class ShaderId
 	Basic,
 	Lambert,
 	PBR,
-	SkyMap,
 
 	EnumCount
 };
@@ -29,10 +28,6 @@ public:
 
 	// 描画実行
 	void Render(const RenderContext& rc);
-
-	// シェーダー取得
-	template <typename T>
-	T* GetShader(ShaderId id) const { return dynamic_cast<T*>(shaders[static_cast<int>(id)].get()); }private:
 
 private:
 	struct CbScene

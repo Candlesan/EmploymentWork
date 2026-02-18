@@ -20,6 +20,17 @@ public:
 		DirectX::XMFLOAT2	texcoord;
 	};
 
+	// 更新処理
+	void Update(
+		float dx, float dy,					// 左上位置
+		float dz,							// 奥行
+		float dw, float dh,					// 幅、高さ
+		float sx, float sy,					// 画像切り抜き位置
+		float sw, float sh,					// 画像切り抜きサイズ
+		float angle,						// 角度
+		float r, float g, float b, float a	// 色
+	) const;
+
 	// 描画実行
 	void Render(ID3D11DeviceContext* dc,
 		float dx, float dy,					// 左上位置
@@ -44,6 +55,7 @@ public:
 	void SetSpriteVS(Microsoft::WRL::ComPtr<ID3D11VertexShader> vs) { vertexShader = vs; }
 	void SetSpritePS(Microsoft::WRL::ComPtr<ID3D11PixelShader> ps) { pixelShader = ps; }
 
+	Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer() { return vertexBuffer; }
 private:
 	// デフォルトシェーダー
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;

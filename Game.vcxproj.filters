@@ -127,6 +127,9 @@
     <Filter Include="Shader\ShadowMap">
       <UniqueIdentifier>{83b296cb-ed95-4292-91b1-f7de053c0ee7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Renderer\Shader\ShadowMap">
+      <UniqueIdentifier>{7b5a9c3f-87ae-4c55-b2ca-f263fbb91aea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -277,7 +280,7 @@
       <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h">
-      <Filter>Source\System\Renderer\Shader</Filter>
+      <Filter>Source\System\Renderer\Shader\ShadowMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -408,7 +411,7 @@
       <Filter>Source\System\Renderer\Shader\PBR</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System\Renderer\Shader\ShadowMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

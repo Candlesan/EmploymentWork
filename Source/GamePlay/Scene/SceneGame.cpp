@@ -66,6 +66,9 @@ void SceneGame::Initialize()
 	// シャドウマップのパラメータ設定
 	shadowAttenuation = 0.125f;
 	shadowBias = 0.002f;
+
+	// スカイマップ初期化
+	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
 }
 
 // 更新処理
@@ -170,7 +173,8 @@ void SceneGame::Render()
 	// 2Dスプライト描画
 	{
 		// スカイマップ描画
-		modelRenderer->GetShader<SkyMap>(ShaderId::SkyMap)->Draw(rc);
+		Graphics::Instance().SetRenderTargets();
+		skyMap->Draw(rc);
 	}
 
 	// デバック描画

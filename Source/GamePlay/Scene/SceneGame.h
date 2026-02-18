@@ -9,6 +9,8 @@
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
+#include "System/Renderer/Shader/SkyMap/SkyMap.h"
+
 // ゲームシーン
 class SceneGame : public Scene
 {
@@ -63,6 +65,8 @@ private:
 	LightManager lightManager;
 
 	float debugOffset = 0.5;
+
+	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 
 	// PBR調整用
 	float pbrMetalness = 0.6f;

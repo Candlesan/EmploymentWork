@@ -1,6 +1,8 @@
 ﻿  Framework.cpp
   SceneGame.cpp
+  SkyMap.cpp
+  Sprite.cpp
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(38,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(58,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(145,54): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(148,54): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
   Game.vcxproj -> C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\bin\x64\Debug\Game.exe

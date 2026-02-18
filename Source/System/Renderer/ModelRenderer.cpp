@@ -5,7 +5,6 @@
 #include "Shader/Basic/BasicShader.h"
 #include "Shader/Lambert/LambertShader.h"
 #include "Shader/PBR/PBRShader.h"
-#include "Shader/SkyMap/SkyMap.h"
 
 // コンストラクタ
 ModelRenderer::ModelRenderer(ID3D11Device* device)
@@ -26,7 +25,6 @@ ModelRenderer::ModelRenderer(ID3D11Device* device)
 	shaders[static_cast<int>(ShaderId::Basic)] = std::make_unique<BasicShader>(device);
 	shaders[static_cast<int>(ShaderId::Lambert)] = std::make_unique<LambertShader>(device);
 	shaders[static_cast<int>(ShaderId::PBR)] = std::make_unique<PBRShader>(device);
-	shaders[static_cast<int>(ShaderId::SkyMap)] = std::make_unique<SkyMap>(device);
 }
 
 // 箱描画

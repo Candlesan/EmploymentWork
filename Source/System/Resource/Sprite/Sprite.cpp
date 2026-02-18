@@ -2,6 +2,7 @@
 #include "Sprite.h"
 #include "System/Core/Misc.h"
 #include "System/Graphic/GpuResourceUtils.h"
+#include "System/Graphic/Graphics.h"
 
 // コンストラクタ
 Sprite::Sprite(ID3D11Device* device)
@@ -151,16 +152,15 @@ Sprite::Sprite(ID3D11Device* device, Microsoft::WRL::ComPtr<ID3D11ShaderResource
 	}
 }
 
-// 描画実行
-void Sprite::Render(ID3D11DeviceContext* dc,
-	float dx, float dy,					// 左上位置
-	float dz,							// 奥行
-	float dw, float dh,					// 幅、高さ
-	float sx, float sy,					// 画像切り抜き位置
-	float sw, float sh,					// 画像切り抜きサイズ
-	float angle,						// 角度
-	float r, float g, float b, float a	// 色
-	) const
+// 更新処理
+void Sprite::Update(
+	float dx, float dy,
+	float dz, 
+	float dw, float dh,
+	float sx, float sy,
+	float sw, float sh,
+	float angle,
+	float r, float g, float b, float a) const
 {
 	// 頂点座標
 	DirectX::XMFLOAT2 positions[] = {
@@ -206,10 +206,12 @@ void Sprite::Render(ID3D11DeviceContext* dc,
 		p.y += my;
 	}
 
+	ID3D11DeviceContext* immediate_context = Graphics::Instance().GetDeviceContext();
+
 	// 現在設定されているビューポートからスクリーンサイズを取得する。
 	D3D11_VIEWPORT viewport;
 	UINT numViewports = 1;
-	dc->RSGetViewports(&numViewports, &viewport);
+	immediate_context->RSGetViewports(&numViewports, &viewport);
 	float screenWidth = viewport.Width;
 	float screenHeight = viewport.Height;
 
@@ -222,7 +224,7 @@ void Sprite::Render(ID3D11DeviceContext* dc,
 
 	// 頂点バッファの内容の編集を開始する。
 	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-	HRESULT hr = dc->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
+	HRESULT hr = immediate_context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	// 頂点バッファの内容を編集
@@ -243,7 +245,21 @@ void Sprite::Render(ID3D11DeviceContext* dc,
 	}
 
 	// 頂点バッファの内容の編集を終了する。
-	dc->Unmap(vertexBuffer.Get(), 0);
+	immediate_context->Unmap(vertexBuffer.Get(), 0);
+}
+
+// 描画実行
+void Sprite::Render(ID3D11DeviceContext* dc,
+	float dx, float dy,					// 左上位置
+	float dz,							// 奥行
+	float dw, float dh,					// 幅、高さ
+	float sx, float sy,					// 画像切り抜き位置
+	float sw, float sh,					// 画像切り抜きサイズ
+	float angle,						// 角度
+	float r, float g, float b, float a	// 色
+	) const
+{
+	Update(dx, dy, dz, dw, dh, sx, sy, sw, sh, angle, r, g, b, a);
 
 	// GPUに描画するためのデータを渡す
 	UINT stride = sizeof(Vertex);

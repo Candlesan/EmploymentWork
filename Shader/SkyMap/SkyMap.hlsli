@@ -1,4 +1,4 @@
-#include "../Common/Scene.hlsli"
+//#include "../Common/Scene.hlsli"
 
 struct VS_OUT
 {
@@ -11,6 +11,7 @@ struct VS_OUT
 cbuffer SKY_MAP_CONSTAN_TBUFFER : register(b8)
 {
     row_major float4x4 inverse_view_projection;
+    float4 cameraPosition;
 }
 
 #include "../Common/shading_functions.hlsli"
