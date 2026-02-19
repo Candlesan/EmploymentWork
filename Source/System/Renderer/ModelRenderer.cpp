@@ -85,6 +85,8 @@ void ModelRenderer::Render(const RenderContext& rc)
 
 	// レンダーステート設定
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+
+
 	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
 
 	// メッシュ描画関数
@@ -155,6 +157,19 @@ void ModelRenderer::Render(const RenderContext& rc)
 				continue;
 			}
 
+			// 服とか髪用
+			if (mesh.material->alphaMode == Model::AlphaMode::Mask ||
+				mesh.material->alphaMode == Model::AlphaMode::Blend)
+			{
+				// 裏面も描画する
+				dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+			}
+			else
+			{
+				// 通常のパーツは背面をカット（描画負荷軽減）
+				dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
+			}
+
 			// 描画
 			drawMesh(mesh, shader);
 		}
@@ -179,6 +194,9 @@ void ModelRenderer::Render(const RenderContext& rc)
 		Shader* shader = shaders[static_cast<int>(transparencyDrawInfo.shaderId)].get();
 
 		shader->Begin(rc);
+
+		// 半透明も裏側が見えるように設定
+		dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 
 		drawMesh(*transparencyDrawInfo.mesh, shader);
 
