@@ -30,6 +30,8 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
         float4 tex_color = baseColorTexture.Sample(samplerLinear, pin.texcoord);
         tex_color.rgb = pow(tex_color.rgb, GammaFactor);
         base_color *= tex_color;
+        clip(base_color.a - alphaCutoff);
+
     }
     
     // ©ŒÈ”­ŒõF‚ğæ“¾

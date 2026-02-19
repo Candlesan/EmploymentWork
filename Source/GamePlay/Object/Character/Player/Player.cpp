@@ -15,7 +15,8 @@ void Player::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// プレイヤーモデル読み込み
-	player = std::make_shared<Model>(device, "Data/Model/Player/Map_Robot3.gltf");
+	//player = std::make_shared<Model>(device, "Data/Model/Player/Map_Robot3.gltf");
+	player = std::make_shared<Model>(device, "Data/Model/Player/human/SK_SwordsmanGirl_02.gltf");
 
 	// 武器モデル読み込み
 	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/SM_GreatSword.gltf");
@@ -52,7 +53,7 @@ void Player::Update(float elapsedTime)
 	UpdateVelocity(elapsedTime);
 
 	// 武器のアタッチメント処理
-	WeaponAttachment();
+	//WeaponAttachment();
 
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
@@ -296,7 +297,8 @@ void Player::UpdateAnimations(float elapsedTime)
 		animationLoop = true;
 		useRootMotion = false;
 		useRootMotionEx = true;
-		newAnimationIndex = player->GetAnimationIndex("Walk_F");
+		//newAnimationIndex = player->GetAnimationIndex("Walk_F");
+		newAnimationIndex = player->GetAnimationIndex("Walk_InPlace");
 
 		if (moveLength < 0.1f)
 		{
