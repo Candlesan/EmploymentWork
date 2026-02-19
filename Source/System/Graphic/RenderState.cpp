@@ -211,6 +211,17 @@ RenderState::RenderState(ID3D11Device* device)
 			blendStates[static_cast<int>(BlendState::Multiply)].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+	// 深度のみ（Z-PrePass用：色を書かない）
+	{
+		D3D11_BLEND_DESC desc{};
+		desc.AlphaToCoverageEnable = false;
+		desc.IndependentBlendEnable = false;
+		desc.RenderTarget[0].BlendEnable = false;
+		desc.RenderTarget[0].RenderTargetWriteMask = 0;
+		HRESULT hr = device->CreateBlendState(&desc,
+			blendStates[static_cast<int>(BlendState::Multiply)].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
 
 	// ベタ塗り＆カリングなし
 	{

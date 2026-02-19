@@ -116,7 +116,7 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
             // 平行光源用シャドウマップ
             float depth = shadow_map.Sample(shadow_sampler_state, pin.shadow_texcoord.xy).r;
             //深度値を比較して壁かどうかを判定する
-
+            
             if (pin.shadow_texcoord.z - depth > shadow_bias)
             {
                 diffuse *= shadow_attenuation;

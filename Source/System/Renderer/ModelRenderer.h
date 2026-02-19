@@ -47,6 +47,7 @@ private:
 	{
 		ShaderId				shaderId;
 		std::shared_ptr<Model>	model;
+		float					distance;
 	};
 
 	struct TransparencyDrawInfo

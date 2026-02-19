@@ -1,10 +1,11 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
+#include "GamePlay/Object/Character/Character.h"
 #include <memory>
 
 
 // ステージ
-class Stage
+class Stage : public Character
 {
 public:
 	Stage();

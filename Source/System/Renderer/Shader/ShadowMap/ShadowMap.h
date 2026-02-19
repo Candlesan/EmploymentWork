@@ -7,7 +7,7 @@
 class ShadowMap
 {
 public:
-	ShadowMap(ID3D11Device* device, UINT width = 2048, UINT height = 2048);
+	ShadowMap(ID3D11Device* device, UINT width = 1024, UINT height = 1024);
 	~ShadowMap() {}
 
 	// êÿÇËë÷Ç¶ä÷êî
