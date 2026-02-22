@@ -282,6 +282,9 @@
     <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h">
       <Filter>Source\System\Renderer\Shader\ShadowMap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h">
+      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">

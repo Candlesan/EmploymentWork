@@ -15,11 +15,11 @@ void Player::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// プレイヤーモデル読み込み
-	//player = std::make_shared<Model>(device, "Data/Model/Player/Map_Robot3.gltf");
-	player = std::make_shared<Model>(device, "Data/Model/Player/human/SK_SwordsmanGirl_02.gltf");
+	player = std::make_shared<Model>(device, "Data/Model/Player/SKM_DKM_Full.gltf");
 
 	// 武器モデル読み込み
-	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/SM_GreatSword.gltf");
+	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/GreatSword.gltf");
+	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.1f;
 
 	 // プレイヤーパラメーター初期化
 	moveSpeed = 2.0f;
@@ -28,14 +28,14 @@ void Player::Initialize()
 	weight = 0.5f;
 	height = 1.0f;
 	debugOffset = 0.8;
-	weapon.weaponHitOffset = { -0.05, -0.15, 1 };
-	weapon.weaponAngleOffset = { 0.06, 1.3, 0.03 };
-	weapon.weaponRadius = 0.25;
-	weapon.weaponHeight = 1.5f;
+	weapon.weaponHitOffset = { -0.35, -1.05, -0.1 };
+	weapon.weaponAngleOffset = { 0.06, 6.6, 0.23 };
+	weapon.weaponRadius = 0.3f;
+	weapon.weaponHeight = 1.0f;
 
 	// 武器のパラメーター初期化
-	weapon.position = { 0.07, 0.17, 0.02 };
-	weapon.angle = { -1.62, 5.22, 2.89 };
+	weapon.position = { 0.34, 1.02, 0.04 };
+	weapon.angle = { 0, 0, 2.89 };
 
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
@@ -53,7 +53,7 @@ void Player::Update(float elapsedTime)
 	UpdateVelocity(elapsedTime);
 
 	// 武器のアタッチメント処理
-	//WeaponAttachment();
+	WeaponAttachment();
 
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
@@ -142,7 +142,11 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 
 		DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
 
-		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		// 武器の現在の位置と回転だけを取り出す（スケールを無視する）
+		DirectX::XMVECTOR scale, rot, pos;
+		DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
+		DirectX::XMMATRIX baseMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
+
 		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
 			weapon.angle.x + weapon.weaponAngleOffset.x,
 			weapon.angle.y + weapon.weaponAngleOffset.y,
@@ -151,7 +155,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 			weapon.position.x + weapon.weaponHitOffset.x,
 			weapon.position.y + weapon.weaponHitOffset.y,
 			weapon.position.z + weapon.weaponHitOffset.z);
-		DirectX::XMMATRIX WorldWeapon = S * R * T * weaponWorld;
+		DirectX::XMMATRIX WorldWeapon = R * T * baseMatrix;
 		DirectX::XMStoreFloat4x4(&weaponTransform, WorldWeapon);
 
 		renderer->DrawCapsule(weaponTransform, weapon.weaponRadius, weapon.weaponHeight, { 1, 0, 0, 1 });
@@ -297,8 +301,7 @@ void Player::UpdateAnimations(float elapsedTime)
 		animationLoop = true;
 		useRootMotion = false;
 		useRootMotionEx = true;
-		//newAnimationIndex = player->GetAnimationIndex("Walk_F");
-		newAnimationIndex = player->GetAnimationIndex("Walk_InPlace");
+		newAnimationIndex = player->GetAnimationIndex("Walk_F");
 
 		if (moveLength < 0.1f)
 		{

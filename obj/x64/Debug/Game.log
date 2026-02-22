@@ -1,2 +1,13 @@
-﻿  ModelRenderer.cpp
+﻿  Player.cpp
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(30,16): warning C4305: '=': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,43): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,36): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,29): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(32,42): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(32,37): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(32,31): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(37,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(37,28): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(37,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(38,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
   Game.vcxproj -> C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\bin\x64\Debug\Game.exe

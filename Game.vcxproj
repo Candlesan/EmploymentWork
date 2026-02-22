@@ -130,6 +130,7 @@
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
