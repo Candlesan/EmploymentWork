@@ -130,7 +130,9 @@
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationStateManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
@@ -180,6 +182,8 @@
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />

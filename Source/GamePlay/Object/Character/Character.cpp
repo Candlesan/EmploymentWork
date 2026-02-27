@@ -227,9 +227,9 @@ void Character::UpdateVerticalMove(float elapsedTime)
 			OnLanding();
 			isGround = true;
 		}
-		else
-		{
-			isGround = false;
-		}
+	}
+	else
+	{
+		isGround = false;
 	}
 }

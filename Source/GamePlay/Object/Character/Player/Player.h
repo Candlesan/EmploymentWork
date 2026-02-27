@@ -1,9 +1,10 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
 #include "GamePlay/Object/Character/Character.h"
+#include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include <memory>
 
-class Player : public Character
+class Player : public AnimationCharacter<PlayerAnimationState>
 {
 public:
 	Player() {};
@@ -20,6 +21,13 @@ public:
 	DirectX::XMFLOAT3 GetWeaponDirection() const;
 	float GetWeaponRadius() const { return weapon.weaponRadius; }
 	float GetWeaponHeight() const { return weapon.weaponHeight; }
+
+protected:
+	std::shared_ptr<Model> GetModel() override { return player; }
+	const std::shared_ptr<Model> GetModel() const override { return player; }
+
+	//着地したときに呼ばれる
+	void OnLanding() override;
 private:
 	// スティック入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 GetMoveVec() const;
@@ -27,11 +35,14 @@ private:
 	// 入力処理
 	void InputMove(float elapsedTime);
 
-	// アニメーション更新処理
-	void UpdateAnimations(float elapsedTime);
+	// ジャンプ出来るかどうか
+	bool CanJump() const;
 
-	// アニメーションが終了したか
-	bool IsFinshedAnimation();
+	// 状態遷移更新処理
+	void UpdateStateTransitions(float elapsedTime);
+
+	// 歩きのアニメションを決める関数
+	PlayerAnimationState DetermineWalkState(); 
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
@@ -42,34 +53,7 @@ private:
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
-	// アニメーション関係
-	enum class State
-	{
-		Idle = 0,
-		Walk,
-		Attack,
-	};
-	State state = State::Idle;
-
-	std::vector<Model::NodePose> nodePoses;
-	std::vector<Model::NodePose> oldNodePoses;
-
-	int animationIndex = -1;
-	float animationSeconds = 0.0f;
-	float oldAnimationSeconds = 0.0f;
-	float animationBlendSeconds = 0.2f;
-	float animationBlendSecondsLength = 0.2f;
-	bool isBlending = true;
-	bool animationLoop = true;
-
-	bool useRootMotion = false;
-	bool useRootMotionEx = false;
-	bool bakeTranslationY = true; // Y軸移動を無視するか
-	DirectX::XMFLOAT3 rootMotionPosition = { 0, 0, 0 }; // ルートモーションによる位置
-
-	DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-
-	// 武器のアタッチメント関係
+	// 武器のアタッチメqaント関係
 	struct Weapon
 	{
 		std::shared_ptr<Model> model;
@@ -89,6 +73,28 @@ private:
 	};
 	Weapon weapon;
 
+	enum class MoveMode {
+		Walk,   // 通常時
+		Jog,
+		Run,
+		Guarding_Walk, // ガード入力中(歩き)
+		Guarding_Jog,  // ガード入力中(小走り)
+	};
+	MoveMode mode = MoveMode::Walk;
+
 	// 当たり判定関係
 	float debugOffset = 0.5;
+
+	// 回避用の条件
+	float bButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
+	static constexpr float RUN_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
+	float rtButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
+	static constexpr float ATTACK_THRESHOLD = 0.25f; // 何秒以上で走りと判定するか
+
+	// ジャンプ関係
+	bool jumpPressed = false;
+	float jumpSpeed = 5.0f;
+
+	int jumpCount = 0;
+	int jumpLimit = 1;
 };

@@ -4,7 +4,8 @@
 // プレイヤーのアニメーション
 enum class PlayerAnimationState
 {
-	Idle = 0,		// 待機
+	// 待機
+	Idle = 0,
 
 	// 歩き
 	Walk_B,
@@ -20,7 +21,7 @@ enum class PlayerAnimationState
 	Jog_BR,
 	Jog_F,
 	Jog_L,
-	jog_R,
+	Jog_R,
 
 	// 走り
 	Run,
@@ -41,8 +42,6 @@ enum class PlayerAnimationState
 	Attack_02,
 	Charge_Attack,
 	Charge_Attack_Start,
-	Charge_Attack_Loop,
-	Charge_Attack_End,
 
 	// ダッシュ攻撃
 	Run_Attack,
@@ -52,7 +51,7 @@ enum class PlayerAnimationState
 
 	// ジャンプ攻撃
 	Jump_Attack_Start,
-	JumpAttack_Loop,
+	Jump_Attack_Loop,
 	Jump_Attack,
 
 	// ジャンプ
@@ -80,9 +79,9 @@ enum class PlayerAnimationState
 	Guard_Walk_R,
 
 	// ガード受け
-	Guard＿Hit_01, //（小）
-	Guard＿Hit_02, //（大）
-	Guard＿Hit_03, //（崩れ）
+	Guard_Hit_01, //（小）
+	Guard_Hit_02, //（大）
+	Guard_Hit_03, //（崩れ）
 
 	// 戦技・バフ
 	Buff,
@@ -126,16 +125,21 @@ enum class PlayerAnimationState
 	Sit_Start,
 	Sit_Loop,
 	Sit_End,
+
+	// 死亡
+	Die,
+	Die_B,
+	Die_F
 };
 
 // アニメーションの設定
 struct AnimationConfig
 {
-	std::string animationName;
-	bool loop;
-	bool useRootMotion;
+	std::string animationName; // アニメーション名
+	bool loop; // アニメーションをループするか
+	bool useRootMotion; // ルートモーションするか
 	bool useRootMotionEx;
-	float blendTime;
+	float blendTime; // 補間時間
 
 	AnimationConfig()
 		: animationName(""), loop(false), useRootMotion(false), useRootMotionEx(false), blendTime(0.2f) {

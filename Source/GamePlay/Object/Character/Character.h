@@ -122,7 +122,7 @@ protected:
 
 	float friction = 15.0f; // –€C—Í
 	float acceleration = 50.0f; // ‰Á‘¬“x
-	float gravity = -60; // d—Í
+	float gravity = -9.8; // d—Í
 
 	//“–‚½‚è”»’èŠÖŒW
 	float radius = 0.5f; // ”¼Œa
