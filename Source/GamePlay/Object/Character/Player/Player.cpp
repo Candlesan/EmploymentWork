@@ -297,7 +297,10 @@ void Player::InputMove(float elapsedTime)
 bool Player::CanJump() const
 {
 	// Jump_End 中はジャンプ不可（着地の瞬間のフレームのズレ対策）
-	if (currentState == PlayerAnimationState::Jump_End) return false;
+	if (currentState == PlayerAnimationState::Jump_End)
+	{
+		return IsAnimationOutTimeRange(0.238f);
+	}
 
 	if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
 	// 溜め攻撃の開始直後などは絶対にジャンプ不可

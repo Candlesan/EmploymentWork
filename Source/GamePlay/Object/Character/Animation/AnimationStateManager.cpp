@@ -80,9 +80,9 @@ AnimationStateManager<PlayerAnimationState>::AnimationStateManager()
     configs[PlayerAnimationState::Guard_Walk_R]  = { "Guard_Wall_R" , true };
 
     // ÉKÅ[ÉhéÛÇØ
-    configs[PlayerAnimationState::Guard_Hit_01] = { "GuardÅQHit_01", false };
-    configs[PlayerAnimationState::Guard_Hit_02] = { "GuardÅQHit_02", false };
-    configs[PlayerAnimationState::Guard_Hit_03] = { "GuardÅQHit_03", false };
+    configs[PlayerAnimationState::Guard_Hit_01] = { "Guard_Hit_01", false };
+    configs[PlayerAnimationState::Guard_Hit_02] = { "Guard_Hit_02", false };
+    configs[PlayerAnimationState::Guard_Hit_03] = { "Guard_Hit_03", false };
 
     // êÌãZÅEÉoÉt
     configs[PlayerAnimationState::Buff] = { "Buff", false };
