@@ -22,6 +22,9 @@ public:
 	float GetWeaponRadius() const { return weapon.weaponRadius; }
 	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
+	// ロックオン対象の位置を取得
+	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
+
 protected:
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
@@ -43,6 +46,9 @@ private:
 
 	// 歩きのアニメションを決める関数
 	PlayerAnimationState DetermineWalkState(); 
+
+	// 回避のアニメションを決める関数
+	PlayerAnimationState DetermineRollState(); 
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
@@ -75,8 +81,8 @@ private:
 
 	enum class MoveMode {
 		Walk,   // 通常時
-		Jog,
-		Run,
+		Jog,	// 小走り
+		Run,	// 走り
 		Guarding_Walk, // ガード入力中(歩き)
 		Guarding_Jog,  // ガード入力中(小走り)
 	};
@@ -88,8 +94,10 @@ private:
 	// 回避用の条件
 	float bButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
 	static constexpr float RUN_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
-	float rtButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
-	static constexpr float ATTACK_THRESHOLD = 0.25f; // 何秒以上で走りと判定するか
+
+	// 攻撃用の条件
+	float rtButtonHoldTime = 0.0f;          // RTボタンを押し続けた時間
+	static constexpr float ATTACK_THRESHOLD = 0.25f; // 何秒以上で溜め攻撃と判定するか
 
 	// ジャンプ関係
 	bool jumpPressed = false;
@@ -97,4 +105,10 @@ private:
 
 	int jumpCount = 0;
 	int jumpLimit = 1;
+
+	// ロックオン関係
+	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
+	float lerpSpeed = 10.0f;
+	float debug_degree = 0.0f;   // 入力角度
+	int   debug_dirIndex = 0;    // 方向インデックス
 };

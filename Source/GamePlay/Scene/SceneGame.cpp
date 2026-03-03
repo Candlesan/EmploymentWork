@@ -55,7 +55,7 @@ void SceneGame::Initialize()
 	// ライト設定
 	DirectionalLight light;
 	// ここに ImGui で決めた数値をそのまま入れる
-	light.direction = { 0.288, -0.472f, 0.833f }; // 例：斜め上から
+	light.direction = { -0.882, -0.471f, 0.021f }; // 例：斜め上から
 	light.color = { 1.0f, 1.0f, 1.0f }; // 白色
 
 	DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
@@ -84,6 +84,21 @@ void SceneGame::Update(float elapsedTime)
 		DirectX::XMFLOAT3 target = player->GetPosition();
 		target.y += 1.0f; // 注視点を少し上にあげる
 		gameCamera->SetTarget(target);
+
+		// ロックオン対象を毎フレーム渡す
+		gameCamera->SetLockOnTarget(enemy.get());
+
+		if (gameCamera->IsLockOn())
+		{
+			// ロックオン中は敵の位置を教える
+			DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
+			player->SetLockOnTargetPosition(&enemyPos);
+		}
+		else
+		{
+			player->SetLockOnTargetPosition(nullptr);
+		}
+
 		gameCamera->Update(elapsedTime);
 	}
 	else

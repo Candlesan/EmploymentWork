@@ -9,12 +9,12 @@ AnimationStateManager<PlayerAnimationState>::AnimationStateManager()
     configs[PlayerAnimationState::Idle] ={ "Idle", true };
 
     // 歩き
-    configs[PlayerAnimationState::Walk_B ]  = { "Walk_B" , true }; 
-    configs[PlayerAnimationState::Walk_BL]  = { "Walk_BL", true }; 
-    configs[PlayerAnimationState::Walk_BR]  = { "Walk_BR", true }; 
-    configs[PlayerAnimationState::Walk_F ]  = { "Walk_F" , true }; 
-    configs[PlayerAnimationState::Walk_L ]  = { "Walk_L" , true }; 
-    configs[PlayerAnimationState::Walk_R ]  = { "Walk_R" , true };
+    configs[PlayerAnimationState::Walk_B ]  = { "Walk_B" , true, false, true }; 
+    configs[PlayerAnimationState::Walk_BL]  = { "Walk_BL", true, false, true }; 
+    configs[PlayerAnimationState::Walk_BR]  = { "Walk_BR", true, false, true }; 
+    configs[PlayerAnimationState::Walk_F ]  = { "Walk_F" , true, false, true };  
+    configs[PlayerAnimationState::Walk_L ]  = { "Walk_L" , true, false, true }; 
+    configs[PlayerAnimationState::Walk_R ]  = { "Walk_R" , true, false, true }; 
 
     // 小走り
     configs[PlayerAnimationState::Jog_B ] = { "Jog_B" , true };
@@ -29,11 +29,11 @@ AnimationStateManager<PlayerAnimationState>::AnimationStateManager()
     configs[PlayerAnimationState::Run_Stop] = { "Run_Stop", false, false, true };
 
     // 回避
-    configs[PlayerAnimationState::Roll_BL] = { "Roll_BL", false };
-    configs[PlayerAnimationState::Roll_BR] = { "Roll_RR", false };
+    configs[PlayerAnimationState::Roll_BL] = { "Roll_BL", false, false, true };
+    configs[PlayerAnimationState::Roll_BR] = { "Roll_BR", false, false, true };
     configs[PlayerAnimationState::Roll_F ] = { "Roll_F" , false, false, true };
-    configs[PlayerAnimationState::Roll_L ] = { "Roll_L" , false };
-    configs[PlayerAnimationState::Roll_R ] = { "Roll_R" , false };
+    configs[PlayerAnimationState::Roll_L ] = { "Roll_L" , false, false, true };
+    configs[PlayerAnimationState::Roll_R ] = { "Roll_R" , false, false, true };
 
     // バックステップ
     configs[PlayerAnimationState::Dodge] = { "Dodge", false, false, true };
@@ -72,12 +72,12 @@ AnimationStateManager<PlayerAnimationState>::AnimationStateManager()
     configs[PlayerAnimationState::Guard_Jog_R ] = { "Guard_Jog_R" , true };
 
     // ガード歩き
-    configs[PlayerAnimationState::Guard_Walk_B]  = { "Guard_Wall_B" , true };
-    configs[PlayerAnimationState::Guard_Walk_BL] = { "Guard_Wall_BL", true };
-    configs[PlayerAnimationState::Guard_Walk_BR] = { "Guard_Wall_BR", true };
-    configs[PlayerAnimationState::Guard_Walk_F]  = { "Guard_Wall_F" , true };
-    configs[PlayerAnimationState::Guard_Walk_L]  = { "Guard_Wall_L" , true };
-    configs[PlayerAnimationState::Guard_Walk_R]  = { "Guard_Wall_R" , true };
+    configs[PlayerAnimationState::Guard_Walk_B]  = { "Guard_Walk_B" , true };
+    configs[PlayerAnimationState::Guard_Walk_BL] = { "Guard_Walk_BL", true };
+    configs[PlayerAnimationState::Guard_Walk_BR] = { "Guard_Walk_BR", true };
+    configs[PlayerAnimationState::Guard_Walk_F]  = { "Guard_Walk_F" , true };
+    configs[PlayerAnimationState::Guard_Walk_L]  = { "Guard_Walk_L" , true };
+    configs[PlayerAnimationState::Guard_Walk_R]  = { "Guard_Walk_R" , true };
 
     // ガード受け
     configs[PlayerAnimationState::Guard_Hit_01] = { "Guard_Hit_01", false };
