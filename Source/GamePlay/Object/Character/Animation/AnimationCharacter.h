@@ -13,7 +13,10 @@ public:
 	virtual ~AnimationCharacter() = default;
 
 	// ステート変更
-	void ChangeAnimationState(StateEnum newState);
+	void ChangeAnimationState(StateEnum newState, bool ignoreOverlay = false);
+
+	// 上半身のアニメーション
+	void StartOverlayAnimation(StateEnum newState);
 
 	// アニメーション更新
 	void UpdateAnimation(float elapsedTime);
@@ -30,11 +33,13 @@ public:
 	// 再生時間で判定する関数（特定の場所以降なら遷移OK）
 	bool IsAnimationOutTimeRange(float StartTransition) const;
 
-	// 段々をアニメーション遅くする関数
+	// だんだんアニメーション遅くする関数
 	void AnimationLerp(float StartSlow, float endSlow, float SlowSpeed);
 
+	// このノードを起点に子ノードが上半身の子かを判断する関数
+	bool IsUpperBodyNode(const Model::Node& node, const std::string& rootNodeName);
+
 	// 現在のステート取得
-	//AnimationState GetCurrentState() const { return currentState; }
 	StateEnum GetCurrentState() const { return currentState; }
 
 	void SetSpeedUp(float s) { speedUp = s; }
@@ -74,6 +79,13 @@ protected:
 
 	float baseSpeed = 1.0f;
 	float speedUp = 0.0f;
+
+	// 上半身と下半身のアニメーション用
+	int overlayAnimationIndex = -1;       // 上半身アニメのインデックス
+	float overlayAnimationSeconds = 0.0f; // 上半身アニメの再生時間
+	bool overlayAnimationLoop = false;     
+	bool isOverlayPlaying = false;        // 上半身アニメ再生中か
+
 
 	DirectX::XMFLOAT4X4 worldTransform = {
 		1, 0, 0, 0,

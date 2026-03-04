@@ -381,6 +381,19 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	PlayerAnimationState moveState = DetermineWalkState(); // 歩きの遷移条件を取得
 	PlayerAnimationState rollState = DetermineRollState(); // 回避の遷移条件を取得
 
+	// 走ってる途中にローリングするのを防ぐため人次フレームで0にする
+
+	bool bHold = bButtonHoldTime >= RUN_THRESHOLD; // 長押し判定
+
+	// 短押し判定：離した瞬間 かつ 長押しじゃなかった
+	// ※ GetButtonUp() に戻すことで「押した瞬間にRunとRollが競合する」問題を解消
+	bool bTap = (gamePad.GetButtonUp() & GamePad::BTN_B)
+		&& !bHold;
+
+	bool rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD; // 長押し判定
+	bool rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
+		&& !rtHold; // 短押し判定
+
 	// Bボタンの長押し時間を計測
 	if (gamePad.GetButton() & GamePad::BTN_B)
 		bButtonHoldTime += elapsedTime;
@@ -393,17 +406,9 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	else
 		rtButtonHoldTime = 0.0f;
 
-	bool bHold = bButtonHoldTime >= RUN_THRESHOLD; // 長押し判定
-	bool bTap = gamePad.GetButtonUp() & GamePad::BTN_B
-		&& bButtonHoldTime < RUN_THRESHOLD; // 短押し判定(押した瞬間)
-
-	bool rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD; // 長押し判定
-	bool rtTap = gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER
-		&& rtButtonHoldTime < ATTACK_THRESHOLD; // 短押し判定(押した瞬間)
-
 	switch (currentState)
 	{
-	// ===== 待機 =====
+		// ===== 待機 =====
 	case PlayerAnimationState::Idle:
 	{
 		if (jumpPressed)
@@ -433,7 +438,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			else
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 		}
-		else if (moveLength > 0.1 && bHold)
+		else if (moveLength > 0.1f && bHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 		}
@@ -445,7 +450,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			else
 				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
 		}
-		else if (moveLength > 0.1 && bTap)
+		else if (moveLength > 0.1f && bTap)
 		{
 			if (lockOnTargetPos != nullptr)
 				ChangeAnimationState(rollState); // ロックオン中の回避に遷移
@@ -468,9 +473,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
 		}
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+		{
+			StartOverlayAnimation(PlayerAnimationState::Heal); // 回復に遷移
+		}
 
 		break;
-
 	}
 
 	// ===== 歩き =====
@@ -506,7 +514,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				break;
 			}
 		}
-		else if (moveLength > 0.1 && bHold)
+		else if (moveLength > 0.1f && bHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 		}
@@ -518,7 +526,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			else
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 		}
-		else if (moveLength > 0.1 && bTap)
+		else if (moveLength > 0.1f && bTap)
 		{
 			if (lockOnTargetPos != nullptr)
 				ChangeAnimationState(rollState); // ロックオン中の回避に遷移
@@ -540,6 +548,25 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		else if (rtHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
+		}
+		else if (lockOnTargetPos != nullptr && moveLength > 0.1f && moveLength < 0.5f)
+		{
+			mode = MoveMode::Walk;
+			if (currentState != moveState) ChangeAnimationState(moveState); // ロックオン中の歩きに遷移
+		}
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+		{
+			moveSpeed = 5.0f;
+			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
+			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
+			ChangeAnimationState(PlayerAnimationState::Walk_F); // 下半身のアニメーションを歩きにする
+		}
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+		{
+			moveSpeed = 3.0f;
+			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
+			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
+			ChangeAnimationState(PlayerAnimationState::Walk_F, true); // 下半身のアニメーションを歩きにする
 		}
 
 		break;
@@ -556,6 +583,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		moveSpeed = 5.0f;
 
 		if (moveLength <= 0.1f) ChangeAnimationState(PlayerAnimationState::Idle);
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+		{
+			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
+			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
+			ChangeAnimationState(PlayerAnimationState::Jog_F); // 下半身のアニメーションを小走りにする
+		}
 		else if (jumpPressed)
 		{
 			ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
@@ -571,7 +604,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				ChangeAnimationState(PlayerAnimationState::Guard_Walk_F); // ガード(歩き)に遷移
 			}
 		}
-		else if (moveLength > 0.1 && bHold)
+		else if (moveLength > 0.1f && bHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 		}
@@ -583,7 +616,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			else
 				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
 		}
-		else if (moveLength > 0.1 && bTap)
+		else if (moveLength > 0.1f && bTap)
 		{
 			if (lockOnTargetPos != nullptr)
 				ChangeAnimationState(rollState); // ロックオン中の回避に遷移
@@ -605,6 +638,11 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		else if (rtHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
+		}
+		else if (lockOnTargetPos != nullptr && moveLength > 0.5f)
+		{
+			mode = MoveMode::Jog;
+			if (currentState != moveState) ChangeAnimationState(moveState); // ロックオン中の小走りに遷移
 		}
 
 		break;
@@ -626,7 +664,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		}
 		else if (jumpPressed)
 		{
-			ChangeAnimationState(PlayerAnimationState::Jump_Start); //	ジャンプ攻撃に遷移
+			ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプ攻撃に遷移
 		}
 		else if (bHold && gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
 		{
@@ -638,9 +676,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			break;
 		}
-
-
-	    else if (moveLength > 0.5f)
+		else if (moveLength > 0.5f)
 		{
 			ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 		}
@@ -651,6 +687,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 		break;
 	}
+
 	case PlayerAnimationState::Run_Stop:
 	{
 		moveSpeed = 0.0f;
@@ -670,7 +707,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
 			}
-			else if (moveLength > 0.1 && bTap)
+			else if (moveLength > 0.1f && bTap)
 			{
 				ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
 			}
@@ -719,7 +756,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -767,7 +804,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -775,7 +812,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
 			}
-			else if (moveLength > 0.1 && bTap)
+			else if (moveLength > 0.1f && bTap)
 			{
 				ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
 			}
@@ -806,10 +843,10 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		if (IsAnimationOutTimeRange(0.82f))
 		{
 			turnSpeed = DirectX::XMConvertToRadians(0);
-			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)ChangeAnimationState(PlayerAnimationState::Attack_02); // 攻撃2に遷移
-			else if (rtTap)ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 溜め攻撃へ遷移
+			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER) ChangeAnimationState(PlayerAnimationState::Attack_02); // 攻撃2に遷移
+			else if (rtTap) ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 溜め攻撃へ遷移
 			else if (rtHold) ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
-			else if (moveLength > 0.1 && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
+			else if (moveLength > 0.1f && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
 			else if (bTap) ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
 			else if (jumpPressed)
 			{
@@ -827,7 +864,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -839,6 +876,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 		break;
 	}
+
 	case PlayerAnimationState::Attack_02:
 	{
 		moveSpeed = 0.0f;
@@ -849,10 +887,10 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			turnSpeed = DirectX::XMConvertToRadians(0);
 
-			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
-			else if (rtTap)ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 溜め攻撃へ遷移
+			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER) ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
+			else if (rtTap) ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 溜め攻撃へ遷移
 			else if (rtHold) ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
-			else if (moveLength > 0.1 && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
+			else if (moveLength > 0.1f && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
 			else if (bTap) ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
 			else if (jumpPressed)
 			{
@@ -870,7 +908,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -894,8 +932,8 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			turnSpeed = DirectX::XMConvertToRadians(0);
 
-			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
-			else if (moveLength > 0.1 && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
+			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER) ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
+			else if (moveLength > 0.1f && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
 			else if (bTap) ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
 			else if (jumpPressed)
 			{
@@ -913,7 +951,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -925,12 +963,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 		break;
 	}
+
 	case PlayerAnimationState::Charge_Attack_Start:
 	{
 		moveSpeed = 0.0f;
 		turnSpeed = DirectX::XMConvertToRadians(0);
 
-		// 段々遅くする
 		AnimationLerp(0.188f, 0.583f, 0.4f);
 
 		if (IsAnimationFinished())
@@ -952,18 +990,17 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	{
 		moveSpeed = 0.0f;
 
-		// 段々遅くする
 		AnimationLerp(0.0f, 0.319f, 0.4f);
-		SetBaseSpeed(1.0f); // 元の速度に戻す
+		SetBaseSpeed(1.0f);
 
 		if (IsAnimationOutTimeRange(1.248f))
 		{
 			turnSpeed = DirectX::XMConvertToRadians(0);
 
-			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
-			else if (rtTap)ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 溜め攻撃へ遷移
+			if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER) ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
+			else if (rtTap) ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 溜め攻撃へ遷移
 			else if (rtHold) ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
-			else if (moveLength > 0.1 && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
+			else if (moveLength > 0.1f && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避へ遷移
 			else if (bTap) ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
 			else if (jumpPressed)
 			{
@@ -981,7 +1018,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -997,7 +1034,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Guard_Counter:
 		break;
 
-	// ===== ジャンプ攻撃 =====
+		// ===== ジャンプ攻撃 =====
 	case PlayerAnimationState::Jump_Attack_Start:
 	{
 		if (IsAnimationFinished()) ChangeAnimationState(PlayerAnimationState::Jump_Attack_Loop);
@@ -1017,7 +1054,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 		if (IsAnimationOutTimeRange(0.986))
 		{
-			if (moveLength > 0.1 && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
+			if (moveLength > 0.1f && bTap) ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
 			else if (bTap) ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
 			else if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER) ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
 			else if (rtTap) ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 強攻撃へ遷移
@@ -1040,7 +1077,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -1083,7 +1120,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -1091,7 +1128,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
 			}
-			else if (moveLength > 0.1 && bTap)
+			else if (moveLength > 0.1f && bTap)
 			{
 				ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
 			}
@@ -1127,7 +1164,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
 			break;
 		}
-		else if (moveLength > 0.1 && bTap)
+		else if (moveLength > 0.1f && bTap)
 		{
 			ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
 			break;
@@ -1174,7 +1211,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 			}
-			else if (moveLength > 0.1 && bHold)
+			else if (moveLength > 0.1f && bHold)
 			{
 				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 			}
@@ -1199,21 +1236,22 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Guard_Jog_L:
 	case PlayerAnimationState::Guard_Jog_R:
 	{
-		if (bHold)moveSpeed = 7.0f;
+		if (bHold) moveSpeed = 7.0f; // ガード中の走り
 		else moveSpeed = 5.0f;
 
 		if (jumpPressed)
 		{
 			ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
 		}
-		else if (moveLength > 0.1 && bTap)
+		// ガード中走り(bHold)のときはbTapを無効化して回避に遷移させない
+		else if (moveLength > 0.1f && bTap && !bHold)
 		{
 			if (lockOnTargetPos != nullptr)
 				ChangeAnimationState(rollState); // ロックオン中の回避に遷移
 			else
 				ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
 		}
-		else if (bTap)
+		else if (bTap && !bHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
 		}
@@ -1235,7 +1273,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		}
 		else if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
 		{
-			if (moveLength > 0.1f && moveLength < 0.5f)
+			if (lockOnTargetPos != nullptr)
+			{
+				mode = MoveMode::Guarding_Walk;
+				ChangeAnimationState(moveState);
+			}
+			else if (moveLength > 0.1f && moveLength < 0.5f)
 			{
 				ChangeAnimationState(PlayerAnimationState::Guard_Walk_F); // ガード(歩き)に遷移
 			}
@@ -1244,7 +1287,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				ChangeAnimationState(PlayerAnimationState::Guard); // ガードに遷移
 			}
 		}
-
 		else if (moveLength > 0.5f)
 		{
 			mode = MoveMode::Jog;
@@ -1253,7 +1295,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			else
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 		}
-		else if (moveLength > 0.1 && bHold)
+		else if (moveLength > 0.1f && bHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 		}
@@ -1278,11 +1320,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Guard_Walk_R:
 	{
 		moveSpeed = 3.0f;
+
 		if (jumpPressed)
 		{
 			ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
 		}
-		else if (moveLength > 0.1 && bTap)
+		else if (moveLength > 0.1f && bTap)
 		{
 			if (lockOnTargetPos != nullptr)
 				ChangeAnimationState(rollState); // ロックオン中の回避に遷移
@@ -1307,7 +1350,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		}
 		else if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
 		{
-			if (moveLength > 0.5f)
+			if (lockOnTargetPos != nullptr)
+			{
+				mode = MoveMode::Jog;
+				ChangeAnimationState(moveState);
+			}
+			else if (moveLength > 0.5f)
 			{
 				ChangeAnimationState(PlayerAnimationState::Guard_Jog_F); // ガード(小走り)に遷移
 			}
@@ -1316,7 +1364,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				ChangeAnimationState(PlayerAnimationState::Guard); // ガードに遷移
 			}
 		}
-
 		else if (moveLength > 0.5f)
 		{
 			mode = MoveMode::Jog;
@@ -1325,7 +1372,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			else
 				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
 		}
-		else if (moveLength > 0.1 && bHold)
+		else if (moveLength > 0.1f && bHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
 		}
@@ -1338,7 +1385,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
 		}
 
-
 		break;
 	}
 
@@ -1350,23 +1396,96 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Guard_Hit_03:
 		break;
 
-	// ===== バフ/戦技 =====
+		// ===== バフ/戦技 =====
 	case PlayerAnimationState::Buff:
 		break;
 
-	// ===== 装備 =====
+		// ===== 装備 =====
 	case PlayerAnimationState::Equip:
 		break;
 
-	// ===== 装備解除 =====
+		// ===== 装備解除 =====
 	case PlayerAnimationState::UnEquip:
 		break;
 
-	// ===== 回復 =====
+		// ===== 回復 =====
 	case PlayerAnimationState::Heal:
-		break;
+	{
+		if (IsAnimationFinished()) ChangeAnimationState(PlayerAnimationState::Idle); // 待機に遷移
+		else if (IsAnimationOutTimeRange(1.902))
+		{
+			if (jumpPressed)
+			{
+				ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
+			}
+			else if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
+			{
+				if (moveLength > 0.5f)
+				{
+					ChangeAnimationState(PlayerAnimationState::Guard_Jog_F); // ガード(小走り)に遷移
+				}
+				else if (moveLength > 0.1f && moveLength < 0.5f)
+				{
+					ChangeAnimationState(PlayerAnimationState::Guard_Walk_F); // ガード(歩き)に遷移
+				}
+				else
+				{
+					ChangeAnimationState(PlayerAnimationState::Guard); // ガードに遷移
+				}
+			}
+			else if (moveLength > 0.5f)
+			{
+				mode = MoveMode::Jog;
+				if (lockOnTargetPos != nullptr)
+					ChangeAnimationState(moveState); // ロックオン中の小走りへ遷移
+				else
+					ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
+			}
+			else if (moveLength > 0.1f && bHold)
+			{
+				ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
+			}
+			else if (moveLength > 0.1f && moveLength < 0.5f)
+			{
+				mode = MoveMode::Walk;
+				if (lockOnTargetPos != nullptr)
+					ChangeAnimationState(moveState); // ロックオン中の歩きに遷移
+				else
+					ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
+			}
+			else if (moveLength > 0.1f && bTap)
+			{
+				if (lockOnTargetPos != nullptr)
+					ChangeAnimationState(rollState); // ロックオン中の回避に遷移
+				else
+					ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
+			}
+			else if (bTap)
+			{
+				ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
+			}
+			else if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
+			{
+				ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
+			}
+			else if (rtTap)
+			{
+				ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 強攻撃へ遷移
+			}
+			else if (rtHold)
+			{
+				ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
+			}
+			else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+			{
+				ChangeAnimationState(PlayerAnimationState::Heal); // 回復に遷移
+			}
+		}
 
-	// ===== 大ダメージ =====
+		break;
+	}
+
+		// ===== 大ダメージ =====
 	case PlayerAnimationState::Hurt_Heavy_B:
 		break;
 	case PlayerAnimationState::Hurt_Heavy_B_Loop:
@@ -1380,7 +1499,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Hurt_End_F:
 		break;
 
-	// ===== 空中ダメージ =====
+		// ===== 空中ダメージ =====
 	case PlayerAnimationState::Hurt_In_Air_Start:
 		break;
 	case PlayerAnimationState::Hurt_In_Air_Loop:
@@ -1388,7 +1507,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Hurt_In_Air_End:
 		break;
 
-	// ===== 軽ダメージ =====
+		// ===== 軽ダメージ =====
 	case PlayerAnimationState::Hurt_Light_B:
 		break;
 	case PlayerAnimationState::Hurt_Light_F:
@@ -1398,17 +1517,17 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Hurt_Light_R:
 		break;
 
-	// ===== アクション =====
+		// ===== アクション =====
 	case PlayerAnimationState::Interaction:
 		break;
 
-	// ===== 拾う =====
+		// ===== 拾う =====
 	case PlayerAnimationState::PickUp_01:
 		break;
 	case PlayerAnimationState::PickUp_02:
 		break;
 
-	// ===== 座る =====
+		// ===== 座る =====
 	case PlayerAnimationState::Sit_Start:
 		break;
 	case PlayerAnimationState::Sit_Loop:
@@ -1416,7 +1535,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Sit_End:
 		break;
 
-	// ===== 死亡 =====
+		// ===== 死亡 =====
 	case PlayerAnimationState::Die:
 		break;
 	case PlayerAnimationState::Die_B:

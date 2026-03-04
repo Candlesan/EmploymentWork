@@ -4,9 +4,12 @@
 
 // ステート変更
 template<typename StateEnum>
-void AnimationCharacter<StateEnum>::ChangeAnimationState(StateEnum newState)
+void AnimationCharacter<StateEnum>::ChangeAnimationState(StateEnum newState, bool ignoreOverlay)
 {
 	if (currentState == newState) return;
+
+	// オーバーレイ中はステート更新だけスキップ
+	if (!ignoreOverlay && isOverlayPlaying) return;
 
 	// ステート設定を取得
 	const AnimationConfig* config = AnimationStateManager<StateEnum>::Instance().GetConfig(newState);
@@ -43,6 +46,30 @@ void AnimationCharacter<StateEnum>::ChangeAnimationState(StateEnum newState)
 	useRootMotion = config->useRootMotion;
 	useRootMotionEx = config->useRootMotionEx;
 	animationBlendSecondsLength = config->blendTime;
+}
+
+// 上半身のアニメーション
+template<typename StateEnum>
+void AnimationCharacter<StateEnum>::StartOverlayAnimation(StateEnum newState)
+{
+	if (currentState == newState) return;
+
+	// ステート設定を取得
+	const AnimationConfig* config = AnimationStateManager<StateEnum>::Instance().GetConfig(newState);
+	if (!config) return;
+
+	// モデルを取得
+	std::shared_ptr<Model> model = GetModel();
+	if (!model) return;
+
+	// アニメーションインデックス取得
+	int newAnimationIndex = model->GetAnimationIndex(config->animationName.c_str());
+	if (newAnimationIndex < 0) return;
+
+	overlayAnimationIndex = newAnimationIndex;
+	overlayAnimationSeconds = 0.0f;
+	overlayAnimationLoop = config->loop;
+	isOverlayPlaying = true;
 }
 
 // アニメーション更新
@@ -211,6 +238,43 @@ void AnimationCharacter<StateEnum>::UpdateAnimation(float elapsedTime)
 		}
 	}
 
+	if (isOverlayPlaying)
+	{
+		// 上半身アニメのポーズを計算
+		std::vector<Model::NodePose> overlayPoses;
+		model->ComputeAnimation(overlayAnimationIndex, overlayAnimationSeconds, overlayPoses);
+
+		// モデルのノード一覧を取得 
+		const auto& nodes = model->GetNodes();
+
+		// 上半身ノードだけ nodePoses を上書き
+		for (int i = 0; i < (int)nodes.size(); i++)
+		{
+			if (IsUpperBodyNode(nodes[i], "spine_01"))
+			{
+				nodePoses[i] = overlayPoses[i];
+			}
+		}
+
+		// 上半身アニメーションの時間を進める
+		overlayAnimationSeconds += elapsedTime;
+
+		// アニメーション終了判定
+		const Model::Animation& overlayAnim = model->GetAnimations().at(overlayAnimationIndex);
+		if (overlayAnimationSeconds >= overlayAnim.secondsLength)
+		{
+			if (overlayAnimationLoop)
+			{
+				overlayAnimationSeconds -= overlayAnim.secondsLength; // ループ
+			}
+			else
+			{
+				isOverlayPlaying = false;
+				overlayAnimationSeconds = 0.0f;
+			}
+		}
+	}
+
 	// アニメーション時間更新
 	oldAnimationSeconds = animationSeconds;
 	animationSeconds += elapsedTime * baseSpeed;
@@ -263,7 +327,7 @@ bool AnimationCharacter<StateEnum>::IsAnimationOutTimeRange(float startSeconds, 
 {
 	if (animationIndex < 0) return false;
 	// 現在の再生時間がstartSeconds ～　endSecondsの範囲外をチェック
-	return (animationSeconds <= startSeconds && animationSeconds >= endSeconds);
+	return (animationSeconds <= startSeconds || animationSeconds >= endSeconds);
 }
 
 // 再生時間で判定する関数（特定の場所以降なら遷移OK）
@@ -275,6 +339,7 @@ bool AnimationCharacter<StateEnum>::IsAnimationOutTimeRange(float StartTransitio
 	return (animationSeconds >= StartTransition);
 }
 
+// だんだんアニメーション遅くする関数
 template<typename StateEnum>
 void AnimationCharacter<StateEnum>::AnimationLerp(float StartSlow, float endSlow, float SlowSpeed)
 {
@@ -289,6 +354,19 @@ void AnimationCharacter<StateEnum>::AnimationLerp(float StartSlow, float endSlow
 		float newSpeed = 1.0f - (t * SlowSpeed);
 		SetBaseSpeed(newSpeed);
 	}
+}
+
+// このノードを起点に子ノードが上半身の子かを判断する関数
+template<typename StateEnum>
+bool AnimationCharacter<StateEnum>::IsUpperBodyNode(const Model::Node& node, const std::string& rootNodeName)
+{
+	const Model::Node* current = &node;
+	while (current != nullptr)
+	{
+		if (current->name == rootNodeName) return true;
+		current = current->parent; // 親をたどる
+	}
+	return false;
 }
 
 template class AnimationCharacter<PlayerAnimationState>;
