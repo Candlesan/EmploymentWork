@@ -491,6 +491,21 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	{
 		moveSpeed = 3.0f;
 
+		if (moveLength > 0.1f) {
+			if (lockOnTargetPos != nullptr) {
+				if (currentState != moveState) {
+					ChangeAnimationState(moveState);
+					break;
+				}
+			}
+			else {
+				if (currentState != PlayerAnimationState::Walk_F) {
+					ChangeAnimationState(PlayerAnimationState::Walk_F);
+					break;
+				}
+			}
+		}
+
 		if (moveLength <= 0.1f) ChangeAnimationState(PlayerAnimationState::Idle); // 待機へ遷移
 		else if (jumpPressed)
 		{
@@ -549,11 +564,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
 		}
-		else if (lockOnTargetPos != nullptr && moveLength > 0.1f && moveLength < 0.5f)
-		{
-			mode = MoveMode::Walk;
-			if (currentState != moveState) ChangeAnimationState(moveState); // ロックオン中の歩きに遷移
-		}
 		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
 		{
 			moveSpeed = 5.0f;
@@ -581,6 +591,25 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Jog_R:
 	{
 		moveSpeed = 5.0f;
+
+		if (moveLength > 0.1f) {
+			if (lockOnTargetPos != nullptr) {
+				// ロックオン中なら、入力方向(moveState)と一致しているかチェック
+				if (currentState != moveState) {
+					ChangeAnimationState(moveState);
+					break;
+				}
+			}
+			else {
+				// ロックオンなしなら、Jog_Fと一致しているかチェック
+				if (currentState != PlayerAnimationState::Jog_F) {
+					ChangeAnimationState(PlayerAnimationState::Jog_F);
+					break;
+				}
+			}
+		}
+
+
 
 		if (moveLength <= 0.1f) ChangeAnimationState(PlayerAnimationState::Idle);
 		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
@@ -638,11 +667,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		else if (rtHold)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
-		}
-		else if (lockOnTargetPos != nullptr && moveLength > 0.5f)
-		{
-			mode = MoveMode::Jog;
-			if (currentState != moveState) ChangeAnimationState(moveState); // ロックオン中の小走りに遷移
 		}
 
 		break;
