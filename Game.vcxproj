@@ -213,6 +213,7 @@
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
     <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
+    <ClCompile Include="Source\System\UI\AnimationSequence.cpp" />
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>

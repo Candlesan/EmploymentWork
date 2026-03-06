@@ -1,7 +1,10 @@
 #pragma once
-#include "ImSequencer.h"
 #include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
+#include "System/Resource/Model/Model.h"
+#include "ImSequencer.h"
+#include "json.hpp"
 #include <unordered_map>
+#include <fstream>
 #include <string>
 
 enum class TrackType {
@@ -29,22 +32,12 @@ class AnimationSequence : public ImSequencer::SequenceInterface
 public:
     // キーをPlayerAnimationStateに変更
     std::unordered_map<PlayerAnimationState, std::vector<AnimTrack>> attackData;
-    PlayerAnimationState currentState = PlayerAnimationState::Idle; 
+    PlayerAnimationState currentState = PlayerAnimationState::Idle;
 
     void SetModel(std::shared_ptr<Model> model) { this->model = model; }
 
     // stateに対応するアニメの総秒数をModelから直接引く
-    float GetAnimationLength(PlayerAnimationState state) const
-    {
-        if (!model) return 1.0f;
-        auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
-        const AnimationConfig* config = manager.GetConfig(state);
-        if (!config) return 1.0f;
-
-        int index = model->GetAnimationIndex(config->animationName.c_str());
-        if (index < 0) return 1.0f;
-        return model->GetAnimations()[index].secondsLength;
-    }
+    float GetAnimationLength(PlayerAnimationState state) const;
 
     std::vector<AnimTrack>& CurrentTracks() { return attackData[currentState]; }
 
@@ -61,31 +54,22 @@ public:
         return (int)it->second.size();
     }
 
-    void Get(int index, int** start, int** end, int* type, unsigned int* color) override {
-        auto& t = attackData[currentState][index];
-        if (start) *start = &t.start;
-        if (end)   *end = &t.end;
-        if (color) *color = t.color;
-        if (type)  *type = (int)t.type;
-    }
+    void Get(int index, int** start, int** end, int* type, unsigned int* color) override;
 
     const char* GetItemLabel(int index) const override {
         return attackData.at(currentState)[index].label.c_str();
     }
 
-    // 指定秒数がHitBox範囲内かチェック
-    bool IsHitActive(PlayerAnimationState state, float currentSeconds) const {
-        auto it = attackData.find(state);
-        if (it == attackData.end()) return false;
-        for (auto& track : it->second) {
-            if (track.type != TrackType::HitBox) continue;
-            if (currentSeconds >= track.GetStartSeconds() &&
-                currentSeconds <= track.GetEndSeconds())
-                return true;
-        }
-        return false;
-    }
+    void Del(int index) override;
 
+    // 指定秒数がHitBox範囲内かチェック
+    bool IsHitActive(PlayerAnimationState state, float currentSeconds) const;
+
+    // JSON保存
+    void Save(const std::string& filepath) const;
+
+    // JSON読み込み
+    void Load(const std::string& filepath);
 private:
     std::shared_ptr<Model> model;
 };

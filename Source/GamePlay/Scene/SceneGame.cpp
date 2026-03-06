@@ -8,6 +8,7 @@
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
 
 #include <imgui.h>
+#include <fstream>
 
 // 初期化
 void SceneGame::Initialize()
@@ -73,25 +74,35 @@ void SceneGame::Initialize()
 	// シーケンサーの初期化
 	animSequence.SetModel(player->GetModel());
 
-	animSequence.attackData[PlayerAnimationState::Attack_01] = {
-	  { 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
-	};
-	animSequence.attackData[PlayerAnimationState::Attack_02] = {
-	  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
-	};
-	animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
-	  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox },
-	  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox }
-	};
-	animSequence.attackData[PlayerAnimationState::Run_Attack] = {
-	  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
-	};
-	animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
-	  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
-	};
-	animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
-	  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
-	};
+	// Jsonがあれば読み込む、無ければデフォルト値を設定
+	std::ifstream file("Data/Json/Player/AttackData/AttackSequence.json");
+	if (file.is_open())
+	{
+		file.close();
+		animSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
+	}
+	else
+	{
+		animSequence.attackData[PlayerAnimationState::Attack_01] = {
+		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Attack_02] = {
+		  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
+		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox },
+		  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Run_Attack] = {
+		  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
+		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
+		  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+	}
 }
 
 // 更新処理
@@ -417,6 +428,13 @@ void SceneGame::DrawGUI()
 			{ 0, 50, u8"新しい判定", 0xFF0000FF, TrackType::HitBox }
 		);
 	}
+
+	// 保存・読み込みボタン
+	if (ImGui::Button(u8"保存"))
+		animSequence.Save("Data/Json/Player/AttackData/AttackSequence.json");
+	ImGui::SameLine();
+	if (ImGui::Button(u8"読み込み"))
+		animSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
 
 	for (auto& [state, tracks] : animSequence.attackData)
 	{

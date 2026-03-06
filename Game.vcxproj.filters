@@ -431,6 +431,9 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.cpp">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\UI\AnimationSequence.cpp">
+      <Filter>Source\System\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
