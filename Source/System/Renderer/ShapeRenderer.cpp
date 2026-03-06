@@ -93,12 +93,22 @@ void ShapeRenderer::DrawCapsule(
 	{
 		Instance& instance = instances.emplace_back();
 		instance.mesh = &halfSphereMesh;
-		DirectX::XMVECTOR Position = DirectX::XMVector3Transform(DirectX::XMVectorSet(0, height * 0.5f, 0, 0), Transform);
-		DirectX::XMMATRIX World = DirectX::XMMatrixScaling(radius, radius, radius);
+
+		// 上半球の位置を計算
+		DirectX::XMVECTOR Position = DirectX::XMVector3Transform(
+			DirectX::XMVectorSet(0, height * 0.5f, 0, 0), Transform);
+
+		// 回転とスケールを適用
+		DirectX::XMMATRIX World = Transform;
+		World.r[0] = DirectX::XMVectorScale(Transform.r[0], radius);
+		World.r[1] = DirectX::XMVectorScale(Transform.r[1], radius);
+		World.r[2] = DirectX::XMVectorScale(Transform.r[2], radius);
 		World.r[3] = DirectX::XMVectorSetW(Position, 1.0f);
+
 		DirectX::XMStoreFloat4x4(&instance.worldTransform, World);
 		instance.color = color;
 	}
+
 	// 円柱
 	{
 		Instance& instance = instances.emplace_back();
@@ -111,18 +121,24 @@ void ShapeRenderer::DrawCapsule(
 		DirectX::XMStoreFloat4x4(&instance.worldTransform, World);
 		instance.color = color;
 	}
+
 	// 下半球
 	{
 		Instance& instance = instances.emplace_back();
 		instance.mesh = &halfSphereMesh;
-		DirectX::XMMATRIX World = DirectX::XMMatrixRotationX(DirectX::XM_PI);
-		DirectX::XMVECTOR Position = DirectX::XMVector3Transform(DirectX::XMVectorSet(0, -height * 0.5f, 0, 0), Transform);
-		Transform.r[3] = DirectX::XMVectorSet(0, 0, 0, 1);
-		World = DirectX::XMMatrixMultiply(World, Transform);
+
+		// 下半球の位置を計算
+		DirectX::XMVECTOR Position = DirectX::XMVector3Transform(
+			DirectX::XMVectorSet(0, -height * 0.5f, 0, 0), Transform);
+
+		// X軸180度回転 → Transform適用 → スケール適用
+		DirectX::XMMATRIX Rotation = DirectX::XMMatrixRotationX(DirectX::XM_PI);
+		DirectX::XMMATRIX World = DirectX::XMMatrixMultiply(Rotation, Transform);
 		World.r[0] = DirectX::XMVectorScale(World.r[0], radius);
 		World.r[1] = DirectX::XMVectorScale(World.r[1], radius);
 		World.r[2] = DirectX::XMVectorScale(World.r[2], radius);
 		World.r[3] = DirectX::XMVectorSetW(Position, 1.0f);
+
 		DirectX::XMStoreFloat4x4(&instance.worldTransform, World);
 		instance.color = color;
 	}

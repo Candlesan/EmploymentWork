@@ -10,6 +10,7 @@
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
+#include "System/UI/AnimationSequence.h"
 
 // ゲームシーン
 class SceneGame : public Scene
@@ -77,5 +78,11 @@ private:
 	float shadowBias = 0.002f;
 	DirectX::XMFLOAT4X4 lightViewProjection;
 
+	// シーケンサー関連
+	AnimationSequence animSequence;
+	int currentFrame = 0;
+	bool sequencerExpanded = true;
+	int selectedEntry = -1;
+	int firstFrame = 0;
 };
 

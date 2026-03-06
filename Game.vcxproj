@@ -165,6 +165,7 @@
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
     <ClInclude Include="Source\System\Resource\Model\Model.h" />
     <ClInclude Include="Source\System\Resource\Sprite\Sprite.h" />
+    <ClInclude Include="Source\System\UI\AnimationSequence.h" />
     <ClInclude Include="Source\System\UI\Dialog.h" />
   </ItemGroup>
   <ItemGroup>

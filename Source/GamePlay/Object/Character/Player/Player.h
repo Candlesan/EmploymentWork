@@ -1,5 +1,7 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
+#include "System/UI/AnimationSequence.h"
+
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include <memory>
@@ -14,7 +16,7 @@ public:
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
-	void RenderDebugPrimitive(ShapeRenderer* renderer);
+	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox = false);
 
 	// 武器の当たり判定情報
 	DirectX::XMFLOAT3 GetWeaponPosition() const;
@@ -25,9 +27,9 @@ public:
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 
-protected:
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
+protected:
 
 	//着地したときに呼ばれる
 	void OnLanding() override;

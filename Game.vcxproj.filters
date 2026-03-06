@@ -291,6 +291,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.h">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\UI\AnimationSequence.h">
+      <Filter>Source\System\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">

@@ -32,7 +32,7 @@ void Player::Initialize()
 	weapon.weaponHitOffset = { -0.35, -1.05, -0.1 };
 	weapon.weaponAngleOffset = { 0.06, 6.6, 0.23 };
 	weapon.weaponRadius = 0.3f;
-	weapon.weaponHeight = 1.0f;
+	weapon.weaponHeight = 1.7f;
 
 	// 武器のパラメーター初期化
 	weapon.position = { 0.34, 1.02, 0.04 };
@@ -147,7 +147,7 @@ void Player::DrawGUI()
 }
 
 // デバックプリミティブ描画
-void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
+void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 {
 	// プレイヤーの当たり判定
 	{
@@ -160,6 +160,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	}
 
 	// 武器の当たり判定
+	if (showWeaponHitBox)
 	{
 		DirectX::XMFLOAT4X4 weaponTransform;
 
@@ -188,23 +189,34 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 //　武器の位置を取得
 DirectX::XMFLOAT3 Player::GetWeaponPosition() const
 {
-	// transformから位置を取得する
 	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
 
-	// オフセットを適用する
-	DirectX::XMMATRIX offset = DirectX::XMMatrixTranslation(
-		weapon.weaponHitOffset.x,
-		weapon.weaponHitOffset.y,
-		weapon.weaponHitOffset.z
-		);
+	// スケールを除去（描画側と同じ処理）
+	DirectX::XMVECTOR scale, rot, pos;
+	DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
+	DirectX::XMMATRIX baseMatrix =
+		DirectX::XMMatrixRotationQuaternion(rot) *
+		DirectX::XMMatrixTranslationFromVector(pos);
 
-	DirectX::XMMATRIX finalMatrix = offset * weaponWorld;
-	DirectX::XMFLOAT3 position;
-	position.x = finalMatrix.r[3].m128_f32[0];
-	position.y = finalMatrix.r[3].m128_f32[1];
-	position.z = finalMatrix.r[3].m128_f32[2];
+	// 描画側と完全に同じ行列を作る
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+		weapon.angle.x + weapon.weaponAngleOffset.x,
+		weapon.angle.y + weapon.weaponAngleOffset.y,
+		weapon.angle.z + weapon.weaponAngleOffset.z);
 
-	return position;
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
+		weapon.position.x + weapon.weaponHitOffset.x,
+		weapon.position.y + weapon.weaponHitOffset.y,
+		weapon.position.z + weapon.weaponHitOffset.z);
+
+	DirectX::XMMATRIX finalMatrix = R * T * baseMatrix;
+
+	// 位置を取り出す
+	DirectX::XMFLOAT3 result;
+	result.x = finalMatrix.r[3].m128_f32[0];
+	result.y = finalMatrix.r[3].m128_f32[1];
+	result.z = finalMatrix.r[3].m128_f32[2];
+	return result;
 }
 
 // 武器の向きを取得
@@ -221,11 +233,19 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 	);
 
 	DirectX::XMMATRIX finalMatrix = rotation * weaponWorld;
-	DirectX::XMFLOAT3 Direction;
-	Direction.x = finalMatrix.r[1].m128_f32[0]; // Y軸方向
-	Direction.y = finalMatrix.r[1].m128_f32[1];
-	Direction.z = finalMatrix.r[1].m128_f32[2];
 
+	DirectX::XMVECTOR dir = DirectX::XMVectorSet(
+		finalMatrix.r[1].m128_f32[0],
+		finalMatrix.r[1].m128_f32[1],
+		finalMatrix.r[1].m128_f32[2],
+		0.0f
+	);
+
+	// 正規化して長さを1にする
+	dir = DirectX::XMVector3Normalize(dir);
+
+	DirectX::XMFLOAT3 Direction;
+	DirectX::XMStoreFloat3(&Direction, dir);
 	return Direction;
 }
 
