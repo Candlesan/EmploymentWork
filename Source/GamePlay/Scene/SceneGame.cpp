@@ -90,7 +90,7 @@ void SceneGame::Initialize()
 	  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
 	};
 	animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
-	  { 20, 47, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+	  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
 	};
 }
 
