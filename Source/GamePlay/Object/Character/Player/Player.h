@@ -13,6 +13,7 @@ public:
 	~Player() override {};
 
 	void Initialize();
+	void InitializeAttackData();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
@@ -29,6 +30,7 @@ public:
 
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
+	AnimationSequence& GetAnimSequence() { return animSequence; }
 protected:
 
 	//着地したときに呼ばれる
@@ -54,7 +56,6 @@ private:
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
-
 private:
 	std::shared_ptr<Model> player;
 
@@ -113,4 +114,7 @@ private:
 	float lerpSpeed = 10.0f;
 	float debug_degree = 0.0f;   // 入力角度
 	int   debug_dirIndex = 0;    // 方向インデックス
+
+	// シーケンサー関係
+	AnimationSequence animSequence;
 };

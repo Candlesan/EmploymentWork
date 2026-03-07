@@ -38,11 +38,51 @@ void Player::Initialize()
 	weapon.position = { 0.34, 1.02, 0.04 };
 	weapon.angle = { 0, 0, 2.89 };
 
+	// Jsonファイルの初期化
+	InitializeAttackData();
+
 	// アニメーション設定
 	AnimationStateManager<PlayerAnimationState>::Instance();
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
 	ChangeAnimationState(PlayerAnimationState::Idle);
+}
+
+// 攻撃とかの情報を初期化(Jsonファイルの初期化)
+void Player::InitializeAttackData()
+{
+	// シーケンサーの初期化
+	animSequence.SetModel(player);
+
+	// Jsonがあれば読み込む、無ければデフォルト値を設定
+	std::ifstream file("Data/Json/Player/AttackData/AttackSequence.json");
+	if (file.is_open())
+	{
+		file.close();
+		animSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
+	}
+	else
+	{
+		animSequence.attackData[PlayerAnimationState::Attack_01] = {
+		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Attack_02] = {
+		  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
+		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox },
+		  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Run_Attack] = {
+		  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
+		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+		animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
+		  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		};
+	}
 }
 
 // 更新処理
