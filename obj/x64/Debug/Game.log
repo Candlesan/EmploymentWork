@@ -1,32 +1,15 @@
-﻿  Framework.cpp
-  Player.cpp
+﻿  AnimationStateManager.cpp
   SceneGame.cpp
-  AnimationSequence.cpp
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.h(125,18): warning C4305: '初期化中': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(42,104): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(43,104): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(44,104): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(45,104): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(48,86): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(51,91): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp(56,100): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.h(139,18): warning C4305: '初期化中': 'double' から 'float' へ切り詰めます。
   (ソース ファイル 'Source/GamePlay/Scene/SceneGame.cpp' をコンパイルしています)
   
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.h(125,18): warning C4305: '初期化中': 'double' から 'float' へ切り詰めます。
-  (ソース ファイル 'Source/GamePlay/Framework.cpp' をコンパイルしています)
-  
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.h(125,18): warning C4305: '初期化中': 'double' から 'float' へ切り詰めます。
-  (ソース ファイル 'Source/GamePlay/Object/Character/Player/Player.cpp' をコンパイルしています)
-  
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(31,16): warning C4305: '=': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(32,43): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(32,36): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(32,29): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(33,42): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(33,37): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(33,31): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(38,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(38,28): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(38,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(39,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(427,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(878,31): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(1139,31): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(1197,31): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Player\Player.cpp(1499,36): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(39,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(59,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(164,54): warning C4305: '引数': 'double' から 'float' へ切り詰めます。

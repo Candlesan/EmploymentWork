@@ -195,7 +195,7 @@ void SceneGame::Render()
 
 	// デバック描画
 	{
-		bool showWeapon = animSequence.IsHitActive(
+		bool showWeapon = player->GetAnimSequence().IsHitActive(
 			player->GetCurrentState(),
 			player->GetCurrentAnimationSeconds()
 		);
@@ -464,7 +464,7 @@ void SceneGame::CollisonPlayervsEnemy()
 void SceneGame::CollisionPlayerWeaponVsEnemy()
 {
 	float currentSec = player->GetCurrentAnimationSeconds(); // 既にある
-	if (!animSequence.IsHitActive(player->GetCurrentState(), currentSec))
+	if (!player->GetAnimSequence().IsHitActive(player->GetCurrentState(), currentSec))
 		return;
 
 	DirectX::XMFLOAT3 outPositionA, outPositionB;
@@ -484,27 +484,17 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 	))
 	{
 		// ダメージ処理
-		PlayerAnimationState AttackState = player->GetCurrentState();
-		switch (AttackState)
+		auto state = player->GetCurrentState();
+		const auto& config = AnimationStateManager<PlayerAnimationState>::Instance().GetConfig(state);
+
+		if (config->damageRate > 0.0f)
 		{
-		case PlayerAnimationState::Attack_01:
-			enemy->ApplyDamage(1.0f, 0.1f);
-			break;
-		case PlayerAnimationState::Attack_02:
-			enemy->ApplyDamage(1.0f, 0.1f);
-			break;
-		case PlayerAnimationState::Charge_Attack:
-			enemy->ApplyDamage(1.0f, 0.05f);
-			break;
-		case PlayerAnimationState::Run_Attack:
-			enemy->ApplyDamage(1.0f, 0.5f);
-			break;
-		case PlayerAnimationState::Guard_Counter:
-			enemy->ApplyDamage(1.0f, 0.5f);
-			break;
-		case PlayerAnimationState::Jump_Attack:
-			enemy->ApplyDamage(1.0f, 0.5f);
-			break;
+			// CalculateAttackResult に「実数値」を渡す
+			AttackResult res = player->CalculateAttackResult(config->damageRate, config->poiseValue);
+
+			// 敵の強靭値を実数値（res.poiseDamage）で減らす
+			enemy->SetLastDamage(res.damage);
+			enemy->ApplyDamage(res.damage, 0.3f, res.poiseDamage);
 		}
 	}
 }

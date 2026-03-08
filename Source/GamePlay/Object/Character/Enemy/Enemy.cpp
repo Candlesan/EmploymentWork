@@ -6,6 +6,7 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
+#include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
 
 #include <imgui.h>
 
@@ -21,13 +22,19 @@ void Enemy::Initialize()
 	weight = 100.0f;
 	height = 1.0f;
 	debugOffset = 0.8;
+
 	health = 30000;
+	MaxHealth = 30000.0f;
+	maxPoise = 1200.0f;
+	currentPoise = 1200.0f;
+
 	invincibleTimer = 0.0f;
 
 	// アニメーション設定
+	AnimationStateManager<PlayerAnimationState>::Instance();
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
-	state = State::Idle;
+	ChangeAnimationState(PlayerAnimationState::Idle);
 }
 
 // 更新処理
@@ -36,8 +43,14 @@ void Enemy::Update(float elapsedTime)
 	// アニメーション更新処理
 	UpdateAnimations(elapsedTime);
 
+	// アニメーション更新
+	UpdateAnimation(elapsedTime);
+
 	// 無敵時間更新
 	UpdateInvincibleTimer(elapsedTime);
+
+	// ステータス更新
+	UpdateStatus(elapsedTime);
 
 	// モデル更新処理
 	UpdateTransform();
@@ -54,9 +67,19 @@ void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 void Enemy::DrawGUI()
 {
 	ImGui::Begin("Enemy");
+	AttackResult res;
 
-	ImGui::Text("Health: %f.2", health);
+	if (ImGui::Button(u8"HP前回"))
+	{
+		health = MaxHealth;
+	}
+	ImGui::Text("Health: %f.0", health);
+	ImGui::Text("Damage: %f.0", lastDamage);
 	ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
+	ImGui::Separator();
+	ImGui::Text("currentPoise: %f.0", currentPoise);
+	ImGui::Text("poiseFullResetTimer: %f.0", poiseFullResetTimer);
+	ImGui::Text("poiseRecoveryDelay: %f.0", poiseRecoveryDelay);
 
 	// トランスフォーム情報
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -101,221 +124,20 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 // アニメーション更新処理
 void Enemy::UpdateAnimations(float elapsedTime)
 {
-	int newAnimationIndex = animationIndex;
-
-	switch (state)
+	switch (currentState)
 	{
-	case Enemy::State::Idle:
-		animationLoop = true;
-		useRootMotion = false;
-		useRootMotionEx = false;
-		newAnimationIndex = enemy->GetAnimationIndex("Idle");
+	case PlayerAnimationState::Idle:
+		if (Ondown) ChangeAnimationState(PlayerAnimationState::Guard_Hit_03);
+
+	case PlayerAnimationState::Guard_Hit_03:
+
+		if (IsAnimationFinished()) ChangeAnimationState(PlayerAnimationState::Idle);
 
 		break;
 	}
+}
 
-	// アニメーション切り替え判定
-	if (animationIndex != newAnimationIndex)
-	{
-		// 前のアニメーションの姿勢を保存
-		oldNodePoses = nodePoses;
-
-		// 新しいアニメーションに切り替え
-		animationIndex = newAnimationIndex;
-		animationSeconds = 0.0f;
-
-		// 補間開始
-		animationBlendSeconds = 0.0f;
-		isBlending = true;
-	}
-
-	// 補間時間更新
-	if (isBlending)
-	{
-		animationBlendSeconds += elapsedTime;
-		if (animationBlendSeconds >= animationBlendSecondsLength)
-		{
-			isBlending = false;
-			animationBlendSeconds = animationBlendSecondsLength;
-		}
-	}
-
-	// アニメーション更新処理
-	if (animationIndex >= 0)
-	{
-		const Model::Animation& animation = enemy->GetAnimations().at(animationIndex);
-
-		// 現在のアニメーションの姿勢を取得
-		std::vector<Model::NodePose> currentNodePoses;
-		enemy->ComputeAnimation(animationIndex, animationSeconds, currentNodePoses);
-
-		// 補間処理
-		if (isBlending && animationBlendSeconds < animationBlendSecondsLength)
-		{
-			// 補間率を計算
-			float blendRate = animationBlendSeconds / animationBlendSecondsLength;
-
-			// 前のアニメーションと現在のアニメーションを補間
-			enemy->BlendAnimations(oldNodePoses, currentNodePoses, blendRate, nodePoses);
-		}
-		else
-		{
-			// 補間なしで現在のアニメーション姿勢を使用
-			nodePoses = currentNodePoses;
-		}
-
-		// ルートモーション処理
-		if (useRootMotion)
-		{
-			{
-				// ルートモーションノード番号取得
-				const int rootMotionNodeIndex = enemy->GetNodeIndex("mixamorig:Hips");
-
-				// 初回、前回、今回のルートモーションの姿勢を取得
-				Model::NodePose beginPose, oldPose, newPose;
-				enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, 0, beginPose);
-				enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, oldAnimationSeconds, oldPose);
-				enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, animationSeconds, newPose);
-
-				DirectX::XMFLOAT3 localTranslation;
-
-				if (oldAnimationSeconds > animationSeconds)
-				{
-					// ループ時処理
-					Model::NodePose endPose;
-					enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, animation.secondsLength, endPose);
-					// ローカル移動値を算出
-					localTranslation.x = (endPose.position.x - oldPose.position.x) +
-						(newPose.position.x - beginPose.position.x);
-					localTranslation.y = (endPose.position.y - oldPose.position.y) +
-						(newPose.position.y - beginPose.position.y);
-					localTranslation.z = (endPose.position.z - oldPose.position.z) +
-						(newPose.position.z - beginPose.position.z);
-				}
-				else
-				{
-					// ローカル移動値
-					localTranslation.x = newPose.position.x - oldPose.position.x;
-					localTranslation.y = newPose.position.y - oldPose.position.y;
-					localTranslation.z = newPose.position.z - oldPose.position.z;
-				}
-
-				DirectX::XMVECTOR LocalTranslation = DirectX::XMLoadFloat3(&localTranslation);
-
-				// ルートモーションを初回の姿勢にする
-				nodePoses[rootMotionNodeIndex].position = beginPose.position;
-
-				// ワールド移動値を算出
-				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&transform);
-				DirectX::XMVECTOR WorldTranslation = DirectX::XMVector3TransformNormal(LocalTranslation, WorldTransform);
-				DirectX::XMFLOAT3 worldTranslation;
-				DirectX::XMStoreFloat3(&worldTranslation, WorldTranslation);
-
-
-				// 位置を更新
-				position.x += worldTranslation.x;
-				position.y += worldTranslation.y;
-				position.z += worldTranslation.z;
-			}
-		}
-
-		// 腰骨に対応したルートモーション
-		if (useRootMotionEx)
-		{
-			// ルートモーションノード番号取得（モデルに応じて適切なノード名を指定）
-			const int rootMotionNodeIndex = enemy->GetNodeIndex("pelvis");
-			if (rootMotionNodeIndex >= 0)
-			{
-				// 初回、前回、今回のルートモーションの姿勢を取得
-				Model::NodePose beginPose, oldPose, newPose;
-				enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, 0, beginPose);
-				enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, oldAnimationSeconds, oldPose);
-				enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, animationSeconds, newPose);
-
-				// ローカル移動値を算出
-				DirectX::XMFLOAT3 localTranslation;
-				if (oldAnimationSeconds > animationSeconds)
-				{
-					// ループ時処理
-					Model::NodePose endPose;
-					enemy->ComputeAnimation(animationIndex, rootMotionNodeIndex, animation.secondsLength, endPose);
-					// ローカル移動値を算出
-					localTranslation.x = (endPose.position.x - oldPose.position.x) +
-						(newPose.position.x - beginPose.position.x);
-					localTranslation.y = (endPose.position.y - oldPose.position.y) +
-						(newPose.position.y - beginPose.position.y);
-					localTranslation.z = (endPose.position.z - oldPose.position.z) +
-						(newPose.position.z - beginPose.position.z);
-				}
-				else
-				{
-					localTranslation.x = newPose.position.x - oldPose.position.x;
-					localTranslation.y = newPose.position.y - oldPose.position.y;
-					localTranslation.z = newPose.position.z - oldPose.position.z;
-				}
-
-				// グローバル移動値を算出
-				Model::Node& rootMotionNode = enemy->GetNodes().at(rootMotionNodeIndex);
-				DirectX::XMVECTOR LocalTranslation = DirectX::XMLoadFloat3(&localTranslation);
-				DirectX::XMMATRIX ParentGlobalTransform = DirectX::XMLoadFloat4x4(&rootMotionNode.parent->globalTransform);
-				DirectX::XMVECTOR GlobalTranslation = DirectX::XMVector3TransformNormal(LocalTranslation, ParentGlobalTransform);
-
-				if (bakeTranslationY)
-				{
-					// Y成分の移動値を抜く 
-					GlobalTranslation = DirectX::XMVectorSetY(GlobalTranslation, 0);
-
-					// 今回の姿勢のグローバル位置を算出 
-					DirectX::XMVECTOR LocalPos = DirectX::XMLoadFloat3(&newPose.position);
-					DirectX::XMVECTOR currentGlobalPos = DirectX::XMVector3Transform(LocalPos, ParentGlobalTransform);
-
-					// XZ成分を削除 
-					currentGlobalPos = DirectX::XMVectorSetX(currentGlobalPos, 0);
-					currentGlobalPos = DirectX::XMVectorSetZ(currentGlobalPos, 0);
-
-					// ローカル空間変換 
-					DirectX::XMMATRIX invGlobalTransform = DirectX::XMMatrixInverse(nullptr, ParentGlobalTransform);
-					LocalPos = DirectX::XMVector3Transform(currentGlobalPos, invGlobalTransform);
-
-					// ルートモーションノードの位置を設定 
-					DirectX::XMStoreFloat3(&nodePoses[rootMotionNodeIndex].position, LocalPos);
-				}
-				else
-				{
-					//ルートモーションノードを初回の姿勢にする
-					nodePoses[rootMotionNodeIndex].position = beginPose.position;
-				}
-
-				// ワールド移動値を算出（キャラクターの位置に足す）
-				DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&transform);
-				DirectX::XMVECTOR WorldTranslation = DirectX::XMVector3TransformNormal(GlobalTranslation, WorldTransform);
-				DirectX::XMFLOAT3 worldTranslation;
-				DirectX::XMStoreFloat3(&worldTranslation, WorldTranslation);
-
-				//移動値を更新
-				position.x += worldTranslation.x;
-				position.y += worldTranslation.y;
-				position.z += worldTranslation.z;
-			}
-		}
-
-		//アニメーション時間更新
-		oldAnimationSeconds = animationSeconds;
-		animationSeconds += elapsedTime;
-
-		if (animationSeconds > animation.secondsLength)
-		{
-			if (animationLoop)
-			{
-				animationSeconds -= animation.secondsLength;
-			}
-			else
-			{
-				animationSeconds = animation.secondsLength;
-			}
-		}
-
-		//姿勢更新
-		enemy->SetNodePoses(nodePoses);
-	}
+void Enemy::OnDown()
+{
+	Ondown = true;
 }

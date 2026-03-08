@@ -101,36 +101,71 @@ void Character::UpdateInvincibleTimer(float elapsedTime)
 }
 
 //ダメージを与える
-bool Character::ApplyDamage(float damage, float invincibleTime)
+bool Character::ApplyDamage(float damage, float invincibleTime, float poiseDamage)
 {
-	// ダメージが0の場合は体力を変更しない
-	if (damage <= 0) return false;
+	if (this->invincibleTimer > 0.0f || this->health <= 0) return false;
 
-	// 死亡している場合は体力を変更しない
-	if (this->health <= 0) return false;
-
-	// 無敵時間中はダメージを受けない
-	if (this->invincibleTimer > 0.0f) return false;
-
-	// 無敵時間設定
 	this->invincibleTimer = invincibleTime;
-
-	// ダメージ処理
 	this->health -= damage;
 
-	// 死亡通知 
-	if (this->health <= 0)
+	// 強靭削り処理：相手の強靭値（currentPoise）を実数値で減らす
+	this->currentPoise -= poiseDamage;
+
+	// 攻撃を受けたので回復を停止して、タイマーをセット
+	this->poiseRecoveryDelay = (maxPoise / 1200.0f) * 9.0f;
+	if (this->poiseRecoveryDelay < 5.0f) this->poiseRecoveryDelay = 5.0f;
+
+	this->poiseFullResetTimer = 0.0f; // 30秒タイマーをセット
+
+	if (this->currentPoise <= 0.0f)
 	{
-		this->OnDead();
-	}
-	// ダメージ通知
-	else
-	{
-		this->OnDamage();
+		this->OnDown(); // 0になったらダウン
+		this->currentPoise = this->maxPoise; // リセット
 	}
 
-	// 体力が変更した場合はtrueを返す
+	// 死亡・ダメージ通知
+	if (this->health <= 0) this->OnDead();
+	else this->OnDamage();
+
 	return true;
+}
+
+// 体幹削り計算用（プレイヤーが呼ぶ用）
+AttackResult Character::CalculateAttackResult(float damageRate, float poiseValue)
+{
+	AttackResult res;
+	res.damage = this->baseAttackPower * damageRate;
+	res.poiseDamage = poiseValue;
+	return res;
+}
+
+// ステータス更新
+void Character::UpdateStatus(float elapsedTime)
+{
+	// 無敵タイマー
+	if (invincibleTimer > 0.0f) invincibleTimer -= elapsedTime;
+
+	// 最後の被弾から一定時間経過したら秒間130で回復させる
+	if (poiseRecoveryDelay > 0.0f)
+	{
+		poiseRecoveryDelay -= elapsedTime;
+	}
+	else
+	{
+		if (currentPoise < maxPoise)
+		{
+			currentPoise += 130.0f * elapsedTime; // 急速回復
+			if (currentPoise > maxPoise) currentPoise = maxPoise;
+		}
+	}
+
+	// 被弾してから30秒経ったら、回復中でも最大にする
+	poiseFullResetTimer += elapsedTime;
+	if (poiseFullResetTimer >= 30.0f)
+	{
+		currentPoise = maxPoise;
+		poiseFullResetTimer = 0.0f;
+	}
 }
 
 //水平速力更新処理

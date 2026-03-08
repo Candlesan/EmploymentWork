@@ -1,9 +1,9 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
-#include "GamePlay/Object/Character/Character.h"
+#include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include <memory>
 
-class Enemy : public Character
+class Enemy : public AnimationCharacter<PlayerAnimationState>
 {
 public:
 	Enemy() {};
@@ -15,9 +15,18 @@ public:
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
+	void SetLastDamage(float d) { lastDamage = d; }
+
+private:
+	std::shared_ptr<Model> GetModel() override { return enemy; }
+	const std::shared_ptr<Model> GetModel() const override { return enemy; }
+
 private:
 	// アニメーション更新処理
 	void UpdateAnimations(float elapsedTime);
+
+	// ダウン状態
+	void OnDown() override;
 private:
 	std::shared_ptr<Model> enemy;
 
@@ -28,6 +37,7 @@ private:
 	{
 		Idle = 0,
 		Walk,
+		Down,
 	};
 	State state = State::Idle;
 
@@ -51,4 +61,7 @@ private:
 
 	// 当たり判定関係
 	float debugOffset = 0.5;
+
+	float lastDamage = 0.0f;
+	bool Ondown = false;
 };

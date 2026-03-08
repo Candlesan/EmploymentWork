@@ -140,12 +140,18 @@ struct AnimationConfig
 	bool useRootMotion; // ルートモーションするか
 	bool useRootMotionEx;
 	float blendTime; // 補間時間
+	float damageRate; // 攻撃力倍率 (1.0 = 標準)
+	float poiseValue;  // 体幹削り
 
 	AnimationConfig()
-		: animationName(""), loop(false), useRootMotion(false), useRootMotionEx(false), blendTime(0.2f) {
+		: animationName(""), loop(false), useRootMotion(false), useRootMotionEx(false),
+		blendTime(0.2f), damageRate(0.0f), poiseValue(0.0f) {
 	}
 
-	AnimationConfig(const std::string& name, bool isLoop = false, bool rootMotion = false, bool rootMotionEx = false, float blend = 0.2f)
-		: animationName(name), loop(isLoop), useRootMotion(rootMotion), useRootMotionEx(rootMotionEx), blendTime(blend) {
+	// コンストラクタも更新して、デフォルト値を設定できるようにする
+	AnimationConfig(const std::string& name, bool isLoop = false, bool rootMotion = false,
+		bool rootMotionEx = false, float blend = 0.2f, float dmg = 0.0f, float pise = 0.0f)
+		: animationName(name), loop(isLoop), useRootMotion(rootMotion),
+		useRootMotionEx(rootMotionEx), blendTime(blend), damageRate(dmg), poiseValue(pise) {
 	}
 };

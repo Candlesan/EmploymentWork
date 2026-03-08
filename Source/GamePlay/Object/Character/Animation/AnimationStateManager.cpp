@@ -39,21 +39,21 @@ AnimationStateManager<PlayerAnimationState>::AnimationStateManager()
     configs[PlayerAnimationState::Dodge] = { "Dodge", false, false, true };
 
     // 攻撃
-    configs[PlayerAnimationState::Attack_01]           = { "Attack_01"          , false };
-    configs[PlayerAnimationState::Attack_02]           = { "Attack_02"          , false, false, true };
-    configs[PlayerAnimationState::Charge_Attack]       = { "Charge_Attack"      , false, false, true };
-    configs[PlayerAnimationState::Charge_Attack_Start] = { "Charge_Attack_Start", false };
+    configs[PlayerAnimationState::Attack_01]           = { "Attack_01"          , false, false, true , 0.2, 1.0f, 187.0f };
+    configs[PlayerAnimationState::Attack_02]           = { "Attack_02"          , false, false, true , 0.2, 1.0f, 187.0f };
+    configs[PlayerAnimationState::Charge_Attack]       = { "Charge_Attack"      , false, false, true , 0.2, 1.2f, 187.0f };
+    configs[PlayerAnimationState::Charge_Attack_Start] = { "Charge_Attack_Start", false, false, false, 0.2, 1.5f, 396.0f };
 
     // ダッシュ攻撃
-    configs[PlayerAnimationState::Run_Attack] = { "Run_Attack", false };
+    configs[PlayerAnimationState::Run_Attack] = { "Run_Attack", false, false, false, 0.2, 1.0f, 187 };
 
     // ガードカウンター攻撃
-    configs[PlayerAnimationState::Guard_Counter] = { "Guard_Counter", false };
+    configs[PlayerAnimationState::Guard_Counter] = { "Guard_Counter", false, false, true, 0.2, 2.5, 396 };
 
     // ジャンプ攻撃
     configs[PlayerAnimationState::Jump_Attack_Start] = { "Jump_Attack_Start", false };
     configs[PlayerAnimationState::Jump_Attack_Loop]  = { "Jump_Attack_Loop" , true  };
-    configs[PlayerAnimationState::Jump_Attack]       = { "Jump_Attack"      , false };
+    configs[PlayerAnimationState::Jump_Attack]       = { "Jump_Attack"      , false, false, false, 0.2, 2.5, 264 };
 
     // ジャンプ
     configs[PlayerAnimationState::Jump_Start] = { "Jump_Start", false };

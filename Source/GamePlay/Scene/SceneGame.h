@@ -79,7 +79,6 @@ private:
 	DirectX::XMFLOAT4X4 lightViewProjection;
 
 	// シーケンサー関連
-	AnimationSequence animSequence;
 	int currentFrame = 0;
 	bool sequencerExpanded = true;
 	int selectedEntry = -1;

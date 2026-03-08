@@ -24,6 +24,11 @@ void Player::Initialize()
 
 	 // プレイヤーパラメーター初期化
 	moveSpeed = 2.0f;
+	health = 1400.0f;
+	maxPoise = 100.0f;
+	currentPoise = 100.0f;
+
+	baseAttackPower = 860.0f;
 
 	// 当たり判定パラメーター初期化
 	weight = 0.5f;
