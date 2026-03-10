@@ -15,10 +15,11 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Map_Robot3.gltf");
+	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/SK_Werewolf.gltf");
 
 	position = { 0, 0, 10 };
 	angle = {0, 3, 0};
+	scale.x = scale.y = scale.z = 1.2f;
 	weight = 100.0f;
 	height = 1.0f;
 	debugOffset = 0.8;
@@ -31,10 +32,12 @@ void Enemy::Initialize()
 	invincibleTimer = 0.0f;
 
 	// アニメーション設定
-	AnimationStateManager<PlayerAnimationState>::Instance();
+	AnimationStateManager<EnemyAnimationState>::Instance();
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
-	ChangeAnimationState(PlayerAnimationState::Idle);
+	rootMotionNodeName = "Root";
+	upperBodyNodeName = "Bip001-Pelvis";
+	ChangeAnimationState(EnemyAnimationState::Idle);
 }
 
 // 更新処理
@@ -126,13 +129,7 @@ void Enemy::UpdateAnimations(float elapsedTime)
 {
 	switch (currentState)
 	{
-	case PlayerAnimationState::Idle:
-		if (Ondown) ChangeAnimationState(PlayerAnimationState::Guard_Hit_03);
-
-	case PlayerAnimationState::Guard_Hit_03:
-
-		if (IsAnimationFinished()) ChangeAnimationState(PlayerAnimationState::Idle);
-
+	case EnemyAnimationState::Idle:
 		break;
 	}
 }

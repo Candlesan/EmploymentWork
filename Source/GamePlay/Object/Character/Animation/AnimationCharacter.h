@@ -46,7 +46,7 @@ public:
 	void SetBaseSpeed(float s) { baseSpeed = s; }
 
 	float GetCurrentAnimationSeconds() const { return animationSeconds; }
-	float GetAnimationSeconds(PlayerAnimationState state) const;
+	//float GetAnimationSeconds(PlayerAnimationState state) const;
 
 protected:
 	// サブクラスでオーバーライド出来る
@@ -62,6 +62,9 @@ protected:
 
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
+
+	std::string rootMotionNodeName = "root";      // ルートモーションのノード名
+	std::string upperBodyNodeName = "spine_01";  // 上半身の起点ノード名
 
 	int animationIndex = -1;
 	float animationSeconds = 0.0f;

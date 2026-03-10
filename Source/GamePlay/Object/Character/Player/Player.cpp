@@ -19,7 +19,7 @@ void Player::Initialize()
 	player = std::make_shared<Model>(device, "Data/Model/Player/SKM_DKM_Full.gltf");
 
 	// 武器モデル読み込み
-	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/GreatSword.gltf");
+	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/GreatSword.gltf");
 	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.1f;
 
 	 // プレイヤーパラメーター初期化

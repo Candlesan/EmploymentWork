@@ -112,7 +112,7 @@ void AnimationCharacter<StateEnum>::UpdateAnimation(float elapsedTime)
 	if (useRootMotion)
 	{
 		// ルートモーションノード番号取得
-		const int rootMotionNodeIndex = model->GetNodeIndex("root"); // モデルに合わせて変えてくれ
+		const int rootMotionNodeIndex = model->GetNodeIndex(rootMotionNodeName.c_str()); // モデルに合わせて変えてくれ
 
 		// 初回、前回、今回のルートモーションの姿勢を取得
 		Model::NodePose beginPose, oldPose, newPose;
@@ -162,7 +162,7 @@ void AnimationCharacter<StateEnum>::UpdateAnimation(float elapsedTime)
 	else if (useRootMotionEx)
 	{
 		// ルートモーションノード番号取得（モデルに応じて適切なノード名を指定）
-		const int rootMotionNodeIndex = model->GetNodeIndex("root");
+		const int rootMotionNodeIndex = model->GetNodeIndex(rootMotionNodeName.c_str());
 		if (rootMotionNodeIndex >= 0)
 		{
 			// 初回、前回、今回のルートモーションの姿勢を取得
@@ -250,7 +250,7 @@ void AnimationCharacter<StateEnum>::UpdateAnimation(float elapsedTime)
 		// 上半身ノードだけ nodePoses を上書き
 		for (int i = 0; i < (int)nodes.size(); i++)
 		{
-			if (IsUpperBodyNode(nodes[i], "spine_01"))
+			if (IsUpperBodyNode(nodes[i], upperBodyNodeName.c_str()))
 			{
 				nodePoses[i] = overlayPoses[i];
 			}
@@ -370,4 +370,4 @@ bool AnimationCharacter<StateEnum>::IsUpperBodyNode(const Model::Node& node, con
 }
 
 template class AnimationCharacter<PlayerAnimationState>;
-//template class AnimationCharacter<EnemyAnimationState>;
+template class AnimationCharacter<EnemyAnimationState>;

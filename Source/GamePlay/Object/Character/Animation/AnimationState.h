@@ -132,6 +132,88 @@ enum class PlayerAnimationState
 	Die_F
 };
 
+// エネミーのアニメーション
+enum class EnemyAnimationState
+{
+	// 待機
+	Idle = 0,
+
+	// 歩き
+	Walk_F,
+	Walk_B,
+	Walk_L,
+	Walk_R,
+
+	// 小走り
+	Jog_F,
+
+	// 回避
+	Dodge_Forkward,
+	Dodge_Backward,
+	Dodge_Left,
+	Dodge_Right,
+
+	// 通常攻撃
+	Light_Attack_01,
+	Light_Attack_02,
+	Light_Attack_03,
+
+	// 強攻撃
+	Heavy_Attack_01,
+	Heavy_Attack_02,
+
+	// 回避(追撃)
+	Dodge_FU,
+
+	// 掴み攻撃
+	Grab_Fall,
+
+	// 叫び
+	Roar,
+
+	// 飛びつき切り
+	Skill_BlockBreaker,
+
+	// 空中2連切り(中距離からプレイヤーに向かってする攻撃)
+	Skill_DoubleSwings_Root,
+
+	// 突き攻撃(2連)
+	Skill_EndlessStabs,
+
+	// 突き攻撃(3連)
+	Skill_QuickStab,
+
+	// プレス攻撃
+	Skill_HeavyStomp,
+
+	// 突撃2連ひっかき攻撃
+	Skill_Leaping,
+
+	// 突進攻撃
+	Skill_ShoulderBarge_Root,
+
+	// アッパーカット
+	Skill_UpperCut,
+
+	// 連続切り
+	Skill_WieldDagger,
+
+	// 軽ダメージ
+	Hit_Front,
+	Hit_Light_Left,
+	Hit_Light_Right,
+
+	// 空中ダメージ
+	Hit_Launch_Root,
+
+	// ダウン
+	Hit_Knockdown,
+
+	// 死亡
+	Death_A,
+	Death_B,
+};
+
 // アニメーションの設定
 struct AnimationConfig
 {

@@ -3,7 +3,7 @@
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include <memory>
 
-class Enemy : public AnimationCharacter<PlayerAnimationState>
+class Enemy : public AnimationCharacter<EnemyAnimationState>
 {
 public:
 	Enemy() {};
