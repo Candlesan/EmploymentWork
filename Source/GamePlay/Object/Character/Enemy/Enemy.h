@@ -1,6 +1,11 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
+
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorData.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
+
 #include <memory>
 
 class Enemy : public AnimationCharacter<EnemyAnimationState>
@@ -15,15 +20,30 @@ public:
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
+	// 計算したダメージ
 	void SetLastDamage(float d) { lastDamage = d; }
 
+	// プレイヤーとの距離を取得
+	float GetDistanceToPlayer() const;
+
+	// 移動速度セッター・ゲッター
+	void SetMoveSpeed(float s) { moveSpeed = s; }
+	float GetMoveSpeed() const { return moveSpeed; }
+
+	// 旋回速度取得
+	float GetTurnSpeed() const { return turnSpeed; }
+
+	// 実行タイマー取得(仮実装)
+	float GetRunTimer() { return runTimer; }
+	// 実行タイマー設定(仮実装)
+	void SetRunTimer(float timer) { runTimer = timer; }
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
 
 private:
-	// アニメーション更新処理
-	void UpdateAnimations(float elapsedTime);
+	// 状態遷移更新処理
+	void UpdateStateTransitions(float elapsedTime);
 
 	// ダウン状態
 	void OnDown() override;
@@ -33,6 +53,7 @@ private:
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
+	// アニメーション関係
 	enum class State
 	{
 		Idle = 0,
@@ -62,6 +83,16 @@ private:
 	// 当たり判定関係
 	float debugOffset = 0.5;
 
+	// ダメージ関係
 	float lastDamage = 0.0f;
 	bool Ondown = false;
+
+	// 距離
+	float distance = 0.0f;
+
+	// ビヘイビアツリー関係
+	BehaviorTree* aiTree = nullptr;
+	BehaviorData* behaviorData = nullptr;
+	NodeBase* activeNode = nullptr;
+	float runTimer = 0.0f;
 };

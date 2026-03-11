@@ -31,6 +31,20 @@ public:
 		float height,
 		const DirectX::XMFLOAT4& color);
 
+	//â~íåï`âÊ
+	void DrawCylinder(
+		const DirectX::XMFLOAT3& position,
+		float radius,
+		float height,
+		const DirectX::XMFLOAT4& color);
+
+	//void DrawCylinder(
+	//	const DirectX::XMFLOAT4X4& transform,
+	//	float radius,
+	//	float height,
+	//	const DirectX::XMFLOAT4& color);
+
+
 	// çúï`âÊ
 	void DrawBone(
 		const DirectX::XMFLOAT4X4& transform,

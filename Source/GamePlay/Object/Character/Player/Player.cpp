@@ -24,6 +24,7 @@ void Player::Initialize()
 
 	 // プレイヤーパラメーター初期化
 	moveSpeed = 2.0f;
+	maxMoveSpeed = 7.0f;
 	health = 1400.0f;
 	maxPoise = 100.0f;
 	currentPoise = 100.0f;

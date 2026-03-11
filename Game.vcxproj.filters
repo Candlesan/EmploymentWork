@@ -130,6 +130,12 @@
     <Filter Include="Source\System\Renderer\Shader\ShadowMap">
       <UniqueIdentifier>{7b5a9c3f-87ae-4c55-b2ca-f263fbb91aea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Enemy\BehaviorTree">
+      <UniqueIdentifier>{a4294990-10df-4f16-98c2-20b24a1c8cba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base">
+      <UniqueIdentifier>{45eeee66-534e-480a-a3f2-a22f5294bafe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -294,6 +300,30 @@
     <ClInclude Include="Source\System\UI\AnimationSequence.h">
       <Filter>Source\System\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\ActionBase.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\JudgmentBase.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Core\Mathf.h">
+      <Filter>Source\System\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -433,6 +463,24 @@
     </ClCompile>
     <ClCompile Include="Source\System\UI\AnimationSequence.cpp">
       <Filter>Source\System\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Core\Mathf.cpp">
+      <Filter>Source\System\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,9 @@
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionDerived.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
+#include "GamePlay/Object/Character/Player/Player.h"
 
 #include <imgui.h>
 
@@ -38,22 +41,49 @@ void Enemy::Initialize()
 	rootMotionNodeName = "Root";
 	upperBodyNodeName = "Bip001-Pelvis";
 	ChangeAnimationState(EnemyAnimationState::Idle);
+
+	// ビヘイビアツリーの設定
+	behaviorData = new BehaviorData();
+	aiTree = new BehaviorTree();
+
+	// Root
+	aiTree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, nullptr, nullptr);
+
+	aiTree->AddNode("Root", "Pursuit", 1, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
+	aiTree->AddNode("Root", "Idle", 2, BehaviorTree::SelectRule::Priority, new IdleJudgment(this), new IdleAction(this));
+
 }
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
-	// アニメーション更新処理
-	UpdateAnimations(elapsedTime);
+	// 現在実行されているノードが無ければ
+	if (activeNode == nullptr)
+	{
+		// 次に実行するノードを推論する。
+		activeNode = aiTree->ActiveNodeInference(behaviorData);
+	}
+	// 現在実行するノードがあれば
+	if (activeNode != nullptr)
+	{
+		// ビヘイビアツリーからノードを実行。
+		activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+	}
 
-	// アニメーション更新
-	UpdateAnimation(elapsedTime);
+	// ステータス更新
+	UpdateStatus(elapsedTime);
 
 	// 無敵時間更新
 	UpdateInvincibleTimer(elapsedTime);
 
-	// ステータス更新
-	UpdateStatus(elapsedTime);
+	// 速力更新処理
+	UpdateVelocity(elapsedTime);
+
+	// 状態遷移更新処理
+	UpdateStateTransitions(elapsedTime);
+
+	// アニメーション更新
+	UpdateAnimation(elapsedTime);
 
 	// モデル更新処理
 	UpdateTransform();
@@ -81,8 +111,7 @@ void Enemy::DrawGUI()
 	ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
 	ImGui::Separator();
 	ImGui::Text("currentPoise: %f.0", currentPoise);
-	ImGui::Text("poiseFullResetTimer: %f.0", poiseFullResetTimer);
-	ImGui::Text("poiseRecoveryDelay: %f.0", poiseRecoveryDelay);
+	ImGui::Separator();
 
 	// トランスフォーム情報
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -110,26 +139,150 @@ void Enemy::DrawGUI()
 		ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
 	}
 
+	// 距離判定
+
 	ImGui::End();
 }
 
 // デバックプリミティブ描画
 void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	DirectX::XMFLOAT4X4 capsuleTransform;
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
-	DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
+	// 敵の当たり判定
+	{
+		DirectX::XMFLOAT4X4 capsuleTransform;
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
+		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
-	renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
+		renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
+	}
+
+	// 距離の可視化
+	{
+		// 円の高さ（地面から少し浮かせてチラつきを防止する）
+		float circleY = position.y + 0.05f;
+		// 円の厚み（極限まで薄くして「円」に見せる）
+		float thickness = 0.01f;
+		renderer->DrawCylinder(
+			{ position.x, circleY, position.z },
+			5.0f, thickness, { 1.0f, 0.0f, 0.0f, 1.0f }
+		);
+
+		// 中距離 (例: 10.0m) - 黄色
+		renderer->DrawCylinder(
+			{ position.x, circleY, position.z },
+			10, thickness, { 1.0f, 1.0f, 0.0f, 1.0f }
+		);
+
+		// 遠距離 (例: 15.0m) - 緑色
+		renderer->DrawCylinder(
+			{ position.x, circleY, position.z },
+			15, thickness, { 0.0f, 1.0f, 0.0f, 1.0f }
+		);
+	}
+}
+
+// プレイヤーとの距離を取得
+float Enemy::GetDistanceToPlayer() const
+{
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+
+	// プレイヤーと敵の位置を取得する
+	DirectX::XMVECTOR ePos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR pPos = DirectX::XMLoadFloat3(&player.GetPosition());
+
+	// 今の位置とプレイヤーの位置の差を計算する
+	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(pPos, ePos);
+	DirectX::XMVECTOR Length = DirectX::XMVector3Length(Vec);
+
+	// 計算結果を保存する
+	float distance = 0.0f;
+	DirectX::XMStoreFloat(&distance, Length);
+
+	return distance;
 }
 
 // アニメーション更新処理
-void Enemy::UpdateAnimations(float elapsedTime)
+void Enemy::UpdateStateTransitions(float elapsedTime)
 {
 	switch (currentState)
 	{
 	case EnemyAnimationState::Idle:
+		if (GetAsyncKeyState('1') & 0x8000) ChangeAnimationState(EnemyAnimationState::Light_Attack_01);
+		if (GetAsyncKeyState('2') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_DoubleSwings_Root);
+
+		break;
+	case EnemyAnimationState::Walk_F:
+		break;
+	case EnemyAnimationState::Walk_B:
+		break;
+	case EnemyAnimationState::Walk_L:
+		break;
+	case EnemyAnimationState::Walk_R:
+		break;
+	case EnemyAnimationState::Jog_F:
+		break;
+	case EnemyAnimationState::Dodge_Forkward:
+		break;
+	case EnemyAnimationState::Dodge_Backward:
+		break;
+	case EnemyAnimationState::Dodge_Left:
+		break;
+	case EnemyAnimationState::Dodge_Right:
+		break;
+	case EnemyAnimationState::Light_Attack_01:
+		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+		break;
+	case EnemyAnimationState::Light_Attack_02:
+		break;
+	case EnemyAnimationState::Light_Attack_03:
+		break;
+	case EnemyAnimationState::Heavy_Attack_01:
+		break;
+	case EnemyAnimationState::Heavy_Attack_02:
+		break;
+	case EnemyAnimationState::Dodge_FU:
+		break;
+	case EnemyAnimationState::Grab_Fall:
+		break;
+	case EnemyAnimationState::Roar:
+		break;
+	case EnemyAnimationState::Skill_BlockBreaker:
+		break;
+	case EnemyAnimationState::Skill_DoubleSwings_Root:
+		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+
+		break;
+	case EnemyAnimationState::Skill_EndlessStabs:
+		break;
+	case EnemyAnimationState::Skill_QuickStab:
+		break;
+	case EnemyAnimationState::Skill_HeavyStomp:
+		break;
+	case EnemyAnimationState::Skill_Leaping:
+		break;
+	case EnemyAnimationState::Skill_ShoulderBarge_Root:
+		break;
+	case EnemyAnimationState::Skill_UpperCut:
+		break;
+	case EnemyAnimationState::Skill_WieldDagger:
+		break;
+	case EnemyAnimationState::Hit_Front:
+		break;
+	case EnemyAnimationState::Hit_Light_Left:
+		break;
+	case EnemyAnimationState::Hit_Light_Right:
+		break;
+	case EnemyAnimationState::Hit_Launch_Root:
+		break;
+	case EnemyAnimationState::Hit_Knockdown:
+		break;
+	case EnemyAnimationState::Death_A:
+		break;
+	case EnemyAnimationState::Death_B:
+		break;
+	default:
 		break;
 	}
 }

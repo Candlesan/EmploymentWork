@@ -144,6 +144,22 @@ void ShapeRenderer::DrawCapsule(
 	}
 }
 
+//â~íåï`âÊ
+void ShapeRenderer::DrawCylinder(
+	const DirectX::XMFLOAT3& position,
+	float radius,
+	float height,
+	const DirectX::XMFLOAT4& color)
+{
+	Instance& instance = instances.emplace_back();
+	instance.mesh = &cylinderMesh;
+	instance.color = color;
+
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(radius, height, radius);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + height * 0.5, position.z);
+	DirectX::XMStoreFloat4x4(&instance.worldTransform, S * T);
+}
+
 // çúï`âÊ
 void ShapeRenderer::DrawBone(
 	const DirectX::XMFLOAT4X4& transform,

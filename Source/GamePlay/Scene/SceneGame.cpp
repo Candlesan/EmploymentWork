@@ -1,7 +1,10 @@
 ﻿#include "SceneGame.h"
+
 #include "System/Graphic/Graphics.h"
+
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
+#include "GamePlay/Object/Character/Player/Player.h"
 #include "SceneManager.h"
 
 // シェーダー
@@ -46,8 +49,8 @@ void SceneGame::Initialize()
 	stage = std::make_unique<Stage>();
 
 	// プレイヤー初期化
-	player = std::make_unique<Player>();
-	player->Initialize();
+	Player& player = Player::Instance();
+	player.Initialize();
 
 	// エネミー初期化
 	enemy = std::make_unique<Enemy>();
@@ -78,11 +81,14 @@ void SceneGame::Update(float elapsedTime)
 	// カメラ取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+
 	// GUIの操作でゲーム用とデバック用のカメラを切り替え
 	if (cameraMode == CameraMode::Game)
 	{
 		// ゲーム用のカメラ更新
-		DirectX::XMFLOAT3 target = player->GetPosition();
+		DirectX::XMFLOAT3 target = player.GetPosition();
 		target.y += 1.0f; // 注視点を少し上にあげる
 		gameCamera->SetTarget(target);
 
@@ -93,11 +99,11 @@ void SceneGame::Update(float elapsedTime)
 		{
 			// ロックオン中は敵の位置を教える
 			DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
-			player->SetLockOnTargetPosition(&enemyPos);
+			player.SetLockOnTargetPosition(&enemyPos);
 		}
 		else
 		{
-			player->SetLockOnTargetPosition(nullptr);
+			player.SetLockOnTargetPosition(nullptr);
 		}
 
 		gameCamera->Update(elapsedTime);
@@ -113,7 +119,7 @@ void SceneGame::Update(float elapsedTime)
 	stage->Update(elapsedTime);
 
 	// プレイヤー更新
-	player->Update(elapsedTime);
+	player.Update(elapsedTime);
 
 	// エネミー更新
 	enemy->Update(elapsedTime);
@@ -141,6 +147,9 @@ void SceneGame::Render()
 
 	// カメラ取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
+
+	// プレイヤーを取得
+	Player& player = Player::Instance();
 
 	// シャドウマップ取得
 	Graphics& graphics = Graphics::Instance();
@@ -177,7 +186,7 @@ void SceneGame::Render()
 		stage->Render(rc, modelRenderer);
 
 		// プレイヤー描画
-		player->Render(rc, modelRenderer);
+		player.Render(rc, modelRenderer);
 
 		// エネミー描画
 		enemy->Render(rc, modelRenderer);
@@ -195,12 +204,12 @@ void SceneGame::Render()
 
 	// デバック描画
 	{
-		bool showWeapon = player->GetAnimSequence().IsHitActive(
-			player->GetCurrentState(),
-			player->GetCurrentAnimationSeconds()
+		bool showWeapon = player.GetAnimSequence().IsHitActive(
+			player.GetCurrentState(),
+			player.GetCurrentAnimationSeconds()
 		);
 
-		player->RenderDebugPrimitive(shapeRenderer, showWeapon);
+		player.RenderDebugPrimitive(shapeRenderer, showWeapon);
 		enemy->RenderDebugPrimitive(shapeRenderer);
 
 		// シェイプレンダラ描画
@@ -219,6 +228,9 @@ void SceneGame::RenderShadowMap()
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	Graphics& graphics = Graphics::Instance();
 	ShadowMap* shadowMap = graphics.GetShadowMap();
+
+	// プレイヤーを取得
+	Player& player = Player::Instance();
 
 	// レンダーステート設定
 	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
@@ -282,7 +294,7 @@ void SceneGame::RenderShadowMap()
 		stage->Render(rc, modelRenderer);
 
 		// プレイヤー描画
-		player->Render(rc, modelRenderer);
+		player.Render(rc, modelRenderer);
 
 		// エネミー描画
 		enemy->Render(rc, modelRenderer);
@@ -299,6 +311,9 @@ void SceneGame::RenderShadowMap()
 // GUI描画
 void SceneGame::DrawGUI()
 {
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+
 	ImGui::Begin("Camera System");
 
 	// モード切り替え用のラジオボタン
@@ -373,7 +388,7 @@ void SceneGame::DrawGUI()
 	ImGui::End();
 
 	ImGui::Begin("Attack Sequencer");
-	auto& animSequence = player->GetAnimSequence();
+	auto& animSequence = player.GetAnimSequence();
 	auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
 
 	float totalSec = animSequence.GetAnimationLength(animSequence.currentState);
@@ -415,9 +430,9 @@ void SceneGame::DrawGUI()
 	}
 	ImGui::NewLine();
 
-	if (animSequence.currentState == player->GetCurrentState())
+	if (animSequence.currentState == player.GetCurrentState())
 	{
-		currentFrame = (int)(player->GetCurrentAnimationSeconds() * 144);
+		currentFrame = (int)(player.GetCurrentAnimationSeconds() * 144);
 	}
 
 	ImSequencer::Sequencer(
@@ -431,20 +446,22 @@ void SceneGame::DrawGUI()
 
 	ImGui::End();
 
-	player->DrawGUI();
+	player.DrawGUI();
 	enemy->DrawGUI();
 }
 
 // プレイヤーと敵の当たり判定
 void SceneGame::CollisonPlayervsEnemy()
 {
+	// プレイヤーを取得
+	Player& player = Player::Instance();
 	DirectX::XMFLOAT3 outPositionA, outPositionB;
 	if (Collision::IntersectCapsuleVsCapsule(
-		player->GetPosition(),
-		player->GetCapsuleDirection(),
-		player->GetHeight(),
-		player->GetRadius(),
-		player->GetWeight(),
+		player.GetPosition(),
+		player.GetCapsuleDirection(),
+		player.GetHeight(),
+		player.GetRadius(),
+		player.GetWeight(),
 		enemy->GetPosition(),
 		enemy->GetCapsuleDirection(),
 		enemy->GetHeight(),
@@ -455,7 +472,7 @@ void SceneGame::CollisonPlayervsEnemy()
 	))
 	{
 		// 押し出し処理
-		player->SetPosition(outPositionA);
+		player.SetPosition(outPositionA);
 		enemy->SetPosition(outPositionB);
 	}
 }
@@ -463,16 +480,18 @@ void SceneGame::CollisonPlayervsEnemy()
 // 武器と敵の当たり判定
 void SceneGame::CollisionPlayerWeaponVsEnemy()
 {
-	float currentSec = player->GetCurrentAnimationSeconds(); // 既にある
-	if (!player->GetAnimSequence().IsHitActive(player->GetCurrentState(), currentSec))
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+	float currentSec = player.GetCurrentAnimationSeconds(); // 既にある
+	if (!player.GetAnimSequence().IsHitActive(player.GetCurrentState(), currentSec))
 		return;
 
 	DirectX::XMFLOAT3 outPositionA, outPositionB;
 	if (Collision::IntersectCapsuleVsCapsule(
-		player->GetWeaponPosition(),
-		player->GetWeaponDirection(),
-		player->GetWeaponHeight(),
-		player->GetWeaponRadius(),
+		player.GetWeaponPosition(),
+		player.GetWeaponDirection(),
+		player.GetWeaponHeight(),
+		player.GetWeaponRadius(),
 		1.0f, // 武器の重さ(適当に設定)
 		enemy->GetPosition(),
 		enemy->GetCapsuleDirection(),
@@ -484,13 +503,13 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 	))
 	{
 		// ダメージ処理
-		auto state = player->GetCurrentState();
+		auto state = player.GetCurrentState();
 		const auto& config = AnimationStateManager<PlayerAnimationState>::Instance().GetConfig(state);
 
 		if (config->damageRate > 0.0f)
 		{
 			// CalculateAttackResult に「実数値」を渡す
-			AttackResult res = player->CalculateAttackResult(config->damageRate, config->poiseValue);
+			AttackResult res = player.CalculateAttackResult(config->damageRate, config->poiseValue);
 
 			// 敵の強靭値を実数値（res.poiseDamage）で減らす
 			enemy->SetLastDamage(res.damage);

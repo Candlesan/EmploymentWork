@@ -6,7 +6,6 @@
 
 // ƒ‚ƒfƒ‹
 #include "Gameplay/Object/Stage/Stage.h"
-#include "GamePlay/Object/Character/Player/Player.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
@@ -46,7 +45,6 @@ public:
 private:
 	// 3Dƒ‚ƒfƒ‹
 	std::unique_ptr<Stage> stage;
-	std::unique_ptr<Player> player;
 	std::unique_ptr<Enemy> enemy;
 
 	// ƒJƒƒ‰

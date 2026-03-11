@@ -8,9 +8,17 @@
 
 class Player : public AnimationCharacter<PlayerAnimationState>
 {
-public:
+private:
 	Player() {};
 	~Player() override {};
+
+public:
+	// 唯一のインスタンス
+	static Player& Instance()
+	{
+		static Player instance;
+		return instance;
+	}
 
 	void Initialize();
 	void InitializeAttackData();

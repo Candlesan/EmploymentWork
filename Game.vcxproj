@@ -134,6 +134,13 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationStateManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\ActionBase.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\JudgmentBase.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h" />
@@ -145,6 +152,7 @@
     <ClInclude Include="Source\System\Core\Input\GamePad.h" />
     <ClInclude Include="Source\System\Core\Input\Input.h" />
     <ClInclude Include="Source\System\Core\Input\Mouse.h" />
+    <ClInclude Include="Source\System\Core\Mathf.h" />
     <ClInclude Include="Source\System\Core\Misc.h" />
     <ClInclude Include="Source\System\Core\TransformUtils.h" />
     <ClInclude Include="Source\System\Graphic\GpuResourceUtils.h" />
@@ -186,6 +194,11 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp" />
@@ -197,6 +210,7 @@
     <ClCompile Include="Source\System\Core\Input\Input.cpp" />
     <ClCompile Include="Source\System\Core\Input\Mouse.cpp" />
     <ClCompile Include="Source\System\Core\Main.cpp" />
+    <ClCompile Include="Source\System\Core\Mathf.cpp" />
     <ClCompile Include="Source\System\Core\TransformUtils.cpp" />
     <ClCompile Include="Source\System\Graphic\GpuResourceUtils.cpp" />
     <ClCompile Include="Source\System\Graphic\Graphics.cpp" />
