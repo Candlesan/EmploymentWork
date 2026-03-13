@@ -204,13 +204,18 @@ void SceneGame::Render()
 
 	// デバック描画
 	{
-		bool showWeapon = player.GetAnimSequence().IsHitActive(
+		bool showPlayerWeapon = player.GetAnimSequence().IsHitActive(
 			player.GetCurrentState(),
 			player.GetCurrentAnimationSeconds()
 		);
 
-		player.RenderDebugPrimitive(shapeRenderer, showWeapon);
-		enemy->RenderDebugPrimitive(shapeRenderer);
+		bool showEnemyWeapon = enemy->GetAnimSequence().IsHitActive(
+			enemy->GetCurrentState(),
+			enemy->GetCurrentAnimationSeconds()
+		);
+
+		player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
+		enemy->RenderDebugPrimitive(shapeRenderer, showEnemyWeapon);
 
 		// シェイプレンダラ描画
 		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
@@ -514,6 +519,37 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 			// 敵の強靭値を実数値（res.poiseDamage）で減らす
 			enemy->SetLastDamage(res.damage);
 			enemy->ApplyDamage(res.damage, 0.3f, res.poiseDamage);
+		}
+	}
+}
+
+// 敵の武器とプレイヤーの当たり判定
+void SceneGame::CollisionEnemyWeaponVsPlayer()
+{
+	Player& player = Player::Instance();
+
+	float currentSec = enemy->GetCurrentAnimationSeconds();
+
+	// 敵のi番目の武器 vs プレイヤーの本体
+	DirectX::XMFLOAT3 outPositionA, outPositionB;
+	for (int i = 0; i < 2; ++i)
+	{
+		if (Collision::IntersectCapsuleVsCapsule(
+			enemy->GetWeaponPosition(i),    // インデックス指定
+			enemy->GetWeaponDirection(i),   // インデックス指定
+			enemy->GetWeaponHeight(i),      // インデックス指定
+			enemy->GetWeaponRadius(i),      // インデックス指定
+			1.0f,                           // 武器の重さ
+			player.GetPosition(),
+			player.GetCapsuleDirection(),
+			player.GetHeight(),
+			player.GetRadius(),
+			player.GetWeight(),
+			outPositionA,
+			outPositionB
+		))
+		{
+
 		}
 	}
 }

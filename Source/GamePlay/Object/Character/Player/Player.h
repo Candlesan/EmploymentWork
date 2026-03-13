@@ -38,7 +38,7 @@ public:
 
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
-	AnimationSequence& GetAnimSequence() { return animSequence; }
+	AnimationSequence<PlayerAnimationState>& GetAnimSequence() { return animSequence; }
 protected:
 
 	//着地したときに呼ばれる
@@ -124,5 +124,5 @@ private:
 	int   debug_dirIndex = 0;    // 方向インデックス
 
 	// シーケンサー関係
-	AnimationSequence animSequence;
+	AnimationSequence<PlayerAnimationState> animSequence;
 };

@@ -1,5 +1,8 @@
-﻿  JudgmentDerived.cpp
+﻿  SceneGame.cpp
 C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Object\Character\Character.h(139,18): warning C4305: '初期化中': 'double' から 'float' へ切り詰めます。
-  (ソース ファイル 'Source/GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.cpp' をコンパイルしています)
+  (ソース ファイル 'Source/GamePlay/Scene/SceneGame.cpp' をコンパイルしています)
   
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(42,25): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(62,22): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\Source\GamePlay\Scene\SceneGame.cpp(173,54): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
   Game.vcxproj -> C:\Users\2240032\OneDrive - yamaguchigakuen\デスクトップ\Employment work\bin\x64\Debug\Game.exe

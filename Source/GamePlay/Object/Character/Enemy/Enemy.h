@@ -1,5 +1,6 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
+#include "System/UI/AnimationSequence.h"
 
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
@@ -18,7 +19,7 @@ public:
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
-	void RenderDebugPrimitive(ShapeRenderer* renderer);
+	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox);
 
 	// 計算したダメージ
 	void SetLastDamage(float d) { lastDamage = d; }
@@ -33,10 +34,18 @@ public:
 	// 旋回速度取得
 	float GetTurnSpeed() const { return turnSpeed; }
 
+	// 武器の当たり判定情報
+	DirectX::XMFLOAT3 GetWeaponPosition(int index) const;
+	DirectX::XMFLOAT3 GetWeaponDirection(int index) const;
+	float GetWeaponRadius(int index) const { return weapon[index].weaponRadius; }
+	float GetWeaponHeight(int index) const { return weapon[index].weaponHeight; }
+
+
 	// 実行タイマー取得(仮実装)
 	float GetRunTimer() { return runTimer; }
 	// 実行タイマー設定(仮実装)
 	void SetRunTimer(float timer) { runTimer = timer; }
+	AnimationSequence<EnemyAnimationState>& GetAnimSequence() { return animSequence; }
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
@@ -44,6 +53,9 @@ private:
 private:
 	// 状態遷移更新処理
 	void UpdateStateTransitions(float elapsedTime);
+
+	// 武器のアタッチメント処理
+	void WeaponAttachment();
 
 	// ダウン状態
 	void OnDown() override;
@@ -65,20 +77,27 @@ private:
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
 
-	int animationIndex = -1;
-	float animationSeconds = 0.0f;
-	float oldAnimationSeconds = 0.0f;
-	float animationBlendSeconds = 0.2f;
-	float animationBlendSecondsLength = 0.2f;
-	bool isBlending = true;
-	bool animationLoop = true;
+	// 武器のアタッチメント関係
+	struct Weapon
+	{
+		std::shared_ptr<Model> model;
+		DirectX::XMFLOAT3 position = { 0,0,0 };
+		DirectX::XMFLOAT3 angle = { 0,0,0 };
+		DirectX::XMFLOAT3 scale = { 1,1,1 };
+		DirectX::XMFLOAT4X4 transform = {
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		};
+		DirectX::XMFLOAT3 weaponHitOffset = { 0, 0, 0 };
+		DirectX::XMFLOAT3 weaponAngleOffset = { 0, 0, 0 };
+		bool LeftHandInvincible = true;
+		float weaponRadius = 0.5f;
+		float weaponHeight = 1.0f;
+	};
+	Weapon weapon[2];
 
-	bool useRootMotion = false;
-	bool useRootMotionEx = false;
-	bool bakeTranslationY = true; // Y軸移動を無視するか
-	DirectX::XMFLOAT3 rootMotionPosition = { 0, 0, 0 }; // ルートモーションによる位置
-
-	DirectX::XMFLOAT4X4					worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
 	// 当たり判定関係
 	float debugOffset = 0.5;
@@ -95,4 +114,7 @@ private:
 	BehaviorData* behaviorData = nullptr;
 	NodeBase* activeNode = nullptr;
 	float runTimer = 0.0f;
+
+	// シーケンサー関係
+	AnimationSequence<EnemyAnimationState> animSequence;
 };
