@@ -320,24 +320,24 @@ void SceneGame::DrawGUI()
 	Player& player = Player::Instance();
 
 	ImGui::Begin("Camera System");
+	{
+		// モード切り替え用のラジオボタン
+		int mode = static_cast<int>(cameraMode);
+		if (ImGui::RadioButton("Game (3rd Person)", &mode, 0)) {
+			cameraMode = CameraMode::Game;
+		}
+		ImGui::SameLine();
 
-	// モード切り替え用のラジオボタン
-	int mode = static_cast<int>(cameraMode);
-	if (ImGui::RadioButton("Game (3rd Person)", &mode, 0)) {
-		cameraMode = CameraMode::Game;
+		if (ImGui::RadioButton("Debug (Free)", &mode, 1)) {
+			cameraMode = CameraMode::Debug;
+			// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
+			debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
+		}
+		ImGui::Separator();
+
+		ImGui::DragFloat("Distance", &cameraRange, 0.1f);
+		gameCamera->SetRange(cameraRange);
 	}
-	ImGui::SameLine();
-
-	if (ImGui::RadioButton("Debug (Free)", &mode, 1)) {
-		cameraMode = CameraMode::Debug;
-		// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
-		debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
-	}
-	ImGui::Separator();
-
-	ImGui::DragFloat("Distance", &cameraRange, 0.1f);
-	gameCamera->SetRange(cameraRange);
-
 	ImGui::End();
 
 	ImGui::Begin("Shader");
@@ -390,65 +390,6 @@ void SceneGame::DrawGUI()
 			ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 		}
 	}
-	ImGui::End();
-
-	ImGui::Begin("Attack Sequencer");
-	auto& animSequence = player.GetAnimSequence();
-	auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
-
-	float totalSec = animSequence.GetAnimationLength(animSequence.currentState);
-	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
-	if (selectedEntry >= 0)
-	{
-		auto& tracks = animSequence.CurrentTracks();
-		if (selectedEntry < (int)tracks.size())
-		{
-			auto& t = tracks[selectedEntry];
-			ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
-				t.GetStartSeconds(), t.GetEndSeconds());
-		}
-	}
-
-	// 選択中のステートにトラックを追加するボタン
-	if (ImGui::Button(u8"+ 追加"))
-	{
-		animSequence.attackData[animSequence.currentState].push_back(
-			{ 0, 50, u8"新しい判定", 0xFF0000FF, TrackType::HitBox }
-		);
-	}
-
-	// 保存・読み込みボタン
-	if (ImGui::Button(u8"保存"))
-		animSequence.Save("Data/Json/Player/AttackData/AttackSequence.json");
-	ImGui::SameLine();
-	if (ImGui::Button(u8"読み込み"))
-		animSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
-
-	for (auto& [state, tracks] : animSequence.attackData)
-	{
-		const AnimationConfig* config = manager.GetConfig(state);
-		if (ImGui::Button(config->animationName.c_str()))
-		{
-			animSequence.currentState = state;
-		}
-		ImGui::SameLine();
-	}
-	ImGui::NewLine();
-
-	if (animSequence.currentState == player.GetCurrentState())
-	{
-		currentFrame = (int)(player.GetCurrentAnimationSeconds() * 144);
-	}
-
-	ImSequencer::Sequencer(
-		&animSequence,
-		&currentFrame,
-		&sequencerExpanded,
-		&selectedEntry,
-		&firstFrame,
-		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
-	);
-
 	ImGui::End();
 
 	player.DrawGUI();
@@ -534,12 +475,18 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 	DirectX::XMFLOAT3 outPositionA, outPositionB;
 	for (int i = 0; i < 2; ++i)
 	{
+		// インデックスからHandTypeに変換（0＝右手、1＝左手）
+		HandType hand = (1 == 0) ? HandType::RightHand : HandType::LeftHand;
+
+		// その手のHitBoxがアクティブか確認
+		if (!enemy->GetAnimSequence().IsHitActive(enemy->GetCurrentState(), currentSec, hand)) continue;
+
 		if (Collision::IntersectCapsuleVsCapsule(
-			enemy->GetWeaponPosition(i),    // インデックス指定
-			enemy->GetWeaponDirection(i),   // インデックス指定
-			enemy->GetWeaponHeight(i),      // インデックス指定
-			enemy->GetWeaponRadius(i),      // インデックス指定
-			1.0f,                           // 武器の重さ
+			enemy->GetWeaponPosition(i),    
+			enemy->GetWeaponDirection(i),   
+			enemy->GetWeaponHeight(i),      
+			enemy->GetWeaponRadius(i),      
+			1.0f,                           
 			player.GetPosition(),
 			player.GetCapsuleDirection(),
 			player.GetHeight(),
@@ -549,7 +496,14 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 			outPositionB
 		))
 		{
+			auto state = enemy->GetCurrentState();
+			const auto& config = AnimationStateManager<EnemyAnimationState>::Instance().GetConfig(state);
 
+			if (config->damageRate > 0.0f)
+			{
+				AttackResult res = enemy->CalculateAttackResult(config->damageRate, config->poiseValue);
+				player.ApplyDamage(res.damage, 0.3f, res.poiseDamage);
+			}
 		}
 	}
 }

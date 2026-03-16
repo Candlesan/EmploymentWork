@@ -36,7 +36,7 @@ void ImGuiRenderer::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceCont
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 0.5f;
 	}
 
 	// Setup Platform/Renderer backends
@@ -81,7 +81,7 @@ void ImGuiRenderer::NewFrame()
 	ImGuizmo::SetOrthographic(false);
 	ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
 
-#if 0
+#if 1
 	// Docking
 	const ImGuiWindowFlags window_flags = ImGuiWindowFlags_None
 		| ImGuiWindowFlags_NoTitleBar

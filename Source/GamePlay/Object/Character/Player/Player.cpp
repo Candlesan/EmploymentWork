@@ -25,6 +25,7 @@ void Player::Initialize()
 	 // プレイヤーパラメーター初期化
 	moveSpeed = 2.0f;
 	maxMoveSpeed = 7.0f;
+	MaxHealth = 1400.0f;
 	health = 1400.0f;
 	maxPoise = 100.0f;
 	currentPoise = 100.0f;
@@ -70,23 +71,23 @@ void Player::InitializeAttackData()
 	else
 	{
 		animSequence.attackData[PlayerAnimationState::Attack_01] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
 		};
 		animSequence.attackData[PlayerAnimationState::Attack_02] = {
-		  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
 		};
 		animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
-		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox },
-		  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox }
+		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+		  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
 		};
 		animSequence.attackData[PlayerAnimationState::Run_Attack] = {
-		  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
 		};
 		animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
-		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
 		};
 		animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
-		  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox }
+		  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
 		};
 	}
 }
@@ -130,65 +131,132 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 void Player::DrawGUI()
 {
 	ImGui::Begin("Player");
-
-	// パラメーター
-	if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Text("currentState: %d", (int)currentState);
-		ImGui::Text("Stick Angle: %.2f deg", debug_degree);
-		ImGui::Text("Table Index: %d", debug_dirIndex);
-		const char* directionNames[] = { "Roll_F", "Roll_R", "Roll_BR", "Roll_BL", "Roll_L"};
-		if (debug_degree > 0.1f || debug_degree < -0.1f || debug_dirIndex != 0) {
-			ImGui::Text("Determined Dir: %s", directionNames[debug_dirIndex]);
+		// パラメーター
+		if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button(u8"HP前回"))
+			{
+				health = MaxHealth;
+			}
+			ImGui::Text("Health: %f.0", health);
+
+			ImGui::Text("currentState: %d", (int)currentState);
+			ImGui::Text("Stick Angle: %.2f deg", debug_degree);
+			ImGui::Text("Table Index: %d", debug_dirIndex);
+			const char* directionNames[] = { "F", "R", "BR", "BL", "L" };
+			if (debug_degree > 0.1f || debug_degree < -0.1f || debug_dirIndex != 0) {
+				ImGui::Text("Determined Dir: %s", directionNames[debug_dirIndex]);
+			}
+			else {
+				ImGui::Text("Determined Dir: Idle/None");
+			}
 		}
-		else {
-			ImGui::Text("Determined Dir: Idle/None");
-		}
-	}
 
 		ImGui::DragFloat("Move Speed:", &moveSpeed, 1.0f, 0, 10); // 移動速度
 		ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 
+		// トランスフォーム情報
+		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat3("Position", &position.x); // 位置
 
-	// トランスフォーム情報
-	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		ImGui::DragFloat3("Position", &position.x); // 位置
+			DirectX::XMFLOAT3 a;
+			a.x = DirectX::XMConvertToDegrees(angle.x);
+			a.y = DirectX::XMConvertToDegrees(angle.y);
+			a.z = DirectX::XMConvertToDegrees(angle.z);
+			ImGui::DragFloat3("Angle", &a.x); // 回転
+			// 表示用に度数法に変換した後、再度ラジアンで戻す処理
+			angle.x = DirectX::XMConvertToRadians(a.x);
+			angle.y = DirectX::XMConvertToRadians(a.y);
+			angle.z = DirectX::XMConvertToRadians(a.z);
 
-		DirectX::XMFLOAT3 a;
-		a.x = DirectX::XMConvertToDegrees(angle.x);
-		a.y = DirectX::XMConvertToDegrees(angle.y);
-		a.z = DirectX::XMConvertToDegrees(angle.z);
-		ImGui::DragFloat3("Angle", &a.x); // 回転
-		// 表示用に度数法に変換した後、再度ラジアンで戻す処理
-		angle.x = DirectX::XMConvertToRadians(a.x);
-		angle.y = DirectX::XMConvertToRadians(a.y);
-		angle.z = DirectX::XMConvertToRadians(a.z);
+			ImGui::DragFloat3("Scale", &scale.x); // スケール
+		}
 
-		ImGui::DragFloat3("Scale", &scale.x); // スケール
+		// 当たり判定情報
+		if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
+			ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
+			ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
+		}
+
+		// 武器のアタッチメント情報
+		if (ImGui::CollapsingHeader("Weapon Attachment", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat3("Position##1", &weapon.position.x, 0.01f);
+			ImGui::DragFloat3("Angle##1", &weapon.angle.x, 0.01f);
+			ImGui::DragFloat3("Scale##1", &weapon.scale.x, 0.01f);
+
+			ImGui::DragFloat3("Weapon HitOffset", &weapon.weaponHitOffset.x, 0.1f);
+			ImGui::DragFloat3("Weapon AngleOffset", &weapon.weaponAngleOffset.x, 0.1f);
+			ImGui::DragFloat("Weapon Collision Radius", &weapon.weaponRadius, 0.1f);
+			ImGui::DragFloat("Weapon Collision Height", &weapon.weaponHeight, 0.1f);
+		}
+
+
 	}
+	ImGui::End();
 
-	// 当たり判定情報
-	if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
+	ImGui::Begin("Player Attack Sequencer");
 	{
-		ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
-		ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
-		ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
+		auto& AnimSequence = GetAnimSequence();
+		auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
+
+		float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
+		ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
+		if (selectedEntry >= 0)
+		{
+			auto& tracks = AnimSequence.CurrentTracks();
+			if (selectedEntry < (int)tracks.size())
+			{
+				auto& t = tracks[selectedEntry];
+				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
+					t.GetStartSeconds(), t.GetEndSeconds());
+			}
+		}
+
+		// 選択中のステートにトラックを追加するボタン
+		if (ImGui::Button(u8"+ 追加"))
+		{
+			AnimSequence.attackData[AnimSequence.currentState].push_back(
+				{ 0, 50, u8"新しい判定", 0xFF0000FF, TrackType::HitBox }
+			);
+		}
+
+		// 保存・読み込みボタン
+		if (ImGui::Button(u8"保存"))
+			AnimSequence.Save("Data/Json/Player/AttackData/AttackSequence.json");
+		ImGui::SameLine();
+		if (ImGui::Button(u8"読み込み"))
+			AnimSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
+
+		for (auto& [state, tracks] : AnimSequence.attackData)
+		{
+			const AnimationConfig* config = manager.GetConfig(state);
+			if (ImGui::Button(config->animationName.c_str()))
+			{
+				AnimSequence.currentState = state;
+			}
+			ImGui::SameLine();
+		}
+		ImGui::NewLine();
+
+		if (AnimSequence.currentState == GetCurrentState())
+		{
+			currentFrame = (int)(GetCurrentAnimationSeconds() * 144);
+		}
+
+		ImSequencer::Sequencer(
+			&AnimSequence,
+			&currentFrame,
+			&sequencerExpanded,
+			&selectedEntry,
+			&firstFrame,
+			ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
+		);
 	}
-
-	// 武器のアタッチメント情報
-	if (ImGui::CollapsingHeader("Weapon Attachment", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		ImGui::DragFloat3("Position##1", &weapon.position.x, 0.01f);
-		ImGui::DragFloat3("Angle##1", &weapon.angle.x, 0.01f);
-		ImGui::DragFloat3("Scale##1", &weapon.scale.x, 0.01f);
-
-		ImGui::DragFloat3("Weapon HitOffset", &weapon.weaponHitOffset.x, 0.1f);
-		ImGui::DragFloat3("Weapon AngleOffset", &weapon.weaponAngleOffset.x, 0.1f);
-		ImGui::DragFloat("Weapon Collision Radius", &weapon.weaponRadius, 0.1f);
-		ImGui::DragFloat("Weapon Collision Height", &weapon.weaponHeight, 0.1f);
-	}
-
 	ImGui::End();
 }
 

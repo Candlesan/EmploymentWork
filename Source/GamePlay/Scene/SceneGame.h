@@ -78,11 +78,5 @@ private:
 	float shadowAttenuation = 0.125f;
 	float shadowBias = 0.002f;
 	DirectX::XMFLOAT4X4 lightViewProjection;
-
-	// シーケンサー関連
-	int currentFrame = 0;
-	bool sequencerExpanded = true;
-	int selectedEntry = -1;
-	int firstFrame = 0;
 };
 

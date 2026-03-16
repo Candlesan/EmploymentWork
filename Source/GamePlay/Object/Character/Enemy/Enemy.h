@@ -16,6 +16,7 @@ public:
 	~Enemy() override {};
 
 	void Initialize();
+	void InitializeAttackData();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
@@ -117,4 +118,9 @@ private:
 
 	// シーケンサー関係
 	AnimationSequence<EnemyAnimationState> animSequence;
+	int currentFrame = 0;
+	bool sequencerExpanded = true;
+	int selectedEntry = -1;
+	int firstFrame = 0;
+
 };

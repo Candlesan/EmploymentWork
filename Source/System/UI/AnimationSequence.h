@@ -14,12 +14,21 @@ enum class TrackType {
     Sound,
 };
 
+enum class HandType {
+    None,
+    RightHand,
+    LeftHand,
+    Both, // 両手攻撃
+    Body, // 体当たりなど
+};
+
 struct AnimTrack {
     int start;
     int end;
     std::string label;
     unsigned int color;
     TrackType type;
+    HandType hand = HandType::None;
     std::string effectName;
     std::string soundName;
 
@@ -77,6 +86,7 @@ public:
     float GetAnimationLength(T state) const {
         if (!model) return 1.0f;
         // AnimationStateManagerの型に注意（Tを使用）
+
         auto& manager = AnimationStateManager<T>::Instance();
         const auto* config = manager.GetConfig(state);
         if (!config) return 1.0f;
@@ -86,16 +96,23 @@ public:
         return model->GetAnimations()[index].secondsLength;
     }
 
-    bool IsHitActive(T state, float currentSeconds) const {
+    bool IsHitActive(T state, float currentSeconds, HandType hand = HandType::None) const {
         auto it = attackData.find(state);
         if (it == attackData.end()) return false;
         for (auto& track : it->second) {
             if (track.type != TrackType::HitBox) continue;
+            if (hand != HandType::None && track.hand != hand) continue;
             if (currentSeconds >= track.GetStartSeconds() &&
                 currentSeconds <= track.GetEndSeconds())
                 return true;
         }
         return false;
+    }
+
+    void RenumberTracks(std::vector<AnimTrack>& tracks)
+    {
+        for (int i = 0; i < (int)tracks.size(); ++i)
+            tracks[i].label = u8"判定 " + std::to_string(i + 1);
     }
 
     // --- JSON入出力 ---
@@ -111,6 +128,7 @@ public:
                 track["label"] = t.label;
                 track["color"] = t.color;
                 track["type"] = (int)t.type;
+                track["hand"] = (int)t.hand;
                 trackArray.push_back(track);
             }
             root[std::to_string((int)state)] = trackArray;
@@ -136,6 +154,7 @@ public:
                 track.label = t.value("label", "No Name");
                 track.color = t.value("color", 0xFFFFFFFF);
                 track.type = (TrackType)t.value("type", 0);
+                track.hand = (HandType)t.value("hand", 0);
                 tracks.push_back(track);
             }
             attackData[state] = tracks;
