@@ -28,7 +28,8 @@ void Enemy::Initialize()
 	angle = {0, 3, 0};
 	scale.x = scale.y = scale.z = 1.2f;
 	weight = 100.0f;
-	height = 1.0f;
+	radius = 1.0f;
+	height = 1.6f;
 	debugOffset = 0.8;
 
 	// 武器モデルの設定
@@ -36,20 +37,21 @@ void Enemy::Initialize()
 	weapon[0].angle = { 0.24, 4.55, -1.90 };
 	weapon[0].weaponHitOffset = { -0.83, -0.13, 0.06 };
 	weapon[0].weaponAngleOffset = { 0.54, 8.0, 0.43 };
-	weapon[0].weaponRadius = 0.44f;
+	weapon[0].weaponRadius = 0.59f;
 	weapon[0].weaponHeight = 1.7f;
 
 	weapon[1].position = { -0.16, 0.01, -0.03 };
 	weapon[1].angle = { 0.04, 4.23, 1.78 };
 	weapon[1].weaponHitOffset = { -0.4, 0.02, 0.1 };
 	weapon[1].weaponAngleOffset = { 0.0, 2.12, -0.23 };
-	weapon[1].weaponRadius = 0.44f;
+	weapon[1].weaponRadius = 0.59f;
 	weapon[1].weaponHeight = 1.7f;
 
 	// ステータスの設定
 	health = 30000;
 	MaxHealth = 30000.0f;
 	maxPoise = 1200.0f;
+	baseAttackPower = 1400.0f;
 	currentPoise = 1200.0f;
 
 	invincibleTimer = 0.0f;
@@ -301,6 +303,20 @@ void Enemy::DrawGUI()
 					{
 						t.hand = (HandType)handIndex;
 					}
+
+					if (t.hand == HandType::Body)
+					{
+						char boneBuf[128];
+						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
+						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
+							t.boneName = boneBuf;
+						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
+						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
+					}
+
+					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
+					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
+					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
 				}
 			}
 		}
@@ -397,9 +413,14 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 		{
 			HandType currentHand = (i == 0) ? HandType::RightHand : HandType::LeftHand;
 
+			if (i == 0 && weapon[i].RightHandInvincible)
+			{
+				if (!GetAnimSequence().IsHitActive(currentState, currentSec, currentHand))
+					continue;
+			}
 			if (i == 1 && weapon[i].LeftHandInvincible)
 			{
-				if (!GetAnimSequence().IsHitActive(currentState, currentSec, HandType::LeftHand))
+				if (!GetAnimSequence().IsHitActive(currentState, currentSec, currentHand))
 					continue;
 			}
 
@@ -425,7 +446,15 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 
 			renderer->DrawCapsule(weaponTransform, weapon[i].weaponRadius, weapon[i].weaponHeight, { 1, 0, 0, 1 });
 		}
+
 	}
+		// 武器の攻撃の当たり判定
+		{
+			for (auto& info : GetActiveSphereHits())
+			{
+				renderer->DrawSphere(info.position, info.radius, { 1.0f, 0.0f, 1.0f, 1.0f });
+			}
+		}
 
 	// 距離の可視化
 	{
@@ -478,14 +507,13 @@ DirectX::XMFLOAT3 Enemy::GetWeaponPosition(int index) const
 {
 	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[index].transform);
 
-	// スケールを除去（描画側と同じ処理）
+	// スケールを除去
 	DirectX::XMVECTOR scale, rot, pos;
 	DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
 	DirectX::XMMATRIX baseMatrix =
 		DirectX::XMMatrixRotationQuaternion(rot) *
 		DirectX::XMMatrixTranslationFromVector(pos);
 
-	// 描画側と完全に同じ行列を作る
 	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
 		weapon[index].angle.x + weapon[index].weaponAngleOffset.x,
 		weapon[index].angle.y + weapon[index].weaponAngleOffset.y,
@@ -534,6 +562,58 @@ DirectX::XMFLOAT3 Enemy::GetWeaponDirection(int index) const
 	DirectX::XMFLOAT3 Direction;
 	DirectX::XMStoreFloat3(&Direction, dir);
 	return Direction;
+}
+
+std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
+{
+	std::vector<SphereHitInfo> result;
+	float currentSec = GetCurrentAnimationSeconds();
+	auto state = GetCurrentState();
+
+	auto it = animSequence.attackData.find(state);
+	if (it == animSequence.attackData.end()) return result;
+
+	for (auto& track : it->second)
+	{
+		if (track.type != TrackType::HitBox) continue;
+		if (track.hand != HandType::Body) continue;
+		if (currentSec < track.GetStartSeconds() || currentSec > track.GetEndSeconds()) continue;
+
+		SphereHitInfo info;
+		info.radius = track.sphereRadius;
+
+		// ボーン名が指定されていなければボーン位置を使う
+		if (!track.boneName.empty())
+		{
+			int nodeIndex = enemy->GetNodeIndex(track.boneName.c_str());
+			if (nodeIndex >= 0)
+			{
+				auto& node = enemy->GetNodes()[nodeIndex];
+				DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&node.worldTransform);
+
+				// オフセットをワールド空間に変換して球の位置を求める
+				DirectX::XMVECTOR pos = DirectX::XMVector3Transform(
+					DirectX::XMLoadFloat3(&track.sphereOffset), world);
+				DirectX::XMStoreFloat3(&info.position, pos);
+			}
+			else
+			{
+				info.position = position;
+			}
+		}
+		else
+		{
+			// ボーン名無しの場合敵の位置＋offset
+			info.position = {
+				position.x + track.sphereOffset.x,
+				position.y + track.sphereOffset.y,
+				position.z + track.sphereOffset.z
+			};
+		}
+		result.push_back(info);
+	}
+
+	return result;
 }
 
 // アニメーション更新処理
@@ -593,15 +673,13 @@ void Enemy::UpdateStateTransitions(float elapsedTime)
 		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
 		break;
 	case EnemyAnimationState::Skill_DoubleSwings_Root:
-		weapon->LeftHandInvincible = false;
-		if (IsAnimationFinished())
-		{
-			weapon->LeftHandInvincible = true;
-
-			ChangeAnimationState(EnemyAnimationState::Idle);
-		}
+		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
 		break;
 	case EnemyAnimationState::Skill_EndlessStabs:
+		weapon->LeftHandInvincible = false;
+
+		if (IsAnimationOutTimeRange(3.248)) weapon->LeftHandInvincible = true;
+
 		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
 		break;
 	case EnemyAnimationState::Skill_QuickStab:

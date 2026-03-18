@@ -45,6 +45,7 @@ public:
 	void SetSpeedUp(float s) { speedUp = s; }
 	void SetBaseSpeed(float s) { baseSpeed = s; }
 
+	// Œ»İ‚ÌÄ¶ŠÔ‚ğæ“¾
 	float GetCurrentAnimationSeconds() const { return animationSeconds; }
 	//float GetAnimationSeconds(PlayerAnimationState state) const;
 

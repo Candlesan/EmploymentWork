@@ -31,6 +31,66 @@ bool Collision::IntersectSphereVsSpere(
     return true;
 }
 
+// 球とカプセルの交差判定
+bool Collision::IntersectSphereVsCapsule(
+    const DirectX::XMFLOAT3& spherePosition,
+    float sphereRadius,
+    const DirectX::XMFLOAT3& capsulePosition,
+    const DirectX::XMFLOAT3& capsuleDirection,
+    float capsuleHeight,
+    float capsuleRadius,
+    DirectX::XMFLOAT3& outSphererPosition)
+{
+    using namespace DirectX;
+
+    // カプセルの線分の端点を計算する
+    XMVECTOR CapsulePos = DirectX::XMLoadFloat3(&capsulePosition);
+    XMVECTOR CapsuleDir = DirectX::XMLoadFloat3(&capsuleDirection);
+
+    // このpositionはカプセルの中心だから
+    // 半分にして計算するのは中心から上下の伸ばすと合計でhightになるから
+    // そのまま計算すると上端から線分が始まってカプセル全体が下にずれるから
+    XMVECTOR HalfHeight = XMVectorScale(CapsuleDir, capsuleHeight * 0.5f);
+
+    XMFLOAT3 p, q;
+    XMStoreFloat3(&p, XMVectorSubtract(CapsulePos, HalfHeight));
+    XMStoreFloat3(&q, XMVectorAdd(CapsulePos, HalfHeight));
+
+    // 球の中心から線分への最近点を求める
+    // 球は点として扱う
+    XMFLOAT3 point, dummy;
+    ClosetPointSegmentSegment(spherePosition, spherePosition, p, q, dummy, point);
+
+    // 最近接点と球と中心との距離を計算
+    XMVECTOR SpherePos = XMLoadFloat3(&spherePosition);
+    XMVECTOR Point = XMLoadFloat3(&point);
+    XMVECTOR Vec = XMVectorSubtract(SpherePos, Point);
+    float dist = XMVectorGetX(XMVector3Length(Vec));
+
+    float radius = sphereRadius + capsuleRadius;
+    if (dist < radius)
+    {
+        // 球をカプセルから押し出す
+        XMVECTOR pushDir;
+        if (dist > 1e-6f)
+        {
+            pushDir = XMVector3Normalize(Vec);
+        }
+        else
+        {
+            pushDir = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+        }
+
+        float overlap = radius - dist;
+        XMVECTOR newSpherePos = XMVectorAdd(SpherePos, XMVectorScale(pushDir, overlap));
+        XMStoreFloat3(&outSphererPosition, newSpherePos);
+        return true;
+    }
+
+    outSphererPosition = spherePosition;
+    return false;
+}
+
 // カプセルとカプセルの交差判定
 bool Collision::IntersectCapsuleVsCapsule(
     const DirectX::XMFLOAT3& positionA,

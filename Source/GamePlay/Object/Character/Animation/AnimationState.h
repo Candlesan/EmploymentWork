@@ -223,17 +223,18 @@ struct AnimationConfig
 	bool useRootMotionEx;
 	float blendTime; // 補間時間
 	float damageRate; // 攻撃力倍率 (1.0 = 標準)
+	float invincible; // 無敵時間
 	float poiseValue;  // 体幹削り
 
 	AnimationConfig()
 		: animationName(""), loop(false), useRootMotion(false), useRootMotionEx(false),
-		blendTime(0.2f), damageRate(0.0f), poiseValue(0.0f) {
+		blendTime(0.2f), damageRate(0.0f), poiseValue(0.0f), invincible(0.3f){
 	}
 
 	// コンストラクタも更新して、デフォルト値を設定できるようにする
 	AnimationConfig(const std::string& name, bool isLoop = false, bool rootMotion = false,
-		bool rootMotionEx = false, float blend = 0.2f, float dmg = 0.0f, float pise = 0.0f)
+		bool rootMotionEx = false, float blend = 0.2f, float dmg = 0.0f, float pise = 0.0f, float inv = 0.3f)
 		: animationName(name), loop(isLoop), useRootMotion(rootMotion),
-		useRootMotionEx(rootMotionEx), blendTime(blend), damageRate(dmg), poiseValue(pise) {
+		useRootMotionEx(rootMotionEx), blendTime(blend), damageRate(dmg), poiseValue(pise), invincible(inv){
 	}
 };

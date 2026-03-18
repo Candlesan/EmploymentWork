@@ -156,49 +156,49 @@ AnimationStateManager<EnemyAnimationState>::AnimationStateManager()
     configs[EnemyAnimationState::Dodge_Right] =    { "Dodge_Right"    , false, false, true };
 
     // 通常攻撃
-    configs[EnemyAnimationState::Light_Attack_01] = { "Light_Attack_01" , false, false, true };
-    configs[EnemyAnimationState::Light_Attack_02] = { "Light_Attack_02" , false, false, true };
-    configs[EnemyAnimationState::Light_Attack_03] = { "Light_Attack_03" , false, false, true };
+    configs[EnemyAnimationState::Light_Attack_01] = { "Light_Attack_01" , false, false, true, 0.2, 0.1 , 0.0 };
+    configs[EnemyAnimationState::Light_Attack_02] = { "Light_Attack_02" , false, false, true, 0.2, 0.1 , 0.0 };
+    configs[EnemyAnimationState::Light_Attack_03] = { "Light_Attack_03" , false, false, true, 0.2, 0.1, 0.0 };
 
     // 強攻撃
-    configs[EnemyAnimationState::Heavy_Attack_01] = { "Heavy_Attack_01" , false, false, true };
-    configs[EnemyAnimationState::Heavy_Attack_02] = { "Heavy_Attack_02" , false, false, true };
+    configs[EnemyAnimationState::Heavy_Attack_01] = { "Heavy_Attack_01" , false, false, true, 0.2, 0.1 , 0.0 };
+    configs[EnemyAnimationState::Heavy_Attack_02] = { "Heavy_Attack_02" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 回避(追撃)
-    configs[EnemyAnimationState::Dodge_FU] = { "Dodge_FU" , false, false, true };
+    configs[EnemyAnimationState::Dodge_FU] = { "Dodge_FU" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 掴み攻撃
-    configs[EnemyAnimationState::Grab_Fall] = { "Grab_Fall" , false, false, true };
+    configs[EnemyAnimationState::Grab_Fall] = { "Grab_Fall" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 叫び
-    configs[EnemyAnimationState::Roar] = { "Roar" , false, false, true };
+    configs[EnemyAnimationState::Roar] = { "Roar" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 飛びつき切り
-    configs[EnemyAnimationState::Skill_BlockBreaker] = { "Skill_BlockBreaker" , false, false, true };
+    configs[EnemyAnimationState::Skill_BlockBreaker] = { "Skill_BlockBreaker" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 空中2連切り(中距離からプレイヤーに向かってする攻撃)
-    configs[EnemyAnimationState::Skill_DoubleSwings_Root] = { "Skill_DoubleSwings_Root" , false, false, true };
+    configs[EnemyAnimationState::Skill_DoubleSwings_Root] = { "Skill_DoubleSwings_Root" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 突き攻撃(2連)
-    configs[EnemyAnimationState::Skill_EndlessStabs] = { "Skill_EndlessStabs" , false, false, true };
+    configs[EnemyAnimationState::Skill_EndlessStabs] = { "Skill_EndlessStabs" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 突き攻撃(3連)
-    configs[EnemyAnimationState::Skill_QuickStab] = { "Skill_QuickStab" , false, false, true };
+    configs[EnemyAnimationState::Skill_QuickStab] = { "Skill_QuickStab" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // プレス攻撃
-    configs[EnemyAnimationState::Skill_HeavyStomp] = { "Skill_HeavyStomp" , false, false, true };
+    configs[EnemyAnimationState::Skill_HeavyStomp] = { "Skill_HeavyStomp" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 突撃2連ひっかき攻撃
-    configs[EnemyAnimationState::Skill_Leaping] = { "Skill_Leaping" , false, false, true };
+    configs[EnemyAnimationState::Skill_Leaping] = { "Skill_Leaping" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 突進攻撃
-    configs[EnemyAnimationState::Skill_ShoulderBarge_Root] = { "Skill_ShoulderBarge_Root" , false, false, true };
+    configs[EnemyAnimationState::Skill_ShoulderBarge_Root] = { "Skill_ShoulderBarge_Root" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // アッパーカット
-    configs[EnemyAnimationState::Skill_UpperCut] = { "Skill_UpperCut" , false, false, true };
+    configs[EnemyAnimationState::Skill_UpperCut] = { "Skill_UpperCut" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 連続切り
-    configs[EnemyAnimationState::Skill_WieldDagger] = { "Skill_WieldDagger" , false, false, true };
+    configs[EnemyAnimationState::Skill_WieldDagger] = { "Skill_WieldDagger" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // 軽ダメージ
     configs[EnemyAnimationState::Hit_Front] =       { "Hit_Front"       , false, false, true };

@@ -32,6 +32,15 @@ struct AnimTrack {
     std::string effectName;
     std::string soundName;
 
+    // 球判定用（hand == Body のときに使う）
+    std::string boneName = "";   // 追従するボーン名（空なら敵の position 基準）
+    float sphereRadius = 0.5f;   // 球の半径
+    DirectX::XMFLOAT3 sphereOffset = { 0, 0, 0 }; // ボーンからのオフセット
+
+    float damageRate = 0.0f;
+    float poiseRate = 0.0f;
+    float invincible = 0.3f;
+
     float GetStartSeconds() const { return start / 100.0f; }
     float GetEndSeconds()   const { return end / 100.0f; }
 };
@@ -109,6 +118,19 @@ public:
         return false;
     }
 
+    const AnimTrack* GetActiveHitTrack(T state, float currentSec, HandType hand) {
+        if (attackData.find(state) == attackData.end()) return nullptr;
+
+        for (const auto& track : attackData.at(state)) {
+            if (currentSec >= track.start * 0.01f && currentSec <= track.end * 0.01f) {
+                if (hand == HandType::None || track.hand == hand) {
+                    return &track; // 当たっているデータをまるごと返す
+                }
+            }
+        }
+        return nullptr;
+    }
+
     void RenumberTracks(std::vector<AnimTrack>& tracks)
     {
         for (int i = 0; i < (int)tracks.size(); ++i)
@@ -129,6 +151,12 @@ public:
                 track["color"] = t.color;
                 track["type"] = (int)t.type;
                 track["hand"] = (int)t.hand;
+                track["boneName"] = t.boneName;
+                track["sphereRadius"] = t.sphereRadius;
+                track["sphereOffset"] = nlohmann::json::array({ t.sphereOffset.x, t.sphereOffset.y, t.sphereOffset.z, });
+                track["damageRate"] = t.damageRate;
+                track["invincible"] = t.invincible;
+                track["poiseRate"] = t.poiseRate;
                 trackArray.push_back(track);
             }
             root[std::to_string((int)state)] = trackArray;
@@ -155,6 +183,22 @@ public:
                 track.color = t.value("color", 0xFFFFFFFF);
                 track.type = (TrackType)t.value("type", 0);
                 track.hand = (HandType)t.value("hand", 0);
+                track.boneName = t.value("boneName", "");
+                track.sphereRadius = t.value("sphereRadius", 0.5f);
+                if (t.count("sphereOffset"))
+                {
+                    track.sphereOffset.x = t["sphereOffset"][0];
+                    track.sphereOffset.y = t["sphereOffset"][1];
+                    track.sphereOffset.z = t["sphereOffset"][2];
+                }
+                else
+                {
+                    track.sphereOffset = { 0, 0, 0 };
+                }        
+                track.damageRate = t.value("damageRate", 0.0f);
+                track.invincible = t.value("invincible", 0.3f);
+                track.poiseRate = t.value("poiseRate", 0.0f);
+
                 tracks.push_back(track);
             }
             attackData[state] = tracks;

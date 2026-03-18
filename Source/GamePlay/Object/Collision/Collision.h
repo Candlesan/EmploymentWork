@@ -16,6 +16,16 @@ public:
 		DirectX::XMFLOAT3& outPositionB
 	);
 
+	// 球とカプセルの交差判定
+	static bool IntersectSphereVsCapsule(
+		const DirectX::XMFLOAT3& spherePosition,
+		float sqhereRadius,
+		const DirectX::XMFLOAT3& capsulePosition,
+		const DirectX::XMFLOAT3& capsuleDirection,
+		float capsuleHeight,
+		float capsuleRadius,
+		DirectX::XMFLOAT3& outSphererPosition);
+
 	// カプセルとカプセルの交差判定(重み有りバージョン)
 	static bool IntersectCapsuleVsCapsule(
 		const DirectX::XMFLOAT3& positionA,

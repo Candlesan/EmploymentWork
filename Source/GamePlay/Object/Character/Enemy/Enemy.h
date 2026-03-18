@@ -41,6 +41,12 @@ public:
 	float GetWeaponRadius(int index) const { return weapon[index].weaponRadius; }
 	float GetWeaponHeight(int index) const { return weapon[index].weaponHeight; }
 
+	// アクティブな球判定をすべて取得する
+	struct SphereHitInfo {
+		DirectX::XMFLOAT3 position;
+		float radius;
+	};
+	std::vector<SphereHitInfo> GetActiveSphereHits() const;
 
 	// 実行タイマー取得(仮実装)
 	float GetRunTimer() { return runTimer; }
@@ -93,6 +99,7 @@ private:
 		};
 		DirectX::XMFLOAT3 weaponHitOffset = { 0, 0, 0 };
 		DirectX::XMFLOAT3 weaponAngleOffset = { 0, 0, 0 };
+		bool RightHandInvincible = false;
 		bool LeftHandInvincible = true;
 		float weaponRadius = 0.5f;
 		float weaponHeight = 1.0f;
@@ -122,5 +129,4 @@ private:
 	bool sequencerExpanded = true;
 	int selectedEntry = -1;
 	int firstFrame = 0;
-
 };

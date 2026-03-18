@@ -78,5 +78,8 @@ private:
 	float shadowAttenuation = 0.125f;
 	float shadowBias = 0.002f;
 	DirectX::XMFLOAT4X4 lightViewProjection;
-};
 
+	// デバック機能
+	bool isPaused = false;      // 一時停止中か
+	bool stepNextFrame = false; // 1フレームだけ進めるか
+};

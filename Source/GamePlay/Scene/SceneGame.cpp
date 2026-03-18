@@ -78,6 +78,10 @@ void SceneGame::Initialize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+	// --- デバッグ用の更新制御 ---
+	bool shouldUpdate = !isPaused || stepNextFrame;
+	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
+
 	// カメラ取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 
@@ -115,20 +119,26 @@ void SceneGame::Update(float elapsedTime)
 		debugCamera->SyncControllerToCamera(camera);
 	}
 
-	// ステージ更新
-	stage->Update(elapsedTime);
+	if (shouldUpdate)
+	{
+		// ステージ更新
+		stage->Update(elapsedTime);
 
-	// プレイヤー更新
-	player.Update(elapsedTime);
+		// プレイヤー更新
+		player.Update(elapsedTime);
 
-	// エネミー更新
-	enemy->Update(elapsedTime);
+		// エネミー更新
+		enemy->Update(elapsedTime);
 
-	// プレイヤーと敵の当たり判定
-	CollisonPlayervsEnemy();
+		// プレイヤーと敵の当たり判定
+		CollisonPlayervsEnemy();
 
-	// プレイヤーの武器と敵の当たり判定
-	CollisionPlayerWeaponVsEnemy();
+		// プレイヤーの武器と敵の当たり判定
+		CollisionPlayerWeaponVsEnemy();
+
+		// 敵の攻撃とプレイヤーの当たり判定
+		CollisionEnemyWeaponVsPlayer();
+	}
 }
 
 // 描画処理
@@ -319,6 +329,44 @@ void SceneGame::DrawGUI()
 	// プレイヤーを取得
 	Player& player = Player::Instance();
 
+	ImGui::Begin("Game Debug Control");
+	{
+		// 一時停止ボタン
+		if (isPaused) {
+			if (ImGui::Button("Resume (F5)")) isPaused = false;
+		}
+		else {
+			if (ImGui::Button("Pause (F5)")) isPaused = true;
+		}
+
+		ImGui::SameLine();
+
+		// 1フレーム送りボタン（ポーズ中のみ有効）
+		if (!isPaused)
+		{
+			// ポーズ中じゃない時は、見た目をグレー（無効っぽく）にする
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+		}
+
+		if (ImGui::Button("Step Frame (F6)")) {
+			// ポーズ中のみ処理を受け付ける
+			if (isPaused) {
+				stepNextFrame = true;
+			}
+		}
+
+		if (!isPaused)
+		{
+			// 色の設定を元に戻す
+			ImGui::PopStyleColor(3);
+		}
+
+		ImGui::Text("Status: %s", isPaused ? "PAUSED" : "RUNNING");
+	}
+	ImGui::End();
+
 	ImGui::Begin("Camera System");
 	{
 		// モード切り替え用のラジオボタン
@@ -470,16 +518,20 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 	Player& player = Player::Instance();
 
 	float currentSec = enemy->GetCurrentAnimationSeconds();
+	auto state = enemy->GetCurrentState();
+	const auto& config = AnimationStateManager<EnemyAnimationState>::Instance().GetConfig(state);
+
 
 	// 敵のi番目の武器 vs プレイヤーの本体
 	DirectX::XMFLOAT3 outPositionA, outPositionB;
 	for (int i = 0; i < 2; ++i)
 	{
 		// インデックスからHandTypeに変換（0＝右手、1＝左手）
-		HandType hand = (1 == 0) ? HandType::RightHand : HandType::LeftHand;
+		HandType hand = (i == 0) ? HandType::RightHand : HandType::LeftHand;
 
 		// その手のHitBoxがアクティブか確認
-		if (!enemy->GetAnimSequence().IsHitActive(enemy->GetCurrentState(), currentSec, hand)) continue;
+		const AnimTrack* activeTrack = enemy->GetAnimSequence().GetActiveHitTrack(state, currentSec, hand);
+		if (!activeTrack) continue;
 
 		if (Collision::IntersectCapsuleVsCapsule(
 			enemy->GetWeaponPosition(i),    
@@ -496,13 +548,46 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 			outPositionB
 		))
 		{
-			auto state = enemy->GetCurrentState();
-			const auto& config = AnimationStateManager<EnemyAnimationState>::Instance().GetConfig(state);
-
+			// JsonからAttackDataのダメージを持ってくる
+			float finalDamage = config->damageRate * activeTrack->damageRate;
+			float finalPoiseValue = config->poiseValue * activeTrack->poiseRate;
 			if (config->damageRate > 0.0f)
 			{
-				AttackResult res = enemy->CalculateAttackResult(config->damageRate, config->poiseValue);
-				player.ApplyDamage(res.damage, 0.3f, res.poiseDamage);
+				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
+				player.SetLastDamage(res.damage);
+				player.ApplyDamage(res.damage, config->invincible, res.poiseDamage);
+			}
+		}
+
+	}
+
+	// 手や体の攻撃
+	for (auto& sphereInfo : enemy->GetActiveSphereHits())
+	{
+		// インデックスからHandTypeに変換（0＝右手、1＝左手）
+		HandType hand = HandType::Body;
+
+		// その手のHitBoxがアクティブか確認
+		const AnimTrack* activeTrack = enemy->GetAnimSequence().GetActiveHitTrack(state, currentSec, hand);
+		if (!activeTrack) continue;
+
+		DirectX::XMFLOAT3 outPos;
+		if (Collision::IntersectSphereVsCapsule(
+			sphereInfo.position, sphereInfo.radius,
+			player.GetPosition(),
+			player.GetCapsuleDirection(),
+			player.GetHeight(),
+			player.GetRadius(),
+			outPos))
+		{
+			// JsonからAttackDataのダメージを持ってくる
+			float finalDamage = config->damageRate * activeTrack->damageRate;
+			float finalPoiseValue = config->poiseValue * activeTrack->poiseRate;
+			if (config->damageRate > 0.0f)
+			{
+				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
+				player.SetLastDamage(res.damage);
+				player.ApplyDamage(res.damage, config->invincible, res.poiseDamage);
 			}
 		}
 	}

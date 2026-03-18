@@ -31,10 +31,13 @@ void Player::Initialize()
 	currentPoise = 100.0f;
 
 	baseAttackPower = 860.0f;
+	invincibleTimer = 0.0f;
+
 
 	// 当たり判定パラメーター初期化
 	weight = 0.5f;
-	height = 1.0f;
+	radius = 0.7f;
+	height = 1.6f;
 	debugOffset = 0.8;
 	weapon.weaponHitOffset = { -0.35, -1.05, -0.1 };
 	weapon.weaponAngleOffset = { 0.06, 6.6, 0.23 };
@@ -100,6 +103,9 @@ void Player::Update(float elapsedTime)
 	// 一番最初にジャンプ入力を確定させる
 	jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A) && CanJump();
 
+	// 無敵時間更新
+	UpdateInvincibleTimer(elapsedTime);
+
 	// 入力処理
 	InputMove(elapsedTime);
 
@@ -140,21 +146,18 @@ void Player::DrawGUI()
 				health = MaxHealth;
 			}
 			ImGui::Text("Health: %f.0", health);
+			ImGui::Text("Damage: %f.0", lastDamage);
+			ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
+			ImGui::Separator();
+			ImGui::Text("currentPoise: %f.0", currentPoise);
+			ImGui::Separator();
 
-			ImGui::Text("currentState: %d", (int)currentState);
-			ImGui::Text("Stick Angle: %.2f deg", debug_degree);
-			ImGui::Text("Table Index: %d", debug_dirIndex);
-			const char* directionNames[] = { "F", "R", "BR", "BL", "L" };
-			if (debug_degree > 0.1f || debug_degree < -0.1f || debug_dirIndex != 0) {
-				ImGui::Text("Determined Dir: %s", directionNames[debug_dirIndex]);
-			}
-			else {
-				ImGui::Text("Determined Dir: Idle/None");
-			}
+
+
+			ImGui::DragFloat("Move Speed:", &moveSpeed, 1.0f, 0, 10); // 移動速度
+			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 		}
 
-		ImGui::DragFloat("Move Speed:", &moveSpeed, 1.0f, 0, 10); // 移動速度
-		ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 
 		// トランスフォーム情報
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -193,6 +196,20 @@ void Player::DrawGUI()
 			ImGui::DragFloat3("Weapon AngleOffset", &weapon.weaponAngleOffset.x, 0.1f);
 			ImGui::DragFloat("Weapon Collision Radius", &weapon.weaponRadius, 0.1f);
 			ImGui::DragFloat("Weapon Collision Height", &weapon.weaponHeight, 0.1f);
+		}
+		// 武器のアタッチメント情報
+		if (ImGui::CollapsingHeader("Animation/State", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::Text("currentState: %d", (int)currentState);
+			ImGui::Text("Stick Angle: %.2f deg", debug_degree);
+			ImGui::Text("Table Index: %d", debug_dirIndex);
+			const char* directionNames[] = { "F", "R", "BR", "BL", "L" };
+			if (debug_degree > 0.1f || debug_degree < -0.1f || debug_dirIndex != 0) {
+				ImGui::Text("Determined Dir: %s", directionNames[debug_dirIndex]);
+			}
+			else {
+				ImGui::Text("Determined Dir: Idle/None");
+			}
 		}
 
 

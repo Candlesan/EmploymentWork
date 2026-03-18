@@ -39,6 +39,8 @@ public:
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequence<PlayerAnimationState>& GetAnimSequence() { return animSequence; }
+	// 計算したダメージ
+	void SetLastDamage(float d) { lastDamage = d; }
 protected:
 
 	//着地したときに呼ばれる
@@ -89,6 +91,7 @@ private:
 		float weaponHeight = 1.0f;
 	};
 	Weapon weapon;
+	float lastDamage = 0.0f;
 
 	enum class MoveMode {
 		Walk,   // 通常時
