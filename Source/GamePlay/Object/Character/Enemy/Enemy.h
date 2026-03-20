@@ -8,6 +8,8 @@
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
 
 #include <memory>
+#include <unordered_map>
+
 
 class Enemy : public AnimationCharacter<EnemyAnimationState>
 {
@@ -27,6 +29,11 @@ public:
 
 	// プレイヤーとの距離を取得
 	float GetDistanceToPlayer() const;
+
+	// ターゲットの座標に向かって旋回する
+	void Enemy::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
+	void Enemy::TurnToPosition(float elapsedTime);
+	bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree);
 
 	// 移動速度セッター・ゲッター
 	void SetMoveSpeed(float s) { moveSpeed = s; }
@@ -48,10 +55,25 @@ public:
 	};
 	std::vector<SphereHitInfo> GetActiveSphereHits() const;
 
+	// 始動技を決める関数
+	EnemyAnimationState Enemy::DecideFirstAttack();
+
+	// 技の派生があるか確認する関数
+	EnemyAnimationState Enemy::DecideNextAttack(EnemyAnimationState currentState);
+
+	// スタンプ攻撃
+	void HeavyStompAttack();
+
 	// 実行タイマー取得(仮実装)
 	float GetRunTimer() { return runTimer; }
 	// 実行タイマー設定(仮実装)
 	void SetRunTimer(float timer) { runTimer = timer; }
+
+	// 攻撃のクールダウン
+	void SetAttackCoolTimer(float timer) { attackCoolTimer = timer; }
+	float GetAttackCoolTimer() const { return attackCoolTimer; }
+
+	// シーケンサーを取得
 	AnimationSequence<EnemyAnimationState>& GetAnimSequence() { return animSequence; }
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
@@ -73,13 +95,6 @@ private:
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
 	// アニメーション関係
-	enum class State
-	{
-		Idle = 0,
-		Walk,
-		Down,
-	};
-	State state = State::Idle;
 
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
@@ -90,7 +105,7 @@ private:
 		std::shared_ptr<Model> model;
 		DirectX::XMFLOAT3 position = { 0,0,0 };
 		DirectX::XMFLOAT3 angle = { 0,0,0 };
-		DirectX::XMFLOAT3 scale = { 1,1,1 };
+		DirectX::XMFLOAT3 scale = { 1.5,1,1 };
 		DirectX::XMFLOAT4X4 transform = {
 			1, 0, 0, 0,
 			0, 1, 0, 0,
@@ -115,7 +130,9 @@ private:
 	bool Ondown = false;
 
 	// 距離
-	float distance = 0.0f;
+	float Short_Distance = 4.0f; // 近距離
+	float Middle_Distance = 12.0; // 中距離
+	float Long_Distance = 20.0; // 遠距離
 
 	// ビヘイビアツリー関係
 	BehaviorTree* aiTree = nullptr;
@@ -129,4 +146,25 @@ private:
 	bool sequencerExpanded = true;
 	int selectedEntry = -1;
 	int firstFrame = 0;
+
+	// 技のつながり
+	struct AttackDerivation 
+	{
+		EnemyAnimationState nextState; // 次に出す技
+		float minDistance; // 派生するための最低距離
+		float maxDistance; // 派生するための最大距離
+		int probability; // 派生する確率（0～100）
+	};
+	std::unordered_map<EnemyAnimationState, std::vector<AttackDerivation>> attackComboMap;
+
+	// 始動技
+	struct FirstAttack
+	{
+		EnemyAnimationState state;
+		float minRange;
+		float maxRange;
+	};
+	std::vector<FirstAttack> firstAttackList;
+
+	float attackCoolTimer = 0.0f;
 };

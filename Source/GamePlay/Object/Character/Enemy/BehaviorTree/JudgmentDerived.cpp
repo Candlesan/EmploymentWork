@@ -2,23 +2,18 @@
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "System/Core/Mathf.h"
 
-// í“¬‚É‘JˆÚ‚Å‚«‚é‚©”»’è
-bool BattleJudgment::Judgment()
-{
-	float dist = owner->GetDistanceToPlayer();
-	return false;
-}
 
 // UŒ‚‚É‘JˆÚ‚Å‚«‚é‚©”»’è
 bool AttackJudgment::Judgment()
 {
-	return false;
-}
+    // 1. ƒN[ƒ‹ƒ^ƒCƒ€’†‚È‚çUŒ‚‚µ‚È‚¢
+    if (owner->GetAttackCoolTimer() > 0.0f) return false;
 
-// œpœj‚É‘JˆÚ‚Å‚«‚é‚©”»’è
-bool WanderJudgment::Judgment()
-{
-	return false;
+    // 2. ‹——£ƒ`ƒFƒbƒN
+    float dist = owner->GetDistanceToPlayer();
+    if (dist >= 0 && dist < Long_Distance) return true;
+
+    return false;
 }
 
 // ’ÇÕ‚É‘JˆÚ‚Å‚«‚é‚©”»’è
@@ -26,20 +21,27 @@ bool PursuitJudgment::Judgment()
 {
     float dist = owner->GetDistanceToPlayer();
 
-    if (dist <= 2.5f) {
+    if (dist <= Short_Distance) {
         return false;
     }
 
-    // ‰“‹——£ƒ‰ƒCƒ“‚æ‚èŠO‘¤‚à’ÇÕ‚µ‚È‚¢
-    if (dist >= Long_Distance) {
-        return false;
+    
+    if (dist >= Middle_Distance) {
+        return true;
     }
 
-    return true;
+    return false;
 }
 
-// ‘Ò‹@‚É‘JˆÚ‚Å‚«‚é‚©”»’è
-bool IdleJudgment::Judgment()
+// œpœj‚É‘JˆÚ‚Å‚«‚é‚©”»’è
+bool WanderJudgment::Judgment()
 {
-	return true;
+    float dist = owner->GetDistanceToPlayer();
+
+    if (dist < Long_Distance && owner->GetAttackCoolTimer() > 0.0f)
+    {
+        return true;
+    }
+
+    return false;
 }

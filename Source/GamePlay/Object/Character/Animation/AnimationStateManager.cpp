@@ -53,7 +53,7 @@ AnimationStateManager<PlayerAnimationState>::AnimationStateManager()
     // ジャンプ攻撃
     configs[PlayerAnimationState::Jump_Attack_Start] = { "Jump_Attack_Start", false };
     configs[PlayerAnimationState::Jump_Attack_Loop]  = { "Jump_Attack_Loop" , true  };
-    configs[PlayerAnimationState::Jump_Attack]       = { "Jump_Attack"      , false, false, false, 0.2, 2.5, 264 };
+    configs[PlayerAnimationState::Jump_Attack]       = { "Jump_Attack"      , false, false, false, 0.2, 1.5f, 264 };
 
     // ジャンプ
     configs[PlayerAnimationState::Jump_Start] = { "Jump_Start", false };
@@ -186,7 +186,7 @@ AnimationStateManager<EnemyAnimationState>::AnimationStateManager()
     configs[EnemyAnimationState::Skill_QuickStab] = { "Skill_QuickStab" , false, false, true, 0.2, 0.1 , 0.0 };
 
     // プレス攻撃
-    configs[EnemyAnimationState::Skill_HeavyStomp] = { "Skill_HeavyStomp" , false, false, true, 0.2, 0.1 , 0.0 };
+    configs[EnemyAnimationState::Skill_HeavyStomp] = { "Skill_HeavyStomp" , false, false, false, 0.2, 0.1 , 0.0 };
 
     // 突撃2連ひっかき攻撃
     configs[EnemyAnimationState::Skill_Leaping] = { "Skill_Leaping" , false, false, true, 0.2, 0.1 , 0.0 };

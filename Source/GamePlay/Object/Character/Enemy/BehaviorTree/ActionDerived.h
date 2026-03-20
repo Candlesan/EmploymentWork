@@ -17,6 +17,11 @@ class WanderAction : public ActionBase
 public:
 	WanderAction(Enemy* enemy) : ActionBase(enemy) {}
 	ActionBase::State Run(float elapsedTime);
+private:
+	float Short_Distance = 4.0f; // ‹ß‹——£
+	float Middle_Distance = 12.0; // ’†‹——£
+	float Long_Distance = 20.0; // ‰“‹——£
+	int WalkDirection = 0;
 };
 
 // UŒ‚s“®
@@ -34,7 +39,7 @@ public:
 	PursuitAction(Enemy* enemy) : ActionBase(enemy){}
 	ActionBase::State Run(float elapsedTime);
 private:
-	float Short_Distance = 5.0f; // ‹ß‹——£
-	float Middle_Distance = 10.0f; // ’†‹——£
-	float Long_Distance = 15.0; // ‰“‹——£
+	float Short_Distance = 4.0f; // ‹ß‹——£
+	float Middle_Distance = 12.0; // ’†‹——£
+	float Long_Distance = 20.0; // ‰“‹——£
 };

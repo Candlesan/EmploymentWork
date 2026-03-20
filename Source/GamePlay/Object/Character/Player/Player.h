@@ -33,6 +33,9 @@ public:
 	float GetWeaponRadius() const { return weapon.weaponRadius; }
 	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
+	// 回復
+	void Heal(float elapsedTime);
+
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 
@@ -133,4 +136,8 @@ private:
 	int selectedEntry = -1;
 	int firstFrame = 0;
 
+	int Potion = 14; // ポーション数
+	float HealValue = 810; // 回復量
+	float HealCoolDownTimer = 0.0f; // クールダウン
+	float RegeneTimer = 0.0f; // 回復中
 };

@@ -33,15 +33,15 @@ void Enemy::Initialize()
 	debugOffset = 0.8;
 
 	// 武器モデルの設定
-	weapon[0].position = { -0.13, 0.01, -0.05 };
-	weapon[0].angle = { 0.24, 4.55, -1.90 };
+	weapon[0].position = { -0.06, 0.0, -0.01 };
+	weapon[0].angle = { 9.54, 9.48, -15.74 };
 	weapon[0].weaponHitOffset = { -0.83, -0.13, 0.06 };
 	weapon[0].weaponAngleOffset = { 0.54, 8.0, 0.43 };
 	weapon[0].weaponRadius = 0.59f;
 	weapon[0].weaponHeight = 1.7f;
 
-	weapon[1].position = { -0.16, 0.01, -0.03 };
-	weapon[1].angle = { 0.04, 4.23, 1.78 };
+	weapon[1].position = { -0.03, 0.01, 0.01 };
+	weapon[1].angle = { -3.57, 3.39, 3.12 };
 	weapon[1].weaponHitOffset = { -0.4, 0.02, 0.1 };
 	weapon[1].weaponAngleOffset = { 0.0, 2.12, -0.23 };
 	weapon[1].weaponRadius = 0.59f;
@@ -64,7 +64,7 @@ void Enemy::Initialize()
 	upperBodyNodeName = "Bip001-Pelvis";
 	ChangeAnimationState(EnemyAnimationState::Idle);
 
-	// Jsonファイルの初期化
+	// 攻撃とかの情報を初期化
 	InitializeAttackData();
 
 	// ビヘイビアツリーの設定
@@ -74,12 +74,13 @@ void Enemy::Initialize()
 	// Root
 	aiTree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, nullptr, nullptr);
 
-	aiTree->AddNode("Root", "Pursuit", 1, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
-	aiTree->AddNode("Root", "Idle", 2, BehaviorTree::SelectRule::Priority, new IdleJudgment(this), new IdleAction(this));
-
+	aiTree->AddNode("Root", "Attack" , 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this), new AttackAction(this));
+	aiTree->AddNode("Root", "Pursuit", 2, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
+	aiTree->AddNode("Root", "Wander", 3, BehaviorTree::SelectRule::Priority, new WanderJudgment(this), new WanderAction(this));
+	aiTree->AddNode("Root", "Idle", 4, BehaviorTree::SelectRule::Priority, /*new IdleJudgment(this)*/nullptr, new IdleAction(this));
 }
 
-// 攻撃とかの情報を初期化(Jsonファイルの初期化)
+// 攻撃とかの情報を初期化
 void Enemy::InitializeAttackData()
 {
 	// シーケンサーの初期化
@@ -102,6 +103,10 @@ void Enemy::InitializeAttackData()
 		};
 		animSequence.attackData[EnemyAnimationState::Light_Attack_03] = {
 		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		};
+
+		animSequence.attackData[EnemyAnimationState::Dodge_FU] = {
+		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body }
 		};
 
 		animSequence.attackData[EnemyAnimationState::Heavy_Attack_01] = {
@@ -152,23 +157,65 @@ void Enemy::InitializeAttackData()
 		};
 
 	}
+
+	// 始動技の初期化
+	firstAttackList.push_back({ EnemyAnimationState::Light_Attack_01, 0.0f, Short_Distance });
+	firstAttackList.push_back({ EnemyAnimationState::Skill_QuickStab, 0.0f, Short_Distance });
+	firstAttackList.push_back({ EnemyAnimationState::Skill_EndlessStabs, 0.0f, Short_Distance });
+	firstAttackList.push_back({ EnemyAnimationState::Skill_WieldDagger, 0.0f, Short_Distance });
+
+	firstAttackList.push_back({ EnemyAnimationState::Skill_BlockBreaker, Short_Distance, Long_Distance });
+	firstAttackList.push_back({ EnemyAnimationState::Skill_HeavyStomp, Short_Distance, Long_Distance });
+	firstAttackList.push_back({ EnemyAnimationState::Skill_DoubleSwings_Root, Short_Distance, Long_Distance });
+	firstAttackList.push_back({ EnemyAnimationState::Skill_ShoulderBarge_Root, Short_Distance, Long_Distance });
+
+
+	// コンボとその派生先の初期化
+
+	// 近距離
+	attackComboMap[EnemyAnimationState::Light_Attack_01] = {
+		{ EnemyAnimationState::Light_Attack_02, 0.0f, Short_Distance, 80 },
+		{ EnemyAnimationState::Dodge_FU, 0.0f, Short_Distance, 80 },
+		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
+	};
+	attackComboMap[EnemyAnimationState::Light_Attack_02] = {
+		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
+		{ EnemyAnimationState::Heavy_Attack_02, 0.0f, Short_Distance, 40 },
+	};
+	attackComboMap[EnemyAnimationState::Dodge_FU] = {
+		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
+	};
+
+	attackComboMap[EnemyAnimationState::Light_Attack_03] = {
+		{ EnemyAnimationState::Heavy_Attack_01, 0.0f, Short_Distance, 40 },
+	};
+
+	// 中距離
+
+	attackComboMap[EnemyAnimationState::Dodge_Backward] = {
+		{ EnemyAnimationState::Skill_Leaping, 0.0f, Middle_Distance, 50 },
+		{ EnemyAnimationState::Skill_UpperCut, 0.0f, Short_Distance, 50 },
+		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
+	};
 }
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
-	// 現在実行されているノードが無ければ
-	//if (activeNode == nullptr)
-	//{
-	//	 次に実行するノードを推論する。
-	//	activeNode = aiTree->ActiveNodeInference(behaviorData);
-	//}
-	// 現在実行するノードがあれば
-	//if (activeNode != nullptr)
-	//{
-	//	 ビヘイビアツリーからノードを実行。
-	//	activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
-	//}
+	//現在実行されているノードが無ければ
+	if (activeNode == nullptr)
+	{
+		//次に実行するノードを推論する。
+		activeNode = aiTree->ActiveNodeInference(behaviorData);
+	}
+	//現在実行するノードがあれば
+	if (activeNode != nullptr)
+	{
+		//ビヘイビアツリーからノードを実行。
+		activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+	}
+
+	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
 
 	// ステータス更新
 	UpdateStatus(elapsedTime);
@@ -206,6 +253,12 @@ void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 // GUI描画
 void Enemy::DrawGUI()
 {
+	std::string str = "";
+	if (activeNode != nullptr)
+	{
+		str = activeNode->GetName();
+	}
+
 	ImGui::Begin("Enemy");
 	{
 		AttackResult res;
@@ -220,6 +273,12 @@ void Enemy::DrawGUI()
 		ImGui::Separator();
 		ImGui::Text("currentPoise: %f.0", currentPoise);
 		ImGui::Separator();
+		ImGui::Text("attackCoolTimer: %f.0", attackCoolTimer);
+		ImGui::Separator();
+		ImGui::Text("runTimer: %f.0", runTimer);
+		ImGui::Separator();
+		ImGui::Text(u8"Behavior　%s", str.c_str());
+
 
 		if (ImGui::Button(u8"左手武器表示"))
 		{
@@ -448,13 +507,14 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 		}
 
 	}
-		// 武器の攻撃の当たり判定
+
+	// 武器以外の攻撃の当たり判定
+	{
+		for (auto& info : GetActiveSphereHits())
 		{
-			for (auto& info : GetActiveSphereHits())
-			{
-				renderer->DrawSphere(info.position, info.radius, { 1.0f, 0.0f, 1.0f, 1.0f });
-			}
+			renderer->DrawSphere(info.position, info.radius, { 1.0f, 0.0f, 1.0f, 1.0f });
 		}
+	}
 
 	// 距離の可視化
 	{
@@ -464,19 +524,19 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 		float thickness = 0.01f;
 		renderer->DrawCylinder(
 			{ position.x, circleY, position.z },
-			5.0f, thickness, { 1.0f, 0.0f, 0.0f, 1.0f }
+			Short_Distance, thickness, { 1.0f, 0.0f, 0.0f, 1.0f }
 		);
 
 		// 中距離 (例: 10.0m) - 黄色
 		renderer->DrawCylinder(
 			{ position.x, circleY, position.z },
-			10, thickness, { 1.0f, 1.0f, 0.0f, 1.0f }
+			Middle_Distance, thickness, { 1.0f, 1.0f, 0.0f, 1.0f }
 		);
 
 		// 遠距離 (例: 15.0m) - 緑色
 		renderer->DrawCylinder(
 			{ position.x, circleY, position.z },
-			15, thickness, { 0.0f, 1.0f, 0.0f, 1.0f }
+			Long_Distance, thickness, { 0.0f, 1.0f, 0.0f, 1.0f }
 		);
 	}
 }
@@ -500,6 +560,53 @@ float Enemy::GetDistanceToPlayer() const
 	DirectX::XMStoreFloat(&distance, Length);
 
 	return distance;
+}
+
+// ターゲットの座標に向かって旋回する
+void Enemy::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
+{
+	DirectX::XMFLOAT3 myPos = GetPosition();
+
+	// プレイヤーへの方向ベクトルを計算
+	float vx = targetPos.x - myPos.x;
+	float vz = targetPos.z - myPos.z;
+	float len = sqrtf(vx * vx + vz * vz);
+
+	// 距離が極端に近くない場合のみ回転
+	if (len > 0.001f)
+	{
+		vx /= len;
+		vz /= len;
+
+		// すでに持っている Turn 関数を呼び出す
+		// 第4引数は Enemy が持っている旋回速度
+		this->Turn(elapsedTime, vx, vz, turnSpeed);
+	}
+}
+
+void Enemy::TurnToPosition(float elapsedTime)
+{
+	Player& player = Player::Instance();
+	TurnToPosition(elapsedTime, player.GetPosition());
+}
+
+bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree)
+{
+	// 1. ターゲットへの方向ベクトル
+	float vx = targetPos.x - GetPosition().x;
+	float vz = targetPos.z - GetPosition().z;
+	float targetAngle = atan2f(vx, vz); // 目標の角度
+
+	// 2. 現在の自分の角度（Rotation.y）
+	float currentAngle = GetAngle().y;
+
+	// 3. 角度の差を計算（-PI 〜 PI の範囲に補正するのが理想）
+	float diff = targetAngle - currentAngle;
+	while (diff > DirectX::XM_PI) diff -= DirectX::XM_2PI;
+	while (diff < -DirectX::XM_PI) diff += DirectX::XM_2PI;
+
+	// 4. 差分が指定した角度（epsilonDegree）以内なら true
+	return fabsf(diff) < DirectX::XMConvertToRadians(epsilonDegree);
 }
 
 // 武器の位置を取得
@@ -564,6 +671,66 @@ DirectX::XMFLOAT3 Enemy::GetWeaponDirection(int index) const
 	return Direction;
 }
 
+// 技の派生があるか確認する関数
+EnemyAnimationState Enemy::DecideNextAttack(EnemyAnimationState currentState)
+{
+	// 今の技から派生できるものがあるかを確認
+	if (attackComboMap.count(currentState) == 0) return (EnemyAnimationState)-1;
+
+	// プレイヤーとの距離を取得
+	float dist = GetDistanceToPlayer();
+	auto& derivations = attackComboMap[currentState];
+
+	// 候補をいったん保存する
+	std::vector<EnemyAnimationState> candidates;
+
+	for (const auto& der : derivations)
+	{
+		// 技の範囲内か
+		if (dist >= der.minDistance && dist <= der.maxDistance)
+		{
+			if ((rand() % 100) < der.probability)
+			{
+				candidates.push_back(der.nextState);
+			}
+		}
+	}
+
+	// 候補が無ければIdleを返す
+	if (candidates.empty()) return (EnemyAnimationState)-1;
+
+	// 候補の中からされにランダムに一つ選ぶ
+	return candidates[rand() % candidates.size()];
+}
+
+// スタンプ攻撃
+void Enemy::HeavyStompAttack()
+{
+	moveSpeed = 10;
+
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+
+	// 位置情報を取得する
+	DirectX::XMFLOAT3 bossPos = GetPosition();
+	DirectX::XMFLOAT3 playerPos = player.GetPosition();
+
+	// プレイヤーへの方向ベクトルを計算
+	float vx = playerPos.x - bossPos.x;
+	float vz = playerPos.z - bossPos.z;
+	float distance = GetDistanceToPlayer();
+
+
+	if (IsAnimationInTimeRange(0.0f, 0.843f))
+	{
+		Move(vx, vz, moveSpeed);
+	}
+	else
+	{
+		moveSpeed = 0;
+	}
+}
+
 std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 {
 	std::vector<SphereHitInfo> result;
@@ -616,6 +783,29 @@ std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 	return result;
 }
 
+// 始動技を決める関数
+EnemyAnimationState Enemy::DecideFirstAttack()
+{
+	float dist = GetDistanceToPlayer();
+	std::vector<EnemyAnimationState> validAttacks;
+
+	// 現在の距離に適合する技をすべてリストアップ
+	for (auto& attack : firstAttackList) {
+		if (dist >= attack.minRange && dist <= attack.maxRange) {
+			validAttacks.push_back(attack.state);
+		}
+	}
+
+	// もし候補が一つもなかったら、とりあえず基本攻撃を返すか -1 を返す
+	if (validAttacks.empty()) {
+		return (EnemyAnimationState)-1; // または (EnemyAnimationState)-1;
+	}
+
+	// 候補の中からランダムに1つ選んで返す
+	int randomIndex = rand() % validAttacks.size();
+	return validAttacks[randomIndex];
+}
+
 // アニメーション更新処理
 void Enemy::UpdateStateTransitions(float elapsedTime)
 {
@@ -640,6 +830,8 @@ void Enemy::UpdateStateTransitions(float elapsedTime)
 	case EnemyAnimationState::Dodge_Forkward:
 		break;
 	case EnemyAnimationState::Dodge_Backward:
+		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+
 		break;
 	case EnemyAnimationState::Dodge_Left:
 		break;
@@ -728,7 +920,8 @@ void Enemy::OnDown()
 // 武器のアタッチメント処理
 void Enemy::WeaponAttachment()
 {
-	const char* HandName[2] = { "Bip001-R-Hand", "Bip001-L-Hand" };
+	//const char* HandName[2] = { "Bip001-R-Hand", "Bip001-L-Hand" };
+	const char* HandName[2] = { "Bip001-Prop1", "Bip001-Prop2" };
 
 	for (int i = 0; i < 2; ++i)
 	{

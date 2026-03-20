@@ -121,6 +121,9 @@ void Player::Update(float elapsedTime)
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
 
+	// 回復
+	Heal(elapsedTime);
+
 	// モデル更新処理
 	UpdateTransform();
 	player->UpdateTransform(transform);
@@ -150,6 +153,8 @@ void Player::DrawGUI()
 			ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
 			ImGui::Separator();
 			ImGui::Text("currentPoise: %f.0", currentPoise);
+			ImGui::Separator();
+			ImGui::Text("Potion: %d", Potion);
 			ImGui::Separator();
 
 
@@ -378,6 +383,37 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 	DirectX::XMFLOAT3 Direction;
 	DirectX::XMStoreFloat3(&Direction, dir);
 	return Direction;
+}
+
+// 回復
+void Player::Heal(float elapsedTime)
+{
+	GamePad gamePad = Input::Instance().GetGamePad();
+
+	if ((gamePad.GetButtonDown() & GamePad::BTN_X) && HealCoolDownTimer <= 0.0f && Potion > 0) {
+		Potion--; // 一つ使う
+		HealCoolDownTimer = 0.5f;
+		RegeneTimer = 1.0f;
+	}
+
+
+	if (HealCoolDownTimer > 0.0f)
+	{
+		HealCoolDownTimer -= elapsedTime;
+	}
+
+	if(RegeneTimer > 0.0f)
+	{
+		float healStep = HealValue * elapsedTime;
+
+		health += healStep;
+
+		RegeneTimer -= elapsedTime;
+
+		if (health > MaxHealth) health = MaxHealth;
+
+		if (RegeneTimer < 0.0f) RegeneTimer = 0.0f;
+	}
 }
 
 // ロックオン対象の位置を取得
@@ -624,7 +660,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
 		}
-		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.0f)
 		{
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 回復に遷移
 		}
@@ -720,14 +756,14 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			moveSpeed = 5.0f;
 			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
-			ChangeAnimationState(PlayerAnimationState::Walk_F); // 下半身のアニメーションを歩きにする
+			ChangeAnimationState(moveState, true); // 下半身のアニメーションを歩きにする
 		}
 		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
 		{
 			moveSpeed = 3.0f;
 			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
-			ChangeAnimationState(PlayerAnimationState::Walk_F, true); // 下半身のアニメーションを歩きにする
+			ChangeAnimationState(moveState, true); // 下半身のアニメーションを歩きにする
 		}
 
 		break;
@@ -767,7 +803,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
-			ChangeAnimationState(PlayerAnimationState::Jog_F); // 下半身のアニメーションを小走りにする
+			ChangeAnimationState(moveState); // 下半身のアニメーションを小走りにする
 		}
 		else if (jumpPressed)
 		{
