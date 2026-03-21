@@ -390,7 +390,7 @@ void Player::Heal(float elapsedTime)
 {
 	GamePad gamePad = Input::Instance().GetGamePad();
 
-	if ((gamePad.GetButtonDown() & GamePad::BTN_X) && HealCoolDownTimer <= 0.0f && Potion > 0) {
+	if ((gamePad.GetButtonDown() & GamePad::BTN_X) && HealCoolDownTimer < 0.1f && Potion > 0) {
 		Potion--; // 一つ使う
 		HealCoolDownTimer = 0.5f;
 		RegeneTimer = 1.0f;
@@ -660,7 +660,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
 		}
-		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.0f)
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.1f && Potion > 0)
 		{
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 回復に遷移
 		}
@@ -751,16 +751,14 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
 		}
-		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
-		{
-			moveSpeed = 5.0f;
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.1f && Potion > 0) {
+			mode = MoveMode::Walk;
 			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
 			ChangeAnimationState(moveState, true); // 下半身のアニメーションを歩きにする
 		}
-		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
-		{
-			moveSpeed = 3.0f;
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.1f && Potion > 0) {
+			mode = MoveMode::Jog;
 			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
 			ChangeAnimationState(moveState, true); // 下半身のアニメーションを歩きにする
@@ -799,8 +797,8 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 
 		if (moveLength <= 0.1f) ChangeAnimationState(PlayerAnimationState::Idle);
-		else if (gamePad.GetButtonDown() & GamePad::BTN_X)
-		{
+		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.1f && Potion > 0) {
+			mode = MoveMode::Walk;
 			isOverlayPlaying = true; // 上半身路下半身の別々のアニメーションを起動する
 			StartOverlayAnimation(PlayerAnimationState::Heal); // 上半身のアニメーションを回復にする
 			ChangeAnimationState(moveState); // 下半身のアニメーションを小走りにする
@@ -1623,7 +1621,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	case PlayerAnimationState::Heal:
 	{
 		if (IsAnimationFinished()) ChangeAnimationState(PlayerAnimationState::Idle); // 待機に遷移
-		else if (IsAnimationOutTimeRange(1.902))
+		else if (HealCoolDownTimer < 0.1f)
 		{
 			if (jumpPressed)
 			{
@@ -1687,7 +1685,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
 			}
-			else if (gamePad.GetButtonDown() & GamePad::BTN_X)
+			else if (gamePad.GetButtonDown() & GamePad::BTN_X && Potion > 0)
 			{
 				ChangeAnimationState(PlayerAnimationState::Heal); // 回復に遷移
 			}
