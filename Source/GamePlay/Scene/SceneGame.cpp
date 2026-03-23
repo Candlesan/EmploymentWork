@@ -78,6 +78,8 @@ void SceneGame::Initialize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+	float delta = elapsedTime * timeScale;
+
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
@@ -122,13 +124,13 @@ void SceneGame::Update(float elapsedTime)
 	if (shouldUpdate)
 	{
 		// ステージ更新
-		stage->Update(elapsedTime);
+		stage->Update(delta);
 
 		// プレイヤー更新
-		player.Update(elapsedTime);
+		player.Update(delta);
 
 		// エネミー更新
-		enemy->Update(elapsedTime);
+		enemy->Update(delta);
 
 		// プレイヤーと敵の当たり判定
 		CollisonPlayervsEnemy();
@@ -338,7 +340,6 @@ void SceneGame::DrawGUI()
 		else {
 			if (ImGui::Button("Pause (F5)")) isPaused = true;
 		}
-
 		ImGui::SameLine();
 
 		// 1フレーム送りボタン（ポーズ中のみ有効）
@@ -361,6 +362,16 @@ void SceneGame::DrawGUI()
 		{
 			// 色の設定を元に戻す
 			ImGui::PopStyleColor(3);
+		}
+
+		ImGui::Separator();
+		ImGui::Text("Time Control");
+
+		// 0.01 (ほぼ停止) から 1.0 (通常) までのスライダー
+		ImGui::SliderFloat("Time Scale", &timeScale, 0.01f, 1.0f, "%.2f");
+
+		if (ImGui::Button("Reset Speed")) {
+			timeScale = 1.0f;
 		}
 
 		ImGui::Text("Status: %s", isPaused ? "PAUSED" : "RUNNING");
@@ -548,17 +559,19 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 			outPositionB
 		))
 		{
+			player.SetIsHit(true);
 			// JsonからAttackDataのダメージを持ってくる
 			float finalDamage = config->damageRate * activeTrack->damageRate;
 			float finalPoiseValue = config->poiseValue * activeTrack->poiseRate;
-			if (config->damageRate > 0.0f)
+			bool IsGuarding = player.GetIsGuarding();
+			if (IsGuarding) player.SetIsHit(true);
+			if (config->damageRate > 0.0f && !IsGuarding)
 			{
 				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
 				player.SetLastDamage(res.damage);
 				player.ApplyDamage(res.damage, config->invincible, res.poiseDamage);
 			}
 		}
-
 	}
 
 	// 手や体の攻撃
@@ -580,10 +593,16 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 			player.GetRadius(),
 			outPos))
 		{
+			player.SetIsHit(true);
+
 			// JsonからAttackDataのダメージを持ってくる
 			float finalDamage = config->damageRate * activeTrack->damageRate;
 			float finalPoiseValue = config->poiseValue * activeTrack->poiseRate;
-			if (config->damageRate > 0.0f)
+			bool IsGuarding = player.GetIsGuarding();
+			bool IsAvoid = player.GetIsAvoid();
+
+			if(IsGuarding) player.SetIsHit(true);
+			if (config->damageRate > 0.0f && !IsGuarding && !IsAvoid)
 			{
 				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
 				player.SetLastDamage(res.damage);

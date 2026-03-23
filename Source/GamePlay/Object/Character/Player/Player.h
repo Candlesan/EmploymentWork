@@ -42,8 +42,10 @@ public:
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequence<PlayerAnimationState>& GetAnimSequence() { return animSequence; }
-	// 計算したダメージ
-	void SetLastDamage(float d) { lastDamage = d; }
+	void SetLastDamage(float d) { lastDamage = d; }	// 計算したダメージ
+	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
+	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する
+	bool GetIsAvoid() const { return IsAvoid; } // 回避中かを取得
 protected:
 
 	//着地したときに呼ばれる
@@ -115,6 +117,10 @@ private:
 	// 攻撃用の条件
 	float rtButtonHoldTime = 0.0f;          // RTボタンを押し続けた時間
 	static constexpr float ATTACK_THRESHOLD = 0.25f; // 何秒以上で溜め攻撃と判定するか
+
+	bool IsGuarding = false; // ガード中か
+	bool IsHit = false; // 攻撃を食らったか
+	bool IsAvoid = false; // 回避が有効か
 
 	// ジャンプ関係
 	bool jumpPressed = false;
