@@ -36,6 +36,12 @@ public:
 	// 回復
 	void Heal(float elapsedTime);
 
+	// スタミナ計算処理
+	void calculationStamina(float stamina);
+
+	// スタミナ回復処理
+	void RecoveryStamina(float elapsedTime);
+
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 
@@ -142,8 +148,15 @@ private:
 	int selectedEntry = -1;
 	int firstFrame = 0;
 
+	// 回復関係
 	int Potion = 14; // ポーション数
 	float HealValue = 810; // 回復量
 	float HealCoolDownTimer = 0.0f; // クールダウン
 	float RegeneTimer = 0.0f; // 回復中
+
+	// スタミナ関係
+	float staminaCooldownTimer = 0.0f;
+	bool HaveStamina = false;
+	bool IsStaminaEmpty = false;
+	float runDisableTimer = 0.0f;
 };

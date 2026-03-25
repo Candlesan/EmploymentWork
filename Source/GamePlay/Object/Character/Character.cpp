@@ -94,10 +94,13 @@ void Character::UpdateVelocity(float elapsedTime)
 // –³“GŽžŠÔXV
 void Character::UpdateInvincibleTimer(float elapsedTime)
 {
+	// –³“GŽžŠÔ‚ª0ˆÈã‚ ‚Á‚½‚ç–³“G‚¶‚©‚ñ‚ðŒ¸‚ç‚·
 	if (invincibleTimer > 0.0f)
 	{
 		invincibleTimer -= elapsedTime;
 	}
+
+	if (invincibleTimer <= 0.0f) invincibleTimer = 0.0f; // –³“GŽžŠÔ‚ª0ˆÈ‰º‚É‚È‚Á‚½‚ç0‚É’¼‚·
 }
 
 //ƒ_ƒ[ƒW‚ð—^‚¦‚é

@@ -148,6 +148,9 @@ protected:
 	float health = 10; // ‘Ì—Í
 	float MaxHealth = 10; // Å‘å‘Ì—Í
 
+	float Stamina = 150; // ‹v—Í
+	float MaxStamina = 150; // Å‘å‹v—Í
+
 	float maxPoise = 100.0f;        // Å‘å‘ÌŠ²’l
 	float currentPoise = 100.0f;    // Œ»İ‚Ì‘ÌŠ²’l
 
