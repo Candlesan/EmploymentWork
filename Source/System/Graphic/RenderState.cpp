@@ -219,7 +219,7 @@ RenderState::RenderState(ID3D11Device* device)
 		desc.RenderTarget[0].BlendEnable = false;
 		desc.RenderTarget[0].RenderTargetWriteMask = 0;
 		HRESULT hr = device->CreateBlendState(&desc,
-			blendStates[static_cast<int>(BlendState::Multiply)].GetAddressOf());
+			blendStates[static_cast<int>(BlendState::NoColorWrite)].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
