@@ -15,7 +15,7 @@ class Enemy : public AnimationCharacter<EnemyAnimationState>
 {
 public:
 	Enemy() {};
-	~Enemy() override {};
+	~Enemy();
 
 	void Initialize();
 	void InitializeAttackData();

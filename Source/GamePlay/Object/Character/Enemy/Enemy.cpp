@@ -13,6 +13,14 @@
 
 #include <imgui.h>
 
+
+// デストラクタ
+Enemy::~Enemy()
+{
+	delete aiTree;
+	delete behaviorData;
+}
+
 // 初期化
 void Enemy::Initialize()
 {
@@ -35,15 +43,15 @@ void Enemy::Initialize()
 	// 武器モデルの設定
 	weapon[0].position = { -0.06, 0.0, -0.01 };
 	weapon[0].angle = { 9.54, 9.48, -15.74 };
-	weapon[0].weaponHitOffset = { -0.83, -0.13, 0.06 };
-	weapon[0].weaponAngleOffset = { 0.54, 8.0, 0.43 };
+	weapon[0].weaponHitOffset = { -0.89, -0.11, -0.01 };
+	weapon[0].weaponAngleOffset = { 1.6, 6.76, 1.06 };
 	weapon[0].weaponRadius = 0.59f;
 	weapon[0].weaponHeight = 1.7f;
 
 	weapon[1].position = { -0.03, 0.01, 0.01 };
 	weapon[1].angle = { -3.57, 3.39, 3.12 };
-	weapon[1].weaponHitOffset = { -0.4, 0.02, 0.1 };
-	weapon[1].weaponAngleOffset = { 0.0, 2.12, -0.23 };
+	weapon[1].weaponHitOffset = { -0.82, -0.1, -0.04 };
+	weapon[1].weaponAngleOffset = { 1.96, 4.3, 0.17 };
 	weapon[1].weaponRadius = 0.59f;
 	weapon[1].weaponHeight = 1.7f;
 

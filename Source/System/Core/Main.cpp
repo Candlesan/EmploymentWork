@@ -3,6 +3,9 @@
 #include <assert.h>
 #include <tchar.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+
 #include "GamePlay/Framework.h"
 
 const LONG SCREEN_WIDTH = 1280;
@@ -18,7 +21,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 {
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(237);
+	//_CrtSetBreakAlloc(83268);
 #endif
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
