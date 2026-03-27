@@ -17,45 +17,6 @@ class Graphics
 private:
 	Graphics() = default;
 	~Graphics() = default;
-	//~Graphics()
-	//{
-	//	shadowMap.reset();
-	//	modelRenderer.reset();
-	//	shapeRenderer.reset();
-	//	primitiveRenderer.reset();
-	//	renderState.reset();
-
-	//	depthStencilView.Reset();
-	//	renderTargetView.Reset();
-
-	//	if (immediateContext)
-	//	{
-	//		immediateContext->ClearState();
-	//		immediateContext->Flush();
-	//	}
-	//	immediateContext.Reset();
-	//	swapchain.Reset();
-
-	//	 ← ここに一時的に追加
-	//	OutputDebugStringA("=== ReportLiveDeviceObjects 呼び出し ===\n");
-
-	//	Microsoft::WRL::ComPtr<ID3D11Debug> d3dDebug;
-	//	HRESULT hr = device->QueryInterface(IID_PPV_ARGS(&d3dDebug));
-
-	//	 ← hrの結果も出力
-	//	char buf[128];
-	//	sprintf_s(buf, "QueryInterface hr = 0x%08X\n", hr);
-	//	OutputDebugStringA(buf);
-
-	//	if (SUCCEEDED(hr))
-	//	{
-	//		d3dDebug->ReportLiveDeviceObjects(
-	//			D3D11_RLDO_DETAIL | D3D11_RLDO_IGNORE_INTERNAL
-	//		);
-	//	}
-
-	//	device.Reset();
-	//}
 
 public:
 	// インスタンス取得
@@ -77,6 +38,9 @@ public:
 	// 画面表示
 	void Present(UINT syncInterval);
 
+	// 画面のサイズ変更
+	void OnResize();
+
 	// ウインドウハンドル取得
 	HWND GetWindowHandle() { return hWnd; }
 
@@ -85,6 +49,9 @@ public:
 
 	// デバイスコンテキスト取得
 	ID3D11DeviceContext* GetDeviceContext() { return immediateContext.Get(); }
+
+	// スワップチェーン取得
+	IDXGISwapChain* GetSwapChain() const { return swapchain.Get(); }
 
 	// スクリーン幅取得
 	float GetScreenWidth() const { return screenWidth; }

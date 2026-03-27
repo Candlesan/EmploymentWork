@@ -10,6 +10,7 @@
 // シーン
 #include "Gameplay/Scene/SceneManager.h"
 #include "Gameplay/Scene/SceneGame.h"
+
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 
@@ -108,6 +109,44 @@ void Framework::CalculateFrameStats()
 	}
 }
 
+// フルスクリーンに切り替える
+void Framework::ToggleFullscreen()
+{
+	isFullscreen = !isFullscreen;
+
+	IDXGISwapChain* swapchain = Graphics::Instance().GetSwapChain();
+
+	if (isFullscreen)
+	{
+		// ウィンドウモード時のサイズを保存
+		GetWindowRect(hWnd, &windowedRect);
+
+		// モニターのサイズを取得
+		HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO mi = { sizeof(mi) };
+		GetMonitorInfo(monitor, &mi);
+		int w = mi.rcMonitor.right - mi.rcMonitor.left;
+		int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+		// ボーダーレスウィンドウでモニターサイズに拡大
+		SetWindowLong(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+		SetWindowPos(hWnd, HWND_TOP,
+			mi.rcMonitor.left, mi.rcMonitor.top, w, h,
+			SWP_FRAMECHANGED);
+	}
+	else
+	{
+		// 元のウィンドウスタイルとサイズに戻す
+		SetWindowLong(hWnd, GWL_STYLE,
+			WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE);
+		SetWindowPos(hWnd, HWND_TOP,
+			windowedRect.left, windowedRect.top,
+			windowedRect.right - windowedRect.left,
+			windowedRect.bottom - windowedRect.top,
+			SWP_FRAMECHANGED);
+	}
+}
+
 // アプリケーションループ
 int Framework::Run()
 {
@@ -156,6 +195,13 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 		break;
 	case WM_KEYDOWN:
 		if (wParam == VK_ESCAPE) PostMessage(hWnd, WM_CLOSE, 0, 0);
+		if (wParam == VK_F11) ToggleFullscreen(); // F11を押すとフルスクリーンに切り替え
+		break;
+	case WM_SIZE:
+		if (wParam != SIZE_MINIMIZED)
+		{
+			Graphics::Instance().OnResize();
+		}
 		break;
 	case WM_ENTERSIZEMOVE:
 		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
@@ -166,12 +212,6 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 		// Here we reset everything based on the new window dimensions.
 		timer.Start();
 		break;
-	//case WM_MOUSEWHEEL:
-	//{
-	//	int wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-	//	Input::Instance().GetMouse().SetWheel(wheelDelta);
-	//}
-	//break;
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}

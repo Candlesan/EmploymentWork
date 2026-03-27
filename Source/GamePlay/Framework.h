@@ -1,8 +1,7 @@
 #pragma once
-
-#include <windows.h>
 #include "System/Core/HighResolutionTimer.h"
 #include "Gameplay/Scene/Scene.h"
+#include <windows.h>
 
 class Framework
 {
@@ -15,6 +14,7 @@ private:
 	void Render(float elapsedTime);
 
 	void CalculateFrameStats();
+	void ToggleFullscreen();
 
 public:
 	int Run();
@@ -24,5 +24,6 @@ private:
 	const HWND				hWnd;
 	HighResolutionTimer		timer;
 	std::unique_ptr<Scene>	scene;
+	bool isFullscreen = false;
+	RECT windowedRect = {};
 };
-

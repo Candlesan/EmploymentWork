@@ -153,3 +153,49 @@ void Graphics::Present(UINT syncInterval)
 {
 	swapchain->Present(syncInterval, 0);
 }
+
+// 画面のサイズ変更
+void Graphics::OnResize()
+{
+	if (!swapchain) return;
+
+	immediateContext->OMSetRenderTargets(0, nullptr, nullptr); // 追加：バインド解除
+
+	renderTargetView.Reset();
+	depthStencilView.Reset();
+
+	swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+	// RTV再生成
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
+	swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D),
+		reinterpret_cast<void**>(texture2d.GetAddressOf()));
+	device->CreateRenderTargetView(texture2d.Get(), nullptr,
+		renderTargetView.GetAddressOf());
+
+	// DSV再生成
+	DXGI_SWAP_CHAIN_DESC desc;
+	swapchain->GetDesc(&desc);
+	UINT width = desc.BufferDesc.Width;
+	UINT height = desc.BufferDesc.Height;
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTex;
+	D3D11_TEXTURE2D_DESC texDesc{};
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	device->CreateTexture2D(&texDesc, nullptr, depthTex.GetAddressOf());
+	device->CreateDepthStencilView(depthTex.Get(), nullptr,
+		depthStencilView.GetAddressOf());
+
+	// ビューポート更新
+	screenWidth = static_cast<float>(width);
+	screenHeight = static_cast<float>(height);
+	viewport.Width = screenWidth;
+	viewport.Height = screenHeight;
+}
