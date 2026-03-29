@@ -62,7 +62,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;.\External\nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;.\External\nlohmann;.\External/\imgui-node-editor-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -91,7 +91,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;.\External\nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\imgui-docking;.\External\ImGuizmo;.\External\cereal\include;.\External\tinygltf;.\External\SphereCast\Include;.\External\DirectXTex;.\External\nlohmann;.\External/\imgui-node-editor-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -121,6 +121,12 @@
     <ClInclude Include="External\imgui-docking\imstb_rectpack.h" />
     <ClInclude Include="External\imgui-docking\imstb_textedit.h" />
     <ClInclude Include="External\imgui-docking\imstb_truetype.h" />
+    <ClInclude Include="External\imgui-node-editor-master\crude_json.h" />
+    <ClInclude Include="External\imgui-node-editor-master\imgui_bezier_math.h" />
+    <ClInclude Include="External\imgui-node-editor-master\imgui_canvas.h" />
+    <ClInclude Include="External\imgui-node-editor-master\imgui_extra_math.h" />
+    <ClInclude Include="External\imgui-node-editor-master\imgui_node_editor.h" />
+    <ClInclude Include="External\imgui-node-editor-master\imgui_node_editor_internal.h" />
     <ClInclude Include="External\ImGuizmo\ImCurveEdit.h" />
     <ClInclude Include="External\ImGuizmo\ImGradient.h" />
     <ClInclude Include="External\ImGuizmo\ImGuizmo.h" />
@@ -183,6 +189,10 @@
     <ClCompile Include="External\imgui-docking\imgui_impl_dx11.cpp" />
     <ClCompile Include="External\imgui-docking\imgui_impl_win32.cpp" />
     <ClCompile Include="External\imgui-docking\imgui_widgets.cpp" />
+    <ClCompile Include="External\imgui-node-editor-master\crude_json.cpp" />
+    <ClCompile Include="External\imgui-node-editor-master\imgui_canvas.cpp" />
+    <ClCompile Include="External\imgui-node-editor-master\imgui_node_editor.cpp" />
+    <ClCompile Include="External\imgui-node-editor-master\imgui_node_editor_api.cpp" />
     <ClCompile Include="External\ImGuizmo\ImCurveEdit.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
