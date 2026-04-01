@@ -64,9 +64,7 @@ void Player::Initialize()
 	ChangeAnimationState(PlayerAnimationState::Idle);
 
 	// アニメーションノードエディターの初期化
-	transitionGraph.AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
-	//transitionGraph.AddNode((int)PlayerAnimationState::Walk_F, { 300, 100 });
-	//transitionGraph.AddNode((int)PlayerAnimationState::Jog_F, { 500, 100 });
+	transitionGraph.Load("Data/Json/Player/AnimationState/AnimationState.json");
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)

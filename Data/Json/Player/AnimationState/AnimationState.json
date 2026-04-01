@@ -1,0 +1,112 @@
+{
+    "links": [
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 3.0
+                }
+            ],
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 4
+        },
+        {
+            "Actions": [],
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [],
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 10
+        }
+    ],
+    "nodes": [
+        {
+            "animState": 0,
+            "x": 100.0,
+            "y": 100.0
+        },
+        {
+            "animState": 10,
+            "x": 100.0,
+            "y": 100.0
+        },
+        {
+            "animState": 4,
+            "x": 100.0,
+            "y": 100.0
+        }
+    ]
+}

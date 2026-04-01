@@ -31,8 +31,8 @@ public:
 	void AddLink(ed::PinId from, ed::PinId to); // 矢印の追加
 	void RemoveLink(ed::LinkId id);
 
-	//void Save(const std::string& path); // Jsonファイルに保存する
-	//void Load(const std::string& path); // Jsonファイルを読み込む
+	void Save(const std::string& path); // Jsonファイルに保存する
+	void Load(const std::string& path); // Jsonファイルを読み込む
 
 	const AnimationTransition* GetTransition(int fromState, int toState);
 

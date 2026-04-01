@@ -4,6 +4,22 @@
 // ノードエディタ描画
 void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 {
+	// Jsonに保存する
+	if (ImGui::Button("Save"))
+	{
+		graph.Save("Data/Json/Player/AnimationState/AnimationState.json");
+	}
+
+	ImGui::SameLine();
+
+	// Jsonを読み込む
+	if (ImGui::Button("Load"))
+	{
+		graph.Load("Data/Json/Player/AnimationState/AnimationState.json");
+	}
+
+	ImGui::Separator();
+
 	// ノードの追加
 	if (ImGui::Button("+ Add Node"))
 	{

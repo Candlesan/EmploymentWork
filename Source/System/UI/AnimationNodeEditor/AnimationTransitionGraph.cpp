@@ -42,19 +42,7 @@ void AnimationTransitionGraph::RemoveLink(ed::LinkId id)
 		[&](const AnimLink& l) { return l.linkId == id; });
 }
 
-const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState, int toState)
-{
-	for (auto& link : links)
-	{
-		if (link.transition.fromState == fromState &&
-			link.transition.toState == toState)
-		{
-			return &link.transition;
-		}
-	}
-	return nullptr;
-}
-
+// 条件を評価する関数
 int AnimationTransitionGraph::EvaluateTransitions(int currentState, const TransitionContext& conditions)
 {
 	// currentStateから出るリンクだけ集める
@@ -184,4 +172,123 @@ bool AnimationTransitionGraph::EvaluateConditions(
 
 	// 全条件を満たした
 	return true;
+}
+
+const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState, int toState)
+{
+	for (auto& link : links)
+	{
+		if (link.transition.fromState == fromState &&
+			link.transition.toState == toState)
+		{
+			return &link.transition;
+		}
+	}
+	return nullptr;
+}
+
+// ノードエディタの保存
+void AnimationTransitionGraph::Save(const std::string& path)
+{
+	using json = nlohmann::json;
+
+	json j;
+	j["nodes"] = json::array();
+	for (auto& node : nodes)
+	{
+		j["nodes"].push_back({
+			{"animState", node.animState},
+			{"x", node.position.x},
+			{"y", node.position.y},
+			});
+	}
+
+	json linkJson;
+	for (auto& link : links)
+	{
+		linkJson["fromState"] = link.transition.fromState;
+		linkJson["toState"] = link.transition.toState;
+		linkJson["priority"] = link.transition.priority;
+
+		linkJson["conditions"] = json::array();
+		for (auto& cond : link.transition.conditions)
+		{
+			linkJson["conditions"].push_back({
+				{"type", (int)cond.type},
+				{"threshold", cond.threshold},
+				{"buttonMask", cond.buttonMask},
+				{"negate", cond.negate},
+				});
+		}
+
+		linkJson["Actions"] = json::array();
+		for (auto& act : link.transition.actions)
+		{
+			linkJson["Actions"].push_back({
+				{"type", (int)act.type},
+				{"value", act.value},
+				});
+		}
+		j["links"].push_back(linkJson);
+	}
+
+	std::ofstream file(path);
+	file << j.dump(4);
+}
+
+// ノードエディタの読み込み
+void AnimationTransitionGraph::Load(const std::string& path)
+{
+	using json = nlohmann::json;
+
+	std::ifstream file(path);
+	json j = json::parse(file);
+
+	nodes.clear();
+	links.clear();
+	nextId = 1; // IDをリセット
+
+	for (auto& node : j["nodes"])
+	{
+		AddNode(node["animState"], { node["x"], node["y"] });
+	}
+
+	for (auto& link : j["links"])
+	{
+		// nodesの中から対応するPinIdを探す
+		int fromState = link["fromState"];
+		int toState = link["toState"];
+
+		ed::PinId fromPin, toPin;
+		for (auto& node : nodes)
+		{
+			if (node.animState == fromState)
+				fromPin = node.pinOut;
+			if (node.animState == toState)
+				toPin = node.pinIn;
+		}
+
+		// 見つかったPinIdでAddLinkを呼ぶ
+		AddLink(fromPin, toPin);
+
+		// AddLinkで追加された最後のlinkに条件とアクションを入れる
+		AnimLink& newLink = links.back();
+		for (auto& cond : link["conditions"])
+		{
+			TransitionCondition c;
+			c.type = (TransitionConditionType)(int)cond["type"];
+			c.threshold = cond["threshold"];
+			c.buttonMask = cond["buttonMask"];
+			c.negate = cond["negate"];
+			newLink.transition.conditions.push_back(c);
+		}
+
+		for (auto& act : link["Actions"])
+		{
+			TransitionAction a;
+			a.type = (TransitionActionType)(int)act["type"];
+			a.value = act["value"];
+			newLink.transition.actions.push_back(a);
+		}
+	}
 }
