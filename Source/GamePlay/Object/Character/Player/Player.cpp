@@ -62,6 +62,11 @@ void Player::Initialize()
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
 	ChangeAnimationState(PlayerAnimationState::Idle);
+
+	// アニメーションノードエディターの初期化
+	transitionGraph.AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
+	transitionGraph.AddNode((int)PlayerAnimationState::Walk_F, { 300, 100 });
+	transitionGraph.AddNode((int)PlayerAnimationState::Jog_F, { 500, 100 });
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -254,19 +259,10 @@ void Player::DrawGUI()
 		// アニメーション遷移状態
 		if (ImGui::CollapsingHeader("Animation/State", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::Text("currentState: %d", (int)currentState);
-			ImGui::Text("Stick Angle: %.2f deg", debug_degree);
-			ImGui::Text("Table Index: %d", debug_dirIndex);
-			const char* directionNames[] = { "F", "R", "BR", "BL", "L" };
-			if (debug_degree > 0.1f || debug_degree < -0.1f || debug_dirIndex != 0) {
-				ImGui::Text("Determined Dir: %s", directionNames[debug_dirIndex]);
-			}
-			else {
-				ImGui::Text("Determined Dir: Idle/None");
-			}
+			const AnimationConfig* currentConfig = AnimationStateManager<PlayerAnimationState>
+				::Instance().GetConfig(currentState);
+			ImGui::Text("currentState: %s", currentConfig->animationName.c_str());
 		}
-
-
 	}
 	ImGui::End();
 
@@ -386,6 +382,10 @@ void Player::DrawGUI()
 			ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
 		);
 	}
+	ImGui::End();
+
+	ImGui::Begin("Animation Transition Editor");
+	transitionEditor.Draw(transitionGraph);
 	ImGui::End();
 }
 
@@ -738,84 +738,118 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 	bool canRunTrigger = (runDisableTimer <= 0.0f); // 3秒ペナルティが終わっているか
 
+	TransitionContext ctx;
+	ctx.animSeconds = GetCurrentAnimationSeconds();
+	ctx.animLength = GetCurrentAnimationLength();
+	ctx.moveLength = moveLength;
+	ctx.buttonDown = gamePad.GetButtonDown();
+	ctx.buttonHeld = gamePad.GetButton();
+	ctx.buttonUp = gamePad.GetButtonUp();
+	ctx.bHold = bButtonHoldTime >= RUN_THRESHOLD;
+	ctx.bTap = (gamePad.GetButtonUp() & GamePad::BTN_B) && !ctx.bHold;
+	ctx.rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD;
+	ctx.rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER) && !ctx.rtHold;
+	ctx.jumpPressed = jumpPressed;
+	ctx.isStaminaEmpty = IsStaminaEmpty;
+	ctx.canRunTrigger = (runDisableTimer <= 0.0f);
+	ctx.isLockOn = (lockOnTargetPos != nullptr);
+	ctx.havePotion = (Potion > 0);
+	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
+	ctx.isGuarding = IsGuarding;
+
+	// これ1個渡すだけ
+	int next = transitionGraph.EvaluateTransitions((int)currentState, ctx);
+	debugNextState = next;
+
+	// Idleのときだけグラフの結果で遷移する
+	if (currentState == PlayerAnimationState::Idle)
+	{
+		if (next != (int)currentState)
+		{
+			ChangeAnimationState(static_cast<PlayerAnimationState>(next));
+			return;
+		}
+	}
+
+
 	switch (currentState)
 	{
 		// ===== 待機 =====
-	case PlayerAnimationState::Idle:
-	{
-		if (jumpPressed && !IsStaminaEmpty)
-		{
-			ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
-		}
-		else if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
-		{
-			if (moveLength > 0.5f)
-			{
-				ChangeAnimationState(PlayerAnimationState::Guard_Jog_F); // ガード(小走り)に遷移
-			}
-			else if (moveLength > 0.1f && moveLength < 0.5f)
-			{
-				ChangeAnimationState(PlayerAnimationState::Guard_Walk_F); // ガード(歩き)に遷移
-			}
-			else
-			{
-				ChangeAnimationState(PlayerAnimationState::Guard); // ガードに遷移
-			}
-		}
-		else if (moveLength > 0.5f)
-		{
-			mode = MoveMode::Jog;
-			if (lockOnTargetPos != nullptr)
-				ChangeAnimationState(moveState); // ロックオン中の小走りへ遷移
-			else
-				ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
-		}
-		else if (moveLength > 0.1f && bHold && !IsStaminaEmpty && canRunTrigger)
-		{
-			ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
-		}
-		else if (moveLength > 0.1f && moveLength < 0.5f)
-		{
-			mode = MoveMode::Walk;
-			if (lockOnTargetPos != nullptr)
-				ChangeAnimationState(moveState); // ロックオン中の歩きに遷移
-			else
-				ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
-		}
-		else if (moveLength > 0.1f && bTap && !IsStaminaEmpty)
-		{
-			IsAvoid = true;
-			calculationStamina(30);
-			if (lockOnTargetPos != nullptr)
-				ChangeAnimationState(rollState); // ロックオン中の回避に遷移
-			else
-				ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
-		}
-		else if (bTap && !IsStaminaEmpty)
-		{
-			ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
-		}
-		else if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && !IsStaminaEmpty)
-		{
-			calculationStamina(20);
-			ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
-		}
-		else if (rtTap && !IsStaminaEmpty)
-		{
-			calculationStamina(30);
-			ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 強攻撃へ遷移
-		}
-		else if (rtHold && !IsStaminaEmpty)
-		{
-			ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
-		}
-		else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.1f && Potion > 0)
-		{
-			StartOverlayAnimation(PlayerAnimationState::Heal); // 回復に遷移
-		}
+	//case PlayerAnimationState::Idle:
+	//{
+	//	if (jumpPressed && !IsStaminaEmpty)
+	//	{
+	//		ChangeAnimationState(PlayerAnimationState::Jump_Start); // ジャンプへ遷移
+	//	}
+	//	else if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
+	//	{
+	//		if (moveLength > 0.5f)
+	//		{
+	//			ChangeAnimationState(PlayerAnimationState::Guard_Jog_F); // ガード(小走り)に遷移
+	//		}
+	//		else if (moveLength > 0.1f && moveLength < 0.5f)
+	//		{
+	//			ChangeAnimationState(PlayerAnimationState::Guard_Walk_F); // ガード(歩き)に遷移
+	//		}
+	//		else
+	//		{
+	//			ChangeAnimationState(PlayerAnimationState::Guard); // ガードに遷移
+	//		}
+	//	}
+	//	else if (moveLength > 0.5f)
+	//	{
+	//		mode = MoveMode::Jog;
+	//		if (lockOnTargetPos != nullptr)
+	//			ChangeAnimationState(moveState); // ロックオン中の小走りへ遷移
+	//		else
+	//			ChangeAnimationState(PlayerAnimationState::Jog_F); // 小走りへ遷移
+	//	}
+	//	else if (moveLength > 0.1f && bHold && !IsStaminaEmpty && canRunTrigger)
+	//	{
+	//		ChangeAnimationState(PlayerAnimationState::Run); // 走りへ遷移
+	//	}
+	//	else if (moveLength > 0.1f && moveLength < 0.5f)
+	//	{
+	//		mode = MoveMode::Walk;
+	//		if (lockOnTargetPos != nullptr)
+	//			ChangeAnimationState(moveState); // ロックオン中の歩きに遷移
+	//		else
+	//			ChangeAnimationState(PlayerAnimationState::Walk_F); // 歩きに遷移
+	//	}
+	//	else if (moveLength > 0.1f && bTap && !IsStaminaEmpty)
+	//	{
+	//		IsAvoid = true;
+	//		calculationStamina(30);
+	//		if (lockOnTargetPos != nullptr)
+	//			ChangeAnimationState(rollState); // ロックオン中の回避に遷移
+	//		else
+	//			ChangeAnimationState(PlayerAnimationState::Roll_F); // 前回避に遷移
+	//	}
+	//	else if (bTap && !IsStaminaEmpty)
+	//	{
+	//		ChangeAnimationState(PlayerAnimationState::Dodge); // バックステップへ遷移
+	//	}
+	//	else if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && !IsStaminaEmpty)
+	//	{
+	//		calculationStamina(20);
+	//		ChangeAnimationState(PlayerAnimationState::Attack_01); // 攻撃1に遷移
+	//	}
+	//	else if (rtTap && !IsStaminaEmpty)
+	//	{
+	//		calculationStamina(30);
+	//		ChangeAnimationState(PlayerAnimationState::Charge_Attack); // 強攻撃へ遷移
+	//	}
+	//	else if (rtHold && !IsStaminaEmpty)
+	//	{
+	//		ChangeAnimationState(PlayerAnimationState::Charge_Attack_Start); // 溜め攻撃へ遷移
+	//	}
+	//	else if (gamePad.GetButtonDown() & GamePad::BTN_X && HealCoolDownTimer < 0.1f && Potion > 0)
+	//	{
+	//		StartOverlayAnimation(PlayerAnimationState::Heal); // 回復に遷移
+	//	}
 
-		break;
-	}
+	//	break;
+	//}
 
 	// ===== 歩き =====
 	case PlayerAnimationState::Walk_B:

@@ -139,6 +139,9 @@
     <Filter Include="External\NodeEdeiter">
       <UniqueIdentifier>{d6ab45af-d410-4a73-8a6c-b486cb4ab745}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\UI\AnimationNodeEditor">
+      <UniqueIdentifier>{66af326e-e5aa-428e-8462-82135e6f3af2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -345,6 +348,15 @@
     <ClInclude Include="External\imgui-node-editor-master\imgui_node_editor_internal.h">
       <Filter>External\NodeEdeiter</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTranstion.h">
+      <Filter>Source\System\UI\AnimationNodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.h">
+      <Filter>Source\System\UI\AnimationNodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.h">
+      <Filter>Source\System\UI\AnimationNodeEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -482,9 +494,6 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.cpp">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="Source\System\UI\AnimationSequence.cpp">
-      <Filter>Source\System\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.cpp">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
     </ClCompile>
@@ -514,6 +523,12 @@
     </ClCompile>
     <ClCompile Include="External\imgui-node-editor-master\imgui_node_editor_api.cpp">
       <Filter>External\NodeEdeiter</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp">
+      <Filter>Source\System\UI\AnimationNodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

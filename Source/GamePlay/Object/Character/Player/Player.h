@@ -1,6 +1,8 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence.h"
+#include "System/UI/AnimationNodeEditor/AnimationTransitionEditor.h"
+#include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
 
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
@@ -159,4 +161,9 @@ private:
 	bool HaveStamina = false;
 	bool IsStaminaEmpty = false;
 	float runDisableTimer = 0.0f;
+
+	// ノードエディター
+	AnimationTransitionGraph   transitionGraph;
+	AnimationTransitionEditor  transitionEditor;
+	int debugNextState = 0;
 };

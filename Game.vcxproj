@@ -179,6 +179,9 @@
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
     <ClInclude Include="Source\System\Resource\Model\Model.h" />
     <ClInclude Include="Source\System\Resource\Sprite\Sprite.h" />
+    <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.h" />
+    <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.h" />
+    <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTranstion.h" />
     <ClInclude Include="Source\System\UI\AnimationSequence.h" />
     <ClInclude Include="Source\System\UI\Dialog.h" />
   </ItemGroup>
@@ -237,7 +240,8 @@
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
     <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
-    <ClCompile Include="Source\System\UI\AnimationSequence.cpp" />
+    <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp" />
+    <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp" />
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>

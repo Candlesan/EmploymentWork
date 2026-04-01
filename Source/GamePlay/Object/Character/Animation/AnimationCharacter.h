@@ -48,7 +48,7 @@ public:
 	// 現在の再生時間を取得
 	float GetCurrentAnimationSeconds() const { return animationSeconds; }
 	//float GetAnimationSeconds(PlayerAnimationState state) const;
-
+	float GetCurrentAnimationLength() const;
 protected:
 	// サブクラスでオーバーライド出来る
 	virtual void OnStateChanged(StateEnum oldState, StateEnum newState) {}

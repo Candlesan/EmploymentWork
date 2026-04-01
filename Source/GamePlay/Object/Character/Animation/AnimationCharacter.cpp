@@ -369,5 +369,18 @@ bool AnimationCharacter<StateEnum>::IsUpperBodyNode(const Model::Node& node, con
 	return false;
 }
 
+template<typename StateEnum>
+float AnimationCharacter<StateEnum>::GetCurrentAnimationLength() const
+{
+	if (animationIndex < 0) return false;
+
+	std::shared_ptr<Model> model = const_cast<AnimationCharacter*>(this)->GetModel();
+	if (!model) return false;
+
+	const Model::Animation& animation = model->GetAnimations().at(animationIndex);
+
+	return animation.secondsLength;
+}
+
 template class AnimationCharacter<PlayerAnimationState>;
 template class AnimationCharacter<EnemyAnimationState>;
