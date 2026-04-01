@@ -71,6 +71,9 @@ private:
 	// 状態遷移更新処理
 	void UpdateStateTransitions(float elapsedTime);
 
+	// 遷移以外の細かい条件
+	void UpdateStateBehavior();
+
 	// 歩きのアニメションを決める関数
 	PlayerAnimationState DetermineWalkState(); 
 

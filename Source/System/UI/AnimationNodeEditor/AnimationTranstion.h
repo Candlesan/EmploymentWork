@@ -26,6 +26,21 @@ enum class TransitionConditionType
 	Always, // 無条件
 };
 
+enum class TransitionActionType
+{
+	None,
+	MoveSpeed, // 移動速度
+	TurnSpeed, // 旋回速度
+	ConsumeStamina, // スタミナ消費
+	SetIsAvoid, // 回避フラグ
+};
+
+struct TransitionAction
+{
+	TransitionActionType type = TransitionActionType::None;
+	float value = 0.0f; // ConsumeStaminaの時の消費量
+};
+
 struct TransitionCondition
 {
 	TransitionConditionType type = TransitionConditionType::AnimationFinished;
@@ -40,6 +55,7 @@ struct AnimationTransition
 	int toState;
 	std::vector<TransitionCondition> conditions;  // AND条件
 	int priority = 0;  // 複数遷移が成立したとき優先度が高いほうが勝つ
+	std::vector<TransitionAction> actions;
 };
 
 struct TransitionContext

@@ -4,6 +4,43 @@
 // ノードエディタ描画
 void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 {
+	// ノードの追加
+	if (ImGui::Button("+ Add Node"))
+	{
+		showSelectNodeWindow = true; // 追加ノード選択画面を開く
+	}
+
+	if (showSelectNodeWindow)
+	{
+		ImGui::Begin("SelectNode");
+
+		// AnimationStateManagerを取得
+		auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
+
+		for (auto& [state, config] : manager.GetAllConfigs())
+		{
+			// 既に追加済みのアニメーションかをチェックする
+			bool alreadyAnimation = false;
+			for (auto& node : graph.nodes)
+			{
+				if (node.animState == (int)state)
+				{
+					alreadyAnimation = true;
+					break;
+				}
+			}
+			if (alreadyAnimation) continue; // 追加済みはスキップする
+
+			if (ImGui::Selectable(config.animationName.c_str()))
+			{
+				graph.AddNode((int)state, { 100, 100 }); // 選んだらノード追加
+				showSelectNodeWindow = false; // 選んだら閉じる
+			}
+		}
+
+		ImGui::End();
+	}
+
 	ed::SetCurrentEditor(context);
 	ed::Begin("Animation Transition Editor");
 
@@ -92,6 +129,41 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 		ImGui::DragInt("Priority", &trans.priority);
 		ImGui::Separator();
 
+		ImGui::Text(u8"Actions(遷移時に実行する処理)");
+		for (int i = 0; i < (int)trans.actions.size(); i++)
+		{
+			auto& action = trans.actions[i];
+			ImGui::PushID(i + 1000); // conditionsとIDを被らないようにするため
+
+			const char* actionTypes[] = {
+				"None",
+				"MoveSpeed",
+				"TurnSpeed",
+				"Stamina",
+				"Avoid",
+			};
+			int actionIndex = (int)action.type;
+			if (ImGui::Combo("Action", &actionIndex, actionTypes, IM_ARRAYSIZE(actionTypes)))
+				action.type = (TransitionActionType)actionIndex;
+
+			switch (action.type)
+			{
+			case TransitionActionType::MoveSpeed:
+			case TransitionActionType::TurnSpeed:
+			case TransitionActionType::ConsumeStamina:
+				ImGui::DragFloat("Amout", &action.value, 0.1f, 0.0, 1000.0);
+				break;
+			}
+
+			if (ImGui::Button("Remove Action"))
+			{
+				trans.actions.erase(trans.actions.begin() + i);
+				ImGui::PopID();
+				break;
+			}
+			ImGui::PopID();
+		}
+
 		// 条件リストを表示
 		for (int i = 0; i < (int)trans.conditions.size(); i++)
 		{
@@ -158,6 +230,12 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 		if (ImGui::Button("+ Add Condition"))
 		{
 			trans.conditions.push_back(TransitionCondition{});
+		}
+
+		// 遷移時の条件の追加
+		if (ImGui::Button("+ Add Action"))
+		{
+			trans.actions.push_back(TransitionAction{});
 		}
 	}
 

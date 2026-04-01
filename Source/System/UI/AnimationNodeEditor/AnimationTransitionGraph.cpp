@@ -42,6 +42,19 @@ void AnimationTransitionGraph::RemoveLink(ed::LinkId id)
 		[&](const AnimLink& l) { return l.linkId == id; });
 }
 
+const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState, int toState)
+{
+	for (auto& link : links)
+	{
+		if (link.transition.fromState == fromState &&
+			link.transition.toState == toState)
+		{
+			return &link.transition;
+		}
+	}
+	return nullptr;
+}
+
 int AnimationTransitionGraph::EvaluateTransitions(int currentState, const TransitionContext& conditions)
 {
 	// currentState‚©‚ço‚éƒŠƒ“ƒN‚¾‚¯W‚ß‚é

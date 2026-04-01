@@ -34,6 +34,8 @@ public:
 	//void Save(const std::string& path); // Jsonファイルに保存する
 	//void Load(const std::string& path); // Jsonファイルを読み込む
 
+	const AnimationTransition* GetTransition(int fromState, int toState);
+
 	// ランタイム評価：現在のステートから次ステートを返す
 	int EvaluateTransitions(int currentState, const TransitionContext& conditions);
 

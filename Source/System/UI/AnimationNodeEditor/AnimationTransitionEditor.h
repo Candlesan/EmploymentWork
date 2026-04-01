@@ -22,4 +22,5 @@ private:
 	void DrawSelectedLinkEditor(AnimationTransitionGraph& graph);
 
 	ed::EditorContext* context = nullptr;
+    bool showSelectNodeWindow = false;
 };
