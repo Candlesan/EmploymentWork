@@ -19,6 +19,7 @@ struct AnimLink {
 	ed::PinId startPin; // fromノードpinOut
 	ed::PinId endPin; // toノードのpinIn
 	AnimationTransition transition; // この矢印の遷移条件
+	ImVec4 color = ImVec4(1, 1, 1, 1);
 };
 
 class AnimationTransitionGraph
@@ -39,6 +40,8 @@ public:
 	// ランタイム評価：現在のステートから次ステートを返す
 	int EvaluateTransitions(int currentState, const TransitionContext& conditions);
 
+	// 自動整列
+	void AutoLayout();
 private:
 	int nextId = 1;
 	int NextId() { return nextId++; }

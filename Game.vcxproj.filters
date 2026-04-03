@@ -528,7 +528,7 @@
       <Filter>Source\System\UI\AnimationNodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System\UI\AnimationNodeEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -40,6 +40,8 @@ void AnimationTransitionGraph::RemoveLink(ed::LinkId id)
 	// find_if:イテレーターの範囲内から指定された条件を満たす最初の要素を検索する関数
 	auto it = std::find_if(links.begin(), links.end(),
 		[&](const AnimLink& l) { return l.linkId == id; });
+	if (it != links.end())
+		links.erase(it);
 }
 
 // 条件を評価する関数
@@ -135,7 +137,7 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			break;
 
 		case TransitionConditionType::HasStamina:
-			result = !ctx.isStaminaEmpty;
+			result = ctx.haveStamina;
 			break;
 
 		case TransitionConditionType::IsLockOn:
@@ -156,7 +158,22 @@ bool AnimationTransitionGraph::EvaluateConditions(
 
 		case TransitionConditionType::IsGuarding:
 			result = ctx.isGuarding;
-		break;	
+			break;	
+
+		case TransitionConditionType::PositionX:
+
+			result = (ctx.position.x > cond.threshold);
+			break;
+
+		case TransitionConditionType::PositionY:
+
+			result = ((ctx.position.y > cond.threshold) );
+			break;
+
+		case TransitionConditionType::PositionZ:
+
+			result = (ctx.position.z > cond.threshold);
+			break;
 
 		case TransitionConditionType::Always:
 			result = true;
@@ -187,6 +204,29 @@ const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState
 	return nullptr;
 }
 
+// 自動整列
+void AnimationTransitionGraph::AutoLayout()
+{
+	// 1行に並べるノード数
+	const int columns = 4;
+	const float nodeWidth = 200.0f; // ノード同士の横間隔
+	const float nodeHeight = 120.0f; // ノード同士の縦間隔
+
+	for (int i = 0; i < (int)nodes.size(); i++)
+	{
+		int col = i % columns;          // 何列目か
+		int row = i / columns;          // 何行目か
+
+		nodes[i].position = {
+			col * nodeWidth + 100.0f,
+			row * nodeHeight + 100.0f
+		};
+
+		// Node Editorに位置を反映する
+		ed::SetNodePosition(nodes[i].nodeId, nodes[i].position);
+	}
+}
+
 // ノードエディタの保存
 void AnimationTransitionGraph::Save(const std::string& path)
 {
@@ -198,8 +238,6 @@ void AnimationTransitionGraph::Save(const std::string& path)
 	{
 		j["nodes"].push_back({
 			{"animState", node.animState},
-			{"x", node.position.x},
-			{"y", node.position.y},
 			});
 	}
 
@@ -209,6 +247,10 @@ void AnimationTransitionGraph::Save(const std::string& path)
 		linkJson["fromState"] = link.transition.fromState;
 		linkJson["toState"] = link.transition.toState;
 		linkJson["priority"] = link.transition.priority;
+		linkJson["colorR"] = link.color.x;
+		linkJson["colorG"] = link.color.y;
+		linkJson["colorB"] = link.color.z;
+		linkJson["colorA"] = link.color.w;
 
 		linkJson["conditions"] = json::array();
 		for (auto& cond : link.transition.conditions)
@@ -250,7 +292,7 @@ void AnimationTransitionGraph::Load(const std::string& path)
 
 	for (auto& node : j["nodes"])
 	{
-		AddNode(node["animState"], { node["x"], node["y"] });
+		AddNode(node["animState"], { 0, 0 });
 	}
 
 	for (auto& link : j["links"])
@@ -273,6 +315,13 @@ void AnimationTransitionGraph::Load(const std::string& path)
 
 		// AddLinkで追加された最後のlinkに条件とアクションを入れる
 		AnimLink& newLink = links.back();
+
+		newLink.transition.priority = link["priority"];
+		newLink.color.x = link["colorR"];
+		newLink.color.y = link["colorG"];
+		newLink.color.z = link["colorB"];
+		newLink.color.w = link["colorA"];
+
 		for (auto& cond : link["conditions"])
 		{
 			TransitionCondition c;

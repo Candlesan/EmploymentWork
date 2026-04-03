@@ -23,4 +23,5 @@ private:
 
 	ed::EditorContext* context = nullptr;
     bool showSelectNodeWindow = false;
+    bool needAutoLayout = false;
 };

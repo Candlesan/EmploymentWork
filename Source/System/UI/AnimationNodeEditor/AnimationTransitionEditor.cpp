@@ -1,5 +1,6 @@
 #include "AnimationTransitionEditor.h"
 #include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
+#include "System/Core/Input/Input.h"
 
 // ノードエディタ描画
 void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
@@ -24,6 +25,11 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	if (ImGui::Button("+ Add Node"))
 	{
 		showSelectNodeWindow = true; // 追加ノード選択画面を開く
+	}
+
+	if (ImGui::Button("Auto Layout"))
+	{
+		needAutoLayout = true; // フラグを立てるだけ
 	}
 
 	if (showSelectNodeWindow)
@@ -84,7 +90,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	// リンク描画
 	for (auto& link : graph.links)
 	{
-		ed::Link(link.linkId, link.startPin, link.endPin);
+		ed::Link(link.linkId, link.startPin, link.endPin, link.color);
 	}
 
 	// ドラックでリンクを作成
@@ -103,7 +109,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	if (ed::BeginDelete())
 	{
 		ed::LinkId deletedLink;
-		if (ed::QueryDeletedLink(&deletedLink));
+		if (ed::QueryDeletedLink(&deletedLink))
 		{
 			if (ed::AcceptDeletedItem())
 				graph.RemoveLink(deletedLink);
@@ -112,6 +118,13 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	ed::EndDelete();
 
 	ed::End();
+
+	// 自動整列
+	if (needAutoLayout)
+	{
+		graph.AutoLayout();
+		needAutoLayout = false;
+	}
 
 	DrawSelectedLinkEditor(graph);
 	ed::SetCurrentEditor(nullptr);
@@ -141,7 +154,14 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 	// 条件編集ウィンドウ
 	ImGui::Begin("Transition Condition Editor");
 	{
-		ImGui::Text("From State: %d -> To State: %d", trans.fromState, trans.toState);
+		const AnimationConfig* fromStateName = AnimationStateManager<PlayerAnimationState>
+			::Instance().GetConfig(static_cast<PlayerAnimationState>(trans.fromState));
+
+		const AnimationConfig* toStateName = AnimationStateManager<PlayerAnimationState>
+			::Instance().GetConfig(static_cast<PlayerAnimationState>(trans.toState));
+
+		ImGui::Text("From State: %s -> To State: %s", fromStateName->animationName.c_str(), toStateName->animationName.c_str());
+		ImGui::ColorEdit4("Link Color", &selectedLink->color.x);
 		ImGui::DragInt("Priority", &trans.priority);
 		ImGui::Separator();
 
@@ -169,6 +189,16 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionActionType::ConsumeStamina:
 				ImGui::DragFloat("Amout", &action.value, 0.1f, 0.0, 1000.0);
 				break;
+
+			case TransitionActionType::SetIsAvoid:
+			{
+				bool avoidFlag = (action.value != 0.0f);
+				if (ImGui::Checkbox("Avoid", &avoidFlag))
+				{
+					action.value = avoidFlag ? 1.0f : 0.0f;
+				}
+				break;
+			}
 			}
 
 			if (ImGui::Button("Remove Action"))
@@ -180,7 +210,10 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			ImGui::PopID();
 		}
 
+		ImGui::Separator();
+
 		// 条件リストを表示
+		ImGui::Text(u8"Condition(アニメーションの遷移条件)");
 		for (int i = 0; i < (int)trans.conditions.size(); i++)
 		{
 			TransitionCondition& cond = trans.conditions[i];
@@ -188,14 +221,29 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 
 			// 条件タイプのドロップダウン
 			const char* condTypes[] = {
-				"AnimationFinished", // アニメション終了
-				"AnimationTimeOver", // 指定秒数を超えたら
-				"AnimationTimeIn", // 指定秒数以内であれば
+				"AnimationFinished", // アニメーションが終了したら
+				"AnimationTimeOver", // 指定の再生時間オを過ぎたら
+				"AnimationTimeIn", // 指定の再生時間内だったら
 				"ButtonPressed", // ボタンを押した瞬間
 				"ButtonReleased", // ボタンを離した瞬間
-				"ButtonHeld", // ボタン長押し
-				"MoveLengthOver", // 移動値が一定以上
-				"MoveLengthUnder", // 移動値が一定以下
+				"ButtonHeld", // ボタンを長押ししているとき
+				"MoveLengthOver", // 入力が一定以上の時
+				"MoveLengthUnder", // 入力が一定以下の時
+				"BHold", // Bボタンを長押している時
+				"BTap", // Bボタンを単押ししている時
+				"RTHold", // RTボタンを長押している時
+				"RTTap", // RTボタンを単押ししている時
+				"JumpPressed", // ジャンプ可能かどうか
+				"StaminaEmpty", // スタミナが空かどうか
+				"HasStamina", // スタミナを持っているか
+				"IsLockOn", // ロックオン中かどうか
+				"CanRun", // 走れるかどうか
+				"HavePotion",// ポーションを持っているか
+				"HealCooldownReady", // 回復のクールダウン中か
+				"IsGuarding", // ガード中か
+				"PoaitionX", // X軸が～なら
+				"PoaitionY", // Y軸が～なら
+				"PoaitionZ", // Z軸が～なら
 				"Always", // 無条件
 			};
 			int typeIdx = (int)cond.type;
@@ -216,15 +264,36 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionConditionType::ButtonReleased:
 			case TransitionConditionType::ButtonHeld:
 			{
-				// よく使うボタンだけ並べる
-				const char* buttonNames[] = {
-					"A", "B", "X", "Y", "LB", "RB", "LT", "RT",
-					"B_Hold", "B_Tap", "RT_Hold", "RT_Tap", "Jump"
+				// ボタン選択Comboを表示
+				const char* buttonNames[] = { "A","B","X","Y","LB","RB","LT","RT" };
+				const int   buttonMasks[] = {
+					GamePad::BTN_A, GamePad::BTN_B,
+					GamePad::BTN_X, GamePad::BTN_Y,
+					GamePad::BTN_LEFT_SHOULDER,  GamePad::BTN_RIGHT_SHOULDER,
+					GamePad::BTN_LEFT_TRIGGER,   GamePad::BTN_RIGHT_TRIGGER,
 				};
-				// buttonMaskをインデックスに変換して表示
-				ImGui::InputInt("ButtonMask", &cond.buttonMask);
+				int currentIndex = 0;
+				for (int i = 0; i < IM_ARRAYSIZE(buttonMasks); i++)
+				{
+					if (cond.buttonMask == buttonMasks[i]) { currentIndex = i; break; }
+				}
+				if (ImGui::Combo("Button", &currentIndex, buttonNames, IM_ARRAYSIZE(buttonNames)))
+					cond.buttonMask = buttonMasks[currentIndex];
 				break;
 			}
+			case TransitionConditionType::BHold:
+			case TransitionConditionType::BTap:
+			case TransitionConditionType::RTHold:
+			case TransitionConditionType::RTTap:
+			case TransitionConditionType::JumpPressed:
+				ImGui::TextDisabled(u8"（追加設定なし）");
+				break;
+
+			case TransitionConditionType::PositionX:
+			case TransitionConditionType::PositionY:
+			case TransitionConditionType::PositionZ:
+				ImGui::DragFloat("Thershold", &cond.threshold, 0.01f, 0.0f, 1000.0f);
+				break;
 			}
 
 			// 条件の反転チェックボックス

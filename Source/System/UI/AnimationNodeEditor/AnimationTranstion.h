@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <vector>
+#include <DirectXMath.h>
 
 enum class TransitionConditionType
 {
@@ -23,6 +24,9 @@ enum class TransitionConditionType
 	HavePotion, // ポーションがある
 	HealCooldownReady, // 回復のクールダウン中か
 	IsGuarding, // ガード中
+	PositionX, // 位置:X座標
+	PositionY, // 位置:Y座標
+	PositionZ, // 位置:Z座標
 	Always, // 無条件
 };
 
@@ -60,6 +64,7 @@ struct AnimationTransition
 
 struct TransitionContext
 {
+	DirectX::XMFLOAT3 position;
 	float animSeconds;
 	float animLength;
 	float moveLength;
@@ -71,6 +76,7 @@ struct TransitionContext
 	bool  rtHold;
 	bool  rtTap;
 	bool  jumpPressed;
+	bool  haveStamina;
 	bool  isStaminaEmpty;
 	bool  canRunTrigger;
 	bool  isLockOn;
