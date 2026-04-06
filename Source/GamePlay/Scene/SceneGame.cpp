@@ -488,8 +488,10 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 	// プレイヤーを取得
 	Player& player = Player::Instance();
 	float currentSec = player.GetCurrentAnimationSeconds(); // 既にある
-	if (!player.GetAnimSequence().IsHitActive(player.GetCurrentState(), currentSec))
-		return;
+
+	// その手のHitBoxがアクティブか確認
+	const AnimTrack* activeTrack = player.GetAnimSequence().GetActiveHitTrack(player.GetCurrentState(), currentSec, HandType::RightHand);
+	if (!activeTrack) return;
 
 	DirectX::XMFLOAT3 outPositionA, outPositionB;
 	if (Collision::IntersectCapsuleVsCapsule(
@@ -511,14 +513,17 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 		auto state = player.GetCurrentState();
 		const auto& config = AnimationStateManager<PlayerAnimationState>::Instance().GetConfig(state);
 
-		if (config->damageRate > 0.0f)
+		float finalDamage = activeTrack->damageRate;
+		float finalPoiseValue = activeTrack->poiseRate;
+
+		if (activeTrack->damageRate > 0.0f)
 		{
 			// CalculateAttackResult に「実数値」を渡す
-			AttackResult res = player.CalculateAttackResult(config->damageRate, config->poiseValue);
+			AttackResult res = player.CalculateAttackResult(activeTrack->damageRate, activeTrack->poiseRate);
 
 			// 敵の強靭値を実数値（res.poiseDamage）で減らす
 			enemy->SetLastDamage(res.damage);
-			enemy->ApplyDamage(res.damage, 0.3f, res.poiseDamage);
+			enemy->ApplyDamage(res.damage, activeTrack->invincible, res.poiseDamage);
 		}
 	}
 }
@@ -561,15 +566,15 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 		{
 			player.SetIsHit(true);
 			// JsonからAttackDataのダメージを持ってくる
-			float finalDamage = config->damageRate * activeTrack->damageRate;
-			float finalPoiseValue = config->poiseValue * activeTrack->poiseRate;
+			float finalDamage = activeTrack->damageRate;
+			float finalPoiseValue = activeTrack->poiseRate;
 			bool IsGuarding = player.GetIsGuarding();
 			if (IsGuarding) player.SetIsHit(true);
-			if (config->damageRate > 0.0f && !IsGuarding)
+			if (activeTrack->damageRate > 0.0f && !IsGuarding)
 			{
 				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
 				player.SetLastDamage(res.damage);
-				player.ApplyDamage(res.damage, config->invincible, res.poiseDamage);
+				player.ApplyDamage(res.damage, activeTrack->invincible, res.poiseDamage);
 			}
 		}
 	}
@@ -596,17 +601,17 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 			player.SetIsHit(true);
 
 			// JsonからAttackDataのダメージを持ってくる
-			float finalDamage = config->damageRate * activeTrack->damageRate;
-			float finalPoiseValue = config->poiseValue * activeTrack->poiseRate;
+			float finalDamage = activeTrack->damageRate;
+			float finalPoiseValue = activeTrack->poiseRate;
 			bool IsGuarding = player.GetIsGuarding();
 			bool IsAvoid = player.GetIsAvoid();
 
 			if(IsGuarding) player.SetIsHit(true);
-			if (config->damageRate > 0.0f && !IsGuarding && !IsAvoid)
+			if (activeTrack->damageRate > 0.0f && !IsGuarding && !IsAvoid)
 			{
 				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
 				player.SetLastDamage(res.damage);
-				player.ApplyDamage(res.damage, config->invincible, res.poiseDamage);
+				player.ApplyDamage(res.damage, activeTrack->invincible, res.poiseDamage);
 			}
 		}
 	}
