@@ -177,6 +177,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"TurnSpeed",
 				"Stamina",
 				"Avoid",
+				"AnimationSpeed",
 			};
 			int actionIndex = (int)action.type;
 			if (ImGui::Combo("Action", &actionIndex, actionTypes, IM_ARRAYSIZE(actionTypes)))
@@ -187,7 +188,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionActionType::MoveSpeed:
 			case TransitionActionType::TurnSpeed:
 			case TransitionActionType::ConsumeStamina:
-				ImGui::DragFloat("Amout", &action.value, 0.1f, 0.0, 1000.0);
+				ImGui::DragFloat("Amout", &action.value, 0.1f, 0.0f, 1000.0f);
 				break;
 
 			case TransitionActionType::SetIsAvoid:
@@ -197,6 +198,12 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{
 					action.value = avoidFlag ? 1.0f : 0.0f;
 				}
+				break;
+			}
+
+			case TransitionActionType::SetAnimationSpeed:
+			{
+				float AnimSpeed = ImGui::DragFloat("Amout", &action.value, 0.01f, 0.0f, 10.0f);
 				break;
 			}
 			}
@@ -221,30 +228,31 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 
 			// 条件タイプのドロップダウン
 			const char* condTypes[] = {
-				"AnimationFinished", // アニメーションが終了したら
-				"AnimationTimeOver", // 指定の再生時間オを過ぎたら
-				"AnimationTimeIn", // 指定の再生時間内だったら
-				"ButtonPressed", // ボタンを押した瞬間
-				"ButtonReleased", // ボタンを離した瞬間
-				"ButtonHeld", // ボタンを長押ししているとき
-				"MoveLengthOver", // 入力が一定以上の時
-				"MoveLengthUnder", // 入力が一定以下の時
-				"BHold", // Bボタンを長押している時
-				"BTap", // Bボタンを単押ししている時
-				"RTHold", // RTボタンを長押している時
-				"RTTap", // RTボタンを単押ししている時
-				"JumpPressed", // ジャンプ可能かどうか
-				"StaminaEmpty", // スタミナが空かどうか
-				"HasStamina", // スタミナを持っているか
-				"IsLockOn", // ロックオン中かどうか
-				"CanRun", // 走れるかどうか
-				"HavePotion",// ポーションを持っているか
-				"HealCooldownReady", // 回復のクールダウン中か
-				"IsGuarding", // ガード中か
-				"PoaitionX", // X軸が～なら
-				"PoaitionY", // Y軸が～なら
-				"PoaitionZ", // Z軸が～なら
-				"Always", // 無条件
+				"AnimationFinished",	// アニメーションが終了したら
+				"AnimationTimeOver",	// 指定の再生時間オを過ぎたら
+				"AnimationTimeIn",		// 指定の再生時間内だったら
+				"ButtonPressed",		// ボタンを押した瞬間
+				"ButtonReleased",		// ボタンを離した瞬間
+				"ButtonHeld",			// ボタンを長押ししているとき
+				"MoveLengthOver",		// 入力が一定以上の時
+				"MoveLengthUnder",		// 入力が一定以下の時
+				"BHold",				// Bボタンを長押している時
+				"BTap",					// Bボタンを単押ししている時
+				"RBTap",				// RBボタンを単押ししている時
+				"RTHold",				// RTボタンを長押している時
+				"RTTap",				// RTボタンを単押ししている時
+				"JumpPressed",			// ジャンプ可能かどうか
+				"StaminaEmpty",			// スタミナが空かどうか
+				"HasStamina",			// スタミナを持っているか
+				"IsLockOn",				// ロックオン中かどうか
+				"CanRun",				// 走れるかどうか
+				"HavePotion",			// ポーションを持っているか
+				"HealCooldownReady",	// 回復のクールダウン中か
+				"IsGuarding",			// ガード中か
+				"PoaitionX",			// X軸が～なら
+				"PoaitionY",			// Y軸が～なら
+				"PoaitionZ",			// Z軸が～なら
+				"Always",				// 無条件
 			};
 			int typeIdx = (int)cond.type;
 			if (ImGui::Combo("Type", &typeIdx, condTypes, IM_ARRAYSIZE(condTypes)))
@@ -283,6 +291,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			}
 			case TransitionConditionType::BHold:
 			case TransitionConditionType::BTap:
+			case TransitionConditionType::RBTap:
 			case TransitionConditionType::RTHold:
 			case TransitionConditionType::RTTap:
 			case TransitionConditionType::JumpPressed:

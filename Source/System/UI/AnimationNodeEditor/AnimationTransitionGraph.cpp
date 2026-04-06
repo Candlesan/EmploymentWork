@@ -120,6 +120,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.bTap;
 			break;
 
+		case TransitionConditionType::RBTap:
+			result = ctx.rbTap;
+			break;
+
 		case TransitionConditionType::RTHold:
 			result = ctx.rtHold;
 			break;

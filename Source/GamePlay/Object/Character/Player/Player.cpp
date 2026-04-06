@@ -157,6 +157,9 @@ void Player::Update(float elapsedTime)
 	if(!IsGuarding)// ガード中は回復しない
 	Heal(elapsedTime);
 
+	// エリア移動制限
+	AreaRestriction();
+
 	// モデル更新処理
 	UpdateTransform();
 	player->UpdateTransform(transform);
@@ -718,8 +721,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	PlayerAnimationState moveState = DetermineWalkState(); // 歩きの遷移条件を取得
 	PlayerAnimationState rollState = DetermineRollState(); // 回避の遷移条件を取得
 
-	// 走ってる途中にローリングするのを防ぐため人次フレームで0にする
-
 	bool bHold = bButtonHoldTime >= RUN_THRESHOLD; // 長押し判定
 
 	// 短押し判定：離した瞬間 かつ 長押しじゃなかった
@@ -760,6 +761,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.bHold = bButtonHoldTime >= RUN_THRESHOLD;
 	ctx.bTap = (gamePad.GetButtonUp() & GamePad::BTN_B) && !ctx.bHold;
+	ctx.rbTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER) && !ctx.bHold;
 	ctx.rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD;
 	ctx.rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER) && !ctx.rtHold;
 	ctx.jumpPressed = jumpPressed;
@@ -798,6 +800,10 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				case TransitionActionType::SetIsAvoid:
 					IsAvoid = (action.value != 0.0f);
 					break;
+
+				case TransitionActionType::SetAnimationSpeed:
+					SetBaseSpeed(action.value);
+					break;
 				}
 			}
 		}
@@ -810,158 +816,13 @@ void Player::UpdateStateBehavior()
 {
 	switch (currentState)
 	{
-	case PlayerAnimationState::Idle:
-		break;
-	case PlayerAnimationState::Walk_B:
-		break;
-	case PlayerAnimationState::Walk_BL:
-		break;
-	case PlayerAnimationState::Walk_BR:
-		break;
-	case PlayerAnimationState::Walk_F:
-		break;
-	case PlayerAnimationState::Walk_L:
-		break;
-	case PlayerAnimationState::Walk_R:
-		break;
-	case PlayerAnimationState::Jog_B:
-		break;
-	case PlayerAnimationState::Jog_BL:
-		break;
-	case PlayerAnimationState::Jog_BR:
-		break;
-	case PlayerAnimationState::Jog_F:
-		break;
-	case PlayerAnimationState::Jog_L:
-		break;
-	case PlayerAnimationState::Jog_R:
-		break;
 	case PlayerAnimationState::Run:
 		calculationStamina(0.1f);
 		break;
-	case PlayerAnimationState::Run_Stop:
-		break;
-	case PlayerAnimationState::Roll_BL:
-		break;
-	case PlayerAnimationState::Roll_BR:
-		break;
-	case PlayerAnimationState::Roll_F:
-		break;
-	case PlayerAnimationState::Roll_L:
-		break;
-	case PlayerAnimationState::Roll_R:
-		break;
-	case PlayerAnimationState::Dodge:
-		break;
-	case PlayerAnimationState::Attack_01:
-		break;
-	case PlayerAnimationState::Attack_02:
-		break;
-	case PlayerAnimationState::Charge_Attack:
-		break;
+
 	case PlayerAnimationState::Charge_Attack_Start:
-		break;
-	case PlayerAnimationState::Run_Attack:
-		break;
-	case PlayerAnimationState::Guard_Counter:
-		break;
-	case PlayerAnimationState::Jump_Attack_Start:
-		break;
-	case PlayerAnimationState::Jump_Attack_Loop:
-		break;
-	case PlayerAnimationState::Jump_Attack:
-		break;
-	case PlayerAnimationState::Jump_Start:
-		break;
-	case PlayerAnimationState::Jump_Loop:
-		break;
-	case PlayerAnimationState::Jump_End:
-		break;
-	case PlayerAnimationState::Guard:
-		break;
-	case PlayerAnimationState::Guard_Jog_B:
-		break;
-	case PlayerAnimationState::Guard_Jog_BL:
-		break;
-	case PlayerAnimationState::Guard_Jog_BR:
-		break;
-	case PlayerAnimationState::Guard_Jog_F:
-		break;
-	case PlayerAnimationState::Guard_Jog_L:
-		break;
-	case PlayerAnimationState::Guard_Jog_R:
-		break;
-	case PlayerAnimationState::Guard_Walk_B:
-		break;
-	case PlayerAnimationState::Guard_Walk_BL:
-		break;
-	case PlayerAnimationState::Guard_Walk_BR:
-		break;
-	case PlayerAnimationState::Guard_Walk_F:
-		break;
-	case PlayerAnimationState::Guard_Walk_L:
-		break;
-	case PlayerAnimationState::Guard_Walk_R:
-		break;
-	case PlayerAnimationState::Guard_Hit_01:
-		break;
-	case PlayerAnimationState::Guard_Hit_02:
-		break;
-	case PlayerAnimationState::Guard_Hit_03:
-		break;
-	case PlayerAnimationState::Buff:
-		break;
-	case PlayerAnimationState::Equip:
-		break;
-	case PlayerAnimationState::UnEquip:
-		break;
-	case PlayerAnimationState::Heal:
-		break;
-	case PlayerAnimationState::Hurt_Heavy_B:
-		break;
-	case PlayerAnimationState::Hurt_Heavy_B_Loop:
-		break;
-	case PlayerAnimationState::Hurt_Heavy_F:
-		break;
-	case PlayerAnimationState::Hurt_Heavy_F_Loop:
-		break;
-	case PlayerAnimationState::Hurt_End_B:
-		break;
-	case PlayerAnimationState::Hurt_End_F:
-		break;
-	case PlayerAnimationState::Hurt_In_Air_Start:
-		break;
-	case PlayerAnimationState::Hurt_In_Air_Loop:
-		break;
-	case PlayerAnimationState::Hurt_In_Air_End:
-		break;
-	case PlayerAnimationState::Hurt_Light_B:
-		break;
-	case PlayerAnimationState::Hurt_Light_F:
-		break;
-	case PlayerAnimationState::Hurt_Light_L:
-		break;
-	case PlayerAnimationState::Hurt_Light_R:
-		break;
-	case PlayerAnimationState::Interaction:
-		break;
-	case PlayerAnimationState::PickUp_01:
-		break;
-	case PlayerAnimationState::PickUp_02:
-		break;
-	case PlayerAnimationState::Sit_Start:
-		break;
-	case PlayerAnimationState::Sit_Loop:
-		break;
-	case PlayerAnimationState::Sit_End:
-		break;
-	case PlayerAnimationState::Die:
-		break;
-	case PlayerAnimationState::Die_B:
-		break;
-	case PlayerAnimationState::Die_F:
-		break;
-	default:
+		calculationStamina(0.5f);
+		AnimationLerp(0.188f, 0.583f, 0.4f);
 		break;
 	}
 }

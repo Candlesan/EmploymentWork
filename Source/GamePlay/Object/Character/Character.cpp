@@ -171,6 +171,20 @@ void Character::UpdateStatus(float elapsedTime)
 	}
 }
 
+void Character::AreaRestriction()
+{
+	float areaDisrance = sqrtf(position.x * position.x + position.y * position.y + position.z * position.z);
+
+	if (areaDisrance > stageRadius)
+	{
+		float normalDisX = position.x / areaDisrance;
+		float normalDisZ = position.z / areaDisrance;
+
+		position.x = normalDisX * stageRadius;
+		position.z = normalDisZ * stageRadius;
+	}
+}
+
 //…•½‘¬—ÍXVˆ—
 void Character::UpdateHorizontalVelocity(float elapsedTime)
 {

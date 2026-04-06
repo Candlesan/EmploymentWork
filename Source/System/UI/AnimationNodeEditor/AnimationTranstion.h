@@ -4,30 +4,31 @@
 
 enum class TransitionConditionType
 {
-	AnimationFinished, // アニメーションが終了したら
-	AnimationTimeOver, // 指定の秒数を超えたら
-	AnimationTimeIn, // 指定の秒数以内だったら
-	ButtonPressed, // ボタンが押されたら
-	ButtonReleased, // ボタンを離したら
-	ButtonHeld, // ボタンを長押ししていたら
-	MoveLengthOver, // スティックの入力値が一定以上だったら
-	MoveLengthUnder, // スティックの入力値が一定以下だったら
-	BHold,       // Bボタン長押し（走り）
-	BTap,        // Bボタン短押し（回避）
-	RTHold,      // RT長押し（溜め攻撃）
-	RTTap,       // RT短押し（強攻撃）
-	JumpPressed, // ジャンプ入力
-	StaminaEmpty,   // スタミナ切れ
-	HasStamina,     // スタミナあり
-	IsLockOn,       // ロックオン中
-	CanRun,         // 走れる状態
-	HavePotion, // ポーションがある
-	HealCooldownReady, // 回復のクールダウン中か
-	IsGuarding, // ガード中
-	PositionX, // 位置:X座標
-	PositionY, // 位置:Y座標
-	PositionZ, // 位置:Z座標
-	Always, // 無条件
+	AnimationFinished,	// アニメーションが終了したら
+	AnimationTimeOver,	// 指定の秒数を超えたら
+	AnimationTimeIn,	// 指定の秒数以内だったら
+	ButtonPressed,		// ボタンが押されたら
+	ButtonReleased,		// ボタンを離したら
+	ButtonHeld,			// ボタンを長押ししていたら
+	MoveLengthOver,		// スティックの入力値が一定以上だったら
+	MoveLengthUnder,	// スティックの入力値が一定以下だったら
+	BHold,				// Bボタン長押し（走り）
+	BTap,				// Bボタン短押し（回避）
+	RBTap,				// Bボタン短押し（バックステップ）
+	RTHold,				// RT長押し（溜め攻撃）
+	RTTap,				// RT短押し（強攻撃）
+	JumpPressed,		// ジャンプ入力
+	StaminaEmpty,		// スタミナ切れ
+	HasStamina,			// スタミナあり
+	IsLockOn,			// ロックオン中
+	CanRun,				// 走れる状態
+	HavePotion,			// ポーションがある
+	HealCooldownReady,	// 回復のクールダウン中か
+	IsGuarding,			// ガード中
+	PositionX,			// 位置:X座標
+	PositionY,			// 位置:Y座標
+	PositionZ,			// 位置:Z座標
+	Always,				// 無条件
 };
 
 enum class TransitionActionType
@@ -37,6 +38,7 @@ enum class TransitionActionType
 	TurnSpeed, // 旋回速度
 	ConsumeStamina, // スタミナ消費
 	SetIsAvoid, // 回避フラグ
+	SetAnimationSpeed, // アニメーション再生速度
 };
 
 struct TransitionAction
@@ -73,6 +75,7 @@ struct TransitionContext
 	int   buttonUp;
 	bool  bHold;
 	bool  bTap;
+	bool  rbTap;
 	bool  rtHold;
 	bool  rtTap;
 	bool  jumpPressed;

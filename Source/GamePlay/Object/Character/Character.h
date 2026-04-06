@@ -80,6 +80,9 @@ public:
 
 	// ステータス更新
 	void UpdateStatus(float elapsedTime);
+
+	// エリア制限
+	void AreaRestriction();
 private:
 	// 水平速力更新処理
 	void UpdateHorizontalVelocity(float elapsedTime);
@@ -160,4 +163,6 @@ protected:
 	float poiseFullResetTimer = 0.0f; // 30秒後に強制全回復する用
 
 	float invincibleTimer = 0.0f; // 無敵時間
+
+	float stageRadius = 38.0f;
 };

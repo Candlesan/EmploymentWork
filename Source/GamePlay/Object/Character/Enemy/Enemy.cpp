@@ -243,6 +243,9 @@ void Enemy::Update(float elapsedTime)
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
 
+	// エリア移動制限
+	AreaRestriction();
+
 	// モデル更新処理
 	UpdateTransform();
 	enemy->UpdateTransform(transform);
