@@ -7,7 +7,7 @@
             "damageRate": 1.0,
             "end": 90,
             "hand": 1,
-            "invincible": 0.0,
+            "invincible": 0.30000001192092896,
             "label": "当たり判定1",
             "poiseRate": 0.0,
             "sphereOffset": [
@@ -291,7 +291,7 @@
             "boneName": "No Name",
             "color": 4278190335,
             "damageRate": 1.2999999523162842,
-            "end": 161,
+            "end": 164,
             "hand": 1,
             "invincible": 0.30000001192092896,
             "label": "当たり判定3",
@@ -302,7 +302,7 @@
                 0.0
             ],
             "sphereRadius": 0.5,
-            "start": 119,
+            "start": 122,
             "type": 0
         }
     ],
@@ -391,7 +391,7 @@
             "damageRate": 1.2000000476837158,
             "end": 90,
             "hand": 4,
-            "invincible": 0.30000001192092896,
+            "invincible": 0.5,
             "label": "当たり判定1",
             "poiseRate": 0.0,
             "sphereOffset": [
@@ -411,7 +411,7 @@
             "damageRate": 0.699999988079071,
             "end": 135,
             "hand": 1,
-            "invincible": 0.10000000149011612,
+            "invincible": 0.30000001192092896,
             "label": "当たり判定1",
             "poiseRate": 0.0,
             "sphereOffset": [
@@ -429,7 +429,7 @@
             "damageRate": 0.699999988079071,
             "end": 154,
             "hand": 1,
-            "invincible": 0.10000000149011612,
+            "invincible": 0.30000001192092896,
             "label": "当たり判定2",
             "poiseRate": 0.0,
             "sphereOffset": [
@@ -447,7 +447,7 @@
             "damageRate": 0.699999988079071,
             "end": 187,
             "hand": 1,
-            "invincible": 0.10000000149011612,
+            "invincible": 0.30000001192092896,
             "label": "当たり判定3",
             "poiseRate": 0.0,
             "sphereOffset": [
