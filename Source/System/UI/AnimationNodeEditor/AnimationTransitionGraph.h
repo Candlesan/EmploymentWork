@@ -27,21 +27,29 @@ class AnimationTransitionGraph
 public:
 	std::vector<AnimNode> nodes;
 	std::vector<AnimLink> links;
+	std::string graphName = "NewGraph"; // グラフの名前
 
+	// ===== 基本機能 ======
 	void AddNode(int animState, ImVec2 pos); // ノードの追加
 	void AddLink(ed::PinId from, ed::PinId to); // 矢印の追加
-	void RemoveLink(ed::LinkId id);
+	void RemoveNode(ed::NodeId id); // ノードの削除
+	void RemoveLink(ed::LinkId id); // 矢印の削除
 
 	void Save(const std::string& path); // Jsonファイルに保存する
 	void Load(const std::string& path); // Jsonファイルを読み込む
-
-	const AnimationTransition* GetTransition(int fromState, int toState);
+	// =====================
 
 	// ランタイム評価：現在のステートから次ステートを返す
 	int EvaluateTransitions(int currentState, const TransitionContext& conditions);
 
 	// 自動整列
 	void AutoLayout();
+
+	// 新しいグラフのセットアップ
+	void InitializeAsNew(const std::string& name);
+
+	// ゲッター
+	const AnimationTransition* GetTransition(int fromState, int toState);
 private:
 	int nextId = 1;
 	int NextId() { return nextId++; }

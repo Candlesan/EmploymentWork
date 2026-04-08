@@ -34,6 +34,30 @@ void AnimationTransitionGraph::AddLink(ed::PinId from, ed::PinId to)
 	links.push_back(link);
 }
 
+// ノードの削除
+void AnimationTransitionGraph::RemoveNode(ed::NodeId id)
+{
+	// ノードを消す前に繋がっているリンクを先に消す
+	for (auto& node : nodes)
+	{
+		if (node.nodeId == id)
+		{
+			// このノードのpinInとpinOutを使ってるリンクを全部消す
+			links.erase(std::remove_if(links.begin(), links.end(),
+				[&](const AnimLink& l) {return l.startPin == node.pinOut || l.endPin == node.pinIn; }),
+				links.end());
+			break;
+		}
+	}
+
+	// 削除対象を探す
+	auto it = std::find_if(nodes.begin(), nodes.end(),
+		[&](const AnimNode& n) {return n.nodeId == id; });
+
+	if (it != nodes.end())
+		nodes.erase(it);
+}
+
 // 矢印を消す
 void AnimationTransitionGraph::RemoveLink(ed::LinkId id)
 {
@@ -195,42 +219,6 @@ bool AnimationTransitionGraph::EvaluateConditions(
 	return true;
 }
 
-const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState, int toState)
-{
-	for (auto& link : links)
-	{
-		if (link.transition.fromState == fromState &&
-			link.transition.toState == toState)
-		{
-			return &link.transition;
-		}
-	}
-	return nullptr;
-}
-
-// 自動整列
-void AnimationTransitionGraph::AutoLayout()
-{
-	// 1行に並べるノード数
-	const int columns = 4;
-	const float nodeWidth = 200.0f; // ノード同士の横間隔
-	const float nodeHeight = 120.0f; // ノード同士の縦間隔
-
-	for (int i = 0; i < (int)nodes.size(); i++)
-	{
-		int col = i % columns;          // 何列目か
-		int row = i / columns;          // 何行目か
-
-		nodes[i].position = {
-			col * nodeWidth + 100.0f,
-			row * nodeHeight + 100.0f
-		};
-
-		// Node Editorに位置を反映する
-		ed::SetNodePosition(nodes[i].nodeId, nodes[i].position);
-	}
-}
-
 // ノードエディタの保存
 void AnimationTransitionGraph::Save(const std::string& path)
 {
@@ -344,4 +332,55 @@ void AnimationTransitionGraph::Load(const std::string& path)
 			newLink.transition.actions.push_back(a);
 		}
 	}
+}
+
+// 自動整列
+void AnimationTransitionGraph::AutoLayout()
+{
+	// 1行に並べるノード数
+	const int columns = 4;
+	const float nodeWidth = 200.0f; // ノード同士の横間隔
+	const float nodeHeight = 120.0f; // ノード同士の縦間隔
+
+	for (int i = 0; i < (int)nodes.size(); i++)
+	{
+		int col = i % columns;          // 何列目か
+		int row = i / columns;          // 何行目か
+
+		nodes[i].position = {
+			col * nodeWidth + 100.0f,
+			row * nodeHeight + 100.0f
+		};
+
+		// Node Editorに位置を反映する
+		ed::SetNodePosition(nodes[i].nodeId, nodes[i].position);
+	}
+}
+
+// 新しいグラフのセットアップ
+void AnimationTransitionGraph::InitializeAsNew(const std::string& name)
+{
+	// 既存のデータをクリアする
+	nodes.clear();
+	links.clear();
+
+	// IDのカウントを初期値に戻す
+	nextId = 1;
+
+	// 名前をセットする
+	graphName = name;
+}
+
+// リンクの取得
+const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState, int toState)
+{
+	for (auto& link : links)
+	{
+		if (link.transition.fromState == fromState &&
+			link.transition.toState == toState)
+		{
+			return &link.transition;
+		}
+	}
+	return nullptr;
 }

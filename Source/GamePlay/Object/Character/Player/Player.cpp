@@ -64,18 +64,42 @@ void Player::Initialize()
 	ChangeAnimationState(PlayerAnimationState::Idle);
 
 	// アニメーションノードエディターの初期化
-	std::ifstream file("Data/Json/Player/AnimationState/AnimationState.json");
-	if (file.is_open())
 	{
-		file.close();
-		transitionGraph.Load("Data/Json/Player/AnimationState/AnimationState.json");
-	}
-	else
-	{
-		transitionGraph.AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
+		namespace fs = std::filesystem;
+		std::string folderPath = "Data/Json/Player/AnimationState/";
 
-		// 最後に保存
-		transitionGraph.Save("Data/Json/Player/AnimationState/AnimationState.json");
+		// ディレクトリが存在するかをチェック
+		if (fs::exists(folderPath) && fs::is_directory(folderPath))
+		{
+			//ディレクトリ内のJsonを一つずつ取り出す
+			for (const auto& entry : fs::directory_iterator(folderPath))
+			{
+				// 拡張子が.jsonかを調べる
+				if (entry.is_regular_file() && entry.path().extension() == ".json")
+				{
+					// フルパスを取得する（タブの名前にするため）
+					std::string filePath = entry.path().string();
+
+					// 新しいグラフをvectorに追加してLoadする
+					AnimationTransitionGraph newGraph;
+					newGraph.Load(filePath);
+
+					// ファイル名をグラフ名にする
+					newGraph.graphName = entry.path().stem().string();
+
+					transitionGraphs.push_back(newGraph);
+				}
+				else
+				{
+					// ファイルがない場合の初期ノード作成
+					transitionGraphs[0].AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
+
+					// 最後に保存
+					transitionGraphs[0].Save("Data/Json/Player/AnimationState/BaseState.json");
+
+				}
+			}
+		}
 	}
 }
 
@@ -398,7 +422,7 @@ void Player::DrawGUI()
 	ImGui::End();
 
 	ImGui::Begin("Animation Transition Editor");
-	transitionEditor.Draw(transitionGraph);
+	transitionEditor.Draw(transitionGraphs);
 	ImGui::End();
 }
 
@@ -573,6 +597,22 @@ void Player::RecoveryStamina(float elapsedTime)
 void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos) 
 {
 	lockOnTargetPos = pos;
+}
+
+// グラフを追加する
+void Player::AddGraph(std::string name)
+{
+	AnimationTransitionGraph newGraph;
+
+	// デフォルトのタブ名をセットする
+	newGraph.InitializeAsNew(name);
+
+	// リストに追加する
+	transitionGraphs.push_back(newGraph);
+
+	// Jsonファイルとして保存する
+	std::string path = "Data/Json/Player/AnimationSate/" + name + ".Json";
+	transitionGraphs.back().Save(path);
 }
 
 //着地したときに呼ばれる
@@ -774,40 +814,44 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.isGuarding = IsGuarding;
 
 	// グラフで評価して遷移する
-	int nextState = transitionGraph.EvaluateTransitions((int)currentState, ctx);
-	if (nextState != (int)currentState)
+
+	for (auto& graph : transitionGraphs)
 	{
-		// 遷移時のアクション
-		const AnimationTransition* trans = transitionGraph.GetTransition((int)currentState, nextState);
-		if (trans)
+		int nextState = graph.EvaluateTransitions((int)currentState, ctx);
+		if (nextState != (int)currentState)
 		{
-			for (auto& action : trans->actions)
+			// 遷移時のアクション
+			const AnimationTransition* trans = graph.GetTransition((int)currentState, nextState);
+			if (trans)
 			{
-				switch (action.type)
+				for (auto& action : trans->actions)
 				{
-				case TransitionActionType::MoveSpeed:
-					moveSpeed = action.value;
-					break;
+					switch (action.type)
+					{
+					case TransitionActionType::MoveSpeed:
+						moveSpeed = action.value;
+						break;
 
-				case TransitionActionType::TurnSpeed:
-					turnSpeed = DirectX::XMConvertToRadians(action.value);
-					break;
+					case TransitionActionType::TurnSpeed:
+						turnSpeed = DirectX::XMConvertToRadians(action.value);
+						break;
 
-				case TransitionActionType::ConsumeStamina:
-					calculationStamina(action.value);
-					break;
+					case TransitionActionType::ConsumeStamina:
+						calculationStamina(action.value);
+						break;
 
-				case TransitionActionType::SetIsAvoid:
-					IsAvoid = (action.value != 0.0f);
-					break;
+					case TransitionActionType::SetIsAvoid:
+						IsAvoid = (action.value != 0.0f);
+						break;
 
-				case TransitionActionType::SetAnimationSpeed:
-					SetBaseSpeed(action.value);
-					break;
+					case TransitionActionType::SetAnimationSpeed:
+						SetBaseSpeed(action.value);
+						break;
+					}
 				}
 			}
+			ChangeAnimationState(static_cast<PlayerAnimationState>(nextState));
 		}
-		ChangeAnimationState(static_cast<PlayerAnimationState>(nextState));
 	}
 }
 

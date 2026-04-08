@@ -47,6 +47,9 @@ public:
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 
+	// グラフを追加する
+	void AddGraph(std::string name);
+
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequence<PlayerAnimationState>& GetAnimSequence() { return animSequence; }
@@ -166,7 +169,8 @@ private:
 	float runDisableTimer = 0.0f;
 
 	// ノードエディター
-	AnimationTransitionGraph   transitionGraph;
+	std::vector<AnimationTransitionGraph>   transitionGraphs;
 	AnimationTransitionEditor  transitionEditor;
+	int currentGraphIndex = 0;
 	int debugNextState = 0;
 };

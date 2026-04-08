@@ -1,14 +1,36 @@
 #include "AnimationTransitionEditor.h"
+
 #include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
+#include "GamePlay/Object/Character/Player/Player.h"
+
 #include "System/Core/Input/Input.h"
+#include "System/Graphic/Graphics.h"
+#include "System/UI/Dialog.h"
 
 // ノードエディタ描画
-void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
+void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs)
 {
 	// Jsonに保存する
 	if (ImGui::Button("Save"))
 	{
-		graph.Save("Data/Json/Player/AnimationState/AnimationState.json");
+		if (graphs.empty()) return;
+
+		// 現在選択中のグラフを参照して取得する
+		auto& editGraph = graphs[currentGraphIndex];
+
+		char filepath[MAX_PATH] = { 0 };
+
+		HWND hwnd = Graphics::Instance().GetWindowHandle();
+
+		if (Dialog::SaveFileName(filepath, MAX_PATH,
+			"JSON File\0*.json\0\0",	// フィルター
+			u8"名前を付けて保存",	// タイトル
+			"json")				// 拡張子
+			== DialogResult::OK,
+			hwnd)
+		{
+			editGraph.Save(filepath); // 編集中のやつを保存
+		}
 	}
 
 	ImGui::SameLine();
@@ -16,22 +38,69 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	// Jsonを読み込む
 	if (ImGui::Button("Load"))
 	{
-		graph.Load("Data/Json/Player/AnimationState/AnimationState.json");
+		char filepath[MAX_PATH] = { 0 };
+
+		HWND hwnd = Graphics::Instance().GetWindowHandle();
+
+		if (Dialog::OpenFileName(filepath, MAX_PATH,
+			"JSON File\0*.json\0\0",	// フィルター
+			u8"ファイルを開く",
+			hwnd)	// タイトル
+			== DialogResult::OK)
+		{
+			AnimationTransitionGraph newGraph;
+			newGraph.Load(filepath);
+
+			// ファイル名だけ取り出してgraphNameにセットする
+			char filename[MAX_PATH];
+			_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+			newGraph.graphName = filename;
+
+			graphs.push_back(newGraph); // リストに追加
+			currentGraphIndex = (int)graphs.size() - 1; // 追加したやつを表示する
+		}
 	}
 
 	ImGui::Separator();
 
+	// ファイルをタブで表示する
+	if (ImGui::BeginTabBar("GraphTabs"))
+	{
+		for (int i = 0; i < (int)graphs.size(); i++)
+		{
+			if (ImGui::BeginTabItem(graphs[i].graphName.c_str()))
+			{
+				currentGraphIndex = i;
+				ImGui::EndTabItem();
+			}
+		}
+	}
+	ImGui::EndTabBar();
+
+	// 選択中のグラフを描画する
+	AnimationTransitionGraph& currentGraph = graphs[currentGraphIndex];
+
 	// ノードの追加
 	if (ImGui::Button("+ Add Node"))
 	{
-		showSelectNodeWindow = true; // 追加ノード選択画面を開く
+		showSelectNodeWindow = !showSelectNodeWindow; // 追加ノード選択画面を開く
 	}
 
+	ImGui::SameLine();
+
+	// グラフの追加
+	if (ImGui::Button("+ Add Graph"))
+	{
+		ImGui::OpenPopup("Add Graph");
+	}
+
+	// 自動整列
 	if (ImGui::Button("Auto Layout"))
 	{
 		needAutoLayout = true; // フラグを立てるだけ
 	}
 
+	// 追加ノード選択画面
 	if (showSelectNodeWindow)
 	{
 		ImGui::Begin("SelectNode");
@@ -43,7 +112,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 		{
 			// 既に追加済みのアニメーションかをチェックする
 			bool alreadyAnimation = false;
-			for (auto& node : graph.nodes)
+			for (auto& node : currentGraph.nodes)
 			{
 				if (node.animState == (int)state)
 				{
@@ -55,7 +124,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 
 			if (ImGui::Selectable(config.animationName.c_str()))
 			{
-				graph.AddNode((int)state, { 100, 100 }); // 選んだらノード追加
+				currentGraph.AddNode((int)state, { 100, 100 }); // 選んだらノード追加
 				showSelectNodeWindow = false; // 選んだら閉じる
 			}
 		}
@@ -67,7 +136,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	ed::Begin("Animation Transition Editor");
 
 	// ノード描画
-	for (auto& node : graph.nodes)
+	for (auto& node : currentGraph.nodes)
 	{
 		ed::BeginNode(node.nodeId);
 
@@ -88,7 +157,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	}
 
 	// リンク描画
-	for (auto& link : graph.links)
+	for (auto& link : currentGraph.links)
 	{
 		ed::Link(link.linkId, link.startPin, link.endPin, link.color);
 	}
@@ -100,10 +169,22 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 		if (ed::QueryNewLink(&startPin, &endPin))
 		{
 			if (ed::AcceptNewItem())
-				graph.AddLink(startPin, endPin);
+				currentGraph.AddLink(startPin, endPin);
 		}
 	}
 	ed::EndCreate();
+
+	// ノード削除
+	if (ed::BeginDelete())
+	{
+		ed::NodeId deletedNode;
+		if (ed::QueryDeletedNode(&deletedNode))
+		{
+			if (ed::AcceptDeletedItem())
+				currentGraph.RemoveNode(deletedNode);
+		}
+	}
+	ed::EndDelete();
 
 	// リンク削除
 	if (ed::BeginDelete())
@@ -112,7 +193,7 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 		if (ed::QueryDeletedLink(&deletedLink))
 		{
 			if (ed::AcceptDeletedItem())
-				graph.RemoveLink(deletedLink);
+				currentGraph.RemoveLink(deletedLink);
 		}
 	}
 	ed::EndDelete();
@@ -122,11 +203,45 @@ void AnimationTransitionEditor::Draw(AnimationTransitionGraph& graph)
 	// 自動整列
 	if (needAutoLayout)
 	{
-		graph.AutoLayout();
+		currentGraph.AutoLayout();
 		needAutoLayout = false;
 	}
 
-	DrawSelectedLinkEditor(graph);
+	// AddGraphのポップ
+	if (ImGui::BeginPopupModal("Add Graph", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static char newName[64] = ""; // 入力用の一時バッファ
+
+		ImGui::Text("Enter graph name:");
+
+		ImGui::InputText("##graph_name_input", newName, IM_ARRAYSIZE(newName));
+
+		ImGui::Separator();
+
+		// OKを押した時の処理
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			// AddGraphを呼ぶ
+			Player::Instance().AddGraph(newName);
+
+			// グラフを追加したらバッファをクリアしポップを閉じる
+			newName[0] = '\0';
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		// Cancelを押した時の処理
+		if (ImGui::Button("CANCEL", ImVec2(120, 0)))
+		{
+			// 何もせずポップを閉じる
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	DrawSelectedLinkEditor(currentGraph);
 	ed::SetCurrentEditor(nullptr);
 }
 
