@@ -48,11 +48,12 @@ public:
 	// 新しいグラフのセットアップ
 	void InitializeAsNew(const std::string& name);
 
+	int NextId() { return nextId++; }
+
 	// ゲッター
 	const AnimationTransition* GetTransition(int fromState, int toState);
 private:
-	int nextId = 1;
-	int NextId() { return nextId++; }
+	static int nextId;
 	bool EvaluateConditions(const std::vector<TransitionCondition>& conditions,
 		const TransitionContext& ctx);
 };

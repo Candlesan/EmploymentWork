@@ -1,0 +1,41 @@
+{
+    "links": [
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 3.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 4
+        }
+    ],
+    "nodes": [
+        {
+            "animState": 0
+        },
+        {
+            "animState": 4
+        }
+    ]
+}

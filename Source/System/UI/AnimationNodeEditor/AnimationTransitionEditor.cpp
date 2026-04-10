@@ -198,6 +198,23 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 	}
 	ed::EndDelete();
 
+	// 右クリックメニュー
+	ed::LinkId rightClickedLinkId;
+	if (ed::ShowLinkContextMenu(&rightClickedLinkId))
+	{
+		// クリックされたリンクを探してメンバ変数に保存
+		for (auto& link : currentGraph.links)
+		{
+			if (link.linkId == rightClickedLinkId)
+			{
+				copiedLink = &link;
+				break;
+			}
+		}
+		OpenCopyMenu = true;
+	}
+
+
 	ed::End();
 
 	// 自動整列
@@ -212,7 +229,7 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 	{
 		static char newName[64] = ""; // 入力用の一時バッファ
 
-		ImGui::Text("Enter graph name:");
+		ImGui::Text(u8"グラフ名を入力してください");
 
 		ImGui::InputText("##graph_name_input", newName, IM_ARRAYSIZE(newName));
 
@@ -239,6 +256,75 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 		}
 
 		ImGui::EndPopup();
+	}
+
+	if (OpenCopyMenu)
+	{
+		ImGui::Begin("CopeMenu");
+		ImGui::Text(u8"コピー先のグラフ");
+		ImGui::Separator();
+
+		for (int i = 0; i < (int)graphs.size(); i++)
+		{
+			if (i == currentGraphIndex) continue; // 自分自身はスキップする
+
+			bool selected = ImGui::MenuItem(graphs[i].graphName.c_str());
+
+			if (selected)
+			{
+				// コピー処理
+				if (copiedLink)
+				{
+					// コピー先グラフ
+					auto& targetGraph = graphs[i];
+
+					// コピー先にfromStateとtoStateのノードを探す
+					ed::PinId fromPin, toPin;
+					bool foundFrom = false, foundTo = false;
+
+					for (auto& node : targetGraph.nodes)
+					{
+						if (node.animState == copiedLink->transition.fromState)
+						{
+							fromPin = node.pinOut;
+							foundFrom = true;
+						}
+
+						if (node.animState == copiedLink->transition.toState)
+						{
+							toPin = node.pinIn;
+							foundTo = true;
+						}
+					}
+
+					// 両方見つかったらリンクを追加
+					if (foundFrom && foundTo)
+					{
+						// リンク追加
+						targetGraph.AddLink(fromPin, toPin);
+
+						// 条件とアクションをコピー
+						// 追加したリンクを取得する
+						AnimLink& newLink = targetGraph.links.back();
+
+						// 条件をコピーする
+						newLink.transition.conditions = copiedLink->transition.conditions;
+
+						// アクションをコピーする
+						newLink.transition.actions = copiedLink->transition.actions;
+
+						// 色をコピーする
+						newLink.color = copiedLink->color;
+
+						OpenCopyMenu = false;
+					}
+				}
+			}
+		}
+
+		if (ImGui::Button(u8"閉じる")) OpenCopyMenu = false;
+
+		ImGui::End();
 	}
 
 	DrawSelectedLinkEditor(currentGraph);

@@ -607,11 +607,14 @@ void Player::AddGraph(std::string name)
 	// デフォルトのタブ名をセットする
 	newGraph.InitializeAsNew(name);
 
+	// 初期ノードをセット
+	newGraph.AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
+
 	// リストに追加する
 	transitionGraphs.push_back(newGraph);
 
 	// Jsonファイルとして保存する
-	std::string path = "Data/Json/Player/AnimationSate/" + name + ".Json";
+	std::string path = "Data/Json/Player/AnimationState/" + name + ".json";
 	transitionGraphs.back().Save(path);
 }
 

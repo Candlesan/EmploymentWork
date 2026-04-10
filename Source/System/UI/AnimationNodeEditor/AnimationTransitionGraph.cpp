@@ -1,6 +1,8 @@
 #include "AnimationTransitionGraph.h"
 #include <algorithm>
 
+int AnimationTransitionGraph::nextId = 1;
+
 // ノードの追加
 void AnimationTransitionGraph::AddNode(int animState, ImVec2 pos)
 {
@@ -280,7 +282,6 @@ void AnimationTransitionGraph::Load(const std::string& path)
 
 	nodes.clear();
 	links.clear();
-	nextId = 1; // IDをリセット
 
 	for (auto& node : j["nodes"])
 	{
@@ -363,9 +364,6 @@ void AnimationTransitionGraph::InitializeAsNew(const std::string& name)
 	// 既存のデータをクリアする
 	nodes.clear();
 	links.clear();
-
-	// IDのカウントを初期値に戻す
-	nextId = 1;
 
 	// 名前をセットする
 	graphName = name;

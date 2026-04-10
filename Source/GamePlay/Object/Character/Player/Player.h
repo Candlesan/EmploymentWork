@@ -47,9 +47,6 @@ public:
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 
-	// グラフを追加する
-	void AddGraph(std::string name);
-
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequence<PlayerAnimationState>& GetAnimSequence() { return animSequence; }
@@ -57,6 +54,11 @@ public:
 	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
 	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する
 	bool GetIsAvoid() const { return IsAvoid; } // 回避中かを取得
+
+public:
+	// グラフを追加する
+	void AddGraph(std::string name);
+
 protected:
 
 	//着地したときに呼ばれる

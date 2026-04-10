@@ -16,15 +16,17 @@ public:
 
 	// ノードエディタ描画
 	//void Draw(AnimationTransitionGraph& graph);
-	void Draw(std::vector< AnimationTransitionGraph>& graphs);
+	void Draw(std::vector< AnimationTransitionGraph>& graph);
 
 private:
 	// リンク選択
 	void DrawSelectedLinkEditor(AnimationTransitionGraph& graph);
 
 	ed::EditorContext* context = nullptr;
+    AnimLink* copiedLink = nullptr; // コピー元のリンクを保持する変数
 
     int currentGraphIndex = 0; // 今選択中のグラフ番号
     bool showSelectNodeWindow = false;
     bool needAutoLayout = false;
+    bool OpenCopyMenu = false;
 };
