@@ -28,6 +28,949 @@
             "fromState": 0,
             "priority": 0,
             "toState": 4
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 7.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 13
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 13
+                }
+            ],
+            "fromState": 13,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 3.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 4
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": 14,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 13,
+            "priority": 0,
+            "toState": 14
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 14,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": 14,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": 14,
+            "priority": 0,
+            "toState": 4
+        },
+        {
+            "Actions": [
+                {
+                    "type": 4,
+                    "value": 1.0
+                },
+                {
+                    "type": 1,
+                    "value": 0.0
+                },
+                {
+                    "type": 2,
+                    "value": 0.0
+                },
+                {
+                    "type": 3,
+                    "value": 30.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 9
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 14
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 17
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 3.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 4
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 7.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 13
+        },
+        {
+            "Actions": [
+                {
+                    "type": 4,
+                    "value": 0.0
+                },
+                {
+                    "type": 2,
+                    "value": 720.0
+                },
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5680000185966492,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 17,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": 17,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 7.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 0.4901960790157318,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 13
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 16
+                }
+            ],
+            "fromState": 4,
+            "priority": 0,
+            "toState": 13
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": 13,
+            "priority": 0,
+            "toState": 14
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 13
+                }
+            ],
+            "fromState": 13,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 3.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 1.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 13
+                }
+            ],
+            "fromState": 13,
+            "priority": 0,
+            "toState": 4
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5680000185966492,
+                    "type": 1
+                }
+            ],
+            "fromState": 20,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                },
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5490000247955322,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 20,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 3.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 4
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 30.0
+                },
+                {
+                    "type": 1,
+                    "value": 0.0
+                },
+                {
+                    "type": 2,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 9
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 13
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 20
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 30.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 0.0,
+            "colorG": 0.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 14
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 13
+                }
+            ],
+            "fromState": 0,
+            "priority": 0,
+            "toState": 30
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 30.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.3921568691730499,
+            "colorR": 0.3921568691730499,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.08900000154972076,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 12
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 13
+                }
+            ],
+            "fromState": 32,
+            "priority": 0,
+            "toState": 30
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.5882353186607361,
+            "colorR": 0.5882353186607361,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.009999999776482582,
+                    "type": 22
+                }
+            ],
+            "fromState": 30,
+            "priority": 0,
+            "toState": 31
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.5882353186607361,
+            "colorR": 0.5882353186607361,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.009999999776482582,
+                    "type": 22
+                }
+            ],
+            "fromState": 31,
+            "priority": 0,
+            "toState": 32
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.5882353186607361,
+            "colorR": 0.5882353186607361,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": 32,
+            "priority": 0,
+            "toState": 0
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 30.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.5882353186607361,
+            "colorR": 0.5882353186607361,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.009999999776482582,
+                    "type": 22
+                }
+            ],
+            "fromState": 30,
+            "priority": 0,
+            "toState": 31
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.0,
+            "colorR": 0.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 13
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 0.0,
+                    "type": 14
+                }
+            ],
+            "fromState": 10,
+            "priority": 0,
+            "toState": 30
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 0.5882353186607361,
+            "colorR": 0.6235294342041016,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 32,
+            "priority": 0,
+            "toState": 10
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                },
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.9860000014305115,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": 29,
+            "priority": 0,
+            "toState": 10
         }
     ],
     "nodes": [
@@ -36,6 +979,33 @@
         },
         {
             "animState": 4
+        },
+        {
+            "animState": 10
+        },
+        {
+            "animState": 13
+        },
+        {
+            "animState": 17
+        },
+        {
+            "animState": 14
+        },
+        {
+            "animState": 20
+        },
+        {
+            "animState": 30
+        },
+        {
+            "animState": 31
+        },
+        {
+            "animState": 32
+        },
+        {
+            "animState": 29
         }
     ]
 }
