@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <wrl.h>
 #include <memory>
+#include <mutex>
 #include "RenderState.h"
 #include "System/Renderer/PrimitiveRenderer.h"
 #include "System/Renderer/ShapeRenderer.h"
@@ -74,6 +75,8 @@ public:
 	// シャドウマップ取得
 	ShadowMap* GetShadowMap() const { return shadowMap.get(); }
 
+	// ミューテックス取得 
+	std::mutex& GetMutex() { return mutex; }
 private:
 	HWND hWnd = nullptr;
 	float screenWidth = 0;
@@ -93,4 +96,5 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>          swapchain;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext>      immediateContext;
 	Microsoft::WRL::ComPtr<ID3D11Device>            device; // 一番最後
+	std::mutex mutex;
 };

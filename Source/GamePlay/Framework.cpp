@@ -11,6 +11,8 @@
 #include "Gameplay/Scene/SceneManager.h"
 #include "Gameplay/Scene/SceneGame.h"
 
+#include "GamePlay/Object/Effect/EffectManager.h"
+
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 
@@ -27,6 +29,9 @@ Framework::Framework(HWND hWnd)
 	// 入力初期化
 	Input::Instance().Initialize(hWnd);
 
+	// エフェクトマネージャー初期化 
+	EffectManager::Instance().Initialize();
+
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneGame);
 }
@@ -39,6 +44,9 @@ Framework::~Framework()
 
 	// シーン終了化
 	SceneManager::Instance().Clear();
+
+	// エフェクトマネージャー終了化 
+	EffectManager::Instance().Finalize();
 }
 
 // 更新処理
@@ -58,6 +66,10 @@ void Framework::Update(float elapsedTime)
 void Framework::Render(float elapsedTime)
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+	// 別スレッド中にデバイスコンテキストが使われていた場合に 
+	// 同時アクセスしないように排他制御する 
+	std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
 
 	// 画面クリア
 	Graphics::Instance().Clear(0, 0, 1.0f, 1);

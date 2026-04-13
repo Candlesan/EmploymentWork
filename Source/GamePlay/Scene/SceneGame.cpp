@@ -5,6 +5,7 @@
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Character/Player/Player.h"
+#include "GamePlay/Object/Effect/EffectManager.h"
 #include "SceneManager.h"
 
 // シェーダー
@@ -73,6 +74,9 @@ void SceneGame::Initialize()
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
+
+	// エフェクト初期化
+	testEffect = std::make_unique<Effect>("Data/Effect/spark.efk");
 }
 
 // 更新処理
@@ -89,6 +93,11 @@ void SceneGame::Update(float elapsedTime)
 
 	// プレイヤーを取得
 	Player& player = Player::Instance();
+
+	if (GetAsyncKeyState('1') & 0x8000)
+	{
+		testEffect->Play({0, 0, 0});
+	}
 
 	// GUIの操作でゲーム用とデバック用のカメラを切り替え
 	if (cameraMode == CameraMode::Game)
@@ -131,6 +140,9 @@ void SceneGame::Update(float elapsedTime)
 
 		// エネミー更新
 		enemy->Update(delta);
+
+		// エフェクト更新処理 
+		EffectManager::Instance().Update(elapsedTime);
 
 		// プレイヤーと敵の当たり判定
 		CollisonPlayervsEnemy();
@@ -205,6 +217,9 @@ void SceneGame::Render()
 
 		// 全モデル描画
 		modelRenderer->Render(rc);
+
+		// エフェクト描画 
+		EffectManager::Instance().Render(rc.camera->GetView(), rc.camera->GetProjection());
 	}
 
 	// 2Dスプライト描画
