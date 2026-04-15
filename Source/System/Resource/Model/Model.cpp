@@ -470,6 +470,18 @@ void Model::GetNodePoses(std::vector<NodePose>& nodePoses) const
 	}
 }
 
+// ボーンの位置を取得
+DirectX::XMFLOAT3 Model::GetBonePosition(const char* BoneName)
+{
+	for (const Model::Node& node : GetNodes())
+	{
+		if (std::strcmp(node.name.c_str(), BoneName) == 0)
+		{
+			return node.position;
+		}
+	}
+}
+
 // シリアライズ
 void Model::Serialize(const char* filename)
 {

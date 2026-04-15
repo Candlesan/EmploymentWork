@@ -6,6 +6,8 @@
 
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
+#include "GamePlay/Object/Effect/Effect.h"
+
 #include <memory>
 
 class Player : public AnimationCharacter<PlayerAnimationState>
@@ -87,6 +89,12 @@ private:
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
+
+	// シーケンサー描画
+	void AnimationSequencer();
+
+	// エフェクト再生
+	void UpdateEffects();
 private:
 	std::shared_ptr<Model> player;
 
@@ -175,4 +183,7 @@ private:
 	AnimationTransitionEditor  transitionEditor;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;
+
+	// エフェクト
+	std::vector<std::unique_ptr<Effect>> effects;
 };

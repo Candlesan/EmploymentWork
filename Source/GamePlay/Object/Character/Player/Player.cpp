@@ -96,11 +96,13 @@ void Player::Initialize()
 
 					// 最後に保存
 					transitionGraphs[0].Save("Data/Json/Player/AnimationState/BaseState.json");
-
 				}
 			}
 		}
 	}
+
+	// エフェクト初期化
+	effects = std::make_unique<Effect>("");
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -303,123 +305,8 @@ void Player::DrawGUI()
 	}
 	ImGui::End();
 
-	ImGui::Begin("Player Attack Sequencer");
-	{
-		auto& AnimSequence = GetAnimSequence();
-		auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
-
-		float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
-		ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
-		auto& tracks = AnimSequence.CurrentTracks();
-		if (selectedEntry >= 0)
-		{
-			if (selectedEntry < (int)tracks.size())
-			{
-				auto& t = tracks[selectedEntry];
-				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
-					t.GetStartSeconds(), t.GetEndSeconds());
-
-				// TrackType の変更
-				const char* trackTypeItems[] = { "HitBox", "Effect", "Sound" };
-				int trackTypeIndex = (int)t.type;
-				if (ImGui::Combo(u8"タイプ", &trackTypeIndex, trackTypeItems, IM_ARRAYSIZE(trackTypeItems)))
-				{
-					t.type = (TrackType)trackTypeIndex;
-				}
-
-				// HandType の変更（HitBox のときだけ表示）
-				if (t.type == TrackType::HitBox)
-				{
-					const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body" };
-					int handIndex = (int)t.hand;
-					if (ImGui::Combo(u8"手", &handIndex, handItems, IM_ARRAYSIZE(handItems)))
-					{
-						t.hand = (HandType)handIndex;
-					}
-
-					if (t.hand == HandType::Body)
-					{
-						char boneBuf[128];
-						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
-						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
-							t.boneName = boneBuf;
-						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
-						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
-					}
-
-					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
-					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
-					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
-				}
-			}
-		}
-
-		// 選択中のステートにトラックを追加するボタン
-		if (ImGui::Button(u8"+ 追加"))
-		{
-			auto& tracks = AnimSequence.attackData[AnimSequence.currentState];
-			int newIndex = (int)tracks.size() + 1; // 現在の数+1が新しい番号
-			std::string label = u8"当たり判定 " + std::to_string(newIndex);
-			tracks.push_back({ 0, 50, label, 0xFF0000FF, TrackType::HitBox, HandType::RightHand });
-		}
-
-		ImGui::SameLine();
-		// 選択中のステートにトラックを削除するボタン
-		if (ImGui::Button(u8"- 削除"))
-		{
-			if (selectedEntry >= 0 && selectedEntry < (int)tracks.size())
-			{
-				tracks.erase(tracks.begin() + selectedEntry);
-				animSequence.RenumberTracks(tracks);
-				selectedEntry = -1;
-			}
-		}
-
-
-		// 保存・読み込みボタン
-		if (ImGui::Button(u8"保存"))
-			AnimSequence.Save("Data/Json/Player/AttackData/AttackSequence.json");
-		ImGui::SameLine();
-		if (ImGui::Button(u8"読み込み"))
-			AnimSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
-
-		if (ImGui::CollapsingHeader(u8"Animation List", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			// 高さ200pxのスクロールエリアを作成
-			if (ImGui::BeginChild("AnimList", ImVec2(0, 200), true))
-			{
-				for (auto& [state, tracks] : AnimSequence.attackData)
-				{
-					const AnimationConfig* config = manager.GetConfig(state);
-
-					// 横に並べず、あえて縦に並べる（選択しやすいため）
-					// 現在選択中のアニメーションをハイライトすると分かりやすい
-					bool is_selected = (AnimSequence.currentState == state);
-					if (ImGui::Selectable(config->animationName.c_str(), is_selected))
-					{
-						AnimSequence.currentState = state;
-						ChangeAnimationState(state);
-					}
-				}
-			}
-			ImGui::EndChild();
-		}
-
-		if (AnimSequence.currentState == GetCurrentState())
-		{
-			currentFrame = (int)(GetCurrentAnimationSeconds() * 144);
-		}
-
-		ImSequencer::Sequencer(
-			&AnimSequence,
-			&currentFrame,
-			&sequencerExpanded,
-			&selectedEntry,
-			&firstFrame,
-			ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
-		);
-	}
-	ImGui::End();
+	// アニメーションシーケンサー描画
+	AnimationSequencer();
 
 	ImGui::Begin("Animation Transition Editor");
 	transitionEditor.Draw(transitionGraphs);
@@ -985,6 +872,167 @@ void Player::WeaponAttachment()
 			DirectX::XMStoreFloat4x4(&weapon.transform, weaponWorld);
 			weapon.model->UpdateTransform(weapon.transform);
 			break;
+		}
+	}
+}
+
+// シーケンサー描画
+void Player::AnimationSequencer()
+{
+	ImGui::Begin("Player Attack Sequencer");
+	{
+		auto& AnimSequence = GetAnimSequence();
+		auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
+
+		float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
+		ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
+		auto& tracks = AnimSequence.CurrentTracks();
+		if (selectedEntry >= 0)
+		{
+			if (selectedEntry < (int)tracks.size())
+			{
+				auto& t = tracks[selectedEntry];
+				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
+					t.GetStartSeconds(), t.GetEndSeconds());
+
+				// TrackType の変更
+				const char* trackTypeItems[] = { "HitBox", "Effect", "Sound" };
+				int trackTypeIndex = (int)t.type;
+				if (ImGui::Combo(u8"タイプ", &trackTypeIndex, trackTypeItems, IM_ARRAYSIZE(trackTypeItems)))
+				{
+					t.type = (TrackType)trackTypeIndex;
+				}
+
+				// HandType の変更（HitBox のときだけ表示）
+				if (t.type == TrackType::HitBox)
+				{
+					const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body" };
+					int handIndex = (int)t.hand;
+					if (ImGui::Combo(u8"手", &handIndex, handItems, IM_ARRAYSIZE(handItems)))
+					{
+						t.hand = (HandType)handIndex;
+					}
+
+					if (t.hand == HandType::Body)
+					{
+						char boneBuf[128];
+						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
+						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
+							t.boneName = boneBuf;
+						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
+						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
+					}
+
+					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
+					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
+					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
+				}
+			}
+		}
+
+		// 選択中のステートにトラックを追加するボタン
+		if (ImGui::Button(u8"+ 追加"))
+		{
+			auto& tracks = AnimSequence.attackData[AnimSequence.currentState];
+			int newIndex = (int)tracks.size() + 1; // 現在の数+1が新しい番号
+			std::string label = u8"当たり判定 " + std::to_string(newIndex);
+			tracks.push_back({ 0, 50, label, 0xFF0000FF, TrackType::HitBox, HandType::RightHand });
+		}
+
+		ImGui::SameLine();
+		// 選択中のステートにトラックを削除するボタン
+		if (ImGui::Button(u8"- 削除"))
+		{
+			if (selectedEntry >= 0 && selectedEntry < (int)tracks.size())
+			{
+				tracks.erase(tracks.begin() + selectedEntry);
+				animSequence.RenumberTracks(tracks);
+				selectedEntry = -1;
+			}
+		}
+
+
+		// 保存・読み込みボタン
+		if (ImGui::Button(u8"保存"))
+			AnimSequence.Save("Data/Json/Player/AttackData/AttackSequence.json");
+		ImGui::SameLine();
+		if (ImGui::Button(u8"読み込み"))
+			AnimSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
+
+		if (ImGui::CollapsingHeader(u8"Animation List", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// 高さ200pxのスクロールエリアを作成
+			if (ImGui::BeginChild("AnimList", ImVec2(0, 200), true))
+			{
+				for (auto& [state, tracks] : AnimSequence.attackData)
+				{
+					const AnimationConfig* config = manager.GetConfig(state);
+
+					// 横に並べず、あえて縦に並べる（選択しやすいため）
+					// 現在選択中のアニメーションをハイライトすると分かりやすい
+					bool is_selected = (AnimSequence.currentState == state);
+					if (ImGui::Selectable(config->animationName.c_str(), is_selected))
+					{
+						AnimSequence.currentState = state;
+						ChangeAnimationState(state);
+					}
+				}
+			}
+			ImGui::EndChild();
+		}
+
+		if (AnimSequence.currentState == GetCurrentState())
+		{
+			currentFrame = (int)(GetCurrentAnimationSeconds() * 144);
+		}
+
+		ImSequencer::Sequencer(
+			&AnimSequence,
+			&currentFrame,
+			&sequencerExpanded,
+			&selectedEntry,
+			&firstFrame,
+			ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
+		);
+	}
+	ImGui::End();
+}
+
+// エフェクト再生
+void Player::UpdateEffects()
+{
+	auto& AnimSequence = GetAnimSequence();
+	auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
+
+	for (auto& track : AnimSequence.CurrentTracks())
+	{
+		if (track.type != TrackType::Effect) continue;
+
+		float now = GetCurrentAnimationSeconds();
+
+		if (now >= track.GetStartSeconds() && !track.effectPlayed)
+		{
+			switch (track.effectSpawnType)
+			{
+			case EffectSpawnType::Bone:
+				DirectX::XMFLOAT3 pos = player->GetBonePosition(track.boneName.c_str());
+				pos.x += track.effectOffset.x;
+				pos.y += track.effectOffset.y;
+				pos.z += track.effectOffset.z;
+
+				// 名前でエフェクトを探して再生
+				auto it = effects.find(track.effectName);
+				if (it != effects.end())
+				{
+					it->second->Play(pos);
+				}
+				track.effectPlayed = true;  // ← これも忘れずに！
+			break;
+			case EffectSpawnType::OnHit:
+				break;
+			case EffectSpawnType::WorldPos:
+				break;
+			}
 		}
 	}
 }

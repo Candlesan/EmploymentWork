@@ -22,6 +22,13 @@ enum class HandType {
     Body, // 体当たりなど
 };
 
+enum class EffectSpawnType
+{
+    Bone, // ボーンについてくる
+    OnHit, // ヒット時
+    WorldPos, // ワールド座標固定
+};
+
 struct AnimTrack {
     int start;
     int end;
@@ -29,6 +36,10 @@ struct AnimTrack {
     unsigned int color;
     TrackType type;
     HandType hand = HandType::None;
+    EffectSpawnType effectSpawnType = EffectSpawnType::Bone;
+    const char* effectBoneName = "";
+    DirectX::XMFLOAT3 effectOffset = { 0, 0, 0 };
+    bool effectPlayed = false;
     std::string effectName;
     std::string soundName;
 
@@ -37,10 +48,12 @@ struct AnimTrack {
     float sphereRadius = 0.5f;   // 球の半径
     DirectX::XMFLOAT3 sphereOffset = { 0, 0, 0 }; // ボーンからのオフセット
 
+    // ダメージ設定
     float damageRate = 0.0f;
     float poiseRate = 0.0f;
     float invincible = 0.3f;
 
+    // ゲッター
     float GetStartSeconds() const { return start / 100.0f; }
     float GetEndSeconds()   const { return end / 100.0f; }
 };

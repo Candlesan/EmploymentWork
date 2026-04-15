@@ -195,6 +195,9 @@ public:
 	// ノードポーズ取得
 	void GetNodePoses(std::vector<NodePose>& nodePoses) const;
 
+	// ボーンの位置を取得
+	DirectX::XMFLOAT3 GetBonePosition(const char* BoneName);
+
 private:
 	// シリアライズ
 	void Serialize(const char* filename);

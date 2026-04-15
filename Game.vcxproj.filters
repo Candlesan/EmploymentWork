@@ -543,7 +543,7 @@
       <Filter>Source\GamepPlay\Object\Effect</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Effect\Effect.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Object\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
