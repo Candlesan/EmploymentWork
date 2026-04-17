@@ -142,6 +142,9 @@
     <Filter Include="Source\System\UI\AnimationNodeEditor">
       <UniqueIdentifier>{66af326e-e5aa-428e-8462-82135e6f3af2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Audio">
+      <UniqueIdentifier>{213932f2-1185-4f7b-89c0-4fb1c8f572af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -357,6 +360,15 @@
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.h">
       <Filter>Source\System\UI\AnimationNodeEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Audio\Audio.h">
+      <Filter>Source\System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Audio\AudioResource.h">
+      <Filter>Source\System\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Audio\AudioSource.h">
+      <Filter>Source\System\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -529,6 +541,15 @@
     </ClCompile>
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp">
       <Filter>Source\System\UI\AnimationNodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Audio\Audio.cpp">
+      <Filter>Source\System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Audio\AudioResource.cpp">
+      <Filter>Source\System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Audio\AudioSource.cpp">
+      <Filter>Source\System\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

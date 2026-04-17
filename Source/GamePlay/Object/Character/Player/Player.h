@@ -3,6 +3,7 @@
 #include "System/UI/AnimationSequence.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionEditor.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
+#include "System/Audio/AudioSource.h"
 
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
@@ -23,6 +24,7 @@ public:
 	}
 
 	void Initialize();
+	void Finalize();
 	void InitializeAttackData();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
@@ -59,10 +61,18 @@ public:
 	// グラフを追加する
 	void AddGraph(std::string name);
 
+	// シーケンサーを描画する
+	void PlayerAnimationSequencer();
+
+	// サウンドを流す
+	void UpdateSounds(PlayerAnimationState state);
 protected:
 
 	//着地したときに呼ばれる
 	void OnLanding() override;
+
+	// アニメーションのコールバック関数
+	void OnStateChanged(PlayerAnimationState oldState, PlayerAnimationState newState);
 private:
 	// スティック入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 GetMoveVec() const;
@@ -87,6 +97,9 @@ private:
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
+
+	// 音を取得（無ければ自動ロード）する関数
+	AudioSource* GetOrLoadSound(const std::string& soundName);
 private:
 	std::shared_ptr<Model> player;
 
@@ -175,4 +188,8 @@ private:
 	AnimationTransitionEditor  transitionEditor;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;
+
+	// SE関係
+	// 音の名前と実体を紐づけるマップ
+	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 };

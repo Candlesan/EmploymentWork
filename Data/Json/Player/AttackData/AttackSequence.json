@@ -1,5 +1,7 @@
 {
     "0": [],
+    "10": [],
+    "17": [],
     "21": [
         {
             "boneName": "",
@@ -10,6 +12,7 @@
             "invincible": 0.30000001192092896,
             "label": "当たり判定1",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -18,6 +21,25 @@
             "sphereRadius": 0.5,
             "start": 39,
             "type": 0
+        },
+        {
+            "boneName": "",
+            "color": 4278255615,
+            "damageRate": 0.0,
+            "end": 89,
+            "hand": 0,
+            "invincible": 0.30000001192092896,
+            "label": "Sound1",
+            "poiseRate": 0.0,
+            "soundName": "Hit",
+            "sphereOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "sphereRadius": 0.5,
+            "start": 39,
+            "type": 2
         }
     ],
     "22": [
@@ -28,8 +50,9 @@
             "end": 80,
             "hand": 1,
             "invincible": 0.30000001192092896,
-            "label": "当たり判定1",
+            "label": "当たり判定2",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -50,6 +73,7 @@
             "invincible": 0.20000000298023224,
             "label": "当たり判定1",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -68,6 +92,7 @@
             "invincible": 0.30000001192092896,
             "label": "当たり判定2",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -88,6 +113,7 @@
             "invincible": 0.30000001192092896,
             "label": "当たり判定1",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -108,6 +134,7 @@
             "invincible": 0.30000001192092896,
             "label": "当たり判定1",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -128,6 +155,7 @@
             "invincible": 0.30000001192092896,
             "label": "当たり判定1",
             "poiseRate": 0.0,
+            "soundName": "",
             "sphereOffset": [
                 0.0,
                 0.0,
@@ -137,5 +165,6 @@
             "start": 34,
             "type": 0
         }
-    ]
+    ],
+    "4": []
 }

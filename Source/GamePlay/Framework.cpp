@@ -10,6 +10,7 @@
 // シーン
 #include "Gameplay/Scene/SceneManager.h"
 #include "Gameplay/Scene/SceneGame.h"
+#include "System/Audio/Audio.h"
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
@@ -27,6 +28,9 @@ Framework::Framework(HWND hWnd)
 	// 入力初期化
 	Input::Instance().Initialize(hWnd);
 
+	// オーディオ初期化
+	Audio::Instance().Initialize();
+
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneGame);
 }
@@ -36,6 +40,9 @@ Framework::~Framework()
 {
 	// IMGUI終了化
 	ImGuiRenderer::Finalize();
+
+	// オーディオ終了化
+	Audio::Instance().Finalize();
 
 	// シーン終了化
 	SceneManager::Instance().Clear();

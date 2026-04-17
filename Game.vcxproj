@@ -154,6 +154,9 @@
     <ClInclude Include="Source\GamePlay\Scene\Scene.h" />
     <ClInclude Include="Source\GamePlay\Scene\SceneGame.h" />
     <ClInclude Include="Source\GamePlay\Scene\SceneManager.h" />
+    <ClInclude Include="Source\System\Audio\Audio.h" />
+    <ClInclude Include="Source\System\Audio\AudioResource.h" />
+    <ClInclude Include="Source\System\Audio\AudioSource.h" />
     <ClInclude Include="Source\System\Core\HighResolutionTimer.h" />
     <ClInclude Include="Source\System\Core\Input\GamePad.h" />
     <ClInclude Include="Source\System\Core\Input\Input.h" />
@@ -219,6 +222,9 @@
     <ClCompile Include="Source\GamePlay\Scene\Scene.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\SceneGame.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\System\Audio\Audio.cpp" />
+    <ClCompile Include="Source\System\Audio\AudioResource.cpp" />
+    <ClCompile Include="Source\System\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\System\Core\Input\GamePad.cpp" />
     <ClCompile Include="Source\System\Core\Input\Input.cpp" />
     <ClCompile Include="Source\System\Core\Input\Mouse.cpp" />

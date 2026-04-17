@@ -1,6 +1,7 @@
 ﻿#include "SceneGame.h"
 
 #include "System/Graphic/Graphics.h"
+#include "System/Audio/Audio.h"
 
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
@@ -73,6 +74,12 @@ void SceneGame::Initialize()
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
+}
+
+// 終了化
+void SceneGame::Finalize()
+{
+	Player::Instance().Finalize();
 }
 
 // 更新処理

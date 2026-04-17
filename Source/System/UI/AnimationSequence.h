@@ -28,15 +28,24 @@ struct AnimTrack {
     std::string label;
     unsigned int color;
     TrackType type;
+
+    // 攻撃属性
     HandType hand = HandType::None;
-    std::string effectName;
-    std::string soundName;
+
+    // エフェクト
+    std::string effectName = "";
+    bool effectPlayed = false;
+
+    // サウンド
+    std::string soundName = "";
+    bool soundPlayed = false;
 
     // 球判定用（hand == Body のときに使う）
     std::string boneName = "";   // 追従するボーン名（空なら敵の position 基準）
     float sphereRadius = 0.5f;   // 球の半径
     DirectX::XMFLOAT3 sphereOffset = { 0, 0, 0 }; // ボーンからのオフセット
 
+    // 攻撃系のパラメーター設定変数
     float damageRate = 0.0f;
     float poiseRate = 0.0f;
     float invincible = 0.3f;
@@ -157,6 +166,7 @@ public:
                 track["damageRate"] = t.damageRate;
                 track["invincible"] = t.invincible;
                 track["poiseRate"] = t.poiseRate;
+                track["soundName"] = t.soundName;
                 trackArray.push_back(track);
             }
             root[std::to_string((int)state)] = trackArray;
@@ -198,7 +208,8 @@ public:
                 track.damageRate = t.value("damageRate", 0.0f);
                 track.invincible = t.value("invincible", 0.3f);
                 track.poiseRate = t.value("poiseRate", 0.0f);
-
+                track.soundName = t.value("soundName", "");
+                track.soundPlayed = false;
                 tracks.push_back(track);
             }
             attackData[state] = tracks;

@@ -11,6 +11,7 @@
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
 #include "System/UI/AnimationSequence.h"
 
+
 // ゲームシーン
 class SceneGame : public Scene
 {
@@ -22,7 +23,7 @@ public:
 	void Initialize() override;
 
 	// 終了化
-	void Finalize() override {};
+	void Finalize() override ;
 
 	// 更新処理
 	void Update(float elapsedTime) override;
