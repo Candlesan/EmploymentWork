@@ -212,6 +212,10 @@ void SceneGame::Render()
 
 		// 全モデル描画
 		modelRenderer->Render(rc);
+
+		// プリミティブ描画
+		primitiveRenderer->Render(dc, camera.GetView(), camera.GetProjection(),
+			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
 
 	// 2Dスプライト描画

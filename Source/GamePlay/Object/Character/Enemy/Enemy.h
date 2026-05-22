@@ -1,6 +1,7 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence.h"
+#include "System/Audio/AudioSource.h"
 
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
@@ -88,6 +89,18 @@ private:
 
 	// ダウン状態
 	void OnDown() override;
+
+	// アニメーションのコールバック関数
+	void OnStateChanged(EnemyAnimationState oldState, EnemyAnimationState newState);
+
+	// シーケンサーを描画する
+	void EnemyAnimationSequencer();
+
+	// サウンドを流す
+	void UpdateSounds(EnemyAnimationState state);
+
+	// 音を取得（無ければ自動ロード）する関数
+	AudioSource* GetOrLoadSound(const std::string& soundName);
 private:
 	std::shared_ptr<Model> enemy;
 
@@ -167,4 +180,8 @@ private:
 	std::vector<FirstAttack> firstAttackList;
 
 	float attackCoolTimer = 0.0f;
+
+	// SE関係
+// 音の名前と実体を紐づけるマップ
+	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 };

@@ -177,6 +177,9 @@ void Player::Update(float elapsedTime)
 	// 武器のアタッチメント処理
 	WeaponAttachment();
 
+	// 根本と剣先を求める関数
+	CalculationRootAndTip();
+
 	// 状態遷移更新処理
 	UpdateStateTransitions(elapsedTime);
 
@@ -203,6 +206,7 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, player); 
 	renderer->Draw(ShaderId::PBR, weapon.model);
+	trail.Render();
 }
 
 // GUI描画
@@ -300,6 +304,13 @@ void Player::DrawGUI()
 			ImGui::DragFloat3("Weapon AngleOffset", &weapon.weaponAngleOffset.x, 0.1f);
 			ImGui::DragFloat("Weapon Collision Radius", &weapon.weaponRadius, 0.1f);
 			ImGui::DragFloat("Weapon Collision Height", &weapon.weaponHeight, 0.1f);
+		}
+
+		// トレイル
+		if (ImGui::CollapsingHeader("Weapon Trail", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat3("Root Offset", &rootOffset.x, 0.01f);
+			ImGui::DragFloat3("Tip Offset", &tipOffset.x, 0.01f);
 		}
 
 		// アニメーション遷移状態
@@ -522,7 +533,7 @@ void Player::PlayerAnimationSequencer()
 	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
 	auto& tracks = AnimSequence.CurrentTracks();
 
-	ImGui::Begin(u8"アニメーション一覧");
+	ImGui::Begin(u8"アニメーション一覧##2");
 	for (auto& [state, tracks] : AnimSequence.attackData)
 	{
 		const AnimationConfig* config = manager.GetConfig(state);
@@ -1092,6 +1103,25 @@ void Player::WeaponAttachment()
 			break;
 		}
 	}
+}
+
+// 剣先と根本を求める関数
+void Player::CalculationRootAndTip()
+{
+	// 剣の根本・先端の座標を計算
+	DirectX::XMVECTOR RootOffset = DirectX::XMLoadFloat3(&rootOffset);
+	DirectX::XMVECTOR TipOffset = DirectX::XMLoadFloat3(&tipOffset);
+
+	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&weapon.transform);
+
+	DirectX::XMVECTOR Root = DirectX::XMVector3TransformCoord(RootOffset, W);
+	DirectX::XMVECTOR Tip = DirectX::XMVector3TransformCoord(TipOffset, W);
+
+	DirectX::XMFLOAT3 rootF3, tipF3;
+	DirectX::XMStoreFloat3(&rootF3, Root);
+	DirectX::XMStoreFloat3(&tipF3, Tip);
+
+	trail.Update(rootF3, tipF3);
 }
 
 // 音を取得（無ければ自動ロード）する関数

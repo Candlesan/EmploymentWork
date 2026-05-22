@@ -145,6 +145,9 @@
     <Filter Include="Source\System\Audio">
       <UniqueIdentifier>{213932f2-1185-4f7b-89c0-4fb1c8f572af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Trail">
+      <UniqueIdentifier>{466dbc54-11fb-48e3-ade7-eae50a5ec94c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -369,6 +372,9 @@
     <ClInclude Include="Source\System\Audio\AudioSource.h">
       <Filter>Source\System\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Trail\Trail.h">
+      <Filter>Source\GamepPlay\Object\Trail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -550,6 +556,9 @@
     </ClCompile>
     <ClCompile Include="Source\System\Audio\AudioSource.cpp">
       <Filter>Source\System\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Trail\Trail.cpp">
+      <Filter>Source\GamepPlay\Object\Trail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

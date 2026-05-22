@@ -3,6 +3,7 @@
 // システム
 #include "System/Graphic/Graphics.h"
 #include "System/Core/Input/Input.h"
+#include "System/Audio/Audio.h"
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
@@ -243,6 +244,7 @@ void Enemy::Update(float elapsedTime)
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
 
+	UpdateSounds(this->currentState);
 	// エリア移動制限
 	AreaRestriction();
 
@@ -340,124 +342,7 @@ void Enemy::DrawGUI()
 	}
 	ImGui::End();
 
-	ImGui::Begin("Enemy Attack Sequencer");
-	{
-		auto& AnimSequence = GetAnimSequence();
-		auto& manager = AnimationStateManager<EnemyAnimationState>::Instance();
-
-		float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
-		ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
-			auto& tracks = AnimSequence.CurrentTracks();
-		if (selectedEntry >= 0)
-		{
-			if (selectedEntry < (int)tracks.size())
-			{
-				auto& t = tracks[selectedEntry];
-				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
-					t.GetStartSeconds(), t.GetEndSeconds());
-
-				// TrackType の変更
-				const char* trackTypeItems[] = { "HitBox", "Effect", "Sound" };
-				int trackTypeIndex = (int)t.type;
-				if (ImGui::Combo(u8"タイプ", &trackTypeIndex, trackTypeItems, IM_ARRAYSIZE(trackTypeItems)))
-				{
-					t.type = (TrackType)trackTypeIndex;
-				}
-
-				// HandType の変更（HitBox のときだけ表示）
-				if (t.type == TrackType::HitBox)
-				{
-					const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body" };
-					int handIndex = (int)t.hand;
-					if (ImGui::Combo(u8"手", &handIndex, handItems, IM_ARRAYSIZE(handItems)))
-					{
-						t.hand = (HandType)handIndex;
-					}
-
-					if (t.hand == HandType::Body)
-					{
-						char boneBuf[128];
-						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
-						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
-							t.boneName = boneBuf;
-						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
-						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
-					}
-
-					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
-					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
-					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
-				}
-			}
-		}
-
-		// 選択中のステートにトラックを追加するボタン
-		if (ImGui::Button(u8"+ 追加"))
-		{
-			auto& tracks = AnimSequence.attackData[AnimSequence.currentState];
-			int newIndex = (int)tracks.size() + 1; // 現在の数+1が新しい番号
-			std::string label = u8"当たり判定 " + std::to_string(newIndex);
-			tracks.push_back({ 0, 50, label, 0xFF0000FF, TrackType::HitBox, HandType::RightHand });
-		}
-
-		ImGui::SameLine();
-		// 選択中のステートにトラックを削除するボタン
-		if (ImGui::Button(u8"- 削除"))
-		{
-			if (selectedEntry >= 0 && selectedEntry < (int)tracks.size())
-			{
-				tracks.erase(tracks.begin() + selectedEntry);
-				animSequence.RenumberTracks(tracks);
-				selectedEntry = -1;
-			}
-		}
-
-
-		// 保存・読み込みボタン
-		if (ImGui::Button(u8"保存"))
-			AnimSequence.Save("Data/Json/Enemy/AttackData/AttackSequence.json");
-		ImGui::SameLine();
-		if (ImGui::Button(u8"読み込み"))
-			AnimSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
-
-		if (ImGui::CollapsingHeader(u8"Animation List", ImGuiTreeNodeFlags_DefaultOpen)) 
-		{
-			// 高さ200pxのスクロールエリアを作成
-			if (ImGui::BeginChild("AnimList", ImVec2(0, 200), true))
-			{
-				for (auto& [state, tracks] : AnimSequence.attackData)
-				{
-					const AnimationConfig* config = manager.GetConfig(state);
-
-					// 横に並べず、あえて縦に並べる（選択しやすいため）
-					// 現在選択中のアニメーションをハイライトすると分かりやすい
-					bool is_selected = (AnimSequence.currentState == state);
-					if (ImGui::Selectable(config->animationName.c_str(), is_selected))
-					{
-						AnimSequence.currentState = state;
-						ChangeAnimationState(state);
-					}
-				}
-			}
-			ImGui::EndChild();
-		}
-
-		if (AnimSequence.currentState == GetCurrentState())
-		{
-			currentFrame = (int)(GetCurrentAnimationSeconds() * 144);
-		}
-
-		ImSequencer::Sequencer(
-			&AnimSequence,
-			&currentFrame,
-			&sequencerExpanded,
-			&selectedEntry,
-			&firstFrame,
-			ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
-		);
-	}
-	ImGui::End();
-
+	EnemyAnimationSequencer();
 }
 
 // デバックプリミティブ描画
@@ -926,6 +811,250 @@ void Enemy::UpdateStateTransitions(float elapsedTime)
 void Enemy::OnDown()
 {
 	Ondown = true;
+}
+
+// アニメーションのコールバック関数
+void Enemy::OnStateChanged(EnemyAnimationState oldState, EnemyAnimationState newState)
+{
+	// 新しいステートのトラックフラグをリセット
+	for (auto& track : animSequence.attackData[newState])
+	{
+		track.soundPlayed = false;
+	}
+}
+
+// シーケンサーを描画する
+void Enemy::EnemyAnimationSequencer()
+{
+	ImGui::Begin("Enemy Attack Sequencer");
+	auto& AnimSequence = GetAnimSequence();
+	auto& manager = AnimationStateManager<EnemyAnimationState>::Instance();
+
+	float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
+	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
+	auto& tracks = AnimSequence.CurrentTracks();
+
+	ImGui::Begin(u8"アニメーション一覧##1");
+	for (auto& [state, tracks] : AnimSequence.attackData)
+	{
+		const AnimationConfig* config = manager.GetConfig(state);
+
+		bool is_selected = (AnimSequence.currentState == state);
+		if (ImGui::Selectable(config->animationName.c_str(), is_selected))
+		{
+			AnimSequence.currentState = state;
+			ChangeAnimationState(state);
+		}
+	}
+	ImGui::End();
+
+	if (selectedEntry >= 0)
+	{
+		//選択中のトラックを参照
+		auto& t = tracks[selectedEntry];
+
+		char inputlabelName[256];
+		// t.labelの中身をinputlabelNameにコピーする
+		strncpy_s(inputlabelName, t.label.c_str(), sizeof(inputlabelName));
+		if (ImGui::InputText(u8"ラベル名", inputlabelName, IM_ARRAYSIZE(inputlabelName)))
+		{
+			t.label = inputlabelName;
+		}
+		ImGui::Separator();
+
+		// シーケンサーがunsigned int型を要求しているためfloat[4]型に変換
+		ImVec4 col = ImGui::ColorConvertU32ToFloat4(t.color);
+		if (ImGui::ColorEdit4(u8"ラベルの色", &col.x))
+		{
+			// 編集してるときにunsigned intに戻して保存
+			t.color = ImGui::GetColorU32(col);
+		}
+
+		ImGui::Separator();
+
+		switch (t.type)
+		{
+		case TrackType::HitBox:
+			ImGui::Begin(u8"当たり判定設定");
+			{
+				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
+					t.GetStartSeconds(), t.GetEndSeconds());
+
+				// TrackType の変更
+				const char* trackTypeItems[] = { "HitBox", "Effect", "Sound" };
+				int trackTypeIndex = (int)t.type;
+				if (ImGui::Combo(u8"タイプ", &trackTypeIndex, trackTypeItems, sizeof(trackTypeItems)))
+				{
+					t.type = (TrackType)trackTypeIndex;
+				}
+
+				// HandType の変更（HitBox のときだけ表示）
+				if (t.type == TrackType::HitBox)
+				{
+					const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body" };
+					int handIndex = (int)t.hand;
+					if (ImGui::Combo(u8"手", &handIndex, handItems, sizeof(handItems)))
+					{
+						t.hand = (HandType)handIndex;
+					}
+
+					if (t.hand == HandType::Body)
+					{
+						char boneBuf[128];
+						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
+						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
+							t.boneName = boneBuf;
+						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
+						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
+					}
+
+					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
+					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
+					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
+				}
+			}
+			ImGui::End();
+			break;
+		case TrackType::Effect:
+			break;
+		case TrackType::Sound:
+			ImGui::Begin(u8"サウンド設定");
+			{
+				char soundbuf[256] = "";
+				strncpy_s(soundbuf, t.soundName.c_str(), sizeof(soundbuf));
+				if (ImGui::InputText(u8"SE名を入力してください", soundbuf, sizeof(soundbuf)))
+				{
+					t.soundName = soundbuf;
+				}
+
+				if (ImGui::Button(u8"視聴する"))
+				{
+					GetOrLoadSound(t.soundName);
+					sounds[t.soundName]->Play(false);
+				}
+			}
+			ImGui::End();
+			break;
+		}
+
+	}
+	// 選択中のステートにトラックを追加するボタン
+	if (ImGui::Button(u8"+ 追加"))
+	{
+		ImGui::OpenPopup("AddTrack");
+	}
+
+	if (ImGui::BeginPopup("AddTrack"))
+	{
+		ImGui::Text(u8"追加するトラックタイプを選択してください");
+		ImGui::Separator();
+
+		if (ImGui::Selectable(u8"当たり判定を追加"))
+		{
+			std::string label = u8"HitBox" + std::to_string(tracks.size());
+			tracks.push_back({ 0, 50, label, 0xFF0000FF, TrackType::HitBox, HandType::RightHand });
+		}
+
+		if (ImGui::Selectable(u8"サウンド追加"))
+		{
+			std::string label = u8"Sound" + std::to_string(tracks.size());
+			tracks.push_back({ 0, 50, label, 0xFF00FFFF, TrackType::Sound });
+		}
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::SameLine();
+
+	// 選択中のステートにトラックを削除するボタン
+	if (ImGui::Button(u8"- 削除"))
+	{
+		if (selectedEntry >= 0 && selectedEntry < (int)tracks.size())
+		{
+			tracks.erase(tracks.begin() + selectedEntry);
+			animSequence.RenumberTracks(tracks);
+			selectedEntry = -1;
+		}
+	}
+
+
+	// 保存・読み込みボタン
+	if (ImGui::Button(u8"保存"))
+		AnimSequence.Save("Data/Json/Enemy/AttackData/AttackSequence.json");
+	ImGui::SameLine();
+	if (ImGui::Button(u8"読み込み"))
+		AnimSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
+
+	if (AnimSequence.currentState == GetCurrentState())
+	{
+		currentFrame = (int)(GetCurrentAnimationSeconds() * 144);
+	}
+
+	ImSequencer::Sequencer(
+		&AnimSequence,
+		&currentFrame,
+		&sequencerExpanded,
+		&selectedEntry,
+		&firstFrame,
+		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
+	);
+	ImGui::End();
+}
+
+// サウンドを流す
+void Enemy::UpdateSounds(EnemyAnimationState state)
+{
+	auto& AnimSequence = GetAnimSequence();
+	float now = GetCurrentAnimationSeconds();
+
+	auto& tracks = AnimSequence.attackData[state];
+
+	for (auto& track : tracks)
+	{
+		if (track.type != TrackType::Sound) continue; // 音トラックのみ通す
+		if (track.soundPlayed) continue;
+
+		if (now >= track.GetStartSeconds()) {
+			AudioSource* se = GetOrLoadSound(track.soundName);
+			if (se) {
+				se->Play(false); // SEやからループ無し
+			}
+			track.soundPlayed = true; // フラグを立てる
+		}
+	}
+}
+
+// 音を取得（無ければ自動ロード）する関数
+AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
+{
+	// 空文字なら何もしない
+	if (soundName.empty()) return nullptr;
+
+	// 既にmapにあるかを確認（読み込み失敗したものも含めてキャッシュ）
+	if (sounds.count(soundName)) {
+		return sounds[soundName].get();
+	}
+
+	// パスを組み立てる
+	std::string fileName = soundName;
+	// もし入力に.wavが含まれていなければ足す
+	if (fileName.find(".wav") == std::string::npos) {
+		fileName += ".wav";
+	}
+	std::string path = "Data/Sound/" + fileName;
+
+	// ロード試行
+	auto source = Audio::Instance().LoadAudioSource(path.c_str());
+
+	if (source) {
+		sounds[soundName] = std::unique_ptr<AudioSource>(source);
+		return sounds[soundName].get();
+	}
+	else {
+		// 見つからなかった場合、次は探さないようにnullptrを保持（または警告を出すようにする）
+		sounds[soundName] = nullptr;
+		return nullptr;
+	}
 }
 
 // 武器のアタッチメント処理

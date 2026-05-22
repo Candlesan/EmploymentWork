@@ -7,6 +7,7 @@
 
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
+#include "GamePlay/Object/Trail/Trail.h"
 #include <memory>
 
 class Player : public AnimationCharacter<PlayerAnimationState>
@@ -97,6 +98,9 @@ private:
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
+
+	// 剣先と根本を求める関数
+	void CalculationRootAndTip();
 
 	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
@@ -192,4 +196,9 @@ private:
 	// SE関係
 	// 音の名前と実体を紐づけるマップ
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
+
+	// トレイル
+	Trail trail;
+	DirectX::XMFLOAT3 rootOffset = { 0.42, -5.93, -0.37 };
+	DirectX::XMFLOAT3 tipOffset = { 0.770, 6.22, -0.5 };
 };
