@@ -64,6 +64,8 @@ void Player::Initialize()
 	player->GetNodePoses(oldNodePoses);
 	ChangeAnimationState(PlayerAnimationState::Idle);
 
+	trail.Initialize();
+
 	// アニメーションノードエディターの初期化
 	{
 		namespace fs = std::filesystem;
@@ -206,7 +208,6 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, player); 
 	renderer->Draw(ShaderId::PBR, weapon.model);
-	trail.Render();
 }
 
 // GUI描画

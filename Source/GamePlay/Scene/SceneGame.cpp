@@ -197,6 +197,11 @@ void SceneGame::Render()
 	// シャドウマップ描画
 	RenderShadowMap();
 
+	// スカイマップ描画
+	Graphics::Instance().SetRenderTargets();
+	skyMap->Draw(rc);
+
+
 	Graphics::Instance().SetRenderTargets();
 
 	// 3Dモデル描画
@@ -213,6 +218,8 @@ void SceneGame::Render()
 		// 全モデル描画
 		modelRenderer->Render(rc);
 
+		player.RenderTrail(rc);
+
 		// プリミティブ描画
 		primitiveRenderer->Render(dc, camera.GetView(), camera.GetProjection(),
 			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -220,9 +227,6 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
-		// スカイマップ描画
-		Graphics::Instance().SetRenderTargets();
-		skyMap->Draw(rc);
 	}
 
 	// デバック描画

@@ -29,6 +29,7 @@ public:
 	void InitializeAttackData();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
+	void RenderTrail(const RenderContext& rc) { trail.Render(rc); }
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox = false);
 

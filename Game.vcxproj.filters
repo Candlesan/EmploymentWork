@@ -148,6 +148,9 @@
     <Filter Include="Source\GamepPlay\Object\Trail">
       <UniqueIdentifier>{466dbc54-11fb-48e3-ade7-eae50a5ec94c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Trail">
+      <UniqueIdentifier>{ba886de2-2d5e-4892-8093-40845a39a7c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -596,6 +599,9 @@
     <None Include="Shader\SkyMap\SkyMap.hlsli">
       <Filter>Shader\SkyMap</Filter>
     </None>
+    <None Include="Shader\Trail\Trail.hlsli">
+      <Filter>Shader\Trail</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\Basic\BasicPS.hlsl">
@@ -642,6 +648,12 @@
     </FxCompile>
     <FxCompile Include="Shader\SkyMap\Shadow_Caster_vs.hlsl">
       <Filter>Shader\ShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Trail\TrailVS.hlsl">
+      <Filter>Shader\Trail</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Trail\TrailPS.hlsl">
+      <Filter>Shader\Trail</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
