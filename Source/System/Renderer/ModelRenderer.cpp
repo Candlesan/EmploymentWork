@@ -49,6 +49,11 @@ void ModelRenderer::Render(const RenderContext& rc)
 		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
 		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
 		DirectX::XMStoreFloat4x4(&cbScene.viewProjection, V * P);
+
+		// ƒJƒƒ‰‚Ì‹ts—ñ‚ðŒvŽZ‚·‚é
+		DirectX::XMMATRIX invV = DirectX::XMMatrixInverse(nullptr, V);
+		DirectX::XMStoreFloat4x4(&cbScene.inverseView, invV);
+
 		const DirectionalLight& directionalLight = lightManager->GetDirectionalLight();
 		cbScene.lightDirection.x = directionalLight.direction.x;
 		cbScene.lightDirection.y = directionalLight.direction.y;

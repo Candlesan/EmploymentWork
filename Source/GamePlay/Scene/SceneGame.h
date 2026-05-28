@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
+#include "GamePlay/Object/Particle/Compute_Particle.h"
 #include <memory>
 
 // モデル
@@ -84,4 +85,7 @@ private:
 	bool isPaused = false;      // 一時停止中か
 	bool stepNextFrame = false; // 1フレームだけ進めるか
 	float timeScale = 1.0f; // 1.0が通常、0.1が10倍スロー
+
+	// パーティクル
+	std::unique_ptr<Compute_Particle> particleManager;
 };

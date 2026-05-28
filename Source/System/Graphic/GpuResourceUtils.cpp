@@ -70,6 +70,56 @@ HRESULT GpuResourceUtils::LoadPixelShader(
 	return hr;
 }
 
+// ジオメトリシェーダー読み込み
+HRESULT GpuResourceUtils::LoadGeometryShader(
+	ID3D11Device* device,
+	const char* filename,
+	ID3D11GeometryShader** geometry_shader)
+{
+	FILE* fp{ nullptr };
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "CSO File not found");
+
+	fseek(fp, 0, SEEK_END);
+	long cso_sz{ ftell(fp) };
+	fseek(fp, 0, SEEK_SET);
+
+	std::unique_ptr<unsigned char[]> cso_data{ std::make_unique<unsigned char[]>(cso_sz) };
+	fread(cso_data.get(), cso_sz, 1, fp);
+	fclose(fp);
+
+	HRESULT hr{ S_OK };
+	hr = device->CreateGeometryShader(cso_data.get(), cso_sz, nullptr, geometry_shader);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	return hr;
+}
+
+// コンピュートシェーダー読み込み
+HRESULT GpuResourceUtils::LoadComputShader(
+	ID3D11Device* device,
+	const char* filename,
+	ID3D11ComputeShader** compute_shader)
+{
+	FILE* fp{ nullptr };
+	fopen_s(&fp, filename, "rb");
+	_ASSERT_EXPR_A(fp, "CSO File not found");
+
+	fseek(fp, 0, SEEK_END);
+	long cso_sz{ ftell(fp) };
+	fseek(fp, 0, SEEK_SET);
+
+	std::unique_ptr<unsigned char[]> cso_data{ std::make_unique<unsigned char[]>(cso_sz) };
+	fread(cso_data.get(), cso_sz, 1, fp);
+	fclose(fp);
+
+	HRESULT hr{ S_OK };
+	hr = device->CreateComputeShader(cso_data.get(), cso_sz, nullptr, compute_shader);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	return hr;
+}
+
 // テクスチャ読み込み
 HRESULT GpuResourceUtils::LoadTexture(
 	ID3D11Device* device,

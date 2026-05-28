@@ -151,6 +151,12 @@
     <Filter Include="Shader\Trail">
       <UniqueIdentifier>{ba886de2-2d5e-4892-8093-40845a39a7c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Particle">
+      <UniqueIdentifier>{a2f89a31-9aeb-427d-91f7-db7706548fd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Particle">
+      <UniqueIdentifier>{d95f4bb3-b4fc-4bb5-be33-aeaefd55d71f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -247,9 +253,6 @@
       <Filter>Source\System\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\Renderer\Light.h">
-      <Filter>Source\System\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\ModelRenderer.h">
       <Filter>Source\System\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\Renderer\PrimitiveRenderer.h">
@@ -378,6 +381,15 @@
     <ClInclude Include="Source\GamePlay\Object\Trail\Trail.h">
       <Filter>Source\GamepPlay\Object\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Renderer\ModelRenderer.h">
+      <Filter>Source\System\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Particle\Compute_Particle.h">
+      <Filter>Source\GamepPlay\Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Particle\compute_particle_system.h">
+      <Filter>Source\GamepPlay\Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -453,9 +465,6 @@
       <Filter>Source\System\Graphic</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\ImGuiRenderer.cpp">
-      <Filter>Source\System\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp">
       <Filter>Source\System\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp">
@@ -563,6 +572,15 @@
     <ClCompile Include="Source\GamePlay\Object\Trail\Trail.cpp">
       <Filter>Source\GamepPlay\Object\Trail</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp">
+      <Filter>Source\System\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Particle\compute_particle_system.cpp">
+      <Filter>Source\GamepPlay\Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Particle\Compute_Particle.cpp">
+      <Filter>Source\GamepPlay\Object\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -601,6 +619,12 @@
     </None>
     <None Include="Shader\Trail\Trail.hlsli">
       <Filter>Shader\Trail</Filter>
+    </None>
+    <None Include="Shader\Particle\compute_particle_bitonic_sort.hlsli">
+      <Filter>Shader\Particle</Filter>
+    </None>
+    <None Include="Shader\Particle\compute_particle.hlsli">
+      <Filter>Shader\Particle</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -654,6 +678,39 @@
     </FxCompile>
     <FxCompile Include="Shader\Trail\TrailPS.hlsl">
       <Filter>Shader\Trail</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_begin_frame_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_bitonic_sort_b2_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_bitonic_sort_c2_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_emit_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_end_frame_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_init_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_render_gs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_render_ps.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_render_vs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_sort_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_update_cs.hlsl">
+      <Filter>Shader\Particle</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

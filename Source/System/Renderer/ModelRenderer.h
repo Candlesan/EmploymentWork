@@ -36,6 +36,7 @@ private:
 		DirectX::XMFLOAT4		lightDirection;
 		DirectX::XMFLOAT4		lightColor;
 		DirectX::XMFLOAT4		cameraPosition;
+		DirectX::XMFLOAT4X4		inverseView;
 	};
 
 	struct CbSkeleton

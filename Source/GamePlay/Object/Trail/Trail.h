@@ -23,6 +23,7 @@ private:
 		DirectX::XMFLOAT4 lightDirection; // 使わなくても必要！
 		DirectX::XMFLOAT4 lightColor;     // 使わなくても必要！
 		DirectX::XMFLOAT4 cameraPosition; // 使わなくても必要！
+		DirectX::XMFLOAT4X4 inverseView;
 	};
 
 	struct TrailVertex

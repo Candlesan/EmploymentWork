@@ -74,6 +74,9 @@ void SceneGame::Initialize()
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
+
+	// パーティクル生成
+	particleManager = std::make_unique<Compute_Particle>(device);
 }
 
 // 終了化
@@ -147,6 +150,66 @@ void SceneGame::Update(float elapsedTime)
 
 		// 敵の攻撃とプレイヤーの当たり判定
 		CollisionEnemyWeaponVsPlayer();
+
+		// Xキーを押した瞬間に降雪エフェクトを発生させる
+		if (GetAsyncKeyState('P') & 0x8000)
+		{
+			DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3((rand() % 30 - 15) * 0.1f, (rand() % 30 * 0.1f + 1) + 10.0f, (rand() % 30 - 15) * 0.1f + 3);
+			int max = 100;
+			for (int i = 0; i < max; i++)
+			{
+				//	発生位置
+				DirectX::XMFLOAT3 p = { 0,0,0 };
+				p.x = pos.x + (rand() % 10001 - 5000) * 0.01f;
+				p.y = pos.y;
+				p.z = pos.z + (rand() % 10001 - 5000) * 0.01f;
+				//	発生方向
+				DirectX::XMFLOAT3 v = { 0,0,0 };
+				v.y = -(rand() % 10001) * 0.0002f - 0.002f;
+				//	力
+				DirectX::XMFLOAT3 f = { 0,0,0 };
+				f.x = (rand() % 10001) * 0.00001f + 0.1f;
+				f.z = (rand() % 10001 - 5000) * 0.00001f;
+				//	大きさ
+				DirectX::XMFLOAT2 s = { .2f,.2f };
+
+				// 発生させるパーティクルのパラメータを設定
+				compute_particle_system::emit_particle_data data;
+
+				//	更新タイプ
+				data.parameter.x = 12;
+				data.parameter.y = 5.0f;
+				//	発生位置
+				data.position.x = p.x;
+				data.position.y = p.y;
+				data.position.z = p.z;
+				//	発生方向
+				data.velocity.x = v.x;
+				data.velocity.y = v.y;
+				data.velocity.z = v.z;
+				//	加速力
+				data.acceleration.x = f.x;
+				data.acceleration.y = f.y;
+				data.acceleration.z = f.z;
+				//	大きさ
+				data.scale.x = s.x;
+				data.scale.y = s.y;
+				data.scale.z = 0.0f;
+
+				if (particleManager)
+				{
+					particleManager->Emit(data);
+				}
+			}
+		}
+
+		// パーティクルシステム自体の更新（これは毎フレーム必ず呼ぶ）
+		if (particleManager)
+		{
+			// デバイスコンテキストを取得して渡す（プロジェクトの仕様に合わせてな）
+			ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+			particleManager->Update(dc, elapsedTime);
+		}
 	}
 }
 
@@ -227,6 +290,7 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
+		particleManager->Render(rc);
 	}
 
 	// デバック描画
