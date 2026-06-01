@@ -20,6 +20,8 @@ StraightMagic::~StraightMagic()
 // 更新処理
 void StraightMagic::Update(float elapsedTime)
 {
+	if (isAlive) return;
+
 	// 移動
 	float speed = this->speed * elapsedTime;
 	position.x += direction.x * speed;
@@ -38,12 +40,9 @@ void StraightMagic::Update(float elapsedTime)
 	lifeTimer -= elapsedTime;
 	if (lifeTimer < 0.0f)
 	{
-		testEffect->Stop(handle);
-
-		OnEffect = true;
-
-		// 自分を削除
-		 Destroy();
+		// 寿命が尽きたので、消滅処理を呼び出す
+		OnTerminate();
+		return;
 	}
 
 	// オブジェクト行列更新
@@ -69,5 +68,19 @@ void StraightMagic::Launch(const DirectX::XMFLOAT3& direction,
 {
 	this->direction = direction;
 	this->position = position;
+}
 
+//消滅するときのリセット処理
+void StraightMagic::OnTerminate()
+{
+	isAlive = true;
+
+	if (handle != -1)
+	{
+		testEffect->Stop(handle);
+		handle = -1;
+	}
+
+	// 自分を削除
+	Destroy();
 }

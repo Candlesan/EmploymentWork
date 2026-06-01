@@ -154,6 +154,9 @@ void SceneGame::Update(float elapsedTime)
 		// 敵の攻撃とプレイヤーの当たり判定
 		CollisionEnemyWeaponVsPlayer();
 
+		// 魔法と敵の当たり判定
+		CollisionMagicVsEnemy();
+
 		// Xキーを押した瞬間に降雪エフェクトを発生させる
 		if (GetAsyncKeyState('P') & 0x8000)
 		{
@@ -701,6 +704,35 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 				player.SetLastDamage(res.damage);
 				player.ApplyDamage(res.damage, activeTrack->invincible, res.poiseDamage);
 			}
+		}
+	}
+}
+
+// 敵と魔法の当たり判定
+void SceneGame::CollisionMagicVsEnemy()
+{
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+	MagicManager& magicManager = player.GetMagicManager();
+
+	// 存在する魔法の数だけループ
+	for (int i = 0; i < magicManager.GetMagicCount(); ++i)
+	{
+		MagicBase* magic = magicManager.getMagic(i);
+
+		DirectX::XMFLOAT3 outPos;
+
+		// 魔法と敵の当たり判定
+		if (Collision::IntersectSphereVsCapsule(
+			magic->GetPosition(), magic->GetRadius(),
+			enemy->GetPosition(), enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(),
+			outPos))
+		{
+			// ダメージを与える
+			enemy->ApplyDamage(magic->GetDamage(), 0.3, 10.0f);
+
+			// 魔法自体を消滅させる
+			magic->OnTerminate();
 		}
 	}
 }

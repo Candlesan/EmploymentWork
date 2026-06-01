@@ -23,6 +23,11 @@ public:
 	//発射
 	void Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position);
 
+	//消滅するときのリセット処理
+	void OnTerminate() override;
+
+	// ダメージ取得
+	float GetDamage() const override { return damage; }
 private:
 	float damage = 1.0f; // ダメージ量
 	float power = 10; // 出力
@@ -31,7 +36,7 @@ private:
 	float speed = 5; // 速度
 	float lifeTimer = 3.0f;
 
-	//bool isAlive; // まだ存在しているか
+	bool isAlive = false; // まだ存在しているか
 
 	// エフェクト
 	std::unique_ptr<Effect> testEffect;

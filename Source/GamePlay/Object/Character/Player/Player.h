@@ -70,7 +70,7 @@ public:
 	bool GetIsAvoid() const { return IsAvoid; } // ‰ñ”ð’†‚©‚ðŽæ“¾
 
 	void SetEnemy(Enemy* e) { enemy = e; }
-
+	MagicManager& GetMagicManager() { return magicManager; }
 public:
 	// ƒOƒ‰ƒt‚ð’Ç‰Á‚·‚é
 	void AddGraph(std::string name);

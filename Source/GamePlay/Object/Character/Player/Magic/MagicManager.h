@@ -27,10 +27,10 @@ public:
 	void Clear();
 
 	//’eŠÛ”æ“¾
-	int GetProjectileCount() const { return static_cast<int>(projectiles.size()); }
+	int GetMagicCount() const { return static_cast<int>(projectiles.size()); }
 
 	//’eŠÛæ“¾
-	MagicBase* getProjectile(int index) { return projectiles.at(index); }
+	MagicBase* getMagic(int index) { return projectiles.at(index); }
 
 	//’eŠÛíœ
 	void Remove(MagicBase* projectile);

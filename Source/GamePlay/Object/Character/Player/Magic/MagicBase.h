@@ -22,6 +22,9 @@ public:
 	// 破棄
 	void Destroy();
 
+	//消滅するときのリセット処理
+	virtual void OnTerminate() = 0;
+
 	// 位置取得 
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
 
@@ -34,6 +37,8 @@ public:
 	// 半径取得
 	float GetRadius() const { return radius; }
 
+	// ダメージ取得
+	virtual float GetDamage() const { return 0.0f; }
 protected:
 	// 行列更新処理 
 	void UpdateTransform();

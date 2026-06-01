@@ -47,6 +47,9 @@ public:
 	// 敵の武器とプレイヤーの当たり判定
 	void CollisionEnemyWeaponVsPlayer();
 
+	// 敵と魔法の当たり判定
+	void CollisionMagicVsEnemy();
+
 private:
 	// 3Dモデル
 	std::unique_ptr<Stage> stage;

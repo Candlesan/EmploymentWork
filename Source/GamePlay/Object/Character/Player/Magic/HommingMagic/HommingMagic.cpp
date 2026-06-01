@@ -5,11 +5,11 @@
 HommingMagic::HommingMagic(MagicManager* manager)
 	:MagicBase(manager)
 {
-	// おそらくここにパーティクルを呼び出したり
-	// 当たり判定が入る
+	// エフェクト初期化
+	testEffect = std::make_unique<Effect>("Data/Effect/Enemy_Bullet.efk");
+	handle = -1;
 
-	// ダメージとかのパラメーター初期化
-
+	OnEffect = true;
 }
 
 // デストラクタ
@@ -21,12 +21,15 @@ HommingMagic::~HommingMagic()
 // 更新処理
 void HommingMagic::Update(float elapsedTime)
 {
+	if (isAlive) return;
+
 	// 寿命処理
 	lifeTimer -= elapsedTime;
 	if (lifeTimer < 0.0f)
 	{
-		// 自分を削除
-		Destroy();
+		// 寿命が尽きたので、消滅処理を呼び出す
+		OnTerminate();
+
 		isHoming = true;
 		return;
 	}
@@ -104,6 +107,14 @@ void HommingMagic::Update(float elapsedTime)
 	position.y += direction.y * speed;
 	position.z += direction.z * speed;
 
+	if (OnEffect)
+	{
+		handle = testEffect->Play(position, 1.0f);
+		OnEffect = false;
+	}
+
+	testEffect->SetPosition(handle, position);
+
 	//オブジェクト行列を更新
 	UpdateTransform();
 }
@@ -128,4 +139,18 @@ void HommingMagic::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMF
 	this->target = target;
 
 	UpdateTransform();
+}
+
+//消滅するときのリセット処理
+void HommingMagic::OnTerminate()
+{
+	isAlive = true;
+	if (handle != -1)
+	{
+		testEffect->Stop(handle);
+		handle = -1;
+	}
+
+	// 自分を削除
+	Destroy();
 }
