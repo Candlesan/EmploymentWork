@@ -57,6 +57,8 @@ void SceneGame::Initialize()
 	enemy = std::make_unique<Enemy>();
 	enemy->Initialize();
 
+	player.SetEnemy(enemy.get());
+
 	// ライト設定
 	DirectionalLight light;
 	// ここに ImGui で決めた数値をそのまま入れる

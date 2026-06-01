@@ -157,6 +157,18 @@
     <Filter Include="Shader\Particle">
       <UniqueIdentifier>{d95f4bb3-b4fc-4bb5-be33-aeaefd55d71f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic">
+      <UniqueIdentifier>{b244fe4a-d912-4992-a63c-bd84ffdea295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\StraightMagic">
+      <UniqueIdentifier>{a006f896-8810-4346-a644-1da25361df80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\HommingMangic">
+      <UniqueIdentifier>{fb1f6bfb-b133-4043-8798-c2c53a67dbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Effect">
+      <UniqueIdentifier>{e1dbfc57-1ef7-4492-9e9c-ed5619b5cd33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -390,6 +402,24 @@
     <ClInclude Include="Source\GamePlay\Object\Particle\compute_particle_system.h">
       <Filter>Source\GamepPlay\Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicBase.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicManager.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\StraightMagic\StraightMagic.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\StraightMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\HommingMagic\HommingMagic.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\HommingMangic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Effect\Effect.h">
+      <Filter>Source\System\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Effect\EffectManager.h">
+      <Filter>Source\System\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -580,6 +610,24 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Particle\Compute_Particle.cpp">
       <Filter>Source\GamepPlay\Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicBase.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicManager.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\StraightMagic\StraightMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\StraightMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\HommingMagic\HommingMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\HommingMangic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Effect\Effect.cpp">
+      <Filter>Source\System\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Effect\EffectManager.cpp">
+      <Filter>Source\System\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

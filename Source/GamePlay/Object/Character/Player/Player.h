@@ -1,14 +1,21 @@
 #pragma once
+// システム
 #include "System/Renderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionEditor.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
 #include "System/Audio/AudioSource.h"
 
+// ゲームオブジェクト
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Trail/Trail.h"
+#include "GamePlay/Object/Character/Player/Magic/MagicManager.h"
+
+// 前方宣言
 #include <memory>
+
+class Enemy;
 
 class Player : public AnimationCharacter<PlayerAnimationState>
 {
@@ -39,6 +46,9 @@ public:
 	float GetWeaponRadius() const { return weapon.weaponRadius; }
 	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
+	// 魔法発動処理
+	void MagicInput();
+
 	// 回復
 	void Heal(float elapsedTime);
 
@@ -58,6 +68,8 @@ public:
 	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
 	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する
 	bool GetIsAvoid() const { return IsAvoid; } // 回避中かを取得
+
+	void SetEnemy(Enemy* e) { enemy = e; }
 
 public:
 	// グラフを追加する
@@ -107,6 +119,7 @@ private:
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 private:
 	std::shared_ptr<Model> player;
+	Enemy* enemy = nullptr;
 
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
@@ -202,4 +215,7 @@ private:
 	Trail trail;
 	DirectX::XMFLOAT3 rootOffset = { 0.42, -5.93, -0.37 };
 	DirectX::XMFLOAT3 tipOffset = { 0.770, 6.22, -0.5 };
+
+	// 魔法関係
+	MagicManager magicManager;
 };

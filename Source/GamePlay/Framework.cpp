@@ -6,6 +6,7 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Renderer/ImGuiRenderer.h"
 #include "System/Core/Input/Input.h"
+#include "System/Effect/EffectManager.h"
 
 // シーン
 #include "Gameplay/Scene/SceneManager.h"
@@ -31,6 +32,9 @@ Framework::Framework(HWND hWnd)
 	// オーディオ初期化
 	Audio::Instance().Initialize();
 
+	// エフェクトマネージャー初期化 
+	EffectManager::Instance().Initialize();
+
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneGame);
 }
@@ -41,11 +45,14 @@ Framework::~Framework()
 	// IMGUI終了化
 	ImGuiRenderer::Finalize();
 
+	// シーン終了化
+	SceneManager::Instance().Clear();
+
 	// オーディオ終了化
 	Audio::Instance().Finalize();
 
-	// シーン終了化
-	SceneManager::Instance().Clear();
+	// エフェクトマネージャー終了化 
+	EffectManager::Instance().Finalize();
 }
 
 // 更新処理
@@ -65,6 +72,10 @@ void Framework::Update(float elapsedTime)
 void Framework::Render(float elapsedTime)
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+	// 別スレッド中にデバイスコンテキストが使われていた場合に 
+	// 同時アクセスしないように排他制御する 
+	std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
 
 	// 画面クリア
 	Graphics::Instance().Clear(0, 0, 1.0f, 1);
