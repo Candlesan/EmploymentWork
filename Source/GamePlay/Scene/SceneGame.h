@@ -88,4 +88,5 @@ private:
 
 	// パーティクル
 	std::unique_ptr<Compute_Particle> particleManager;
+
 };

@@ -2,6 +2,8 @@
 #include "GamePlay/Object/Character/Player/Magic/MagicBase.h"
 #include "GamePlay/Object/Character/Player/Magic/MagicManager.h"
 
+#include "System/Effect/Effect.h"
+
 // 真っすぐ跳ぶ魔法
 class StraightMagic : public MagicBase
 {
@@ -30,4 +32,9 @@ private:
 	float lifeTimer = 3.0f;
 
 	//bool isAlive; // まだ存在しているか
+
+	// エフェクト
+	std::unique_ptr<Effect> testEffect;
+	int handle = -1;
+	bool OnEffect = true;
 };

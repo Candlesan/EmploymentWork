@@ -2,6 +2,7 @@
 
 #include "System/Graphic/Graphics.h"
 #include "System/Audio/Audio.h"
+#include "System/Effect/EffectManager.h"
 
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
@@ -212,6 +213,9 @@ void SceneGame::Update(float elapsedTime)
 			ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 			particleManager->Update(dc, elapsedTime);
 		}
+
+		// エフェクト更新処理 
+		EffectManager::Instance().Update(elapsedTime);
 	}
 }
 
@@ -282,6 +286,9 @@ void SceneGame::Render()
 
 		// 全モデル描画
 		modelRenderer->Render(rc);
+
+		// エフェクト描画 
+		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
 
 		player.RenderTrail(rc);
 

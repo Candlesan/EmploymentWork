@@ -4,10 +4,11 @@
 StraightMagic::StraightMagic(MagicManager* manager)
 	: MagicBase(manager) // 基底クラスのコンストラクタを呼び出す
 {
-	// おそらくここにパーティクルを呼び出したり
-	// 当たり判定が入る
+	// エフェクト初期化
+	testEffect = std::make_unique<Effect>("Data/Effect/Enemy_Bullet.efk");
+	handle = -1;
 
-	// ダメージとかのパラメーター初期化
+	OnEffect = true;
 }
 
 // デストラクタ
@@ -25,10 +26,22 @@ void StraightMagic::Update(float elapsedTime)
 	position.y += direction.y * speed;
 	position.z += direction.z * speed;
 
+	if (OnEffect)
+	{
+		handle = testEffect->Play(position, 1.0f);
+		OnEffect = false;
+	}
+
+	testEffect->SetPosition(handle, position);
+
 	// 寿命処理
 	lifeTimer -= elapsedTime;
 	if (lifeTimer < 0.0f)
 	{
+		testEffect->Stop(handle);
+
+		OnEffect = true;
+
 		// 自分を削除
 		 Destroy();
 	}
@@ -56,4 +69,5 @@ void StraightMagic::Launch(const DirectX::XMFLOAT3& direction,
 {
 	this->direction = direction;
 	this->position = position;
+
 }
