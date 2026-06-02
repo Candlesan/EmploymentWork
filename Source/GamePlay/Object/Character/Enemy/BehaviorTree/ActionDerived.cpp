@@ -8,7 +8,7 @@
 // 待機行動
 ActionBase::State IdleAction::Run(float elapsedTime)
 {
-	owner->ChangeAnimationState(EnemyAnimationState::Idle);
+	//owner->ChangeAnimationState(EnemyAnimationState::Idle_1);
 	owner->TurnToPosition(elapsedTime); // 待機中もこっちを見ろ！
 
 	// 1フレームごとに完了を返す
@@ -34,14 +34,14 @@ ActionBase::State WanderAction::Run(float elapsedTime)
 		// 0が左/1が右
 		WalkDirection = rand() % 2;
 
-		if (WalkDirection == 0)
-		{
-			owner->ChangeAnimationState(EnemyAnimationState::Walk_L); // 左に歩く
-		}
-		else
-		{
-			owner->ChangeAnimationState(EnemyAnimationState::Walk_R); // 右に歩く
-		}
+		//if (WalkDirection == 0)
+		//{
+		//	owner->ChangeAnimationState(EnemyAnimationState::Walk_L); // 左に歩く
+		//}
+		//else
+		//{
+		//	owner->ChangeAnimationState(EnemyAnimationState::Walk_R); // 右に歩く
+		//}
 		owner->SetMoveSpeed(2.0f); // ゆっくり歩く
 		step = 1;
 		break;
@@ -113,34 +113,34 @@ ActionBase::State AttackAction::Run(float elapsedTime)
 		return ActionBase::State::Run;
 	}
 
-	else if (owner->GetCurrentState() == EnemyAnimationState::Skill_HeavyStomp)
+	//else if (owner->GetCurrentState() == EnemyAnimationState::Skill_HeavyStomp)
 	{
 		owner->HeavyStompAttack();
 		step = 1;
 	}
 
 	// アニメーションが終了したかチェック
-	if (owner->GetCurrentState() == EnemyAnimationState::Idle || owner->IsAnimationFinished()) {
-		// 次の派生があるか調べる
-		EnemyAnimationState next = owner->DecideNextAttack(owner->GetCurrentState());
+	//if (owner->GetCurrentState() == EnemyAnimationState::Idle || owner->IsAnimationFinished()) {
+	//	// 次の派生があるか調べる
+	//	EnemyAnimationState next = owner->DecideNextAttack(owner->GetCurrentState());
 
-		if (next != (EnemyAnimationState)-1)
-		{
-			// 次の技へ！ステップは維持
-			owner->TurnToPosition(elapsedTime);
-			owner->ChangeAnimationState(next);
-			step = 1;
-			return ActionBase::State::Complete;
-		}
-		else
-		{
-			// 派生が無ければコンボを終了
-			step = 0;
-			owner->SetAttackCoolTimer(1.0f);
+	//	if (next != (EnemyAnimationState)-1)
+	//	{
+	//		// 次の技へ！ステップは維持
+	//		owner->TurnToPosition(elapsedTime);
+	//		owner->ChangeAnimationState(next);
+	//		step = 1;
+	//		return ActionBase::State::Complete;
+	//	}
+	//	else
+	//	{
+	//		// 派生が無ければコンボを終了
+	//		step = 0;
+	//		owner->SetAttackCoolTimer(1.0f);
 
-			return ActionBase::State::Complete;
-		}
-	}
+	//		return ActionBase::State::Complete;
+	//	}
+	//}
 
 	// 実行中を返す
 	return ActionBase::State::Run;
@@ -175,21 +175,21 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
 			return ActionBase::State::Complete;
 		}
 
-		if (distance > Middle_Distance)
-		{
-			owner->SetMoveSpeed(7.0f); // 移動速度を設定
-			owner->SetBaseSpeed(1.2f); // アニメーション再生速度を設定
-			owner->ChangeAnimationState(EnemyAnimationState::Jog_F); // 小走りに遷移
-			step++;
-			break;
-		}
-		else
-		{
-			owner->SetMoveSpeed(5.0f); // 移動速度を設定
-			owner->ChangeAnimationState(EnemyAnimationState::Walk_F); // 歩きに遷移
-			step++;
-			break;
-		}
+		//if (distance > Middle_Distance)
+		//{
+		//	owner->SetMoveSpeed(7.0f); // 移動速度を設定
+		//	owner->SetBaseSpeed(1.2f); // アニメーション再生速度を設定
+		//	owner->ChangeAnimationState(EnemyAnimationState::Jog_F); // 小走りに遷移
+		//	step++;
+		//	break;
+		//}
+		//else
+		//{
+		//	owner->SetMoveSpeed(5.0f); // 移動速度を設定
+		//	owner->ChangeAnimationState(EnemyAnimationState::Walk_F); // 歩きに遷移
+		//	step++;
+		//	break;
+		//}
 	case 1:
 		owner->TurnToPosition(elapsedTime, playerPos);
 

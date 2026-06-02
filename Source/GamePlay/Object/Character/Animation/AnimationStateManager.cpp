@@ -138,80 +138,116 @@ template<>
 AnimationStateManager<EnemyAnimationState>::AnimationStateManager()
 {
     // 待機
-    configs[EnemyAnimationState::Idle] ={ "Idle", true };
+    configs[EnemyAnimationState::Idle_1] ={ "Idle_1", true };
+    configs[EnemyAnimationState::Idle_2] ={ "Idle_2", true };
 
     // 歩き
-    configs[EnemyAnimationState::Walk_B ]  = { "Walk_B" , true, false, true }; 
-    configs[EnemyAnimationState::Walk_F ]  = { "Walk_F" , true, false, true };  
-    configs[EnemyAnimationState::Walk_L ]  = { "Walk_L" , true, false, true }; 
-    configs[EnemyAnimationState::Walk_R ]  = { "Walk_R" , true, false, true }; 
+    configs[EnemyAnimationState::Walk] ={ "Walk", true, true };
+    configs[EnemyAnimationState::Walk_InPlace] ={ "Walk_InPlace", true };
 
-    // 小走り
-    configs[EnemyAnimationState::Jog_F ] = { "Jog_F" , true };
+    // 走り
+	configs[EnemyAnimationState::Run] = { "Run", true, true };
 
-    // 回避
-    configs[EnemyAnimationState::Dodge_Forkward] = { "Dodge_Forkward" , false, false, true };
-    configs[EnemyAnimationState::Dodge_Backward] = { "Dodge_Backward" , false, false, true };
-    configs[EnemyAnimationState::Dodge_Left] =     { "Dodge_Left"     , false, false, true };
-    configs[EnemyAnimationState::Dodge_Right] =    { "Dodge_Right"    , false, false, true };
+	// ジャンプ
+	configs[EnemyAnimationState::Jump] = { "Jump", false, true };
 
-    // 通常攻撃
-    configs[EnemyAnimationState::Light_Attack_01] = { "Light_Attack_01" , false, false, true };
-    configs[EnemyAnimationState::Light_Attack_02] = { "Light_Attack_02" , false, false, true };
-    configs[EnemyAnimationState::Light_Attack_03] = { "Light_Attack_03" , false, false, true };
+	// 落下中
+	configs[EnemyAnimationState::Fall_Loop] = { "Fall_Loop", true, true };
 
-    // 強攻撃
-    configs[EnemyAnimationState::Heavy_Attack_01] = { "Heavy_Attack_01" , false, false, true };
-    configs[EnemyAnimationState::Heavy_Attack_02] = { "Heavy_Attack_02" , false, false, true };
+	// 着地
+	configs[EnemyAnimationState::Land] = { "Land", false, true };
 
-    // 回避(追撃)
-    configs[EnemyAnimationState::Dodge_FU] = { "Dodge_FU" , false, false, true };
+	// 死亡
+	configs[EnemyAnimationState::Death] = { "Death", false };
 
-    // 掴み攻撃
-    configs[EnemyAnimationState::Grab_Fall] = { "Grab_Fall" , false, false, true };
+	// ヒット
+	configs[EnemyAnimationState::Get_Hit] = { "Get_Hit", false };
 
-    // 叫び
-    configs[EnemyAnimationState::Roar] = { "Roar" , false, false, true };
+	// 攻撃
+	configs[EnemyAnimationState::Attack_1] = { "Attack_1", false, false, true };
+	configs[EnemyAnimationState::Attack_2] = { "Attack_2", false, false, true };
+	configs[EnemyAnimationState::Attack_3] = { "Attack_3", false, false, true };
+	configs[EnemyAnimationState::Attack_4] = { "Attack_4", false, false, true };
+	configs[EnemyAnimationState::Attack_Combo_4] = { "Attack_Combo_4", false, false, true };
 
-    // 飛びつき切り
-    configs[EnemyAnimationState::Skill_BlockBreaker] = { "Skill_BlockBreaker" , false, false, true };
+	// 防御
+	configs[EnemyAnimationState::Block_Defense] = { "Block_Defense", true, false, true };
 
-    // 空中2連切り(中距離からプレイヤーに向かってする攻撃)
-    configs[EnemyAnimationState::Skill_DoubleSwings_Root] = { "Skill_DoubleSwings_Root" , false, false, true };
+    // 待機
+    //configs[EnemyAnimationState::Idle] ={ "Idle", true };
 
-    // 突き攻撃(2連)
-    configs[EnemyAnimationState::Skill_EndlessStabs] = { "Skill_EndlessStabs" , false, false, true };
+    //// 歩き
+    //configs[EnemyAnimationState::Walk_B ]  = { "Walk_B" , true, false, true }; 
+    //configs[EnemyAnimationState::Walk_F ]  = { "Walk_F" , true, false, true };  
+    //configs[EnemyAnimationState::Walk_L ]  = { "Walk_L" , true, false, true }; 
+    //configs[EnemyAnimationState::Walk_R ]  = { "Walk_R" , true, false, true }; 
 
-    // 突き攻撃(3連)
-    configs[EnemyAnimationState::Skill_QuickStab] = { "Skill_QuickStab" , false, false, true };
+    //// 小走り
+    //configs[EnemyAnimationState::Jog_F ] = { "Jog_F" , true };
 
-    // プレス攻撃
-    configs[EnemyAnimationState::Skill_HeavyStomp] = { "Skill_HeavyStomp" , false, false, false };
+    //// 回避
+    //configs[EnemyAnimationState::Dodge_Forkward] = { "Dodge_Forkward" , false, false, true };
+    //configs[EnemyAnimationState::Dodge_Backward] = { "Dodge_Backward" , false, false, true };
+    //configs[EnemyAnimationState::Dodge_Left] =     { "Dodge_Left"     , false, false, true };
+    //configs[EnemyAnimationState::Dodge_Right] =    { "Dodge_Right"    , false, false, true };
 
-    // 突撃2連ひっかき攻撃
-    configs[EnemyAnimationState::Skill_Leaping] = { "Skill_Leaping" , false, false, true };
+    //// 通常攻撃
+    //configs[EnemyAnimationState::Light_Attack_01] = { "Light_Attack_01" , false, false, true };
+    //configs[EnemyAnimationState::Light_Attack_02] = { "Light_Attack_02" , false, false, true };
+    //configs[EnemyAnimationState::Light_Attack_03] = { "Light_Attack_03" , false, false, true };
 
-    // 突進攻撃
-    configs[EnemyAnimationState::Skill_ShoulderBarge_Root] = { "Skill_ShoulderBarge_Root" , false, false, true };
+    //// 強攻撃
+    //configs[EnemyAnimationState::Heavy_Attack_01] = { "Heavy_Attack_01" , false, false, true };
+    //configs[EnemyAnimationState::Heavy_Attack_02] = { "Heavy_Attack_02" , false, false, true };
 
-    // アッパーカット
-    configs[EnemyAnimationState::Skill_UpperCut] = { "Skill_UpperCut" , false, false, true };
+    //// 回避(追撃)
+    //configs[EnemyAnimationState::Dodge_FU] = { "Dodge_FU" , false, false, true };
 
-    // 連続切り
-    configs[EnemyAnimationState::Skill_WieldDagger] = { "Skill_WieldDagger" , false, false, true };
+    //// 掴み攻撃
+    //configs[EnemyAnimationState::Grab_Fall] = { "Grab_Fall" , false, false, true };
 
-    // 軽ダメージ
-    configs[EnemyAnimationState::Hit_Front] =       { "Hit_Front"       , false, false, true };
-    configs[EnemyAnimationState::Hit_Light_Left] =  { "Hit_Light_Left"  , false, false, true };
-    configs[EnemyAnimationState::Hit_Light_Right] = { "Hit_Light_Right" , false, false, true };
+    //// 叫び
+    //configs[EnemyAnimationState::Roar] = { "Roar" , false, false, true };
 
-    // 空中ダメージ
-    configs[EnemyAnimationState::Hit_Launch_Root] = { "Hit_Launch_Root" , false, false, true };
+    //// 飛びつき切り
+    //configs[EnemyAnimationState::Skill_BlockBreaker] = { "Skill_BlockBreaker" , false, false, true };
 
-    // ダウン
-    configs[EnemyAnimationState::Hit_Knockdown] = { "Hit_Knockdown" , false, false, true };
+    //// 空中2連切り(中距離からプレイヤーに向かってする攻撃)
+    //configs[EnemyAnimationState::Skill_DoubleSwings_Root] = { "Skill_DoubleSwings_Root" , false, false, true };
 
-    // 死亡
-    configs[EnemyAnimationState::Death_A] = { "Death_A" , false, false, true };
-    configs[EnemyAnimationState::Death_B] = { "Death_B" , false, false, true };
+    //// 突き攻撃(2連)
+    //configs[EnemyAnimationState::Skill_EndlessStabs] = { "Skill_EndlessStabs" , false, false, true };
+
+    //// 突き攻撃(3連)
+    //configs[EnemyAnimationState::Skill_QuickStab] = { "Skill_QuickStab" , false, false, true };
+
+    //// プレス攻撃
+    //configs[EnemyAnimationState::Skill_HeavyStomp] = { "Skill_HeavyStomp" , false, false, false };
+
+    //// 突撃2連ひっかき攻撃
+    //configs[EnemyAnimationState::Skill_Leaping] = { "Skill_Leaping" , false, false, true };
+
+    //// 突進攻撃
+    //configs[EnemyAnimationState::Skill_ShoulderBarge_Root] = { "Skill_ShoulderBarge_Root" , false, false, true };
+
+    //// アッパーカット
+    //configs[EnemyAnimationState::Skill_UpperCut] = { "Skill_UpperCut" , false, false, true };
+
+    //// 連続切り
+    //configs[EnemyAnimationState::Skill_WieldDagger] = { "Skill_WieldDagger" , false, false, true };
+
+    //// 軽ダメージ
+    //configs[EnemyAnimationState::Hit_Front] =       { "Hit_Front"       , false, false, true };
+    //configs[EnemyAnimationState::Hit_Light_Left] =  { "Hit_Light_Left"  , false, false, true };
+    //configs[EnemyAnimationState::Hit_Light_Right] = { "Hit_Light_Right" , false, false, true };
+
+    //// 空中ダメージ
+    //configs[EnemyAnimationState::Hit_Launch_Root] = { "Hit_Launch_Root" , false, false, true };
+
+    //// ダウン
+    //configs[EnemyAnimationState::Hit_Knockdown] = { "Hit_Knockdown" , false, false, true };
+
+    //// 死亡
+    //configs[EnemyAnimationState::Death_A] = { "Death_A" , false, false, true };
+    //configs[EnemyAnimationState::Death_B] = { "Death_B" , false, false, true };
 }

@@ -27,10 +27,13 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/SK_Werewolf.gltf");
+	//enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Werewolf/SK_Werewolf.gltf");
 
-	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/SK_Werewolf_Type_C_Weapon.gltf");
-	weapon[1].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/SK_Werewolf_Type_C_Weapon.gltf");
+	//weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Werewolf/SK_Werewolf_Type_C_Weapon.gltf");
+	//weapon[1].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Werewolf/SK_Werewolf_Type_C_Weapon.gltf");
+	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss/SKM_Hairy_Beast.gltf");
+
+	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Boss/SKM_Hairy_Beast_Hammer.gltf");
 
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
@@ -69,12 +72,14 @@ void Enemy::Initialize()
 	AnimationStateManager<EnemyAnimationState>::Instance();
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
-	rootMotionNodeName = "Root";
-	upperBodyNodeName = "Bip001-Pelvis";
-	ChangeAnimationState(EnemyAnimationState::Idle);
+	rootMotionNodeName = "root";
+	//rootMotionNodeName = "Root";
+	upperBodyNodeName = "pelvis";
+	//upperBodyNodeName = "Bip001-Pelvis";
+	ChangeAnimationState(EnemyAnimationState::Idle_2);
 
 	// 攻撃とかの情報を初期化
-	InitializeAttackData();
+	//InitializeAttackData();
 
 	// ビヘイビアツリーの設定
 	behaviorData = new BehaviorData();
@@ -90,139 +95,141 @@ void Enemy::Initialize()
 }
 
 // 攻撃とかの情報を初期化
-void Enemy::InitializeAttackData()
-{
-	// シーケンサーの初期化
-	animSequence.SetModel(enemy);
-
-	// Jsonがあれば読み込む、無ければデフォルト値を設定
-	std::ifstream file("Data/Json/Enemy/AttackData/AttackSequence.json");
-	if (file.is_open())
-	{
-		file.close();
-		animSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
-	}
-	else
-	{
-		animSequence.attackData[EnemyAnimationState::Light_Attack_01] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[EnemyAnimationState::Light_Attack_02] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[EnemyAnimationState::Light_Attack_03] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-
-		animSequence.attackData[EnemyAnimationState::Dodge_FU] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body }
-		};
-
-		animSequence.attackData[EnemyAnimationState::Heavy_Attack_01] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[EnemyAnimationState::Heavy_Attack_02] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-
-		animSequence.attackData[EnemyAnimationState::Skill_BlockBreaker] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_DoubleSwings_Root] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_EndlessStabs] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
-		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
-		{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_HeavyStomp] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body },
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_Leaping] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_QuickStab] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_ShoulderBarge_Root] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::Body },
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_UpperCut] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		};
-		animSequence.attackData[EnemyAnimationState::Skill_WieldDagger] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		};
-
-	}
-
-	// 始動技の初期化
-	firstAttackList.push_back({ EnemyAnimationState::Light_Attack_01, 0.0f, Short_Distance });
-	firstAttackList.push_back({ EnemyAnimationState::Skill_QuickStab, 0.0f, Short_Distance });
-	firstAttackList.push_back({ EnemyAnimationState::Skill_EndlessStabs, 0.0f, Short_Distance });
-	firstAttackList.push_back({ EnemyAnimationState::Skill_WieldDagger, 0.0f, Short_Distance });
-
-	firstAttackList.push_back({ EnemyAnimationState::Skill_BlockBreaker, Short_Distance, Long_Distance });
-	firstAttackList.push_back({ EnemyAnimationState::Skill_HeavyStomp, Short_Distance, Long_Distance });
-	firstAttackList.push_back({ EnemyAnimationState::Skill_DoubleSwings_Root, Short_Distance, Long_Distance });
-	firstAttackList.push_back({ EnemyAnimationState::Skill_ShoulderBarge_Root, Short_Distance, Long_Distance });
-
-
-	// コンボとその派生先の初期化
-
-	// 近距離
-	attackComboMap[EnemyAnimationState::Light_Attack_01] = {
-		{ EnemyAnimationState::Light_Attack_02, 0.0f, Short_Distance, 80 },
-		{ EnemyAnimationState::Dodge_FU, 0.0f, Short_Distance, 80 },
-		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
-	};
-	attackComboMap[EnemyAnimationState::Light_Attack_02] = {
-		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
-		{ EnemyAnimationState::Heavy_Attack_02, 0.0f, Short_Distance, 40 },
-	};
-	attackComboMap[EnemyAnimationState::Dodge_FU] = {
-		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
-	};
-
-	attackComboMap[EnemyAnimationState::Light_Attack_03] = {
-		{ EnemyAnimationState::Heavy_Attack_01, 0.0f, Short_Distance, 40 },
-	};
-
-	// 中距離
-
-	attackComboMap[EnemyAnimationState::Dodge_Backward] = {
-		{ EnemyAnimationState::Skill_Leaping, 0.0f, Middle_Distance, 50 },
-		{ EnemyAnimationState::Skill_UpperCut, 0.0f, Short_Distance, 50 },
-		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
-	};
-}
+//void Enemy::InitializeAttackData()
+//{
+//	// シーケンサーの初期化
+//	animSequence.SetModel(enemy);
+//
+//	// Jsonがあれば読み込む、無ければデフォルト値を設定
+//	std::ifstream file("Data/Json/Enemy/AttackData/AttackSequence.json");
+//	if (file.is_open())
+//	{
+//		file.close();
+//		animSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
+//	}
+//	else
+//	{
+//		animSequence.attackData[EnemyAnimationState::Light_Attack_01] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//		animSequence.attackData[EnemyAnimationState::Light_Attack_02] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//		animSequence.attackData[EnemyAnimationState::Light_Attack_03] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//
+//		animSequence.attackData[EnemyAnimationState::Dodge_FU] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body }
+//		};
+//
+//		animSequence.attackData[EnemyAnimationState::Heavy_Attack_01] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//		animSequence.attackData[EnemyAnimationState::Heavy_Attack_02] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//
+//		animSequence.attackData[EnemyAnimationState::Skill_BlockBreaker] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_DoubleSwings_Root] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_EndlessStabs] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
+//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
+//		{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_HeavyStomp] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body },
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_Leaping] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_QuickStab] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_ShoulderBarge_Root] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::Body },
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_UpperCut] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		};
+//		animSequence.attackData[EnemyAnimationState::Skill_WieldDagger] = {
+//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+//		};
+//
+//	}
+//
+//	// 始動技の初期化
+//	firstAttackList.push_back({ EnemyAnimationState::Light_Attack_01, 0.0f, Short_Distance });
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_QuickStab, 0.0f, Short_Distance });
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_EndlessStabs, 0.0f, Short_Distance });
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_WieldDagger, 0.0f, Short_Distance });
+//
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_BlockBreaker, Short_Distance, Long_Distance });
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_HeavyStomp, Short_Distance, Long_Distance });
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_DoubleSwings_Root, Short_Distance, Long_Distance });
+//	firstAttackList.push_back({ EnemyAnimationState::Skill_ShoulderBarge_Root, Short_Distance, Long_Distance });
+//
+//
+//	// コンボとその派生先の初期化
+//
+//	// 近距離
+//	attackComboMap[EnemyAnimationState::Light_Attack_01] = {
+//		{ EnemyAnimationState::Light_Attack_02, 0.0f, Short_Distance, 80 },
+//		{ EnemyAnimationState::Dodge_FU, 0.0f, Short_Distance, 80 },
+//		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
+//	};
+//	attackComboMap[EnemyAnimationState::Light_Attack_02] = {
+//		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
+//		{ EnemyAnimationState::Heavy_Attack_02, 0.0f, Short_Distance, 40 },
+//	};
+//	attackComboMap[EnemyAnimationState::Dodge_FU] = {
+//		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
+//	};
+//
+//	attackComboMap[EnemyAnimationState::Light_Attack_03] = {
+//		{ EnemyAnimationState::Heavy_Attack_01, 0.0f, Short_Distance, 40 },
+//	};
+//
+//	// 中距離
+//
+//	attackComboMap[EnemyAnimationState::Dodge_Backward] = {
+//		{ EnemyAnimationState::Skill_Leaping, 0.0f, Middle_Distance, 50 },
+//		{ EnemyAnimationState::Skill_UpperCut, 0.0f, Short_Distance, 50 },
+//		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
+//	};
+//}
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
-	//現在実行されているノードが無ければ
-	if (activeNode == nullptr)
-	{
-		//次に実行するノードを推論する。
-		activeNode = aiTree->ActiveNodeInference(behaviorData);
-	}
-	//現在実行するノードがあれば
-	if (activeNode != nullptr)
-	{
-		//ビヘイビアツリーからノードを実行。
-		activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
-	}
+	////現在実行されているノードが無ければ
+	//if (activeNode == nullptr)
+	//{
+	//	//次に実行するノードを推論する。
+	//	activeNode = aiTree->ActiveNodeInference(behaviorData);
+	//}
+	////現在実行するノードがあれば
+	//if (activeNode != nullptr)
+	//{
+	//	//ビヘイビアツリーからノードを実行。
+	//	activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+	//}
+	if(GetAsyncKeyState('1') & 0x8000)
+	ChangeAnimationState(EnemyAnimationState::Idle_2);
 
 	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
 
@@ -707,104 +714,142 @@ void Enemy::UpdateStateTransitions(float elapsedTime)
 {
 	switch (currentState)
 	{
-	case EnemyAnimationState::Idle:
-		if (GetAsyncKeyState('1') & 0x8000) ChangeAnimationState(EnemyAnimationState::Light_Attack_01);
-		if (GetAsyncKeyState('2') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_DoubleSwings_Root);
-		if (GetAsyncKeyState('3') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_EndlessStabs);
-
+	case EnemyAnimationState::Idle_1:
 		break;
-	case EnemyAnimationState::Walk_F:
+	case EnemyAnimationState::Idle_2:
 		break;
-	case EnemyAnimationState::Walk_B:
+	case EnemyAnimationState::Walk:
 		break;
-	case EnemyAnimationState::Walk_L:
+	case EnemyAnimationState::Walk_InPlace:
 		break;
-	case EnemyAnimationState::Walk_R:
+	case EnemyAnimationState::Run:
 		break;
-	case EnemyAnimationState::Jog_F:
+	case EnemyAnimationState::Jump:
 		break;
-	case EnemyAnimationState::Dodge_Forkward:
+	case EnemyAnimationState::Fall_Loop:
 		break;
-	case EnemyAnimationState::Dodge_Backward:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-
+	case EnemyAnimationState::Land:
 		break;
-	case EnemyAnimationState::Dodge_Left:
+	case EnemyAnimationState::Death:
 		break;
-	case EnemyAnimationState::Dodge_Right:
+	case EnemyAnimationState::Get_Hit:
 		break;
-	case EnemyAnimationState::Light_Attack_01:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	case EnemyAnimationState::Attack_1:
 		break;
-	case EnemyAnimationState::Light_Attack_02:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	case EnemyAnimationState::Attack_2:
 		break;
-	case EnemyAnimationState::Light_Attack_03:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	case EnemyAnimationState::Attack_3:
 		break;
-	case EnemyAnimationState::Heavy_Attack_01:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	case EnemyAnimationState::Attack_4:
 		break;
-	case EnemyAnimationState::Heavy_Attack_02:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	case EnemyAnimationState::Attack_Combo_4:
 		break;
-	case EnemyAnimationState::Dodge_FU:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Grab_Fall:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Roar:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_BlockBreaker:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_DoubleSwings_Root:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_EndlessStabs:
-		weapon->LeftHandInvincible = false;
-
-		if (IsAnimationOutTimeRange(3.248)) weapon->LeftHandInvincible = true;
-
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_QuickStab:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_HeavyStomp:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_Leaping:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_ShoulderBarge_Root:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_UpperCut:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Skill_WieldDagger:
-		if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-		break;
-	case EnemyAnimationState::Hit_Front:
-		break;
-	case EnemyAnimationState::Hit_Light_Left:
-		break;
-	case EnemyAnimationState::Hit_Light_Right:
-		break;
-	case EnemyAnimationState::Hit_Launch_Root:
-		break;
-	case EnemyAnimationState::Hit_Knockdown:
-		break;
-	case EnemyAnimationState::Death_A:
-		break;
-	case EnemyAnimationState::Death_B:
+	case EnemyAnimationState::Block_Defense:
 		break;
 	default:
 		break;
 	}
+
+	//switch (currentState)
+	//{
+	//case EnemyAnimationState::Idle:
+	//	if (GetAsyncKeyState('1') & 0x8000) ChangeAnimationState(EnemyAnimationState::Light_Attack_01);
+	//	if (GetAsyncKeyState('2') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_DoubleSwings_Root);
+	//	if (GetAsyncKeyState('3') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_EndlessStabs);
+
+	//	break;
+	//case EnemyAnimationState::Walk_F:
+	//	break;
+	//case EnemyAnimationState::Walk_B:
+	//	break;
+	//case EnemyAnimationState::Walk_L:
+	//	break;
+	//case EnemyAnimationState::Walk_R:
+	//	break;
+	//case EnemyAnimationState::Jog_F:
+	//	break;
+	//case EnemyAnimationState::Dodge_Forkward:
+	//	break;
+	//case EnemyAnimationState::Dodge_Backward:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+
+	//	break;
+	//case EnemyAnimationState::Dodge_Left:
+	//	break;
+	//case EnemyAnimationState::Dodge_Right:
+	//	break;
+	//case EnemyAnimationState::Light_Attack_01:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Light_Attack_02:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Light_Attack_03:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Heavy_Attack_01:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Heavy_Attack_02:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Dodge_FU:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Grab_Fall:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Roar:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_BlockBreaker:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_DoubleSwings_Root:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_EndlessStabs:
+	//	weapon->LeftHandInvincible = false;
+
+	//	if (IsAnimationOutTimeRange(3.248)) weapon->LeftHandInvincible = true;
+
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_QuickStab:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_HeavyStomp:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_Leaping:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_ShoulderBarge_Root:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_UpperCut:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Skill_WieldDagger:
+	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
+	//	break;
+	//case EnemyAnimationState::Hit_Front:
+	//	break;
+	//case EnemyAnimationState::Hit_Light_Left:
+	//	break;
+	//case EnemyAnimationState::Hit_Light_Right:
+	//	break;
+	//case EnemyAnimationState::Hit_Launch_Root:
+	//	break;
+	//case EnemyAnimationState::Hit_Knockdown:
+	//	break;
+	//case EnemyAnimationState::Death_A:
+	//	break;
+	//case EnemyAnimationState::Death_B:
+	//	break;
+	//default:
+	//	break;
+	//}
 }
 
 // downしたときに呼ばれる
@@ -838,6 +883,11 @@ void Enemy::EnemyAnimationSequencer()
 	for (auto& [state, tracks] : AnimSequence.attackData)
 	{
 		const AnimationConfig* config = manager.GetConfig(state);
+
+		if (config == nullptr)
+		{
+			continue;
+		}
 
 		bool is_selected = (AnimSequence.currentState == state);
 		if (ImGui::Selectable(config->animationName.c_str(), is_selected))
@@ -980,10 +1030,10 @@ void Enemy::EnemyAnimationSequencer()
 
 	// 保存・読み込みボタン
 	if (ImGui::Button(u8"保存"))
-		AnimSequence.Save("Data/Json/Enemy/AttackData/AttackSequence.json");
+		AnimSequence.Save("Data/Json/Enemy/AttackData/Boss.json");
 	ImGui::SameLine();
 	if (ImGui::Button(u8"読み込み"))
-		AnimSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
+		AnimSequence.Load("Data/Json/Enemy/AttackData/Boss.json");
 
 	if (AnimSequence.currentState == GetCurrentState())
 	{
@@ -1061,29 +1111,51 @@ AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 void Enemy::WeaponAttachment()
 {
 	//const char* HandName[2] = { "Bip001-R-Hand", "Bip001-L-Hand" };
-	const char* HandName[2] = { "Bip001-Prop1", "Bip001-Prop2" };
+	//const char* HandName[2] = { "Bip001-Prop1", "Bip001-Prop2" };
+	const char* HandName = "Bip001-Prop1";
 
-	for (int i = 0; i < 2; ++i)
+	// 武器のローカル行列を計算
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[0].scale.x, weapon[0].scale.y, weapon[0].scale.z);
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[0].angle.x, weapon[0].angle.y, weapon[0].angle.z);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon[0].position.x, weapon[0].position.y, weapon[0].position.z);
+	DirectX::XMMATRIX weaponLocal = S * R * T;
+
+	// モデルから両手のノードを検索する
+	for (const Model::Node& node : enemy->GetNodes())
 	{
-		// 武器のローカル行列を計算
-		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[i].scale.x, weapon[i].scale.y, weapon[i].scale.z);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[i].angle.x, weapon[i].angle.y, weapon[i].angle.z);
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon[i].position.x, weapon[i].position.y, weapon[i].position.z);
-		DirectX::XMMATRIX weaponLocal = S * R * T;
-
-		// モデルから両手のノードを検索する
-		for (const Model::Node& node : enemy->GetNodes())
+		if (strcmp(node.name.c_str(), HandName) == 0)
 		{
-			if (strcmp(node.name.c_str(), HandName[i]) == 0)
-			{
-				// 右手ノードと武器のローカル行列から武器のワールド行列を求める
-				DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
-				DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
-				DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
-				DirectX::XMStoreFloat4x4(&weapon[i].transform, weaponWorld);
-				weapon[i].model->UpdateTransform(weapon[i].transform);
-				break;
-			}
+			// 右手ノードと武器のローカル行列から武器のワールド行列を求める
+			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
+			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
+			DirectX::XMStoreFloat4x4(&weapon[0].transform, weaponWorld);
+			weapon[0].model->UpdateTransform(weapon[0].transform);
+			break;
 		}
 	}
+
+	//for (int i = 0; i < 2; ++i)
+	//{
+	//	// 武器のローカル行列を計算
+	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[i].scale.x, weapon[i].scale.y, weapon[i].scale.z);
+	//	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[i].angle.x, weapon[i].angle.y, weapon[i].angle.z);
+	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon[i].position.x, weapon[i].position.y, weapon[i].position.z);
+	//	DirectX::XMMATRIX weaponLocal = S * R * T;
+
+	//	// モデルから両手のノードを検索する
+	//	for (const Model::Node& node : enemy->GetNodes())
+	//	{
+	//		if (strcmp(node.name.c_str(), HandName[i]) == 0)
+	//		{
+	//			// 右手ノードと武器のローカル行列から武器のワールド行列を求める
+	//			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
+	//			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+	//			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
+	//			DirectX::XMStoreFloat4x4(&weapon[i].transform, weaponWorld);
+	//			weapon[i].model->UpdateTransform(weapon[i].transform);
+	//			break;
+	//		}
+	//	}
+	//}
 }

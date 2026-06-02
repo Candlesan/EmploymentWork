@@ -5,6 +5,8 @@
 #include "json.hpp"
 #include <unordered_map>
 #include <fstream>
+#include <filesystem>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -149,6 +151,12 @@ public:
     // --- JSON入出力 ---
 
     void Save(const std::string& filepath) const {
+        // 仮で作る後でりんちゃんのやつをまねて作り直す
+        std::filesystem::path path(filepath);
+        if (path.has_parent_path() && !std::filesystem::exists(path.parent_path())) {
+            std::filesystem::create_directories(path.parent_path());
+        }
+
         nlohmann::json root;
         for (auto& [state, tracks] : attackData) {
             nlohmann::json trackArray = nlohmann::json::array();
@@ -171,49 +179,61 @@ public:
             }
             root[std::to_string((int)state)] = trackArray;
         }
+
         std::ofstream file(filepath);
         if (file.is_open()) file << root.dump(4);
     }
 
     void Load(const std::string& filepath) {
         std::ifstream file(filepath);
-        if (!file.is_open()) return;
-        nlohmann::json root;
-        file >> root;
+        if (!file.is_open()) return; // ファイルが無ければ何もしない
 
-        attackData.clear();
-        for (auto& [key, trackArray] : root.items()) {
-            T state = (T)std::stoi(key);
-            std::vector<AnimTrack> tracks;
-            for (auto& t : trackArray) {
-                AnimTrack track;
-                track.start = t["start"];
-                track.end = t["end"];
-                track.label = t.value("label", "No Name");
-                track.color = t.value("color", 0xFFFFFFFF);
-                track.type = (TrackType)t.value("type", 0);
-                track.hand = (HandType)t.value("hand", 0);
-                track.boneName = t.value("boneName", "");
-                track.sphereRadius = t.value("sphereRadius", 0.5f);
-                if (t.count("sphereOffset"))
-                {
-                    track.sphereOffset.x = t["sphereOffset"][0];
-                    track.sphereOffset.y = t["sphereOffset"][1];
-                    track.sphereOffset.z = t["sphereOffset"][2];
+        try
+        {
+            nlohmann::json root;
+            file >> root;
+
+            attackData.clear();
+            for (auto& [key, trackArray] : root.items()) {
+                T state = (T)std::stoi(key);
+                std::vector<AnimTrack> tracks;
+                for (auto& t : trackArray) {
+                    AnimTrack track;
+                    track.start = t["start"];
+                    track.end = t["end"];
+                    track.label = t.value("label", "No Name");
+                    track.color = t.value("color", 0xFFFFFFFF);
+                    track.type = (TrackType)t.value("type", 0);
+                    track.hand = (HandType)t.value("hand", 0);
+                    track.boneName = t.value("boneName", "");
+                    track.sphereRadius = t.value("sphereRadius", 0.5f);
+                    if (t.count("sphereOffset"))
+                    {
+                        track.sphereOffset.x = t["sphereOffset"][0];
+                        track.sphereOffset.y = t["sphereOffset"][1];
+                        track.sphereOffset.z = t["sphereOffset"][2];
+                    }
+                    else
+                    {
+                        track.sphereOffset = { 0, 0, 0 };
+                    }
+                    track.damageRate = t.value("damageRate", 0.0f);
+                    track.invincible = t.value("invincible", 0.3f);
+                    track.poiseRate = t.value("poiseRate", 0.0f);
+                    track.soundName = t.value("soundName", "");
+                    track.soundPlayed = false;
+                    tracks.push_back(track);
                 }
-                else
-                {
-                    track.sphereOffset = { 0, 0, 0 };
-                }        
-                track.damageRate = t.value("damageRate", 0.0f);
-                track.invincible = t.value("invincible", 0.3f);
-                track.poiseRate = t.value("poiseRate", 0.0f);
-                track.soundName = t.value("soundName", "");
-                track.soundPlayed = false;
-                tracks.push_back(track);
+                attackData[state] = tracks;
             }
-            attackData[state] = tracks;
         }
+        catch (const nlohmann::json::exception& e)
+        {
+            // 中身が空、もしくは壊れている場合はクラッシュさせずにエラーログだけ出す
+            std::cerr << "JSON Load Error (" << filepath << "): " << e.what() << std::endl;
+            // ImGuiのコンソール等があればそこに出力するとなお良し
+        }
+
     }
 
 private:
