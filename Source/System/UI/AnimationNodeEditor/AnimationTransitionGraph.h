@@ -3,12 +3,24 @@
 #include <imgui_node_editor.h>
 #include "json.hpp"
 #include <fstream>
-#include <string>
 namespace ed = ax::NodeEditor;
+
+// アニメーションの設定
+struct AnimationConfig
+{
+	std::string animationName = "";	// アニメーション名
+	bool loop = false;				// アニメーションをループするか
+	bool useRootMotion = false;		// ルートモーションするか
+	bool useRootMotionEx = false;	// 腰骨に対応したルートモーション
+	float blendTime = 0.2f;			// 補間時間
+};
 
 struct AnimNode {
 	ed::NodeId nodeId;
-	int animState; // PlayerAnimationState
+	std::string StateName; // 文字列に変える
+
+	AnimationConfig config; // アニメーション自体の設定
+
 	ImVec2 position; // ノードの位置
 	ed::PinId pinOut; // 遷移の出口
 	ed::PinId pinIn; // 遷移の入口
@@ -30,7 +42,7 @@ public:
 	std::string graphName = "NewGraph"; // グラフの名前
 
 	// ===== 基本機能 ======
-	void AddNode(int animState, ImVec2 pos); // ノードの追加
+	void AddNode(const std::string& StateName, ImVec2 pos); // ノードの追加
 	void AddLink(ed::PinId from, ed::PinId to); // 矢印の追加
 	void RemoveNode(ed::NodeId id); // ノードの削除
 	void RemoveLink(ed::LinkId id); // 矢印の削除
@@ -40,7 +52,7 @@ public:
 	// =====================
 
 	// ランタイム評価：現在のステートから次ステートを返す
-	int EvaluateTransitions(int currentState, const TransitionContext& conditions);
+	std::string EvaluateTransitions(const std::string& currentState, const TransitionContext& conditions);
 
 	// 自動整列
 	void AutoLayout();
@@ -51,7 +63,7 @@ public:
 	int NextId() { return nextId++; }
 
 	// ゲッター
-	const AnimationTransition* GetTransition(int fromState, int toState);
+	const AnimationTransition* GetTransition(const std::string& fromState, const std::string& toState);
 private:
 	static int nextId;
 	bool EvaluateConditions(const std::vector<TransitionCondition>& conditions,

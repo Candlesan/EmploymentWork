@@ -16,11 +16,15 @@ public:
 
 	// ノードエディタ描画
 	//void Draw(AnimationTransitionGraph& graph);
-	void Draw(std::vector< AnimationTransitionGraph>& graph);
+	//void Draw(std::vector< AnimationTransitionGraph>& graph);
+	std::string Draw(std::vector< AnimationTransitionGraph>& graph);
 
 private:
 	// リンク選択
 	void DrawSelectedLinkEditor(AnimationTransitionGraph& graph);
+
+    // ノード選択
+    void DrawSelectedNodeEditor(AnimationTransitionGraph& graph);
 
 	ed::EditorContext* context = nullptr;
     AnimLink* copiedLink = nullptr; // コピー元のリンクを保持する変数

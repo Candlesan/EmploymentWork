@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <string>
 #include <vector>
 #include <DirectXMath.h>
 
@@ -57,8 +58,8 @@ struct TransitionCondition
 
 struct AnimationTransition
 {
-	int fromState;  // PlayerAnimationState の int キャスト
-	int toState;
+	std::string fromState;  // PlayerAnimationState の int キャスト
+	std::string toState;
 	std::vector<TransitionCondition> conditions;  // AND条件
 	int priority = 0;  // 複数遷移が成立したとき優先度が高いほうが勝つ
 	std::vector<TransitionAction> actions;

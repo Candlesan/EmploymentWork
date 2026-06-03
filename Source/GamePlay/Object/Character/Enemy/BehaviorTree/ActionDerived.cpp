@@ -3,6 +3,7 @@
 #include "System/Core/Mathf.h"
 
 #include <stdlib.h>
+#include <string>
 
 
 // ‘Ò‹@s“®
@@ -97,9 +98,9 @@ ActionBase::State AttackAction::Run(float elapsedTime)
 		owner->TurnToPosition(elapsedTime);
 		if (owner->IsFacingTarget(player.GetPosition(), 15.0f))
 		{
-			EnemyAnimationState firstAttack = owner->DecideFirstAttack();
+			std::string firstAttack = owner->DecideFirstAttack();
 
-			if (firstAttack != (EnemyAnimationState)-1)
+			if (firstAttack != "")
 			{
 				owner->ChangeAnimationState(firstAttack);
 				step = 1;

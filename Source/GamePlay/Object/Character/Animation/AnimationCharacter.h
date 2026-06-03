@@ -1,11 +1,12 @@
 #pragma once
 #include "GamePlay/Object/Character/Character.h"
-#include "AnimationState.h"
+#include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
+#include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 // アニメーション機能を持つキャラクター基底クラス
-template<typename StateEnum>
 class AnimationCharacter : public Character
 {
 public:
@@ -13,10 +14,10 @@ public:
 	virtual ~AnimationCharacter() = default;
 
 	// ステート変更
-	void ChangeAnimationState(StateEnum newState, bool ignoreOverlay = false);
+	void ChangeAnimationState(const std::string& newState, bool ignoreOverlay = false);
 
 	// 上半身のアニメーション
-	void StartOverlayAnimation(StateEnum newState);
+	void StartOverlayAnimation(const std::string& newState);
 
 	// アニメーション更新
 	void UpdateAnimation(float elapsedTime);
@@ -40,32 +41,39 @@ public:
 	bool IsUpperBodyNode(const Model::Node& node, const std::string& rootNodeName);
 
 	// 現在のステート取得
-	StateEnum GetCurrentState() const { return currentState; }
+	std::string GetCurrentState() const { return currentState; }
 
 	void SetSpeedUp(float s) { speedUp = s; }
 	void SetBaseSpeed(float s) { baseSpeed = s; }
 
 	// 現在の再生時間を取得
 	float GetCurrentAnimationSeconds() const { return animationSeconds; }
-	//float GetAnimationSeconds(PlayerAnimationState state) const;
 	float GetCurrentAnimationLength() const;
+
+	// JSONファイルパスを渡して、中のノード設定を読み込む関数
+	void LoadAnimationData(const std::string& jsonPath);
+
+	// 指定したステート名の設定を取得する関数
+	const AnimationConfig* GetAnimationConfig(const std::string& stateName) const;
 protected:
 	// サブクラスでオーバーライド出来る
-	virtual void OnStateChanged(StateEnum oldState, StateEnum newState) {}
+	virtual void OnStateChanged(const std::string& oldState, const std::string& newState) {}
 
 	// モデルへのアクセス（派生クラスで実装すること）
 	virtual std::shared_ptr<Model> GetModel() = 0;
 	virtual const std::shared_ptr<Model> GetModel() const = 0;
 
 	// アニメーション関連データ
-	StateEnum currentState = static_cast<StateEnum>(-1);
-	StateEnum previousState = static_cast<StateEnum>(-1);
+	std::string currentState = "";
+	std::string previousState = "";
 
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
 
 	std::string rootMotionNodeName = "root";      // ルートモーションのノード名
 	std::string upperBodyNodeName = "spine_01";  // 上半身の起点ノード名
+
+	std::unordered_map<std::string, AnimationConfig> stateConfigs;
 
 	int animationIndex = -1;
 	float animationSeconds = 0.0f;
@@ -90,7 +98,7 @@ protected:
 	// 上半身と下半身のアニメーション用
 	int overlayAnimationIndex = -1;       // 上半身アニメのインデックス
 	float overlayAnimationSeconds = 0.0f; // 上半身アニメの再生時間
-	bool overlayAnimationLoop = false;     
+	bool overlayAnimationLoop = false;
 	bool isOverlayPlaying = false;        // 上半身アニメ再生中か
 
 

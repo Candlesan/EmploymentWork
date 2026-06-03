@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 
-class Enemy : public AnimationCharacter<EnemyAnimationState>
+class Enemy : public AnimationCharacter
 {
 public:
 	Enemy() {};
@@ -57,10 +57,10 @@ public:
 	std::vector<SphereHitInfo> GetActiveSphereHits() const;
 
 	// 始動技を決める関数
-	EnemyAnimationState Enemy::DecideFirstAttack();
+	std::string Enemy::DecideFirstAttack();
 
 	// 技の派生があるか確認する関数
-	EnemyAnimationState Enemy::DecideNextAttack(EnemyAnimationState currentState);
+	std::string Enemy::DecideNextAttack(std::string currentState);
 
 	// スタンプ攻撃
 	void HeavyStompAttack();
@@ -75,7 +75,7 @@ public:
 	float GetAttackCoolTimer() const { return attackCoolTimer; }
 
 	// シーケンサーを取得
-	AnimationSequence<EnemyAnimationState>& GetAnimSequence() { return animSequence; }
+	AnimationSequence GetAnimSequence() { return animSequence; }
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
@@ -91,13 +91,13 @@ private:
 	void OnDown() override;
 
 	// アニメーションのコールバック関数
-	void OnStateChanged(EnemyAnimationState oldState, EnemyAnimationState newState);
+	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
 	// シーケンサーを描画する
 	void EnemyAnimationSequencer();
 
 	// サウンドを流す
-	void UpdateSounds(EnemyAnimationState state);
+	void UpdateSounds(const std::string& state);
 
 	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
@@ -154,26 +154,26 @@ private:
 	float runTimer = 0.0f;
 
 	// シーケンサー関係
-	AnimationSequence<EnemyAnimationState> animSequence;
+	AnimationSequence animSequence;
 	int currentFrame = 0;
 	bool sequencerExpanded = true;
 	int selectedEntry = -1;
 	int firstFrame = 0;
 
 	// 技のつながり
-	struct AttackDerivation 
+	struct AttackDerivation
 	{
-		EnemyAnimationState nextState; // 次に出す技
+		std::string nextState; // 次に出す技
 		float minDistance; // 派生するための最低距離
 		float maxDistance; // 派生するための最大距離
 		int probability; // 派生する確率（0～100）
 	};
-	std::unordered_map<EnemyAnimationState, std::vector<AttackDerivation>> attackComboMap;
+	std::unordered_map<std::string, std::vector<AttackDerivation>> attackComboMap;
 
 	// 始動技
 	struct FirstAttack
 	{
-		EnemyAnimationState state;
+		std::string state;
 		float minRange;
 		float maxRange;
 	};

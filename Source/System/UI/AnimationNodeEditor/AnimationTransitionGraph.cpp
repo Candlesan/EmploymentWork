@@ -4,13 +4,13 @@
 int AnimationTransitionGraph::nextId = 1;
 
 // ノードの追加
-void AnimationTransitionGraph::AddNode(int animState, ImVec2 pos)
+void AnimationTransitionGraph::AddNode(const std::string& StateName, ImVec2 pos)
 {
 	AnimNode node;
 	node.nodeId = NextId();
 	node.pinIn = NextId();
 	node.pinOut = NextId();
-	node.animState = animState;
+	node.StateName = StateName;
 	node.position = pos;
 	nodes.push_back(node);
 }
@@ -19,13 +19,13 @@ void AnimationTransitionGraph::AddNode(int animState, ImVec2 pos)
 void AnimationTransitionGraph::AddLink(ed::PinId from, ed::PinId to)
 {
 	// fromがどのノードか、toがどのノードかを探す
-	int fromState = -1, toState = -1;
+	std::string fromState = "", toState = "-1";
 	for (auto& n : nodes)
 	{
-		if (n.pinOut == from) fromState = n.animState;
-		if (n.pinIn == to) toState = n.animState;
+		if (n.pinOut == from) fromState = n.StateName;
+		if (n.pinIn == to) toState = n.StateName;
 	}
-	if (fromState == -1 || toState == -1) return; // 見つからなければ何もしない
+	if (fromState.empty()|| toState.empty()) return; // 見つからなければ何もしない
 
 	AnimLink link;
 	link.linkId = NextId();
@@ -71,7 +71,7 @@ void AnimationTransitionGraph::RemoveLink(ed::LinkId id)
 }
 
 // 条件を評価する関数
-int AnimationTransitionGraph::EvaluateTransitions(int currentState, const TransitionContext& conditions)
+std::string AnimationTransitionGraph::EvaluateTransitions(const std::string& currentState, const TransitionContext& conditions)
 {
 	// currentStateから出るリンクだけ集める
 	std::vector<AnimLink*> candidates;
@@ -230,14 +230,24 @@ void AnimationTransitionGraph::Save(const std::string& path)
 	j["nodes"] = json::array();
 	for (auto& node : nodes)
 	{
+		// ★変更: animState ではなく StateName を保存する
 		j["nodes"].push_back({
-			{"animState", node.animState},
+			{"StateName", node.StateName},
+			// ノードが持っている config も一緒に保存する！
+			{"config", {
+				{"animationName", node.config.animationName},
+				{"loop", node.config.loop},
+				{"useRootMotion", node.config.useRootMotion},
+				{"useRootMotionEx", node.config.useRootMotionEx},
+				{"blendTime", node.config.blendTime}
+			}}
 			});
 	}
 
 	json linkJson;
 	for (auto& link : links)
 	{
+		// ★変更: リンクのつながりも fromState(文字列) で保存する
 		linkJson["fromState"] = link.transition.fromState;
 		linkJson["toState"] = link.transition.toState;
 		linkJson["priority"] = link.transition.priority;
@@ -278,59 +288,120 @@ void AnimationTransitionGraph::Load(const std::string& path)
 	using json = nlohmann::json;
 
 	std::ifstream file(path);
-	json j = json::parse(file);
+	if (!file.is_open()) return;
+
+	json j;
+	try {
+		j = json::parse(file);
+	}
+	catch (const nlohmann::json::exception& e) {
+		return; // JSONが壊れていたら何もしない（クラッシュ防止）
+	}
 
 	nodes.clear();
 	links.clear();
 
-	for (auto& node : j["nodes"])
-	{
-		AddNode(node["animState"], { 0, 0 });
+	// -------- ノードの読み込み --------
+	if (j.count("nodes") > 0) {
+		for (auto& node : j["nodes"])
+		{
+			std::string stateName = "";
+
+			// ★安全装置：新しい形式（StateName）か古い形式（animState）か自動判別する
+			if (node.count("StateName") > 0 && node["StateName"].is_string()) {
+				stateName = node["StateName"];
+			}
+			else if (node.count("animState") > 0 && node["animState"].is_number()) {
+				stateName = std::to_string((int)node["animState"]);
+			}
+			else {
+				stateName = "Unknown";
+			}
+
+			// ノードを追加
+			AddNode(stateName, { 0, 0 });
+			AnimNode& newNode = nodes.back();
+
+			// configデータが存在すれば読み込む
+			if (node.count("config") > 0) {
+				auto& c = node["config"];
+				newNode.config.animationName = c.value("animationName", "");
+				newNode.config.loop = c.value("loop", false);
+				newNode.config.useRootMotion = c.value("useRootMotion", false);
+				newNode.config.useRootMotionEx = c.value("useRootMotionEx", false);
+				newNode.config.blendTime = c.value("blendTime", 0.2f);
+			}
+		}
 	}
 
-	for (auto& link : j["links"])
-	{
-		// nodesの中から対応するPinIdを探す
-		int fromState = link["fromState"];
-		int toState = link["toState"];
-
-		ed::PinId fromPin, toPin;
-		for (auto& node : nodes)
+	// -------- リンク（矢印）の読み込み --------
+	if (j.count("links") > 0) {
+		for (auto& link : j["links"])
 		{
-			if (node.animState == fromState)
-				fromPin = node.pinOut;
-			if (node.animState == toState)
-				toPin = node.pinIn;
-		}
+			std::string fromState = "";
+			std::string toState = "";
 
-		// 見つかったPinIdでAddLinkを呼ぶ
-		AddLink(fromPin, toPin);
+			// ★安全装置：ここも新旧の形式に対応させる
+			if (link.count("fromState") > 0) {
+				if (link["fromState"].is_string()) fromState = link["fromState"];
+				else if (link["fromState"].is_number()) fromState = std::to_string((int)link["fromState"]);
+			}
 
-		// AddLinkで追加された最後のlinkに条件とアクションを入れる
-		AnimLink& newLink = links.back();
+			if (link.count("toState") > 0) {
+				if (link["toState"].is_string()) toState = link["toState"];
+				else if (link["toState"].is_number()) toState = std::to_string((int)link["toState"]);
+			}
 
-		newLink.transition.priority = link["priority"];
-		newLink.color.x = link["colorR"];
-		newLink.color.y = link["colorG"];
-		newLink.color.z = link["colorB"];
-		newLink.color.w = link["colorA"];
+			ed::PinId fromPin, toPin;
+			bool foundFrom = false, foundTo = false;
 
-		for (auto& cond : link["conditions"])
-		{
-			TransitionCondition c;
-			c.type = (TransitionConditionType)(int)cond["type"];
-			c.threshold = cond["threshold"];
-			c.buttonMask = cond["buttonMask"];
-			c.negate = cond["negate"];
-			newLink.transition.conditions.push_back(c);
-		}
+			// 文字列（StateName）でつながりを探す
+			for (auto& node : nodes)
+			{
+				if (node.StateName == fromState) {
+					fromPin = node.pinOut;
+					foundFrom = true;
+				}
+				if (node.StateName == toState) {
+					toPin = node.pinIn;
+					foundTo = true;
+				}
+			}
 
-		for (auto& act : link["Actions"])
-		{
-			TransitionAction a;
-			a.type = (TransitionActionType)(int)act["type"];
-			a.value = act["value"];
-			newLink.transition.actions.push_back(a);
+			// 見つかった場合のみ AddLink を呼ぶ（クラッシュ対策）
+			if (foundFrom && foundTo)
+			{
+				AddLink(fromPin, toPin);
+
+				AnimLink& newLink = links.back();
+				newLink.transition.priority = link.value("priority", 0);
+				newLink.color.x = link.value("colorR", 1.0f);
+				newLink.color.y = link.value("colorG", 1.0f);
+				newLink.color.z = link.value("colorB", 1.0f);
+				newLink.color.w = link.value("colorA", 1.0f);
+
+				if (link.count("conditions") > 0) {
+					for (auto& cond : link["conditions"])
+					{
+						TransitionCondition c;
+						c.type = (TransitionConditionType)cond.value("type", 0);
+						c.threshold = cond.value("threshold", 0.0f);
+						c.buttonMask = cond.value("buttonMask", 0);
+						c.negate = cond.value("negate", false);
+						newLink.transition.conditions.push_back(c);
+					}
+				}
+
+				if (link.count("Actions") > 0) {
+					for (auto& act : link["Actions"])
+					{
+						TransitionAction a;
+						a.type = (TransitionActionType)act.value("type", 0);
+						a.value = act.value("value", 0.0f);
+						newLink.transition.actions.push_back(a);
+					}
+				}
+			}
 		}
 	}
 }
@@ -370,7 +441,7 @@ void AnimationTransitionGraph::InitializeAsNew(const std::string& name)
 }
 
 // リンクの取得
-const AnimationTransition* AnimationTransitionGraph::GetTransition(int fromState, int toState)
+const AnimationTransition* AnimationTransitionGraph::GetTransition(const std::string& fromState, const std::string& toState)
 {
 	for (auto& link : links)
 	{

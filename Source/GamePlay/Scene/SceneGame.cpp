@@ -92,7 +92,7 @@ void SceneGame::Finalize()
 void SceneGame::Update(float elapsedTime)
 {
 	float delta = elapsedTime * timeScale;
-
+	
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
@@ -602,7 +602,7 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 	{
 		// ダメージ処理
 		auto state = player.GetCurrentState();
-		const auto& config = AnimationStateManager<PlayerAnimationState>::Instance().GetConfig(state);
+	const AnimationConfig* config = player.GetAnimationConfig(state);
 
 		float finalDamage = activeTrack->damageRate;
 		float finalPoiseValue = activeTrack->poiseRate;
@@ -626,8 +626,8 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 
 	float currentSec = enemy->GetCurrentAnimationSeconds();
 	auto state = enemy->GetCurrentState();
-	const auto& config = AnimationStateManager<EnemyAnimationState>::Instance().GetConfig(state);
 
+	const AnimationConfig* config = enemy->GetAnimationConfig(state);
 
 	// 敵のi番目の武器 vs プレイヤーの本体
 	DirectX::XMFLOAT3 outPositionA, outPositionB;

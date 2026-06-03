@@ -7,7 +7,6 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
-#include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
 #include "GamePlay/Object/Character/Player/Magic/StraightMagic/StraightMagic.h"
 #include "GamePlay/Object/Character/Player/Magic/HommingMagic/HommingMagic.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
@@ -61,12 +60,6 @@ void Player::Initialize()
 	// Jsonファイルの初期化
 	InitializeAttackData();
 
-	// アニメーション設定
-	AnimationStateManager<PlayerAnimationState>::Instance();
-	player->GetNodePoses(nodePoses);
-	player->GetNodePoses(oldNodePoses);
-	ChangeAnimationState(PlayerAnimationState::Idle);
-
 	trail.Initialize();
 
 	// アニメーションノードエディターの初期化
@@ -95,18 +88,34 @@ void Player::Initialize()
 
 					transitionGraphs.push_back(newGraph);
 				}
-				else
-				{
-					// ファイルがない場合の初期ノード作成
-					transitionGraphs[0].AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
-
-					// 最後に保存
-					transitionGraphs[0].Save("Data/Json/Player/AnimationState/BaseState.json");
-
-				}
 			}
 		}
+
+		if (transitionGraphs.empty())
+		{
+			AnimationTransitionGraph defaultGraph;
+			defaultGraph.graphName = "BaseState";
+
+			// ファイルがない場合の初期ノード作成
+			defaultGraph.AddNode("Idle", { 100, 100 });
+
+			if (!fs::exists(folderPath))
+			{
+				fs::create_directories(folderPath);
+			}
+
+			// 最後に保存
+			defaultGraph.Save("Data/Json/Player/AnimationState/BaseState.json");
+			transitionGraphs.push_back(defaultGraph);
+		}
 	}
+
+	// アニメーション設定
+	LoadAnimationData("Data/Json/Player/AnimationState/BaseState.json");
+	player->GetNodePoses(nodePoses);
+	player->GetNodePoses(oldNodePoses);
+	ChangeAnimationState("Idle");
+
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -114,6 +123,8 @@ void Player::InitializeAttackData()
 {
 	// シーケンサーの初期化
 	animSequence.SetModel(player);
+
+	animSequence.SetConfigMap(&stateConfigs);
 
 	// Jsonがあれば読み込む、無ければデフォルト値を設定
 	std::ifstream file("Data/Json/Player/AttackData/AttackSequence.json");
@@ -124,25 +135,25 @@ void Player::InitializeAttackData()
 	}
 	else
 	{
-		animSequence.attackData[PlayerAnimationState::Attack_01] = {
-		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[PlayerAnimationState::Attack_02] = {
-		  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
-		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[PlayerAnimationState::Run_Attack] = {
-		  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
-		  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
-		animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
-		  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		};
+		//animSequence.attackData[PlayerAnimationState::Attack_01] = {
+		//{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		//};
+		//animSequence.attackData[PlayerAnimationState::Attack_02] = {
+		//  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		//};
+		//animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
+		//  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+		//  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		//};
+		//animSequence.attackData[PlayerAnimationState::Run_Attack] = {
+		//  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		//};
+		//animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
+		//  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		//};
+		//animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
+		//  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+		//};
 	}
 }
 
@@ -157,7 +168,7 @@ void Player::Update(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// 一番最初にジャンプ入力を確定させる
-	jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A) && CanJump();
+	jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A)/* && CanJump()*/;
 
 	if (runDisableTimer > 0.0f) {
 		runDisableTimer -= elapsedTime;
@@ -329,18 +340,35 @@ void Player::DrawGUI()
 		// アニメーション遷移状態
 		if (ImGui::CollapsingHeader("Animation/State", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			const AnimationConfig* currentConfig = AnimationStateManager<PlayerAnimationState>
-				::Instance().GetConfig(currentState);
-			ImGui::Text("currentState: %s", currentConfig->animationName.c_str());
+			auto it = stateConfigs.find(currentState);
+
+			// 見つかった場合のみ名前を表示する
+			if (it != stateConfigs.end())
+			{
+				ImGui::Text("currentState: %s", it->second.animationName.c_str());
+			}
+			else
+			{
+				ImGui::Text("currentState: None (or Unknown)");
+			}
 		}
 	}
 	ImGui::End();
 
-	PlayerAnimationSequencer();
-
 	ImGui::Begin("Animation Transition Editor");
-	transitionEditor.Draw(transitionGraphs);
+	std::string clickedNode = transitionEditor.Draw(transitionGraphs);
 	ImGui::End();
+
+	if (clickedNode != "")
+	{
+		animSequence.currentState = clickedNode;
+
+		ChangeAnimationState(clickedNode);
+
+		ImGui::SetWindowFocus("Player Attack Sequencer");
+	}
+
+	PlayerAnimationSequencer();
 }
 
 // デバックプリミティブ描画
@@ -592,7 +620,7 @@ void Player::AddGraph(std::string name)
 	newGraph.InitializeAsNew(name);
 
 	// 初期ノードをセット
-	newGraph.AddNode((int)PlayerAnimationState::Idle, { 100, 100 });
+	newGraph.AddNode("Idle", { 100, 100 });
 
 	// リストに追加する
 	transitionGraphs.push_back(newGraph);
@@ -607,25 +635,37 @@ void Player::PlayerAnimationSequencer()
 {
 	ImGui::Begin("Player Attack Sequencer");
 	auto& AnimSequence = GetAnimSequence();
-	auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
 
 	float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
 	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
 	auto& tracks = AnimSequence.CurrentTracks();
 
-	ImGui::Begin(u8"アニメーション一覧##2");
-	for (auto& [state, tracks] : AnimSequence.attackData)
-	{
-		const AnimationConfig* config = manager.GetConfig(state);
+	// 今選ばれているステート名をわかりやすく表示する（空っぽなら "None"）
+	std::string previewName = AnimSequence.currentState.empty() ? "None" : AnimSequence.currentState;
 
-		bool is_selected = (AnimSequence.currentState == state);
-		if (ImGui::Selectable(config->animationName.c_str(), is_selected))
+	if (ImGui::BeginCombo(u8"編集中のアニメ", previewName.c_str()))
+	{
+		// 自身の stateConfigs (ノードエディタのデータ) から一覧を作る
+		for (auto& [stateName, config] : stateConfigs)
 		{
-			AnimSequence.currentState = state;
-			ChangeAnimationState(state);
+			bool is_selected = (AnimSequence.currentState == stateName);
+
+			// リストにステート名を表示
+			if (ImGui::Selectable(stateName.c_str(), is_selected))
+			{
+				AnimSequence.currentState = stateName;
+				ChangeAnimationState(stateName);
+			}
+
+			// 選択中のものをフォーカスする
+			if (is_selected)
+			{
+				ImGui::SetItemDefaultFocus();
+			}
 		}
+		ImGui::EndCombo();
 	}
-	ImGui::End();
+	ImGui::Separator(); 
 
 	if (selectedEntry >= 0)
 	{
@@ -782,7 +822,7 @@ void Player::PlayerAnimationSequencer()
 }
 
 // サウンドを流す
-void Player::UpdateSounds(PlayerAnimationState state)
+void Player::UpdateSounds(const std::string& state)
 {
 	auto& AnimSequence = GetAnimSequence();
 	float now = GetCurrentAnimationSeconds();
@@ -811,7 +851,7 @@ void Player::OnLanding()
 }
 
 // アニメーションのコールバック関数
-void Player::OnStateChanged(PlayerAnimationState oldState, PlayerAnimationState newState)
+void Player::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
 	// 新しいステートのトラックフラグをリセット
 	for (auto& track : animSequence.attackData[newState])
@@ -880,7 +920,7 @@ void Player::InputMove(float elapsedTime)
 
 	// 回転処理
 
-	if (currentState == PlayerAnimationState::Run)
+	if (currentState == "Run")
 	{
 		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
 	}
@@ -910,45 +950,45 @@ void Player::InputMove(float elapsedTime)
 }
 
 // ジャンプ出来るかどうか
-bool Player::CanJump() const
-{
-	// Jump_End 中はジャンプ不可（着地の瞬間のフレームのズレ対策）
-	if (currentState == PlayerAnimationState::Jump_End)
-	{
-		return IsAnimationOutTimeRange(0.238f);
-	}
-
-	if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
-	// 溜め攻撃の開始直後などは絶対にジャンプ不可
-	if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
-
-	// 通常攻撃の場合
-	if (currentState == PlayerAnimationState::Attack_01) 
-	{
-		return IsAnimationOutTimeRange(0.82f);
-	}
-	else if (currentState == PlayerAnimationState::Attack_02)
-	{
-		return IsAnimationOutTimeRange(0.82f);
-	}
-	else if (currentState == PlayerAnimationState::Charge_Attack)
-	{
-		return IsAnimationOutTimeRange(1.2f);
-
-	}
-	else if (currentState == PlayerAnimationState::Run_Attack)
-	{
-		return IsAnimationOutTimeRange(1.248f);
-
-	}
-	else if (currentState == PlayerAnimationState::Jump_Attack)
-	{
-		return IsAnimationOutTimeRange(0.986);
-
-	}
-
-	return true;
-}
+//bool Player::CanJump() const
+//{
+//	//// Jump_End 中はジャンプ不可（着地の瞬間のフレームのズレ対策）
+//	//if (currentState == PlayerAnimationState::Jump_End)
+//	//{
+//	//	return IsAnimationOutTimeRange(0.238f);
+//	//}
+//
+//	//if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
+//	//// 溜め攻撃の開始直後などは絶対にジャンプ不可
+//	//if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
+//
+//	//// 通常攻撃の場合
+//	//if (currentState == PlayerAnimationState::Attack_01) 
+//	//{
+//	//	return IsAnimationOutTimeRange(0.82f);
+//	//}
+//	//else if (currentState == PlayerAnimationState::Attack_02)
+//	//{
+//	//	return IsAnimationOutTimeRange(0.82f);
+//	//}
+//	//else if (currentState == PlayerAnimationState::Charge_Attack)
+//	//{
+//	//	return IsAnimationOutTimeRange(1.2f);
+//
+//	//}
+//	//else if (currentState == PlayerAnimationState::Run_Attack)
+//	//{
+//	//	return IsAnimationOutTimeRange(1.248f);
+//
+//	//}
+//	//else if (currentState == PlayerAnimationState::Jump_Attack)
+//	//{
+//	//	return IsAnimationOutTimeRange(0.986);
+//
+//	//}
+//
+//	//return true;
+//}
 
 // 状態遷移更新処理
 void Player::UpdateStateTransitions(float elapsedTime)
@@ -957,8 +997,8 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	float moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	PlayerAnimationState moveState = DetermineWalkState(); // 歩きの遷移条件を取得
-	PlayerAnimationState rollState = DetermineRollState(); // 回避の遷移条件を取得
+	std::string moveState = DetermineWalkState(); // 歩きの遷移条件を取得
+	std::string rollState = DetermineRollState(); // 回避の遷移条件を取得
 
 	bool bHold = bButtonHoldTime >= RUN_THRESHOLD; // 長押し判定
 
@@ -1016,11 +1056,11 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 	for (auto& graph : transitionGraphs)
 	{
-		int nextState = graph.EvaluateTransitions((int)currentState, ctx);
-		if (nextState != (int)currentState)
+		std::string nextState = graph.EvaluateTransitions(currentState, ctx);
+		if (nextState != currentState)
 		{
 			// 遷移時のアクション
-			const AnimationTransition* trans = graph.GetTransition((int)currentState, nextState);
+			const AnimationTransition* trans = graph.GetTransition(currentState, nextState);
 			if (trans)
 			{
 				for (auto& action : trans->actions)
@@ -1049,7 +1089,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 					}
 				}
 			}
-			ChangeAnimationState(static_cast<PlayerAnimationState>(nextState));
+			ChangeAnimationState(nextState);
 		}
 	}
 }
@@ -1057,21 +1097,19 @@ void Player::UpdateStateTransitions(float elapsedTime)
 // 遷移以外の細かい条件
 void Player::UpdateStateBehavior()
 {
-	switch (currentState)
+	if (currentState == "Run")
 	{
-	case PlayerAnimationState::Run:
 		calculationStamina(0.1f);
-		break;
-
-	case PlayerAnimationState::Charge_Attack_Start:
+	}
+	else if (currentState == "Charge_Attack_Start")
+	{
 		calculationStamina(0.5f);
 		AnimationLerp(0.188f, 0.583f, 0.4f);
-		break;
 	}
 }
 
 // 歩きのアニメーションを決める関数
-PlayerAnimationState Player::DetermineWalkState()
+std::string Player::DetermineWalkState()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	float lx = gamePad.GetAxisLX(), ly = gamePad.GetAxisLY();
@@ -1085,7 +1123,7 @@ PlayerAnimationState Player::DetermineWalkState()
 	float power = sqrtf((moveVec.x * moveVec.x) + (moveVec.z * moveVec.z));
 
 	//入力がほぼなければIdleを返す
-	if (power < 0.01f)return PlayerAnimationState::Idle;
+	if (power < 0.01f)return "Idle";
 
 	// キャラクターの前・右ベクトルを算出
 	float charForwardX = sinf(angle.y), charForwardZ = cosf(angle.y);
@@ -1104,18 +1142,17 @@ PlayerAnimationState Player::DetermineWalkState()
 	int dirIndex = static_cast<int>((degree + 30.0f) / 60.0f) % 6;
 
 	// 移動方向テーブル (通常 / ガード中)
-	static const PlayerAnimationState moveAnimTable[4][6] = {
-		{ PlayerAnimationState::Walk_F, PlayerAnimationState::Walk_R, PlayerAnimationState::Walk_BR, PlayerAnimationState::Walk_B, PlayerAnimationState::Walk_BL, PlayerAnimationState::Walk_L },
-		{ PlayerAnimationState::Jog_F, PlayerAnimationState::Jog_R, PlayerAnimationState::Jog_BR, PlayerAnimationState::Jog_B, PlayerAnimationState::Jog_BL, PlayerAnimationState::Jog_L },
-		{ PlayerAnimationState::Guard_Walk_F, PlayerAnimationState::Guard_Walk_BR, PlayerAnimationState::Guard_Walk_R, PlayerAnimationState::Guard_Walk_B, PlayerAnimationState::Guard_Walk_BL, PlayerAnimationState::Guard_Walk_L },
-		{ PlayerAnimationState::Guard_Jog_F, PlayerAnimationState::Guard_Jog_R, PlayerAnimationState::Guard_Jog_BR, PlayerAnimationState::Guard_Jog_B, PlayerAnimationState::Guard_Jog_BL, PlayerAnimationState::Guard_Jog_L }
-	};
+	static const std::string moveAnimTable[4][6] = {
+	{ "Walk_F", "Walk_R", "Walk_BR", "Walk_B", "Walk_BL", "Walk_L" },
+	{ "Jog_F", "Jog_R", "Jog_BR", "Jog_B", "Jog_BL", "Jog_L" },
+	{ "Guard_Walk_F", "Guard_Walk_BR", "Guard_Walk_R", "Guard_Walk_B", "Guard_Walk_BL", "Guard_Walk_L" },
+	{ "Guard_Jog_F", "Guard_Jog_R", "Guard_Jog_BR", "Guard_Jog_B", "Guard_Jog_BL", "Guard_Jog_L" } };
 
 	return moveAnimTable[static_cast<int>(mode)][dirIndex];
 }
 
 // 回避のアニメーションを決める関数
-PlayerAnimationState Player::DetermineRollState()
+std::string Player::DetermineRollState()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	float lx = gamePad.GetAxisLX(), ly = gamePad.GetAxisLY();
@@ -1126,7 +1163,7 @@ PlayerAnimationState Player::DetermineRollState()
 	float power = sqrtf((moveVec.x * moveVec.x) + (moveVec.z * moveVec.z));
 
 	//入力がほぼなければIdleを返す
-	if (power < 0.01f)return PlayerAnimationState::Idle;
+	if (power < 0.01f)return "Idle";
 
 	// キャラクターの前・右ベクトルを算出
 	float charForwardX = sinf(angle.y), charForwardZ = cosf(angle.y);
@@ -1147,12 +1184,12 @@ PlayerAnimationState Player::DetermineRollState()
 	debug_dirIndex = dirIndex;
 
 	// 移動方向テーブル (通常 / ガード中)
-	static const PlayerAnimationState moveAnimTable[5] = {
-		PlayerAnimationState::Roll_F,
-		PlayerAnimationState::Roll_R,
-		PlayerAnimationState::Roll_BR,
-		PlayerAnimationState::Roll_BL,
-		PlayerAnimationState::Roll_L,
+	static const std::string moveAnimTable[5] = {
+		"Roll_F",
+		"Roll_R",
+		"Roll_BR",
+		"Roll_BL",
+		"Roll_L",
 	};
 
 	return moveAnimTable[dirIndex];

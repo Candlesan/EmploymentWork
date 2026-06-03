@@ -1,0 +1,67 @@
+{
+    "links": [
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 5.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                }
+            ],
+            "fromState": "Idle",
+            "priority": 0,
+            "toState": "Jog_F"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": "Jog_F",
+            "priority": 0,
+            "toState": "Idle"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Idle",
+            "config": {
+                "animationName": "Idle",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            }
+        },
+        {
+            "StateName": "Jog_F",
+            "config": {
+                "animationName": "Jog_F",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            }
+        }
+    ]
+}

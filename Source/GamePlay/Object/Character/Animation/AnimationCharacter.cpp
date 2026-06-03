@@ -1,10 +1,10 @@
 #include "AnimationCharacter.h"
-#include "AnimationStateManager.h"
+#include "json.hpp"
+#include <fstream>
 
 
 // ステート変更
-template<typename StateEnum>
-void AnimationCharacter<StateEnum>::ChangeAnimationState(StateEnum newState, bool ignoreOverlay)
+void AnimationCharacter::ChangeAnimationState(const std::string& newState, bool ignoreOverlay)
 {
 	if (currentState == newState) return;
 
@@ -12,15 +12,17 @@ void AnimationCharacter<StateEnum>::ChangeAnimationState(StateEnum newState, boo
 	if (!ignoreOverlay && isOverlayPlaying) return;
 
 	// ステート設定を取得
-	const AnimationConfig* config = AnimationStateManager<StateEnum>::Instance().GetConfig(newState);
-	if (!config) return;
+	auto it = stateConfigs.find(newState); // Mapの中から指定されたアニメーションを探す
+	if (it == stateConfigs.end()) return; // 見つからなかったら無視する
+
+	const AnimationConfig& config = it->second;
 
 	// モデルを取得
 	std::shared_ptr<Model> model = GetModel();
 	if (!model) return;
 
 	// アニメーションインデックス取得
-	int newAnimationIndex = model->GetAnimationIndex(config->animationName.c_str());
+	int newAnimationIndex = model->GetAnimationIndex(config.animationName.c_str());
 	if (newAnimationIndex < 0) return;
 
 	// コールバック
@@ -42,39 +44,39 @@ void AnimationCharacter<StateEnum>::ChangeAnimationState(StateEnum newState, boo
 	}
 
 	//アニメーションのリソースが同じでも、ステートが変われば「ループ設定」などは更新
-	animationLoop = config->loop;
-	useRootMotion = config->useRootMotion;
-	useRootMotionEx = config->useRootMotionEx;
-	animationBlendSecondsLength = config->blendTime;
+	animationLoop = config.loop;
+	useRootMotion = config.useRootMotion;
+	useRootMotionEx = config.useRootMotionEx;
+	animationBlendSecondsLength = config.blendTime;
 }
 
 // 上半身のアニメーション
-template<typename StateEnum>
-void AnimationCharacter<StateEnum>::StartOverlayAnimation(StateEnum newState)
+void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 {
 	if (currentState == newState) return;
 
 	// ステート設定を取得
-	const AnimationConfig* config = AnimationStateManager<StateEnum>::Instance().GetConfig(newState);
-	if (!config) return;
+	auto it = stateConfigs.find(newState); // Mapの中から指定されたアニメーションを探す
+	if (it == stateConfigs.end()) return; // 見つからなかったら無視する
+
+	const AnimationConfig& config = it->second;
 
 	// モデルを取得
 	std::shared_ptr<Model> model = GetModel();
 	if (!model) return;
 
 	// アニメーションインデックス取得
-	int newAnimationIndex = model->GetAnimationIndex(config->animationName.c_str());
+	int newAnimationIndex = model->GetAnimationIndex(config.animationName.c_str());
 	if (newAnimationIndex < 0) return;
 
 	overlayAnimationIndex = newAnimationIndex;
 	overlayAnimationSeconds = 0.0f;
-	overlayAnimationLoop = config->loop;
+	overlayAnimationLoop = config.loop;
 	isOverlayPlaying = true;
 }
 
 // アニメーション更新
-template<typename StateEnum>
-void AnimationCharacter<StateEnum>::UpdateAnimation(float elapsedTime)
+void AnimationCharacter::UpdateAnimation(float elapsedTime)
 {
 	if (animationIndex < 0) return;
 
@@ -299,8 +301,7 @@ void AnimationCharacter<StateEnum>::UpdateAnimation(float elapsedTime)
 }
 
 // アニメーション終了判定
-template<typename StateEnum>
-bool AnimationCharacter<StateEnum>::IsAnimationFinished() const
+bool AnimationCharacter::IsAnimationFinished() const
 {
 	if (animationIndex < 0) return false;
 
@@ -312,8 +313,7 @@ bool AnimationCharacter<StateEnum>::IsAnimationFinished() const
 }
 
 // 再生時間で判定する関数（特定の範囲内なら遷移OK）
-template<typename StateEnum>
-bool AnimationCharacter<StateEnum>::IsAnimationInTimeRange(float startSeconds, float endSeconds) const
+bool AnimationCharacter::IsAnimationInTimeRange(float startSeconds, float endSeconds) const
 {
 	if (animationIndex < 0) return false;
 	// 現在の再生時間がstartSeconds ～　endSecondsの間にあるかをチェック
@@ -322,8 +322,7 @@ bool AnimationCharacter<StateEnum>::IsAnimationInTimeRange(float startSeconds, f
 }
 
 // 再生時間で判定する関数（特定の範囲外なら遷移OK）
-template<typename StateEnum>
-bool AnimationCharacter<StateEnum>::IsAnimationOutTimeRange(float startSeconds, float endSeconds) const
+bool AnimationCharacter::IsAnimationOutTimeRange(float startSeconds, float endSeconds) const
 {
 	if (animationIndex < 0) return false;
 	// 現在の再生時間がstartSeconds ～　endSecondsの範囲外をチェック
@@ -331,8 +330,7 @@ bool AnimationCharacter<StateEnum>::IsAnimationOutTimeRange(float startSeconds, 
 }
 
 // 再生時間で判定する関数（特定の場所以降なら遷移OK）
-template<typename StateEnum>
-bool AnimationCharacter<StateEnum>::IsAnimationOutTimeRange(float StartTransition) const
+bool AnimationCharacter::IsAnimationOutTimeRange(float StartTransition) const
 {
 	if (animationIndex < 0) return false;
 	// 現在の再生時間がStartTransition以上かををチェック
@@ -340,8 +338,7 @@ bool AnimationCharacter<StateEnum>::IsAnimationOutTimeRange(float StartTransitio
 }
 
 // だんだんアニメーション遅くする関数
-template<typename StateEnum>
-void AnimationCharacter<StateEnum>::AnimationLerp(float StartSlow, float endSlow, float SlowSpeed)
+void AnimationCharacter::AnimationLerp(float StartSlow, float endSlow, float SlowSpeed)
 {
 	if (animationSeconds >= StartSlow)
 	{
@@ -357,8 +354,7 @@ void AnimationCharacter<StateEnum>::AnimationLerp(float StartSlow, float endSlow
 }
 
 // このノードを起点に子ノードが上半身の子かを判断する関数
-template<typename StateEnum>
-bool AnimationCharacter<StateEnum>::IsUpperBodyNode(const Model::Node& node, const std::string& rootNodeName)
+bool AnimationCharacter::IsUpperBodyNode(const Model::Node& node, const std::string& rootNodeName)
 {
 	const Model::Node* current = &node;
 	while (current != nullptr)
@@ -369,8 +365,8 @@ bool AnimationCharacter<StateEnum>::IsUpperBodyNode(const Model::Node& node, con
 	return false;
 }
 
-template<typename StateEnum>
-float AnimationCharacter<StateEnum>::GetCurrentAnimationLength() const
+// 現在のアニメーションの再生時間の長さ
+float AnimationCharacter::GetCurrentAnimationLength() const
 {
 	if (animationIndex < 0) return false;
 
@@ -382,5 +378,47 @@ float AnimationCharacter<StateEnum>::GetCurrentAnimationLength() const
 	return animation.secondsLength;
 }
 
-template class AnimationCharacter<PlayerAnimationState>;
-template class AnimationCharacter<EnemyAnimationState>;
+// JSONファイルパスを渡して、中のノード設定を読み込む関数
+void AnimationCharacter::LoadAnimationData(const std::string& jsonPath)
+{
+	std::ifstream file(jsonPath);
+	if (!file.is_open()) return;
+
+	nlohmann::json root;
+	file >> root;
+
+	stateConfigs.clear(); // 中身を空にしておく
+
+	// ノードエディターで保存したnodesの設定を復元する
+	if (root.count("nodes") > 0)
+	{
+		for (auto& node : root["nodes"])
+		{
+			std::string stateName = node["StateName"];
+
+			AnimationConfig config;
+			if (node.count("config") > 0)
+			{
+				auto& c = node["config"];
+				config.animationName	= c.value("animationName", "");
+				config.loop				= c.value("loop", false);
+				config.useRootMotion	= c.value("useRootMotion", false);
+				config.useRootMotionEx	= c.value("useRootMotionEx", false);
+				config.blendTime		= c.value("blendTime", 0.2);
+			}
+
+			// Mapに登録
+			stateConfigs[stateName] = config;
+		}
+	}
+}
+
+const AnimationConfig* AnimationCharacter::GetAnimationConfig(const std::string& stateName) const
+{
+	auto it = stateConfigs.find(stateName); // ※m_stateConfigs にしてる場合は m_ をつけてな
+	if (it != stateConfigs.end())
+	{
+		return &it->second;
+	}
+	return nullptr; // 見つからなかったら空を返す
+}

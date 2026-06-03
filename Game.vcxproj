@@ -137,8 +137,6 @@
     <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.h" />
-    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationState.h" />
-    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationStateManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\ActionBase.h" />
@@ -217,7 +215,6 @@
     <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationStateManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Character.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.cpp" />
@@ -266,6 +263,7 @@
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp" />
+    <ClCompile Include="Source\System\UI\AnimationSequence.cpp" />
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>

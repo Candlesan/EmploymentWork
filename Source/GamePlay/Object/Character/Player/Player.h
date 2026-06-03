@@ -17,7 +17,7 @@
 
 class Enemy;
 
-class Player : public AnimationCharacter<PlayerAnimationState>
+class Player : public AnimationCharacter
 {
 private:
 	Player() {};
@@ -63,7 +63,7 @@ public:
 
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
-	AnimationSequence<PlayerAnimationState>& GetAnimSequence() { return animSequence; }
+	AnimationSequence& GetAnimSequence() { return animSequence; }
 	void SetLastDamage(float d) { lastDamage = d; }	// 計算したダメージ
 	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
 	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する
@@ -79,14 +79,14 @@ public:
 	void PlayerAnimationSequencer();
 
 	// サウンドを流す
-	void UpdateSounds(PlayerAnimationState state);
+	void UpdateSounds(const std::string& state);
 protected:
 
 	//着地したときに呼ばれる
 	void OnLanding() override;
 
 	// アニメーションのコールバック関数
-	void OnStateChanged(PlayerAnimationState oldState, PlayerAnimationState newState);
+	void OnStateChanged(const std::string& oldState, const std::string& newState);
 private:
 	// スティック入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 GetMoveVec() const;
@@ -95,7 +95,7 @@ private:
 	void InputMove(float elapsedTime);
 
 	// ジャンプ出来るかどうか
-	bool CanJump() const;
+	//bool CanJump() const;
 
 	// 状態遷移更新処理
 	void UpdateStateTransitions(float elapsedTime);
@@ -104,10 +104,10 @@ private:
 	void UpdateStateBehavior();
 
 	// 歩きのアニメションを決める関数
-	PlayerAnimationState DetermineWalkState(); 
+	std::string DetermineWalkState();
 
 	// 回避のアニメションを決める関数
-	PlayerAnimationState DetermineRollState(); 
+	std::string DetermineRollState();
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();
@@ -183,7 +183,7 @@ private:
 	int   debug_dirIndex = 0;    // 方向インデックス
 
 	// シーケンサー関係
-	AnimationSequence<PlayerAnimationState> animSequence;
+	AnimationSequence animSequence;
 	int currentFrame = 0;
 	bool sequencerExpanded = true;
 	int selectedEntry = -1;

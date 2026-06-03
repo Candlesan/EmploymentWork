@@ -1,6 +1,5 @@
 #include "AnimationTransitionEditor.h"
 
-#include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
 #include "GamePlay/Object/Character/Player/Player.h"
 
 #include "System/Core/Input/Input.h"
@@ -8,12 +7,14 @@
 #include "System/UI/Dialog.h"
 
 // ノードエディタ描画
-void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs)
+std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs)
 {
+	std::string doubleClickedState = "";
+
 	// Jsonに保存する
 	if (ImGui::Button("Save"))
 	{
-		if (graphs.empty()) return;
+		if (graphs.empty()) return "";
 
 		// 現在選択中のグラフを参照して取得する
 		auto& editGraph = graphs[currentGraphIndex];
@@ -77,6 +78,8 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 	}
 	ImGui::EndTabBar();
 
+	if (graphs.empty()) return "";
+
 	// 選択中のグラフを描画する
 	AnimationTransitionGraph& currentGraph = graphs[currentGraphIndex];
 
@@ -105,27 +108,36 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 	{
 		ImGui::Begin("SelectNode");
 
-		// AnimationStateManagerを取得
-		auto& manager = AnimationStateManager<PlayerAnimationState>::Instance();
+		//Modelクラスから取得するように変更する
+		auto model = Player::Instance().GetModel();
 
-		for (auto& [state, config] : manager.GetAllConfigs())
+		if (model)
 		{
-			// 既に追加済みのアニメーションかをチェックする
-			bool alreadyAnimation = false;
-			for (auto& node : currentGraph.nodes)
+			// モデルにあるアニメーションを取得する
+			for (const auto& anim : model->GetAnimations())
 			{
-				if (node.animState == (int)state)
+				// 既に追加済みのアニメーションかをチェックする
+				bool alreadyAnimation = false;
+				for (auto& node : currentGraph.nodes)
 				{
-					alreadyAnimation = true;
-					break;
+					// アニメーション名が一致するかをチェック
+					if (node.config.animationName == anim.name)
+					{
+						alreadyAnimation = true;
+						break;
+					}
 				}
-			}
-			if (alreadyAnimation) continue; // 追加済みはスキップする
+				if (alreadyAnimation) continue;
 
-			if (ImGui::Selectable(config.animationName.c_str()))
-			{
-				currentGraph.AddNode((int)state, { 100, 100 }); // 選んだらノード追加
-				showSelectNodeWindow = false; // 選んだら閉じる
+				if (ImGui::Selectable(anim.name.c_str()))
+				{
+					currentGraph.AddNode(anim.name, { 100, 100 }); // 選んだらノード追加
+
+					// 追加したノードにアニメーション名を設定する
+					currentGraph.nodes.back().config.animationName = anim.name;
+
+					showSelectNodeWindow = false; // 選んだら閉じる
+				}
 			}
 		}
 
@@ -140,9 +152,7 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 	{
 		ed::BeginNode(node.nodeId);
 
-		AnimationStateManager<PlayerAnimationState>& stateManager = AnimationStateManager<PlayerAnimationState>::Instance();
-		const AnimationConfig* config = stateManager.GetConfig(static_cast<PlayerAnimationState>(node.animState));
-		ImGui::Text("State: %s", config->animationName.c_str());
+		ImGui::Text("State: %s", node.StateName.c_str());
 
 		ed::BeginPin(node.pinIn, ed::PinKind::Input);
 		ImGui::Text("IN");
@@ -214,7 +224,6 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 		OpenCopyMenu = true;
 	}
 
-
 	ed::End();
 
 	// 自動整列
@@ -284,13 +293,13 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 
 					for (auto& node : targetGraph.nodes)
 					{
-						if (node.animState == copiedLink->transition.fromState)
+						if (node.StateName == copiedLink->transition.fromState)
 						{
 							fromPin = node.pinOut;
 							foundFrom = true;
 						}
 
-						if (node.animState == copiedLink->transition.toState)
+						if (node.StateName == copiedLink->transition.toState)
 						{
 							toPin = node.pinIn;
 							foundTo = true;
@@ -327,8 +336,28 @@ void AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& grap
 		ImGui::End();
 	}
 
+	// ノードをダブルクリックするとシーケンサーを起動
+	ed::NodeId doubleClickedNode = ed::GetDoubleClickedNode();
+
+	if (doubleClickedNode)
+	{
+		// ダブルクリックされたノードを探す
+		for (auto& node : currentGraph.nodes)
+		{
+			if (node.nodeId == doubleClickedNode)
+			{
+				// シーケンサーの現在のステートをこのノードの名前に変える
+				doubleClickedState = node.StateName; // 見つけたら名前を保存する
+			}
+		}
+	}
+
 	DrawSelectedLinkEditor(currentGraph);
+	DrawSelectedNodeEditor(currentGraph);
+
 	ed::SetCurrentEditor(nullptr);
+
+	return doubleClickedState;
 }
 
 // リンク選択
@@ -355,13 +384,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 	// 条件編集ウィンドウ
 	ImGui::Begin("Transition Condition Editor");
 	{
-		const AnimationConfig* fromStateName = AnimationStateManager<PlayerAnimationState>
-			::Instance().GetConfig(static_cast<PlayerAnimationState>(trans.fromState));
-
-		const AnimationConfig* toStateName = AnimationStateManager<PlayerAnimationState>
-			::Instance().GetConfig(static_cast<PlayerAnimationState>(trans.toState));
-
-		ImGui::Text("From State: %s -> To State: %s", fromStateName->animationName.c_str(), toStateName->animationName.c_str());
+		ImGui::Text("From State: %s -> To State: %s", trans.fromState.c_str(), trans.toState.c_str());
 		ImGui::ColorEdit4("Link Color", &selectedLink->color.x);
 		ImGui::DragInt("Priority", &trans.priority);
 		ImGui::Separator();
@@ -534,5 +557,51 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 		}
 	}
 
+	ImGui::End();
+}
+
+// ノード選択
+void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph& graph)
+{
+	// 選択中のノードを取得（1つだけ）
+	ed::NodeId selectedNodeId;
+	if (ed::GetSelectedNodes(&selectedNodeId, 1) == 0) return; // 何も選択されていなければ何もしない
+
+	// 選択されたノードをgraph.nodesから探す
+	AnimNode* selectedNode = nullptr;
+	for (auto& node : graph.nodes)
+	{
+		if (node.nodeId == selectedNodeId)
+		{
+			selectedNode = &node;
+			break;
+		}
+	}
+	if (!selectedNode) return;
+
+	// プロパティ編集ウィンドウを表示
+	ImGui::Begin("Node Properties (Animation Config)");
+	{
+		ImGui::Text(u8"ステート名: %s", selectedNode->StateName.c_str());
+		ImGui::Separator();
+
+		// 1. アニメーション名 (GLTFの本当の名前)
+		char nameBuf[256] = "";
+		strncpy_s(nameBuf, selectedNode->config.animationName.c_str(), sizeof(nameBuf));
+		if (ImGui::InputText(u8"アニメーション名 (GLTF)", nameBuf, sizeof(nameBuf)))
+		{
+			selectedNode->config.animationName = nameBuf;
+		}
+
+		// 2. ループ設定
+		ImGui::Checkbox(u8"ループ再生", &selectedNode->config.loop);
+
+		// 3. ルートモーション設定
+		ImGui::Checkbox(u8"ルートモーションを使用", &selectedNode->config.useRootMotion);
+		ImGui::Checkbox(u8"ルートモーション(拡張)", &selectedNode->config.useRootMotionEx);
+
+		// 4. ブレンド時間
+		ImGui::DragFloat(u8"ブレンド時間(秒)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);
+	}
 	ImGui::End();
 }

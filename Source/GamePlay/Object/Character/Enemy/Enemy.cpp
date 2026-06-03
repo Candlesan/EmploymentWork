@@ -7,7 +7,6 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
-#include "GamePlay/Object/Character/Animation/AnimationStateManager.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
 #include "GamePlay/Object/Character/Player/Player.h"
@@ -69,14 +68,14 @@ void Enemy::Initialize()
 	invincibleTimer = 0.0f;
 
 	// アニメーション設定
-	AnimationStateManager<EnemyAnimationState>::Instance();
+	LoadAnimationData("Data/Json/Enemy/Enemy_AnimationGraph.json");
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
 	//rootMotionNodeName = "Root";
 	upperBodyNodeName = "pelvis";
 	//upperBodyNodeName = "Bip001-Pelvis";
-	ChangeAnimationState(EnemyAnimationState::Idle_2);
+	ChangeAnimationState("Idle_2");
 
 	// 攻撃とかの情報を初期化
 	//InitializeAttackData();
@@ -99,6 +98,8 @@ void Enemy::Initialize()
 //{
 //	// シーケンサーの初期化
 //	animSequence.SetModel(enemy);
+// 
+// animSequence.SetConfigMap(&stateConfigs);
 //
 //	// Jsonがあれば読み込む、無ければデフォルト値を設定
 //	std::ifstream file("Data/Json/Enemy/AttackData/AttackSequence.json");
@@ -228,8 +229,6 @@ void Enemy::Update(float elapsedTime)
 	//	//ビヘイビアツリーからノードを実行。
 	//	activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
 	//}
-	if(GetAsyncKeyState('1') & 0x8000)
-	ChangeAnimationState(EnemyAnimationState::Idle_2);
 
 	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
 
@@ -575,17 +574,17 @@ DirectX::XMFLOAT3 Enemy::GetWeaponDirection(int index) const
 }
 
 // 技の派生があるか確認する関数
-EnemyAnimationState Enemy::DecideNextAttack(EnemyAnimationState currentState)
+std::string Enemy::DecideNextAttack(std::string currentState)
 {
 	// 今の技から派生できるものがあるかを確認
-	if (attackComboMap.count(currentState) == 0) return (EnemyAnimationState)-1;
+	if (attackComboMap.count(currentState) == 0) return "";
 
 	// プレイヤーとの距離を取得
 	float dist = GetDistanceToPlayer();
 	auto& derivations = attackComboMap[currentState];
 
 	// 候補をいったん保存する
-	std::vector<EnemyAnimationState> candidates;
+	std::vector<std::string> candidates;
 
 	for (const auto& der : derivations)
 	{
@@ -600,7 +599,7 @@ EnemyAnimationState Enemy::DecideNextAttack(EnemyAnimationState currentState)
 	}
 
 	// 候補が無ければIdleを返す
-	if (candidates.empty()) return (EnemyAnimationState)-1;
+	if (candidates.empty()) return "";
 
 	// 候補の中からされにランダムに一つ選ぶ
 	return candidates[rand() % candidates.size()];
@@ -687,10 +686,10 @@ std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 }
 
 // 始動技を決める関数
-EnemyAnimationState Enemy::DecideFirstAttack()
+std::string Enemy::DecideFirstAttack()
 {
 	float dist = GetDistanceToPlayer();
-	std::vector<EnemyAnimationState> validAttacks;
+	std::vector<std::string> validAttacks;
 
 	// 現在の距離に適合する技をすべてリストアップ
 	for (auto& attack : firstAttackList) {
@@ -701,7 +700,7 @@ EnemyAnimationState Enemy::DecideFirstAttack()
 
 	// もし候補が一つもなかったら、とりあえず基本攻撃を返すか -1 を返す
 	if (validAttacks.empty()) {
-		return (EnemyAnimationState)-1; // または (EnemyAnimationState)-1;
+		return ""; // または (EnemyAnimationState)-1;
 	}
 
 	// 候補の中からランダムに1つ選んで返す
@@ -712,144 +711,6 @@ EnemyAnimationState Enemy::DecideFirstAttack()
 // アニメーション更新処理
 void Enemy::UpdateStateTransitions(float elapsedTime)
 {
-	switch (currentState)
-	{
-	case EnemyAnimationState::Idle_1:
-		break;
-	case EnemyAnimationState::Idle_2:
-		break;
-	case EnemyAnimationState::Walk:
-		break;
-	case EnemyAnimationState::Walk_InPlace:
-		break;
-	case EnemyAnimationState::Run:
-		break;
-	case EnemyAnimationState::Jump:
-		break;
-	case EnemyAnimationState::Fall_Loop:
-		break;
-	case EnemyAnimationState::Land:
-		break;
-	case EnemyAnimationState::Death:
-		break;
-	case EnemyAnimationState::Get_Hit:
-		break;
-	case EnemyAnimationState::Attack_1:
-		break;
-	case EnemyAnimationState::Attack_2:
-		break;
-	case EnemyAnimationState::Attack_3:
-		break;
-	case EnemyAnimationState::Attack_4:
-		break;
-	case EnemyAnimationState::Attack_Combo_4:
-		break;
-	case EnemyAnimationState::Block_Defense:
-		break;
-	default:
-		break;
-	}
-
-	//switch (currentState)
-	//{
-	//case EnemyAnimationState::Idle:
-	//	if (GetAsyncKeyState('1') & 0x8000) ChangeAnimationState(EnemyAnimationState::Light_Attack_01);
-	//	if (GetAsyncKeyState('2') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_DoubleSwings_Root);
-	//	if (GetAsyncKeyState('3') & 0x8000) ChangeAnimationState(EnemyAnimationState::Skill_EndlessStabs);
-
-	//	break;
-	//case EnemyAnimationState::Walk_F:
-	//	break;
-	//case EnemyAnimationState::Walk_B:
-	//	break;
-	//case EnemyAnimationState::Walk_L:
-	//	break;
-	//case EnemyAnimationState::Walk_R:
-	//	break;
-	//case EnemyAnimationState::Jog_F:
-	//	break;
-	//case EnemyAnimationState::Dodge_Forkward:
-	//	break;
-	//case EnemyAnimationState::Dodge_Backward:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-
-	//	break;
-	//case EnemyAnimationState::Dodge_Left:
-	//	break;
-	//case EnemyAnimationState::Dodge_Right:
-	//	break;
-	//case EnemyAnimationState::Light_Attack_01:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Light_Attack_02:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Light_Attack_03:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Heavy_Attack_01:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Heavy_Attack_02:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Dodge_FU:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Grab_Fall:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Roar:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_BlockBreaker:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_DoubleSwings_Root:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_EndlessStabs:
-	//	weapon->LeftHandInvincible = false;
-
-	//	if (IsAnimationOutTimeRange(3.248)) weapon->LeftHandInvincible = true;
-
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_QuickStab:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_HeavyStomp:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_Leaping:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_ShoulderBarge_Root:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_UpperCut:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Skill_WieldDagger:
-	//	if (IsAnimationFinished()) ChangeAnimationState(EnemyAnimationState::Idle);
-	//	break;
-	//case EnemyAnimationState::Hit_Front:
-	//	break;
-	//case EnemyAnimationState::Hit_Light_Left:
-	//	break;
-	//case EnemyAnimationState::Hit_Light_Right:
-	//	break;
-	//case EnemyAnimationState::Hit_Launch_Root:
-	//	break;
-	//case EnemyAnimationState::Hit_Knockdown:
-	//	break;
-	//case EnemyAnimationState::Death_A:
-	//	break;
-	//case EnemyAnimationState::Death_B:
-	//	break;
-	//default:
-	//	break;
-	//}
 }
 
 // downしたときに呼ばれる
@@ -859,7 +720,7 @@ void Enemy::OnDown()
 }
 
 // アニメーションのコールバック関数
-void Enemy::OnStateChanged(EnemyAnimationState oldState, EnemyAnimationState newState)
+void Enemy::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
 	// 新しいステートのトラックフラグをリセット
 	for (auto& track : animSequence.attackData[newState])
@@ -873,7 +734,6 @@ void Enemy::EnemyAnimationSequencer()
 {
 	ImGui::Begin("Enemy Attack Sequencer");
 	auto& AnimSequence = GetAnimSequence();
-	auto& manager = AnimationStateManager<EnemyAnimationState>::Instance();
 
 	float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
 	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
@@ -882,12 +742,15 @@ void Enemy::EnemyAnimationSequencer()
 	ImGui::Begin(u8"アニメーション一覧##1");
 	for (auto& [state, tracks] : AnimSequence.attackData)
 	{
-		const AnimationConfig* config = manager.GetConfig(state);
+		auto it = stateConfigs.find(state);
 
-		if (config == nullptr)
+		// 見つからなかったら一覧には表示しない（スキップ）
+		if (it == stateConfigs.end())
 		{
 			continue;
 		}
+
+		const AnimationConfig* config = &it->second;
 
 		bool is_selected = (AnimSequence.currentState == state);
 		if (ImGui::Selectable(config->animationName.c_str(), is_selected))
@@ -1052,7 +915,7 @@ void Enemy::EnemyAnimationSequencer()
 }
 
 // サウンドを流す
-void Enemy::UpdateSounds(EnemyAnimationState state)
+void Enemy::UpdateSounds(const std::string& state)
 {
 	auto& AnimSequence = GetAnimSequence();
 	float now = GetCurrentAnimationSeconds();
