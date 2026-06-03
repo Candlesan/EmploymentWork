@@ -65,7 +65,7 @@ void Player::Initialize()
 	// アニメーションノードエディターの初期化
 	{
 		namespace fs = std::filesystem;
-		std::string folderPath = "Data/Json/Player/AnimationState/";
+		std::string folderPath = "Data/Json/Player/AnimationNodeEditor/";
 
 		// ディレクトリが存在するかをチェック
 		if (fs::exists(folderPath) && fs::is_directory(folderPath))
@@ -105,13 +105,13 @@ void Player::Initialize()
 			}
 
 			// 最後に保存
-			defaultGraph.Save("Data/Json/Player/AnimationState/BaseState.json");
+			defaultGraph.Save("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 			transitionGraphs.push_back(defaultGraph);
 		}
 	}
 
 	// アニメーション設定
-	LoadAnimationData("Data/Json/Player/AnimationState/BaseState.json");
+	LoadAnimationData("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
 	ChangeAnimationState("Idle");
@@ -122,39 +122,9 @@ void Player::Initialize()
 void Player::InitializeAttackData()
 {
 	// シーケンサーの初期化
-	animSequence.SetModel(player);
-
-	animSequence.SetConfigMap(&stateConfigs);
-
-	// Jsonがあれば読み込む、無ければデフォルト値を設定
-	std::ifstream file("Data/Json/Player/AttackData/AttackSequence.json");
-	if (file.is_open())
-	{
-		file.close();
-		animSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
-	}
-	else
-	{
-		//animSequence.attackData[PlayerAnimationState::Attack_01] = {
-		//{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		//};
-		//animSequence.attackData[PlayerAnimationState::Attack_02] = {
-		//  { 55, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		//};
-		//animSequence.attackData[PlayerAnimationState::Charge_Attack] = {
-		//  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-		//  { 100, 127, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		//};
-		//animSequence.attackData[PlayerAnimationState::Run_Attack] = {
-		//  { 55, 100, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		//};
-		//animSequence.attackData[PlayerAnimationState::Guard_Counter] = {
-		//  { 55, 82, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		//};
-		//animSequence.attackData[PlayerAnimationState::Jump_Attack] = {
-		//  { 15, 42, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-		//};
-	}
+	std::string path = "Data/Json/Player/AnimationSequencer/PlayerAnimationSequence.json";
+	sequencerEditor.SetJsonPath(path);
+	animSequence.Load(path);
 }
 
 void Player::Finalize()
@@ -167,8 +137,16 @@ void Player::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	// 一番最初にジャンプ入力を確定させる
-	jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A)/* && CanJump()*/;
+	// 今、文字入力中かどうかを取得
+	bool isTyping = ImGui::GetIO().WantCaptureKeyboard;
+
+	// ジャンプ入力を確定させる（文字入力中・プレビュー中は無効化）
+	if (!isTyping && !isPreviewMode) {
+		jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A)/* && CanJump()*/;
+	}
+	else {
+		jumpPressed = false;
+	}
 
 	if (runDisableTimer > 0.0f) {
 		runDisableTimer -= elapsedTime;
@@ -180,12 +158,31 @@ void Player::Update(float elapsedTime)
 
 	// 無敵時間更新
 	UpdateInvincibleTimer(elapsedTime);
-
 	// スタミナ回復処理
 	RecoveryStamina(elapsedTime);
 
-	// 入力処理
-	InputMove(elapsedTime);
+	if (!isTyping && !isPreviewMode)
+	{
+		InputMove(elapsedTime);
+		MagicInput();
+		if (!IsGuarding) Heal(elapsedTime);
+
+		UpdateStateTransitions(elapsedTime);
+	}
+	else if (isTyping && !isPreviewMode)
+	{
+		// もし普通にゲームしている最中に文字入力を始めたら、足踏みしないようにIdleに戻す
+		ChangeAnimationState("Idle");
+	}
+
+	// プレビューモード用の強制ループ処理
+	if (isPreviewMode)
+	{
+		if (GetCurrentAnimationSeconds() >= GetCurrentAnimationLength())
+		{
+			animationSeconds = 0.0f; // ループさせる
+		}
+	}
 
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
@@ -196,24 +193,19 @@ void Player::Update(float elapsedTime)
 	// 根本と剣先を求める関数
 	CalculationRootAndTip();
 
-	// 魔法発動処理
-	MagicInput();
-
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
 
-	// 状態遷移更新処理
-	UpdateStateTransitions(elapsedTime);
+
+	// シーケンサーとアニメーションの再生を同期させる
+	animSequence.Update(currentState, GetCurrentAnimationSeconds());
+	SetBaseSpeed(animSequence.GetSpeed());
 
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
 
 	// サウンド再生
 	UpdateSounds(this->currentState);
-
-	// 回復
-	if(!IsGuarding)// ガード中は回復しない
-	Heal(elapsedTime);
 
 	// エリア移動制限
 	AreaRestriction();
@@ -359,16 +351,52 @@ void Player::DrawGUI()
 	std::string clickedNode = transitionEditor.Draw(transitionGraphs);
 	ImGui::End();
 
+	// ノードがダブルクリックされたらプレビューモードに切り替える
 	if (clickedNode != "")
 	{
-		animSequence.currentState = clickedNode;
-
-		ChangeAnimationState(clickedNode);
-
-		ImGui::SetWindowFocus("Player Attack Sequencer");
+		editingState = clickedNode;
+		ChangeAnimationState(editingState);
+		isPreviewMode = true;
+		ImGui::SetWindowFocus("Sequencer");
 	}
 
-	PlayerAnimationSequencer();
+	if (isPreviewMode)
+	{
+		ImGui::Begin("Preview Timeline");
+
+		if (ImGui::Button(u8"▶ ゲームに戻る"))
+		{
+			isPreviewMode = false;
+			ChangeAnimationState("Idle"); // プレビューを終えてIdleに戻す
+		}
+		ImGui::SameLine();
+
+		// 現在の時間を取得
+		float length = GetCurrentAnimationLength();
+
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
+		ImGui::SameLine();
+		ImGui::Text("  Time: %.2f / %.2f s", animationSeconds, length);
+
+		// スライダーでアニメーションの時間を操作
+		ImGui::SetNextItemWidth(-1);
+		if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
+		{
+			// スライダーを操作した瞬間は、補間を切らないとキャラがガタガタする
+			isBlending = false;
+		}
+
+		ImGui::End();
+	}
+
+	// プレビュー中なら editingState を、そうじゃなければ今のステートをシーケンサーに渡す
+	std::string displayState = isPreviewMode ? editingState : currentState;
+	sequencerEditor.DrawEditor(
+		animSequence,
+		currentState,
+		GetCurrentAnimationSeconds(),
+		GetCurrentAnimationLength()
+	);
 }
 
 // デバックプリミティブ描画
@@ -630,216 +658,21 @@ void Player::AddGraph(std::string name)
 	transitionGraphs.back().Save(path);
 }
 
-// シーケンサーを描画する
-void Player::PlayerAnimationSequencer()
-{
-	ImGui::Begin("Player Attack Sequencer");
-	auto& AnimSequence = GetAnimSequence();
-
-	float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
-	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
-	auto& tracks = AnimSequence.CurrentTracks();
-
-	// 今選ばれているステート名をわかりやすく表示する（空っぽなら "None"）
-	std::string previewName = AnimSequence.currentState.empty() ? "None" : AnimSequence.currentState;
-
-	if (ImGui::BeginCombo(u8"編集中のアニメ", previewName.c_str()))
-	{
-		// 自身の stateConfigs (ノードエディタのデータ) から一覧を作る
-		for (auto& [stateName, config] : stateConfigs)
-		{
-			bool is_selected = (AnimSequence.currentState == stateName);
-
-			// リストにステート名を表示
-			if (ImGui::Selectable(stateName.c_str(), is_selected))
-			{
-				AnimSequence.currentState = stateName;
-				ChangeAnimationState(stateName);
-			}
-
-			// 選択中のものをフォーカスする
-			if (is_selected)
-			{
-				ImGui::SetItemDefaultFocus();
-			}
-		}
-		ImGui::EndCombo();
-	}
-	ImGui::Separator(); 
-
-	if (selectedEntry >= 0)
-	{
-		//選択中のトラックを参照
-		auto& t = tracks[selectedEntry];
-
-		char inputlabelName[256];
-		// t.labelの中身をinputlabelNameにコピーする
-		strncpy_s(inputlabelName, t.label.c_str(), sizeof(inputlabelName));
-		if (ImGui::InputText(u8"ラベル名", inputlabelName, IM_ARRAYSIZE(inputlabelName)))
-		{
-			t.label = inputlabelName;
-		}
-		ImGui::Separator();
-
-		// シーケンサーがunsigned int型を要求しているためfloat[4]型に変換
-		ImVec4 col = ImGui::ColorConvertU32ToFloat4(t.color);
-		if (ImGui::ColorEdit4(u8"ラベルの色", &col.x))
-		{
-			// 編集してるときにunsigned intに戻して保存
-			t.color = ImGui::GetColorU32(col);
-		}
-
-		ImGui::Separator();
-
-		switch (t.type)
-		{
-		case TrackType::HitBox:
-			ImGui::Begin(u8"当たり判定設定");
-			{
-				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
-					t.GetStartSeconds(), t.GetEndSeconds());
-
-				// TrackType の変更
-				const char* trackTypeItems[] = { "HitBox", "Effect", "Sound" };
-				int trackTypeIndex = (int)t.type;
-				if (ImGui::Combo(u8"タイプ", &trackTypeIndex, trackTypeItems, sizeof(trackTypeItems)))
-				{
-					t.type = (TrackType)trackTypeIndex;
-				}
-
-				// HandType の変更（HitBox のときだけ表示）
-				if (t.type == TrackType::HitBox)
-				{
-					const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body" };
-					int handIndex = (int)t.hand;
-					if (ImGui::Combo(u8"手", &handIndex, handItems, sizeof(handItems)))
-					{
-						t.hand = (HandType)handIndex;
-					}
-
-					if (t.hand == HandType::Body)
-					{
-						char boneBuf[128];
-						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
-						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
-							t.boneName = boneBuf;
-						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
-						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
-					}
-
-					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
-					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
-					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
-				}
-			}
-			ImGui::End();
-			break;
-		case TrackType::Effect:
-			break;
-		case TrackType::Sound:
-			ImGui::Begin(u8"サウンド設定");
-			{
-				char soundbuf[256] = "";
-				strncpy_s(soundbuf, t.soundName.c_str(), sizeof(soundbuf));
-				if (ImGui::InputText(u8"SE名を入力してください", soundbuf, sizeof(soundbuf)))
-				{
-					t.soundName = soundbuf;
-				}
-
-				if (ImGui::Button(u8"視聴する"))
-				{
-					GetOrLoadSound(t.soundName);
-					sounds[t.soundName]->Play(false);
-				}
-			}
-			ImGui::End();
-			break;
-		}
-
-	}
-	// 選択中のステートにトラックを追加するボタン
-	if (ImGui::Button(u8"+ 追加"))
-	{
-		ImGui::OpenPopup("AddTrack");
-	}
-
-	if (ImGui::BeginPopup("AddTrack"))
-	{
-		ImGui::Text(u8"追加するトラックタイプを選択してください");
-		ImGui::Separator();
-
-		if (ImGui::Selectable(u8"当たり判定を追加"))
-		{			
-			std::string label = u8"HitBox" + std::to_string(tracks.size());
-			tracks.push_back({ 0, 50, label, 0xFF0000FF, TrackType::HitBox, HandType::RightHand });
-		}
-
-		if (ImGui::Selectable(u8"サウンド追加"))
-		{
-			std::string label = u8"Sound" + std::to_string(tracks.size());
-			tracks.push_back({ 0, 50, label, 0xFF00FFFF, TrackType::Sound });
-		}
-
-		ImGui::EndPopup();
-	}
-
-	ImGui::SameLine();
-
-	// 選択中のステートにトラックを削除するボタン
-	if (ImGui::Button(u8"- 削除"))
-	{
-		if (selectedEntry >= 0 && selectedEntry < (int)tracks.size())
-		{
-			tracks.erase(tracks.begin() + selectedEntry);
-			animSequence.RenumberTracks(tracks);
-			selectedEntry = -1;
-		}
-	}
-
-
-	// 保存・読み込みボタン
-	if (ImGui::Button(u8"保存"))
-		AnimSequence.Save("Data/Json/Player/AttackData/AttackSequence.json");
-	ImGui::SameLine();
-	if (ImGui::Button(u8"読み込み"))
-		AnimSequence.Load("Data/Json/Player/AttackData/AttackSequence.json");
-
-	if (AnimSequence.currentState == GetCurrentState())
-	{
-		currentFrame = (int)(GetCurrentAnimationSeconds() * 100);
-	}
-
-	ImSequencer::Sequencer(
-		&AnimSequence,
-		&currentFrame,
-		&sequencerExpanded,
-		&selectedEntry,
-		&firstFrame,
-		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
-	);
-
-	ImGui::End();
-}
-
 // サウンドを流す
 void Player::UpdateSounds(const std::string& state)
 {
-	auto& AnimSequence = GetAnimSequence();
-	float now = GetCurrentAnimationSeconds();
-
-	auto& tracks = AnimSequence.attackData[state];
-
-	for (auto& track : tracks)
+	auto& animations = animSequence.GetAnimations();
+	for (auto& data : animations)
 	{
-		if (track.type != TrackType::Sound) continue; // 音トラックのみ通す
-		if (track.soundPlayed) continue;
+		if (data.name != state) continue;
 
-		if (now >= track.GetStartSeconds()) {
-			AudioSource* se = GetOrLoadSound(track.soundName);
-			if (se) {
-				se->Play(false); // SEやからループ無し
+		for (auto& e : data.events)
+		{
+			AudioSource* se = GetOrLoadSound(e.soundName);
+			if (se)
+			{
+				se->Play(false);
 			}
-			track.soundPlayed = true; // フラグを立てる
 		}
 	}
 }
@@ -853,11 +686,6 @@ void Player::OnLanding()
 // アニメーションのコールバック関数
 void Player::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
-	// 新しいステートのトラックフラグをリセット
-	for (auto& track : animSequence.attackData[newState])
-	{
-		track.soundPlayed = false;
-	}
 }
 
 // スティック入力値から移動ベクトルを取得

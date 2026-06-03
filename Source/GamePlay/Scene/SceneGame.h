@@ -10,7 +10,7 @@
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
-#include "System/UI/AnimationSequence.h"
+//#include "System/UI/AnimationSequence/AnimationSequence.h"
 
 
 // ÉQÅ[ÉÄÉVÅ[Éì

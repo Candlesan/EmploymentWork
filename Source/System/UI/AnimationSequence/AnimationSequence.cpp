@@ -1,4 +1,4 @@
-#include "System/UI/AnimationSequence.h"
+#include "System/UI/AnimationSequence/AnimationSequence.h"
 #include "json.hpp"
 #include <fstream>
 #include <algorithm>

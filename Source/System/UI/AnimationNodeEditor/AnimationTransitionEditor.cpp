@@ -26,9 +26,9 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		if (Dialog::SaveFileName(filepath, MAX_PATH,
 			"JSON File\0*.json\0\0",	// フィルター
 			u8"名前を付けて保存",	// タイトル
-			"json")				// 拡張子
-			== DialogResult::OK,
-			hwnd)
+			"json",// 拡張子
+			hwnd)				
+			== DialogResult::OK)
 		{
 			editGraph.Save(filepath); // 編集中のやつを保存
 		}

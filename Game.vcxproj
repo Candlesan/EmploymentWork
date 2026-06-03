@@ -192,7 +192,8 @@
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.h" />
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.h" />
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTranstion.h" />
-    <ClInclude Include="Source\System\UI\AnimationSequence.h" />
+    <ClInclude Include="Source\System\UI\AnimationSequence\AnimationSequence.h" />
+    <ClInclude Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.h" />
     <ClInclude Include="Source\System\UI\Dialog.h" />
   </ItemGroup>
   <ItemGroup>
@@ -263,7 +264,8 @@
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp" />
-    <ClCompile Include="Source\System\UI\AnimationSequence.cpp" />
+    <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequence.cpp" />
+    <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.cpp" />
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>

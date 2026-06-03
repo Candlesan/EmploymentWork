@@ -40,6 +40,42 @@
             "fromState": "Jog_F",
             "priority": 0,
             "toState": "Idle"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "Idle",
+            "priority": 0,
+            "toState": "Attack_01"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "Attack_01",
+            "priority": 0,
+            "toState": "Idle"
         }
     ],
     "nodes": [
@@ -60,6 +96,16 @@
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": false,
+                "useRootMotionEx": false
+            }
+        },
+        {
+            "StateName": "Attack_01",
+            "config": {
+                "animationName": "Attack_01",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": true,
                 "useRootMotionEx": false
             }
         }

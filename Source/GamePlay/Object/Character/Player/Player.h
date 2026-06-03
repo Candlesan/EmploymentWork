@@ -1,7 +1,8 @@
 #pragma once
 // システム
 #include "System/Renderer/ModelRenderer.h"
-#include "System/UI/AnimationSequence.h"
+#include "System/UI/AnimationSequence/AnimationSequence.h"
+#include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionEditor.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
 #include "System/Audio/AudioSource.h"
@@ -63,7 +64,7 @@ public:
 
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
-	AnimationSequence& GetAnimSequence() { return animSequence; }
+	AnimationSequencer& GetAnimSequence() { return animSequence; }
 	void SetLastDamage(float d) { lastDamage = d; }	// 計算したダメージ
 	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
 	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する
@@ -74,9 +75,6 @@ public:
 public:
 	// グラフを追加する
 	void AddGraph(std::string name);
-
-	// シーケンサーを描画する
-	void PlayerAnimationSequencer();
 
 	// サウンドを流す
 	void UpdateSounds(const std::string& state);
@@ -182,13 +180,6 @@ private:
 	float debug_degree = 0.0f;   // 入力角度
 	int   debug_dirIndex = 0;    // 方向インデックス
 
-	// シーケンサー関係
-	AnimationSequence animSequence;
-	int currentFrame = 0;
-	bool sequencerExpanded = true;
-	int selectedEntry = -1;
-	int firstFrame = 0;
-
 	// 回復関係
 	int Potion = 14; // ポーション数
 	float HealValue = 810; // 回復量
@@ -201,11 +192,19 @@ private:
 	bool IsStaminaEmpty = false;
 	float runDisableTimer = 0.0f;
 
+	// シーケンサー関係
+	AnimationSequencer animSequence;
+	AnimationSequencerEditor sequencerEditor;
+
 	// ノードエディター
 	std::vector<AnimationTransitionGraph>   transitionGraphs;
 	AnimationTransitionEditor  transitionEditor;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;
+
+	// --- プレビューモード用 ---
+	bool isPreviewMode = false;
+	std::string editingState = "";
 
 	// SE関係
 	// 音の名前と実体を紐づけるマップ

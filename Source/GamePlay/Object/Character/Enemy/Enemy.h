@@ -1,6 +1,7 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
-#include "System/UI/AnimationSequence.h"
+#include "System/UI/AnimationSequence/AnimationSequence.h"
+#include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/Audio/AudioSource.h"
 
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
@@ -75,7 +76,7 @@ public:
 	float GetAttackCoolTimer() const { return attackCoolTimer; }
 
 	// シーケンサーを取得
-	AnimationSequence GetAnimSequence() { return animSequence; }
+	AnimationSequencer& GetAnimSequence() { return animSequence; }
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
@@ -92,9 +93,6 @@ private:
 
 	// アニメーションのコールバック関数
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
-
-	// シーケンサーを描画する
-	void EnemyAnimationSequencer();
 
 	// サウンドを流す
 	void UpdateSounds(const std::string& state);
@@ -154,11 +152,8 @@ private:
 	float runTimer = 0.0f;
 
 	// シーケンサー関係
-	AnimationSequence animSequence;
-	int currentFrame = 0;
-	bool sequencerExpanded = true;
-	int selectedEntry = -1;
-	int firstFrame = 0;
+	AnimationSequencer animSequence;
+	AnimationSequencerEditor sequencerEditor;
 
 	// 技のつながり
 	struct AttackDerivation

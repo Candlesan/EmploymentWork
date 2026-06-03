@@ -94,125 +94,126 @@ void Enemy::Initialize()
 }
 
 // 攻撃とかの情報を初期化
-//void Enemy::InitializeAttackData()
-//{
-//	// シーケンサーの初期化
-//	animSequence.SetModel(enemy);
-// 
-// animSequence.SetConfigMap(&stateConfigs);
-//
-//	// Jsonがあれば読み込む、無ければデフォルト値を設定
-//	std::ifstream file("Data/Json/Enemy/AttackData/AttackSequence.json");
-//	if (file.is_open())
-//	{
-//		file.close();
-//		animSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
-//	}
-//	else
-//	{
-//		animSequence.attackData[EnemyAnimationState::Light_Attack_01] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//		animSequence.attackData[EnemyAnimationState::Light_Attack_02] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//		animSequence.attackData[EnemyAnimationState::Light_Attack_03] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//
-//		animSequence.attackData[EnemyAnimationState::Dodge_FU] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body }
-//		};
-//
-//		animSequence.attackData[EnemyAnimationState::Heavy_Attack_01] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//		animSequence.attackData[EnemyAnimationState::Heavy_Attack_02] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//
-//		animSequence.attackData[EnemyAnimationState::Skill_BlockBreaker] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_DoubleSwings_Root] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_EndlessStabs] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
-//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
-//		{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_HeavyStomp] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body },
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_Leaping] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_QuickStab] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_ShoulderBarge_Root] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::Body },
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_UpperCut] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		};
-//		animSequence.attackData[EnemyAnimationState::Skill_WieldDagger] = {
-//		{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
-//		};
-//
-//	}
-//
-//	// 始動技の初期化
-//	firstAttackList.push_back({ EnemyAnimationState::Light_Attack_01, 0.0f, Short_Distance });
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_QuickStab, 0.0f, Short_Distance });
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_EndlessStabs, 0.0f, Short_Distance });
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_WieldDagger, 0.0f, Short_Distance });
-//
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_BlockBreaker, Short_Distance, Long_Distance });
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_HeavyStomp, Short_Distance, Long_Distance });
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_DoubleSwings_Root, Short_Distance, Long_Distance });
-//	firstAttackList.push_back({ EnemyAnimationState::Skill_ShoulderBarge_Root, Short_Distance, Long_Distance });
-//
-//
-//	// コンボとその派生先の初期化
-//
-//	// 近距離
-//	attackComboMap[EnemyAnimationState::Light_Attack_01] = {
-//		{ EnemyAnimationState::Light_Attack_02, 0.0f, Short_Distance, 80 },
-//		{ EnemyAnimationState::Dodge_FU, 0.0f, Short_Distance, 80 },
-//		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
-//	};
-//	attackComboMap[EnemyAnimationState::Light_Attack_02] = {
-//		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
-//		{ EnemyAnimationState::Heavy_Attack_02, 0.0f, Short_Distance, 40 },
-//	};
-//	attackComboMap[EnemyAnimationState::Dodge_FU] = {
-//		{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
-//	};
-//
-//	attackComboMap[EnemyAnimationState::Light_Attack_03] = {
-//		{ EnemyAnimationState::Heavy_Attack_01, 0.0f, Short_Distance, 40 },
-//	};
-//
-//	// 中距離
-//
-//	attackComboMap[EnemyAnimationState::Dodge_Backward] = {
-//		{ EnemyAnimationState::Skill_Leaping, 0.0f, Middle_Distance, 50 },
-//		{ EnemyAnimationState::Skill_UpperCut, 0.0f, Short_Distance, 50 },
-//		{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
-//	};
-//}
+void Enemy::InitializeAttackData()
+{
+	std::string path = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
+	sequencerEditor.SetJsonPath(path);
+	animSequence.Load(path);
+	
+	{
+	 //// Jsonがあれば読み込む、無ければデフォルト値を設定
+ //std::ifstream file("Data/Json/Enemy/AttackData/AttackSequence.json");
+ //if (file.is_open())
+ //{
+ //	file.close();
+ //	animSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
+ //}
+ //else
+ //{
+ //	animSequence.attackData[EnemyAnimationState::Light_Attack_01] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Light_Attack_02] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Light_Attack_03] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+
+ //	animSequence.attackData[EnemyAnimationState::Dodge_FU] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body }
+ //	};
+
+ //	animSequence.attackData[EnemyAnimationState::Heavy_Attack_01] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Heavy_Attack_02] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+
+ //	animSequence.attackData[EnemyAnimationState::Skill_BlockBreaker] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_DoubleSwings_Root] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_EndlessStabs] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
+ //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
+ //	{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_HeavyStomp] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body },
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_Leaping] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_QuickStab] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_ShoulderBarge_Root] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::Body },
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_UpperCut] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	};
+ //	animSequence.attackData[EnemyAnimationState::Skill_WieldDagger] = {
+ //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
+ //	};
+
+ //}
+
+ //// 始動技の初期化
+ //firstAttackList.push_back({ EnemyAnimationState::Light_Attack_01, 0.0f, Short_Distance });
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_QuickStab, 0.0f, Short_Distance });
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_EndlessStabs, 0.0f, Short_Distance });
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_WieldDagger, 0.0f, Short_Distance });
+
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_BlockBreaker, Short_Distance, Long_Distance });
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_HeavyStomp, Short_Distance, Long_Distance });
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_DoubleSwings_Root, Short_Distance, Long_Distance });
+ //firstAttackList.push_back({ EnemyAnimationState::Skill_ShoulderBarge_Root, Short_Distance, Long_Distance });
+
+
+ //// コンボとその派生先の初期化
+
+ //// 近距離
+ //attackComboMap[EnemyAnimationState::Light_Attack_01] = {
+ //	{ EnemyAnimationState::Light_Attack_02, 0.0f, Short_Distance, 80 },
+ //	{ EnemyAnimationState::Dodge_FU, 0.0f, Short_Distance, 80 },
+ //	{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
+ //};
+ //attackComboMap[EnemyAnimationState::Light_Attack_02] = {
+ //	{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
+ //	{ EnemyAnimationState::Heavy_Attack_02, 0.0f, Short_Distance, 40 },
+ //};
+ //attackComboMap[EnemyAnimationState::Dodge_FU] = {
+ //	{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
+ //};
+
+ //attackComboMap[EnemyAnimationState::Light_Attack_03] = {
+ //	{ EnemyAnimationState::Heavy_Attack_01, 0.0f, Short_Distance, 40 },
+ //};
+
+ //// 中距離
+
+ //attackComboMap[EnemyAnimationState::Dodge_Backward] = {
+ //	{ EnemyAnimationState::Skill_Leaping, 0.0f, Middle_Distance, 50 },
+ //	{ EnemyAnimationState::Skill_UpperCut, 0.0f, Short_Distance, 50 },
+ //	{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
+ //};
+ }
+}
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
@@ -249,6 +250,8 @@ void Enemy::Update(float elapsedTime)
 
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
+
+	animSequence.Update(currentState, GetCurrentAnimationSeconds());
 
 	UpdateSounds(this->currentState);
 	// エリア移動制限
@@ -348,7 +351,6 @@ void Enemy::DrawGUI()
 	}
 	ImGui::End();
 
-	EnemyAnimationSequencer();
 }
 
 // デバックプリミティブ描画
@@ -367,26 +369,29 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 	// 武器の当たり判定
 	if (showWeaponHitBox)
 	{
-		float currentSec = GetCurrentAnimationSeconds();
-		auto currentState = GetCurrentState();
-
 		for (int i = 0; i < 2; ++i)
 		{
 			HandType currentHand = (i == 0) ? HandType::RightHand : HandType::LeftHand;
 
-			if (i == 0 && weapon[i].RightHandInvincible)
-			{
-				if (!GetAnimSequence().IsHitActive(currentState, currentSec, currentHand))
-					continue;
+			// 新しいシーケンサーから、今有効な判定（Range）を探す
+			bool isHit = false;
+			for (auto& data : animSequence.GetAnimations()) {
+				if (data.name == currentState) {
+					for (auto& r : data.ranges) {
+						// その手の判定が存在し、かつ現在時刻が有効範囲内(GetRangeがtrue)か？
+						if (r.hand == currentHand && animSequence.GetRange(r.name)) {
+							isHit = true;
+							break;
+						}
+					}
+					break;
+				}
 			}
-			if (i == 1 && weapon[i].LeftHandInvincible)
-			{
-				if (!GetAnimSequence().IsHitActive(currentState, currentSec, currentHand))
-					continue;
-			}
+
+			if (i == 0 && weapon[i].RightHandInvincible && !isHit) continue;
+			if (i == 1 && weapon[i].LeftHandInvincible && !isHit) continue;
 
 			DirectX::XMFLOAT4X4 weaponTransform;
-
 			DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[i].transform);
 
 			// 武器の現在の位置と回転だけを取り出す（スケールを無視する）
@@ -407,9 +412,7 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 
 			renderer->DrawCapsule(weaponTransform, weapon[i].weaponRadius, weapon[i].weaponHeight, { 1, 0, 0, 1 });
 		}
-
 	}
-
 	// 武器以外の攻撃の当たり判定
 	{
 		for (auto& info : GetActiveSphereHits())
@@ -636,55 +639,50 @@ void Enemy::HeavyStompAttack()
 std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 {
 	std::vector<SphereHitInfo> result;
-	float currentSec = GetCurrentAnimationSeconds();
 	auto state = GetCurrentState();
 
-	auto it = animSequence.attackData.find(state);
-	if (it == animSequence.attackData.end()) return result;
-
-	for (auto& track : it->second)
+	for (auto& data : animSequence.GetAnimations())
 	{
-		if (track.type != TrackType::HitBox) continue;
-		if (track.hand != HandType::Body) continue;
-		if (currentSec < track.GetStartSeconds() || currentSec > track.GetEndSeconds()) continue;
+		if (data.name != state) continue;
 
-		SphereHitInfo info;
-		info.radius = track.sphereRadius;
-
-		// ボーン名が指定されていなければボーン位置を使う
-		if (!track.boneName.empty())
+		for (auto& r : data.ranges)
 		{
-			int nodeIndex = enemy->GetNodeIndex(track.boneName.c_str());
-			if (nodeIndex >= 0)
-			{
-				auto& node = enemy->GetNodes()[nodeIndex];
-				DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&node.worldTransform);
+			if (r.hand != HandType::Body) continue;
+			if (!animSequence.GetRange(r.name)) continue; // 今フレームで有効な範囲かチェック
 
-				// オフセットをワールド空間に変換して球の位置を求める
-				DirectX::XMVECTOR pos = DirectX::XMVector3Transform(
-					DirectX::XMLoadFloat3(&track.sphereOffset), world);
-				DirectX::XMStoreFloat3(&info.position, pos);
+			SphereHitInfo info;
+			info.radius = r.sphereRadius;
+
+			if (!r.boneName.empty())
+			{
+				int nodeIndex = enemy->GetNodeIndex(r.boneName.c_str());
+				if (nodeIndex >= 0)
+				{
+					auto& node = enemy->GetNodes()[nodeIndex];
+					DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&node.worldTransform);
+					DirectX::XMVECTOR pos = DirectX::XMVector3Transform(
+						DirectX::XMLoadFloat3(&r.sphereOffset), world);
+					DirectX::XMStoreFloat3(&info.position, pos);
+				}
+				else
+				{
+					info.position = position;
+				}
 			}
 			else
 			{
-				info.position = position;
+				info.position = {
+					position.x + r.sphereOffset.x,
+					position.y + r.sphereOffset.y,
+					position.z + r.sphereOffset.z
+				};
 			}
+			result.push_back(info);
 		}
-		else
-		{
-			// ボーン名無しの場合敵の位置＋offset
-			info.position = {
-				position.x + track.sphereOffset.x,
-				position.y + track.sphereOffset.y,
-				position.z + track.sphereOffset.z
-			};
-		}
-		result.push_back(info);
+		break;
 	}
-
 	return result;
 }
-
 // 始動技を決める関数
 std::string Enemy::DecideFirstAttack()
 {
@@ -722,221 +720,31 @@ void Enemy::OnDown()
 // アニメーションのコールバック関数
 void Enemy::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
-	// 新しいステートのトラックフラグをリセット
-	for (auto& track : animSequence.attackData[newState])
-	{
-		track.soundPlayed = false;
-	}
-}
-
-// シーケンサーを描画する
-void Enemy::EnemyAnimationSequencer()
-{
-	ImGui::Begin("Enemy Attack Sequencer");
-	auto& AnimSequence = GetAnimSequence();
-
-	float totalSec = AnimSequence.GetAnimationLength(AnimSequence.currentState);
-	ImGui::Text(u8"総秒数: %.2f秒  (バーの数値 ÷ 100 = 秒)", totalSec);
-	auto& tracks = AnimSequence.CurrentTracks();
-
-	ImGui::Begin(u8"アニメーション一覧##1");
-	for (auto& [state, tracks] : AnimSequence.attackData)
-	{
-		auto it = stateConfigs.find(state);
-
-		// 見つからなかったら一覧には表示しない（スキップ）
-		if (it == stateConfigs.end())
-		{
-			continue;
-		}
-
-		const AnimationConfig* config = &it->second;
-
-		bool is_selected = (AnimSequence.currentState == state);
-		if (ImGui::Selectable(config->animationName.c_str(), is_selected))
-		{
-			AnimSequence.currentState = state;
-			ChangeAnimationState(state);
-		}
-	}
-	ImGui::End();
-
-	if (selectedEntry >= 0)
-	{
-		//選択中のトラックを参照
-		auto& t = tracks[selectedEntry];
-
-		char inputlabelName[256];
-		// t.labelの中身をinputlabelNameにコピーする
-		strncpy_s(inputlabelName, t.label.c_str(), sizeof(inputlabelName));
-		if (ImGui::InputText(u8"ラベル名", inputlabelName, IM_ARRAYSIZE(inputlabelName)))
-		{
-			t.label = inputlabelName;
-		}
-		ImGui::Separator();
-
-		// シーケンサーがunsigned int型を要求しているためfloat[4]型に変換
-		ImVec4 col = ImGui::ColorConvertU32ToFloat4(t.color);
-		if (ImGui::ColorEdit4(u8"ラベルの色", &col.x))
-		{
-			// 編集してるときにunsigned intに戻して保存
-			t.color = ImGui::GetColorU32(col);
-		}
-
-		ImGui::Separator();
-
-		switch (t.type)
-		{
-		case TrackType::HitBox:
-			ImGui::Begin(u8"当たり判定設定");
-			{
-				ImGui::Text(u8"選択中: %.2f秒 〜 %.2f秒",
-					t.GetStartSeconds(), t.GetEndSeconds());
-
-				// TrackType の変更
-				const char* trackTypeItems[] = { "HitBox", "Effect", "Sound" };
-				int trackTypeIndex = (int)t.type;
-				if (ImGui::Combo(u8"タイプ", &trackTypeIndex, trackTypeItems, sizeof(trackTypeItems)))
-				{
-					t.type = (TrackType)trackTypeIndex;
-				}
-
-				// HandType の変更（HitBox のときだけ表示）
-				if (t.type == TrackType::HitBox)
-				{
-					const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body" };
-					int handIndex = (int)t.hand;
-					if (ImGui::Combo(u8"手", &handIndex, handItems, sizeof(handItems)))
-					{
-						t.hand = (HandType)handIndex;
-					}
-
-					if (t.hand == HandType::Body)
-					{
-						char boneBuf[128];
-						strncpy_s(boneBuf, t.boneName.c_str(), sizeof(boneBuf));
-						if (ImGui::InputText(u8"ボーン名", boneBuf, sizeof(boneBuf)))
-							t.boneName = boneBuf;
-						ImGui::DragFloat(u8"球の半径", &t.sphereRadius, 0.01f, 0.1f, 5.0f);
-						ImGui::DragFloat3(u8"オフセット", &t.sphereOffset.x, 0.01f);
-					}
-
-					ImGui::DragFloat(u8"ダメージ倍率", &t.damageRate, 0.01f, 0.1f, 5.0f);
-					ImGui::DragFloat(u8"無敵時間", &t.invincible, 0.01f);
-					ImGui::DragFloat(u8"削り値", &t.poiseRate, 0.01f);
-				}
-			}
-			ImGui::End();
-			break;
-		case TrackType::Effect:
-			break;
-		case TrackType::Sound:
-			ImGui::Begin(u8"サウンド設定");
-			{
-				char soundbuf[256] = "";
-				strncpy_s(soundbuf, t.soundName.c_str(), sizeof(soundbuf));
-				if (ImGui::InputText(u8"SE名を入力してください", soundbuf, sizeof(soundbuf)))
-				{
-					t.soundName = soundbuf;
-				}
-
-				if (ImGui::Button(u8"視聴する"))
-				{
-					GetOrLoadSound(t.soundName);
-					sounds[t.soundName]->Play(false);
-				}
-			}
-			ImGui::End();
-			break;
-		}
-
-	}
-	// 選択中のステートにトラックを追加するボタン
-	if (ImGui::Button(u8"+ 追加"))
-	{
-		ImGui::OpenPopup("AddTrack");
-	}
-
-	if (ImGui::BeginPopup("AddTrack"))
-	{
-		ImGui::Text(u8"追加するトラックタイプを選択してください");
-		ImGui::Separator();
-
-		if (ImGui::Selectable(u8"当たり判定を追加"))
-		{
-			std::string label = u8"HitBox" + std::to_string(tracks.size());
-			tracks.push_back({ 0, 50, label, 0xFF0000FF, TrackType::HitBox, HandType::RightHand });
-		}
-
-		if (ImGui::Selectable(u8"サウンド追加"))
-		{
-			std::string label = u8"Sound" + std::to_string(tracks.size());
-			tracks.push_back({ 0, 50, label, 0xFF00FFFF, TrackType::Sound });
-		}
-
-		ImGui::EndPopup();
-	}
-
-	ImGui::SameLine();
-
-	// 選択中のステートにトラックを削除するボタン
-	if (ImGui::Button(u8"- 削除"))
-	{
-		if (selectedEntry >= 0 && selectedEntry < (int)tracks.size())
-		{
-			tracks.erase(tracks.begin() + selectedEntry);
-			animSequence.RenumberTracks(tracks);
-			selectedEntry = -1;
-		}
-	}
-
-
-	// 保存・読み込みボタン
-	if (ImGui::Button(u8"保存"))
-		AnimSequence.Save("Data/Json/Enemy/AttackData/Boss.json");
-	ImGui::SameLine();
-	if (ImGui::Button(u8"読み込み"))
-		AnimSequence.Load("Data/Json/Enemy/AttackData/Boss.json");
-
-	if (AnimSequence.currentState == GetCurrentState())
-	{
-		currentFrame = (int)(GetCurrentAnimationSeconds() * 144);
-	}
-
-	ImSequencer::Sequencer(
-		&AnimSequence,
-		&currentFrame,
-		&sequencerExpanded,
-		&selectedEntry,
-		&firstFrame,
-		ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
-	);
-	ImGui::End();
 }
 
 // サウンドを流す
 void Enemy::UpdateSounds(const std::string& state)
 {
-	auto& AnimSequence = GetAnimSequence();
-	float now = GetCurrentAnimationSeconds();
-
-	auto& tracks = AnimSequence.attackData[state];
-
-	for (auto& track : tracks)
+	for (auto& data : animSequence.GetAnimations())
 	{
-		if (track.type != TrackType::Sound) continue; // 音トラックのみ通す
-		if (track.soundPlayed) continue;
+		if (data.name != state) continue;
 
-		if (now >= track.GetStartSeconds()) {
-			AudioSource* se = GetOrLoadSound(track.soundName);
-			if (se) {
-				se->Play(false); // SEやからループ無し
+		for (auto& e : data.events)
+		{
+			if (e.type != EventType::Sound) continue;
+
+			// 今フレームで発火したか？
+			if (animSequence.GetEvent(e.name)) 
+			{
+				AudioSource* se = GetOrLoadSound(e.soundName);
+				if (se) {
+					se->Play(false);
+				}
 			}
-			track.soundPlayed = true; // フラグを立てる
 		}
+		break;
 	}
 }
-
 // 音を取得（無ければ自動ロード）する関数
 AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 {
