@@ -87,6 +87,8 @@ void Player::Initialize()
 					newGraph.graphName = entry.path().stem().string();
 
 					transitionGraphs.push_back(newGraph);
+
+					LoadAnimationData(filePath);
 				}
 			}
 		}
@@ -107,14 +109,49 @@ void Player::Initialize()
 			// 最後に保存
 			defaultGraph.Save("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 			transitionGraphs.push_back(defaultGraph);
+			LoadAnimationData("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 		}
 	}
 
 	// アニメーション設定
-	LoadAnimationData("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
-	ChangeAnimationState("Idle");
+
+	// ゲーム開始時は、1つ目のグラフをスタックの１番上に詰む！
+	if (!transitionGraphs.empty())
+	{
+		activeGraphStack.push_back(0); // BaseState
+
+		int targetIndex = -1;
+		for (int i = 0; i < (int)transitionGraphs.size(); i++)
+		{
+			if (transitionGraphs[i].graphName == "State_Idle")
+			{
+				targetIndex = i;
+				break;
+			}
+		}
+
+		if (targetIndex != -1)
+		{
+			activeGraphStack.push_back(targetIndex);
+
+			std::string firstAnim = "";
+			for (auto& link : transitionGraphs[targetIndex].links)
+			{
+				if (link.transition.fromState == "Entry")
+				{
+					firstAnim = link.transition.toState;
+					break;
+				}
+			}
+			if (firstAnim != "") ChangeAnimationState(firstAnim);
+		}
+		else
+		{
+			ChangeAnimationState("Idle");
+		}
+	}
 
 }
 
@@ -260,6 +297,8 @@ void Player::DrawGUI()
 
 			ImGui::Text("Move Speed: %f.0", moveSpeed); // 移動速度
 			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
+			ImGui::Text("moveLength: %.3f", moveLength);
+
 			ImGui::Separator();
 
 			if (ImGui::Button(u8"ポーション回復"))
@@ -348,8 +387,23 @@ void Player::DrawGUI()
 	ImGui::End();
 
 	ImGui::Begin("Animation Transition Editor");
-	std::string clickedNode = transitionEditor.Draw(transitionGraphs);
+	std::string clickedNode = transitionEditor.Draw(transitionGraphs, currentState);
 	ImGui::End();
+
+	ImGui::Begin("Debug Transition");
+	ImGui::Text("currentState: %s", currentState.c_str());
+	ImGui::Text("stack size: %d", (int)activeGraphStack.size());
+	for (int i = 0; i < (int)activeGraphStack.size(); i++)
+	{
+		int gIdx = activeGraphStack[i];
+		// このグラフで evalState が何になるか計算して表示
+		std::string evalS = currentState;
+		if (i < (int)activeGraphStack.size() - 1)
+			evalS = transitionGraphs[activeGraphStack[i + 1]].graphName;
+		ImGui::Text("  graph[%d]=%s  evalState='%s'", i, transitionGraphs[gIdx].graphName.c_str(), evalS.c_str());
+	}
+	ImGui::End();
+
 
 	// ノードがダブルクリックされたらプレビューモードに切り替える
 	if (clickedNode != "")
@@ -654,7 +708,7 @@ void Player::AddGraph(std::string name)
 	transitionGraphs.push_back(newGraph);
 
 	// Jsonファイルとして保存する
-	std::string path = "Data/Json/Player/AnimationState/" + name + ".json";
+	std::string path = "Data/Json/Player/AnimationNodeEditor/" + name + ".json";
 	transitionGraphs.back().Save(path);
 }
 
@@ -721,8 +775,8 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 	if (cameraFrontLength > 0.0f)
 	{
 		// 単位ベクトル化
-		cameraFrontX /= cameraRightLength;
-		cameraFrontZ /= cameraRightLength;
+		cameraFrontX /= cameraFrontLength;
+		cameraFrontZ /= cameraFrontLength;
 	}
 
 	// スティックの水平入力値をカメラ右方向に反映し、
@@ -822,7 +876,7 @@ void Player::InputMove(float elapsedTime)
 void Player::UpdateStateTransitions(float elapsedTime)
 {
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
-	float moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
+	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	std::string moveState = DetermineWalkState(); // 歩きの遷移条件を取得
@@ -880,43 +934,170 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
 	ctx.isGuarding = IsGuarding;
 
-	// グラフで評価して遷移する
+	if (activeGraphStack.empty()) return;
 
-	for (auto& graph : transitionGraphs)
+	int currentIndex = activeGraphStack.back();
+	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
+	int targetLevel = (int)activeGraphStack.size() - 1;
+
+	std::string evalStateForTrans = currentState;
+
+	std::string nextState = currentGraph->EvaluateTransitions(currentState, ctx);
+
+	// 親の割り込み処理
+	for (int i = 0; i < (int)activeGraphStack.size(); i++)
 	{
-		std::string nextState = graph.EvaluateTransitions(currentState, ctx);
-		if (nextState != currentState)
+		int gIdx = activeGraphStack[i];
+		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
+
+		// この階層における「現在のステート名」を決める
+		// 自分が一番上（子）なら実際の currentState。
+		// 親グラフを評価する時は、自分の1つ上に乗っている「子グラフの箱の名前」が現在位置になる。
+		std::string evalState = currentState;
+		if (i < (int)activeGraphStack.size() - 1)
 		{
-			// 遷移時のアクション
-			const AnimationTransition* trans = graph.GetTransition(currentState, nextState);
-			if (trans)
+			evalState = transitionGraphs[activeGraphStack[i + 1]].graphName; // 現在地から１個上
+		}
+
+		// 遷移できるか評価する
+		std::string result = g->EvaluateTransitions(evalState, ctx);
+
+		// 遷移先が見つかったら即遷移
+		if (result != evalState)
+		{
+			nextState = result;
+			currentGraph = g;
+			targetLevel = i;
+
+			evalStateForTrans = evalState;
+			break;
+		}
+	}
+
+	// どの階層でも遷移が出来なかったら終了
+	if (currentGraph == nullptr) return;
+
+	// 遷移する時に指定された階層までスタックを下す
+	while ((int)activeGraphStack.size() - 1 > targetLevel)
+	{
+		activeGraphStack.pop_back();
+	}
+
+	// 今のステートから変化があった場合のみ処理
+	if (nextState != currentState)
+	{
+		// アクションを実行する
+		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
+		if (trans)
+		{
+			// グラフで評価して遷移する
+			for (auto& action : trans->actions)
 			{
-				for (auto& action : trans->actions)
+				switch (action.type)
 				{
-					switch (action.type)
+				case TransitionActionType::MoveSpeed:
+					moveSpeed = action.value;
+					break;
+				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+				case TransitionActionType::ConsumeStamina: calculationStamina(action.value); break;
+				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+				case TransitionActionType::SetAnimationSpeed: SetBaseSpeed(action.value); break;
+				}
+			}
+		}
+
+
+		//脱出（Exit）処理
+		// 階層ノードかどうかを調べる前に、まずはExitかどうか判定するのが正解
+		if (nextState == "Exit")
+		{
+			// 現在のステート名を子グラフの名前（=親グラフでの箱の名前）に上書きする
+			currentState = currentGraph->graphName;
+
+			// スタックから現在の子グラフを下ろして、親グラフに戻る
+			activeGraphStack.pop_back();
+
+			return;
+		}
+
+		// 遷移の結果、その行き先のノードが「階層ノード(SubGraph)」かどうかを調べる
+		AnimNode* nextNode = nullptr;
+		for (auto& n : currentGraph->nodes)
+		{
+			if (n.StateName == nextState) { nextNode = &n; break; }
+		}
+
+		// 潜り込み処理
+		if (nextNode && nextNode->type == NodeType::SubGraph)
+		{
+			AnimationTransitionGraph* subGraph = nullptr;
+			int targetIndex = -1;
+
+			// パスからファイル名(グラフ名)を取り出す
+			char filename[MAX_PATH];
+			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+			std::string targetName = filename;
+
+			// Initializeで既に全ロードされているグラフ群から探す
+			for (int i = 0; i < (int)transitionGraphs.size(); i++)
+			{
+				if (transitionGraphs[i].graphName == targetName)
+				{
+					subGraph = &transitionGraphs[i];
+					targetIndex = i;
+					break;
+				}
+			}
+
+			if (subGraph && targetIndex != -1)
+			{
+				// スタックに子グラフを積んで潜る！
+				activeGraphStack.push_back(targetIndex);
+
+				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
+				std::string firstState = "";
+				for (auto& link : subGraph->links)
+				{
+					if (link.transition.fromState == "Entry")
 					{
-					case TransitionActionType::MoveSpeed:
-						moveSpeed = action.value;
-						break;
+						firstState = link.transition.toState;
 
-					case TransitionActionType::TurnSpeed:
-						turnSpeed = DirectX::XMConvertToRadians(action.value);
-						break;
+						for (auto& action : link.transition.actions)
+						{
+							switch (action.type)
+							{
+							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
+							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+							case TransitionActionType::ConsumeStamina: calculationStamina(action.value); break;
+							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+							case TransitionActionType::SetAnimationSpeed: SetBaseSpeed(action.value); break;
+							}
+						}
 
-					case TransitionActionType::ConsumeStamina:
-						calculationStamina(action.value);
-						break;
-
-					case TransitionActionType::SetIsAvoid:
-						IsAvoid = (action.value != 0.0f);
-						break;
-
-					case TransitionActionType::SetAnimationSpeed:
-						SetBaseSpeed(action.value);
 						break;
 					}
 				}
+
+				// Entryが無ければ、適当なアニメーションノードを最初にする
+				if (firstState == "")
+				{
+					for (auto& n : subGraph->nodes)
+					{
+						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
+						{
+							firstState = n.StateName;
+							break;
+						}
+					}
+				}
+
+				// 最初のステートへ切り替え！
+				if (firstState != "") ChangeAnimationState(firstState);
 			}
+		}
+		else
+		{
+			// 通常のアニメーション遷移
 			ChangeAnimationState(nextState);
 		}
 	}

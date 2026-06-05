@@ -230,10 +230,11 @@ void AnimationTransitionGraph::Save(const std::string& path)
 	j["nodes"] = json::array();
 	for (auto& node : nodes)
 	{
-		// ★変更: animState ではなく StateName を保存する
 		j["nodes"].push_back({
 			{"StateName", node.StateName},
-			// ノードが持っている config も一緒に保存する！
+			{"type", (int)node.type},
+			{"subGraphPath", node.subGraphPath},
+
 			{"config", {
 				{"animationName", node.config.animationName},
 				{"loop", node.config.loop},
@@ -241,13 +242,13 @@ void AnimationTransitionGraph::Save(const std::string& path)
 				{"useRootMotionEx", node.config.useRootMotionEx},
 				{"blendTime", node.config.blendTime}
 			}}
-			});
+		});
 	}
 
 	json linkJson;
 	for (auto& link : links)
 	{
-		// ★変更: リンクのつながりも fromState(文字列) で保存する
+		// リンクのつながりも fromState(文字列) で保存する
 		linkJson["fromState"] = link.transition.fromState;
 		linkJson["toState"] = link.transition.toState;
 		linkJson["priority"] = link.transition.priority;
@@ -307,7 +308,6 @@ void AnimationTransitionGraph::Load(const std::string& path)
 		{
 			std::string stateName = "";
 
-			// ★安全装置：新しい形式（StateName）か古い形式（animState）か自動判別する
 			if (node.count("StateName") > 0 && node["StateName"].is_string()) {
 				stateName = node["StateName"];
 			}
@@ -321,6 +321,9 @@ void AnimationTransitionGraph::Load(const std::string& path)
 			// ノードを追加
 			AddNode(stateName, { 0, 0 });
 			AnimNode& newNode = nodes.back();
+
+			newNode.type = (NodeType)node.value("type", 0);
+			newNode.subGraphPath = node.value("subGraphPath", "");
 
 			// configデータが存在すれば読み込む
 			if (node.count("config") > 0) {
@@ -341,7 +344,6 @@ void AnimationTransitionGraph::Load(const std::string& path)
 			std::string fromState = "";
 			std::string toState = "";
 
-			// ★安全装置：ここも新旧の形式に対応させる
 			if (link.count("fromState") > 0) {
 				if (link["fromState"].is_string()) fromState = link["fromState"];
 				else if (link["fromState"].is_number()) fromState = std::to_string((int)link["fromState"]);

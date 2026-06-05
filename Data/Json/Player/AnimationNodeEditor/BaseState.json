@@ -1,12 +1,7 @@
 {
     "links": [
         {
-            "Actions": [
-                {
-                    "type": 1,
-                    "value": 5.0
-                }
-            ],
+            "Actions": [],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
@@ -19,9 +14,9 @@
                     "type": 6
                 }
             ],
-            "fromState": "Idle",
+            "fromState": "State_Idle",
             "priority": 0,
-            "toState": "Jog_F"
+            "toState": "State_Move"
         },
         {
             "Actions": [],
@@ -37,9 +32,9 @@
                     "type": 7
                 }
             ],
-            "fromState": "Jog_F",
+            "fromState": "State_Move",
             "priority": 0,
-            "toState": "Idle"
+            "toState": "State_Idle"
         },
         {
             "Actions": [],
@@ -55,9 +50,9 @@
                     "type": 10
                 }
             ],
-            "fromState": "Idle",
+            "fromState": "State_Idle",
             "priority": 0,
-            "toState": "Attack_01"
+            "toState": "State_Attack"
         },
         {
             "Actions": [],
@@ -73,41 +68,47 @@
                     "type": 0
                 }
             ],
-            "fromState": "Attack_01",
+            "fromState": "State_Attack",
             "priority": 0,
-            "toState": "Idle"
+            "toState": "State_Idle"
         }
     ],
     "nodes": [
         {
-            "StateName": "Idle",
+            "StateName": "State_Move",
             "config": {
-                "animationName": "Idle",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            }
-        },
-        {
-            "StateName": "Jog_F",
-            "config": {
-                "animationName": "Jog_F",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            }
-        },
-        {
-            "StateName": "Attack_01",
-            "config": {
-                "animationName": "Attack_01",
+                "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
-                "useRootMotion": true,
+                "useRootMotion": false,
                 "useRootMotionEx": false
-            }
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Idle",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Attack",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Attack.json",
+            "type": 1
         }
     ]
 }

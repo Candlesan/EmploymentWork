@@ -17,7 +17,7 @@ public:
 	// ノードエディタ描画
 	//void Draw(AnimationTransitionGraph& graph);
 	//void Draw(std::vector< AnimationTransitionGraph>& graph);
-	std::string Draw(std::vector< AnimationTransitionGraph>& graph);
+	std::string Draw(std::vector< AnimationTransitionGraph>& graph, const std::string& activeState = "");
 
 private:
 	// リンク選択
@@ -33,4 +33,7 @@ private:
     bool showSelectNodeWindow = false;
     bool needAutoLayout = false;
     bool OpenCopyMenu = false;
+
+    // 今どのグラフの階層にいるかを記憶するスタック
+    std::vector<int> graphStack;
 };

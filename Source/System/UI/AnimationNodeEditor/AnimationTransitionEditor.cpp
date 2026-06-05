@@ -7,9 +7,37 @@
 #include "System/UI/Dialog.h"
 
 // ノードエディタ描画
-std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs)
+std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs, const std::string& activeState)
 {
 	std::string doubleClickedState = "";
+
+	// 現在の階層を表示
+	ImGui::Text(u8"現在地:");
+	for (int i = 0; i <= (int)graphStack.size(); i++)
+	{
+		ImGui::SameLine();
+		// スタックの履歴か、現在のグラフかを取得
+		int gIdx = (i < (int)graphStack.size()) ? graphStack[i] : currentGraphIndex;
+
+		if (i == (int)graphStack.size()) ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", graphs[gIdx].graphName.c_str());
+		else ImGui::Text("%s", graphs[gIdx].graphName.c_str());
+
+		if (i < (int)graphStack.size())
+		{
+			ImGui::SameLine(); ImGui::Text(" > ");
+		}
+	}
+
+	// 階層を戻るボタン
+	if (!graphStack.empty())
+	{
+		if (ImGui::Button(u8"<- 親グラフに戻る"))
+		{
+			currentGraphIndex = graphStack.back(); // 親のインデックスに戻す
+			graphStack.pop_back(); // 履歴を1つ消す
+		}
+		ImGui::Separator();
+	}
 
 	// Jsonに保存する
 	if (ImGui::Button("Save"))
@@ -64,21 +92,29 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 	ImGui::Separator();
 
+	// タブ描画部分をこう変える
+	int tabSelectedIndex = currentGraphIndex; // 別変数で受け取る
+
 	// ファイルをタブで表示する
 	if (ImGui::BeginTabBar("GraphTabs"))
 	{
+
 		for (int i = 0; i < (int)graphs.size(); i++)
 		{
 			if (ImGui::BeginTabItem(graphs[i].graphName.c_str()))
 			{
-				currentGraphIndex = i;
+				tabSelectedIndex = i; // ← currentGraphIndex は直接触らない
 				ImGui::EndTabItem();
 			}
 		}
 	}
 	ImGui::EndTabBar();
 
-	if (graphs.empty()) return "";
+	// タブの結果を反映するのは「graphStackが空のとき（トップ階層）のみ」にする
+	if (graphStack.empty())
+	{
+		currentGraphIndex = tabSelectedIndex;
+	}
 
 	// 選択中のグラフを描画する
 	AnimationTransitionGraph& currentGraph = graphs[currentGraphIndex];
@@ -91,10 +127,32 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 	ImGui::SameLine();
 
+	// ノードの追加
+	if (ImGui::Button("+ Add SubGraph Node"))
+	{
+		ImGui::OpenPopup("Add SubGraph");
+	}
+
+	ImGui::SameLine();
+
 	// グラフの追加
 	if (ImGui::Button("+ Add Graph"))
 	{
 		ImGui::OpenPopup("Add Graph");
+	}
+
+	// Entryノードを出すボタン
+	if (ImGui::Button("+ Add Entry"))
+	{
+		currentGraph.AddNode("Entry", { 50, 200 });
+	}
+
+	ImGui::SameLine();
+
+	// Exitノードを出すボタン
+	if (ImGui::Button("+ Add Exit"))
+	{
+		currentGraph.AddNode("Exit", { 400, 200 });
 	}
 
 	// 自動整列
@@ -144,12 +202,58 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		ImGui::End();
 	}
 
+	if (ImGui::BeginPopupModal("Add SubGraph", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static char newSubGraphName[64] = "";
+
+		ImGui::Text(u8"階層ノードの名前を入力してください");
+		ImGui::InputText("##subgraph_name_input", newSubGraphName, IM_ARRAYSIZE(newSubGraphName));
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			if (strlen(newSubGraphName) > 0)
+			{
+				// 新しいノードを追加
+				currentGraph.AddNode(newSubGraphName, { 100, 100 });
+
+				// 作ったノードを取得して、最初から「階層タイプ」にする
+				AnimNode& newNode = currentGraph.nodes.back();
+				newNode.type = NodeType::SubGraph;
+
+				// パスを設定する
+				newNode.subGraphPath = "Data/Json/Player/AnimationNodeEditor/" + std::string(newSubGraphName) + ".json";
+			}
+
+			newSubGraphName[0] = '\0';
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("CANCEL", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
 	ed::SetCurrentEditor(context);
 	ed::Begin("Animation Transition Editor");
 
 	// ノード描画
 	for (auto& node : currentGraph.nodes)
 	{
+		// SubGraphノードなら背景を青っぽくする
+		if (node.type == NodeType::SubGraph)
+			ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.2f, 0.4f, 0.6f, 1.0f));
+
+		bool isActive = (node.StateName == activeState);
+		if (isActive)
+		{
+			ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+			ed::PushStyleVar(ed::StyleVar_NodeBorderWidth, 4.0f);
+		}
+
 		ed::BeginNode(node.nodeId);
 
 		ImGui::Text("State: %s", node.StateName.c_str());
@@ -164,6 +268,18 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		ImGui::Text("OUT");
 		ed::EndPin();
 		ed::EndNode();
+
+		if (isActive)
+		{
+			ed::PopStyleColor();
+			ed::PopStyleVar();
+		}
+
+		// 色をもとに戻す
+		if (node.type == NodeType::SubGraph)
+		{
+			ed::PopStyleColor();
+		}
 	}
 
 	// リンク描画
@@ -346,8 +462,49 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		{
 			if (node.nodeId == doubleClickedNode)
 			{
-				// シーケンサーの現在のステートをこのノードの名前に変える
-				doubleClickedState = node.StateName; // 見つけたら名前を保存する
+				if (node.type == NodeType::SubGraph)
+				{
+					if (node.subGraphPath.empty()) break;
+
+					// 子グラフを作って読み込む
+					char filename[MAX_PATH];
+					_splitpath_s(node.subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+					std::string targetName = filename;
+
+					// 既にロードされているグラフの中から探す
+					int targetIdx = -1;
+					for (int i = 0; i < (int)graphs.size(); i++)
+					{
+						if (graphs[i].graphName == targetName)
+						{
+							targetIdx = i;
+							break;
+						}
+					}
+
+					if (targetIdx == -1)
+					{
+						AnimationTransitionGraph newGraph;
+						newGraph.Load(node.subGraphPath); // 既存ファイルがあればロード、無ければ空
+						newGraph.graphName = targetName;
+						graphs.push_back(newGraph);
+						targetIdx = (int)graphs.size() - 1; // 一番最後に追加されたインデックス
+					}
+
+					// 見つかったらそのグラフに移動する
+					if (targetIdx != -1)
+					{
+						graphStack.push_back(currentGraphIndex); // 今のインデックスを履歴に積む
+						currentGraphIndex = targetIdx;           // グラフを切り替える
+						ed::NavigateToContent();                 // カメラを合わせる
+					}
+				}
+				else
+				{
+					// シーケンサーの現在のステートをこのノードの名前に変える
+					doubleClickedState = node.StateName; // 見つけたら名前を保存する
+				}
+				break;
 			}
 		}
 	}
@@ -585,23 +742,49 @@ void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph&
 		ImGui::Text(u8"ステート名: %s", selectedNode->StateName.c_str());
 		ImGui::Separator();
 
-		// 1. アニメーション名 (GLTFの本当の名前)
-		char nameBuf[256] = "";
-		strncpy_s(nameBuf, selectedNode->config.animationName.c_str(), sizeof(nameBuf));
-		if (ImGui::InputText(u8"アニメーション名 (GLTF)", nameBuf, sizeof(nameBuf)))
+		// ノードの種類を切り替えるボタン
+		if (ImGui::Button(selectedNode->type == NodeType::Animation ? u8"階層(SubGraph)に変換" : u8"通常(Animation)に変換"))
 		{
-			selectedNode->config.animationName = nameBuf;
+			selectedNode->type = (selectedNode->type == NodeType::Animation) ? NodeType::SubGraph : NodeType::Animation;
 		}
 
-		// 2. ループ設定
-		ImGui::Checkbox(u8"ループ再生", &selectedNode->config.loop);
+		ImGui::Separator();
 
-		// 3. ルートモーション設定
-		ImGui::Checkbox(u8"ルートモーションを使用", &selectedNode->config.useRootMotion);
-		ImGui::Checkbox(u8"ルートモーション(拡張)", &selectedNode->config.useRootMotionEx);
+		// 種類によって表示するUIを変える
+		if (selectedNode->type == NodeType::SubGraph)
+		{
+			ImGui::TextColored(ImVec4(0.5f, 0.8f, 1.0f, 1.0f), u8"【階層ノード】");
+			ImGui::Text(u8"ダブルクリックでこのファイルを開きます。");
 
-		// 4. ブレンド時間
-		ImGui::DragFloat(u8"ブレンド時間(秒)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);
+			char pathBuf[MAX_PATH] = "";
+			strncpy_s(pathBuf, selectedNode->subGraphPath.c_str(), sizeof(pathBuf));
+			if (ImGui::InputText(u8"子グラフのファイルパス", pathBuf, sizeof(pathBuf)))
+			{
+				selectedNode->subGraphPath = pathBuf;
+			}
+		}
+		else
+		{
+			ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.5f, 1.0f), u8"【アニメーションノード】");
+
+			// アニメーション名 (GLTFの本当の名前)
+			char nameBuf[256] = "";
+			strncpy_s(nameBuf, selectedNode->config.animationName.c_str(), sizeof(nameBuf));
+			if (ImGui::InputText(u8"アニメーション名 (GLTF)", nameBuf, sizeof(nameBuf)))
+			{
+				selectedNode->config.animationName = nameBuf;
+			}
+
+			// ループ設定
+			ImGui::Checkbox(u8"ループ再生", &selectedNode->config.loop);
+
+			// ルートモーション設定
+			ImGui::Checkbox(u8"ルートモーションを使用", &selectedNode->config.useRootMotion);
+			ImGui::Checkbox(u8"ルートモーション(拡張)", &selectedNode->config.useRootMotionEx);
+
+			// ブレンド時間
+			ImGui::DragFloat(u8"ブレンド時間(秒)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);
+		}
 	}
 	ImGui::End();
 }

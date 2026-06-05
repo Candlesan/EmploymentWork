@@ -1,0 +1,78 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 24
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toState": "Idle"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "Idle",
+            "priority": 0,
+            "toState": "Exit"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Idle",
+            "config": {
+                "animationName": "Idle",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}

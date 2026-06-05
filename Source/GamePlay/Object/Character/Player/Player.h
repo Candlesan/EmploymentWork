@@ -174,6 +174,8 @@ private:
 	int jumpCount = 0;
 	int jumpLimit = 1;
 
+	float moveLength = 0.0f;
+
 	// ロックオン関係
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
 	float lerpSpeed = 10.0f;
@@ -198,6 +200,7 @@ private:
 
 	// ノードエディター
 	std::vector<AnimationTransitionGraph>   transitionGraphs;
+	std::vector<int>   activeGraphStack;
 	AnimationTransitionEditor  transitionEditor;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;

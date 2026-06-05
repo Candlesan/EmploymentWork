@@ -15,9 +15,18 @@ struct AnimationConfig
 	float blendTime = 0.2f;			// 補間時間
 };
 
+// ノードのタイプ
+enum class NodeType {
+	Animation, // アニメーションを再生するためのノード
+	SubGraph, // ダブルクリックしたときに階層に潜るための箱
+};
+
 struct AnimNode {
 	ed::NodeId nodeId;
 	std::string StateName; // 文字列に変える
+
+	NodeType type = NodeType::Animation;
+	std::string subGraphPath = "";
 
 	AnimationConfig config; // アニメーション自体の設定
 

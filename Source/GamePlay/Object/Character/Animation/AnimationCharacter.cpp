@@ -387,7 +387,7 @@ void AnimationCharacter::LoadAnimationData(const std::string& jsonPath)
 	nlohmann::json root;
 	file >> root;
 
-	stateConfigs.clear(); // 中身を空にしておく
+	//stateConfigs.clear(); // 中身を空にしておく
 
 	// ノードエディターで保存したnodesの設定を復元する
 	if (root.count("nodes") > 0)
