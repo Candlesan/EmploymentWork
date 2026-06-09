@@ -661,6 +661,11 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 					GamePad::BTN_LEFT_SHOULDER,  GamePad::BTN_RIGHT_SHOULDER,
 					GamePad::BTN_LEFT_TRIGGER,   GamePad::BTN_RIGHT_TRIGGER,
 				};
+
+				if (cond.buttonMask == 0) {
+					cond.buttonMask = buttonMasks[0];
+				}
+
 				int currentIndex = 0;
 				for (int i = 0; i < IM_ARRAYSIZE(buttonMasks); i++)
 				{
