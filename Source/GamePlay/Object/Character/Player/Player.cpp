@@ -20,11 +20,13 @@ void Player::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// プレイヤーモデル読み込み
-	player = std::make_shared<Model>(device, "Data/Model/Player/SKM_DKM_Full.gltf");
+	//player = std::make_shared<Model>(device, "Data/Model/Player/Player1/SKM_DKM_Full.gltf");
+	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 
 	// 武器モデル読み込み
-	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/GreatSword.gltf");
-	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.1f;
+	//weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon1/GreatSword.gltf");
+	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
+	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.01f;
 
 	 // プレイヤーパラメーター初期化
 	moveSpeed = 2.0f; // 移動速度
@@ -48,14 +50,14 @@ void Player::Initialize()
 	radius = 0.7f;
 	height = 1.6f;
 	debugOffset = 0.8;
-	weapon.weaponHitOffset = { -0.35, -1.05, -0.1 };
-	weapon.weaponAngleOffset = { 0.06, 6.6, 0.23 };
+	weapon.weaponHitOffset = { 0.0f, 0.0f, 0.0f };
+	weapon.weaponAngleOffset = { 0.0f, 0, -0.26f };
 	weapon.weaponRadius = 0.3f;
 	weapon.weaponHeight = 1.7f;
 
 	// 武器のパラメーター初期化
-	weapon.position = { 0.34, 1.02, 0.04 };
-	weapon.angle = { 0, 0, 2.89 };
+	weapon.position = { -0.03f, -0.04f, 0.06f };
+	weapon.angle = { -0.06, 0.23f, -1.13f };
 
 	// Jsonファイルの初期化
 	InitializeAttackData();
@@ -112,6 +114,9 @@ void Player::Initialize()
 			LoadAnimationData("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 		}
 	}
+
+	rootMotionNodeName = "root";
+
 
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
@@ -201,7 +206,7 @@ void Player::Update(float elapsedTime)
 	if (!isTyping && !isPreviewMode)
 	{
 		InputMove(elapsedTime);
-		MagicInput();
+		//MagicInput();
 		if (!IsGuarding) Heal(elapsedTime);
 
 		UpdateStateTransitions(elapsedTime);
@@ -390,19 +395,19 @@ void Player::DrawGUI()
 	std::string clickedNode = transitionEditor.Draw(transitionGraphs, currentState);
 	ImGui::End();
 
-	ImGui::Begin("Debug Transition");
-	ImGui::Text("currentState: %s", currentState.c_str());
-	ImGui::Text("stack size: %d", (int)activeGraphStack.size());
-	for (int i = 0; i < (int)activeGraphStack.size(); i++)
-	{
-		int gIdx = activeGraphStack[i];
-		// このグラフで evalState が何になるか計算して表示
-		std::string evalS = currentState;
-		if (i < (int)activeGraphStack.size() - 1)
-			evalS = transitionGraphs[activeGraphStack[i + 1]].graphName;
-		ImGui::Text("  graph[%d]=%s  evalState='%s'", i, transitionGraphs[gIdx].graphName.c_str(), evalS.c_str());
-	}
-	ImGui::End();
+	//ImGui::Begin("Debug Transition");
+	//ImGui::Text("currentState: %s", currentState.c_str());
+	//ImGui::Text("stack size: %d", (int)activeGraphStack.size());
+	//for (int i = 0; i < (int)activeGraphStack.size(); i++)
+	//{
+	//	int gIdx = activeGraphStack[i];
+	//	// このグラフで evalState が何になるか計算して表示
+	//	std::string evalS = currentState;
+	//	if (i < (int)activeGraphStack.size() - 1)
+	//		evalS = transitionGraphs[activeGraphStack[i + 1]].graphName;
+	//	ImGui::Text("  graph[%d]=%s  evalState='%s'", i, transitionGraphs[gIdx].graphName.c_str(), evalS.c_str());
+	//}
+	//ImGui::End();
 
 
 	// ノードがダブルクリックされたらプレビューモードに切り替える
@@ -945,7 +950,8 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	std::string nextState = currentGraph->EvaluateTransitions(currentState, ctx);
 
 	// 親の割り込み処理
-	for (int i = 0; i < (int)activeGraphStack.size(); i++)
+	//for (int i = 0; i < (int)activeGraphStack.size(); i++)
+	for (int i = (int)activeGraphStack.size() - 1; i >= 0; i--) 
 	{
 		int gIdx = activeGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
@@ -1055,14 +1061,14 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				activeGraphStack.push_back(targetIndex);
 
 				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
-				std::string firstState = "";
-				for (auto& link : subGraph->links)
+				//std::string firstState = "";
+				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
+				if (firstState != "Entry" && firstState != "")
 				{
-					if (link.transition.fromState == "Entry")
+					const AnimationTransition* trans = subGraph->GetTransition("Entry", firstState);
+					if (trans)
 					{
-						firstState = link.transition.toState;
-
-						for (auto& action : link.transition.actions)
+						for (auto& action : trans->actions)
 						{
 							switch (action.type)
 							{
@@ -1073,14 +1079,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 							case TransitionActionType::SetAnimationSpeed: SetBaseSpeed(action.value); break;
 							}
 						}
-
-						break;
 					}
 				}
-
-				// Entryが無ければ、適当なアニメーションノードを最初にする
-				if (firstState == "")
+				else
 				{
+					// 万が一 Entry からの条件がどれも満たされなかったら、適当なノードを最初にする（元のフォールバック）
+					firstState = "";
 					for (auto& n : subGraph->nodes)
 					{
 						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
@@ -1208,6 +1212,7 @@ std::string Player::DetermineRollState()
 void Player::WeaponAttachment()
 {
 	const char* rightHandName = "hand_r";
+	//const char* rightHandName = "ik_hand_gun";
 
 	// 武器のローカル行列を計算する
 	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon.scale.x, weapon.scale.y, weapon.scale.z);

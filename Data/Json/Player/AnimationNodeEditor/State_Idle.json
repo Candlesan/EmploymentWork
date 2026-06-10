@@ -16,7 +16,7 @@
             ],
             "fromState": "Entry",
             "priority": 0,
-            "toState": "Idle"
+            "toState": "AS_Idle_Combat_Seq_0"
         },
         {
             "Actions": [],
@@ -32,7 +32,7 @@
                     "type": 0
                 }
             ],
-            "fromState": "Idle",
+            "fromState": "AS_Idle_Combat_Seq_0",
             "priority": 0,
             "toState": "Exit"
         }
@@ -47,6 +47,8 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position.x": 100.0,
+            "position.y": 100.0,
             "subGraphPath": "",
             "type": 0
         },
@@ -59,18 +61,22 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position.x": 300.0,
+            "position.y": 100.0,
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "Idle",
+            "StateName": "AS_Idle_Combat_Seq_0",
             "config": {
-                "animationName": "Idle",
+                "animationName": "AS_Idle_Combat_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position.x": 500.0,
+            "position.y": 100.0,
             "subGraphPath": "",
             "type": 0
         }

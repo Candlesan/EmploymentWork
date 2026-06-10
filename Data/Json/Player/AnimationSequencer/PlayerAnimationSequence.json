@@ -2,40 +2,69 @@
     "animations": [
         {
             "events": [],
-            "name": "Idle",
+            "name": "AS_Idle_Combat_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
             "events": [],
-            "name": "Jog_F",
+            "name": "AS_Run_Combat_Fast_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
-            "events": [
-                {
-                    "effectName": "",
-                    "name": "まっちゃん",
-                    "soundName": "",
-                    "time": 0.45377981662750244,
-                    "type": 0
-                }
-            ],
-            "name": "Attack_01",
+            "events": [],
+            "name": "AS_Run_Combat_F_0_Loop_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "State_Move",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
             "ranges": [],
             "speedKeys": [
                 {
-                    "speed": 1.0,
+                    "speed": 3.0,
                     "time": 0.0
                 },
                 {
-                    "speed": 1.4500013589859009,
-                    "time": 0.7631262540817261
+                    "speed": 0.9999997615814209,
+                    "time": 0.34358885884284973
                 },
                 {
                     "speed": 1.0,
-                    "time": 2.9166667461395264
+                    "time": 0.6833333373069763
+                }
+            ]
+        },
+        {
+            "events": [],
+            "name": "State_Avoid",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.6833333373069763
                 }
             ]
         }

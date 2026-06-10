@@ -1,7 +1,12 @@
 {
     "links": [
         {
-            "Actions": [],
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                }
+            ],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
@@ -16,15 +21,137 @@
             ],
             "fromState": "Entry",
             "priority": 0,
-            "toState": "Attack_01"
+            "toState": "AS_Combo_Attack_03_01_Seq_0"
         },
         {
             "Actions": [
                 {
-                    "type": 3,
-                    "value": 10.0
+                    "type": 1,
+                    "value": 0.0
                 }
             ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5630000233650208,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "AS_Combo_Attack_03_01_Seq_0",
+            "priority": 0,
+            "toState": "AS_Combo_Attack_01_03_Seq_0"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.5630000233650208,
+                    "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5630000233650208,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Combo_Attack_01_03_Seq_0",
+            "priority": 0,
+            "toState": "AS_Combo_Attack_05_03_Start_Seq_0"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 5
+                }
+            ],
+            "fromState": "AS_Combo_Attack_05_03_Start_Seq_0",
+            "priority": 0,
+            "toState": "AS_Combo_Attack_05_03_Loop_Seq_0"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 4
+                }
+            ],
+            "fromState": "AS_Combo_Attack_05_03_Loop_Seq_0",
+            "priority": 0,
+            "toState": "AS_Combo_Attack_05_04_Seq_0"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.800000011920929,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Combo_Attack_05_04_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
@@ -37,7 +164,25 @@
                     "type": 0
                 }
             ],
-            "fromState": "Attack_01",
+            "fromState": "AS_Combo_Attack_01_03_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Combo_Attack_03_01_Seq_0",
             "priority": 0,
             "toState": "Exit"
         }
@@ -52,6 +197,8 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position.x": 100.0,
+            "position.y": 100.0,
             "subGraphPath": "",
             "type": 0
         },
@@ -64,18 +211,78 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position.x": 300.0,
+            "position.y": 100.0,
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "Attack_01",
+            "StateName": "AS_Combo_Attack_01_03_Seq_0",
             "config": {
-                "animationName": "Attack_01",
+                "animationName": "AS_Combo_Attack_01_03_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
-                "useRootMotion": true,
-                "useRootMotionEx": false
+                "useRootMotion": false,
+                "useRootMotionEx": true
             },
+            "position.x": 500.0,
+            "position.y": 100.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Combo_Attack_03_01_Seq_0",
+            "config": {
+                "animationName": "AS_Combo_Attack_03_01_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "position.x": 700.0,
+            "position.y": 100.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Combo_Attack_05_03_Loop_Seq_0",
+            "config": {
+                "animationName": "AS_Combo_Attack_05_03_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "position.x": 100.0,
+            "position.y": 220.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Combo_Attack_05_03_Start_Seq_0",
+            "config": {
+                "animationName": "AS_Combo_Attack_05_03_Start_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "position.x": 300.0,
+            "position.y": 220.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Combo_Attack_05_04_Seq_0",
+            "config": {
+                "animationName": "AS_Combo_Attack_05_04_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "position.x": 500.0,
+            "position.y": 220.0,
             "subGraphPath": "",
             "type": 0
         }

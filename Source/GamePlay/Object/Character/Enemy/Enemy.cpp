@@ -37,7 +37,7 @@ void Enemy::Initialize()
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
 	angle = {0, 3, 0};
-	scale.x = scale.y = scale.z = 1.2f;
+	scale.x = scale.y = scale.z = 6.0f;
 	weight = 100.0f;
 	radius = 1.0f;
 	height = 1.6f;

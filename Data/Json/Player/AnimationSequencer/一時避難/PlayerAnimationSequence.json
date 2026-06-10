@@ -1,0 +1,43 @@
+{
+    "animations": [
+        {
+            "events": [],
+            "name": "Idle",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "Jog_F",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "まっちゃん",
+                    "soundName": "",
+                    "time": 0.45377981662750244,
+                    "type": 0
+                }
+            ],
+            "name": "Attack_01",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.4500013589859009,
+                    "time": 0.7631262540817261
+                },
+                {
+                    "speed": 1.0,
+                    "time": 2.9166667461395264
+                }
+            ]
+        }
+    ]
+}

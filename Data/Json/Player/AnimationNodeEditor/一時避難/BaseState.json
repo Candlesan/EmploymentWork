@@ -1,0 +1,114 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toState": "State_Move"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toState": "State_Idle"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toState": "State_Attack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_Attack",
+            "priority": 0,
+            "toState": "State_Idle"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "State_Move",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Idle",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Attack",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Attack.json",
+            "type": 1
+        }
+    ]
+}

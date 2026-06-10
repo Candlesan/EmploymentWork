@@ -164,5 +164,5 @@ protected:
 
 	float invincibleTimer = 0.0f; // –³“GŠÔ
 
-	float stageRadius = 38.0f;
+	float stageRadius = 97.5f;
 };

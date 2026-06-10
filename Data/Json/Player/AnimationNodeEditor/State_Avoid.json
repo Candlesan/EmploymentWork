@@ -1,0 +1,145 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toState": "AS_Dodge_Combat_to_Run_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.6000000238418579,
+                    "type": 6
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toState": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [],
+            "fromState": "Exit",
+            "priority": 0,
+            "toState": "-1"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position.x": 100.0,
+            "position.y": 100.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position.x": 300.0,
+            "position.y": 100.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
+            "config": {
+                "animationName": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "position.x": 500.0,
+            "position.y": 100.0,
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+            "config": {
+                "animationName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "position.x": 700.0,
+            "position.y": 100.0,
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}

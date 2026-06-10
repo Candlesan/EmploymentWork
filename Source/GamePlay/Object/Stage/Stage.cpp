@@ -11,7 +11,7 @@ Stage::Stage()
 	stage = std::make_shared<Model>(device, "Data/Model/Stage/circle_of_death.gltf");
 	//stage = std::make_shared<Model>(device, "Data/Model/Stage/ExampleStage.gltf");
 
-	scale.x = scale.y = scale.z = 0.01f;
+	scale.x = scale.y = scale.z = 0.025f;
 }
 
 // XVˆ—

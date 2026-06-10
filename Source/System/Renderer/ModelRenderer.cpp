@@ -172,7 +172,7 @@ void ModelRenderer::Render(const RenderContext& rc)
 			else
 			{
 				// ’Êí‚Ìƒp[ƒc‚Í”w–Ê‚ðƒJƒbƒgi•`‰æ•‰‰×ŒyŒ¸j
-				dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullBack));
+				dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 			}
 
 			// •`‰æ
