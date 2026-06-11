@@ -617,11 +617,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"ButtonHeld",			// ボタンを長押ししているとき
 				"MoveLengthOver",		// 入力が一定以上の時
 				"MoveLengthUnder",		// 入力が一定以下の時
-				"BHold",				// Bボタンを長押している時
-				"BTap",					// Bボタンを単押ししている時
-				"RBTap",				// RBボタンを単押ししている時
-				"RTHold",				// RTボタンを長押している時
-				"RTTap",				// RTボタンを単押ししている時
+				"EnemyFromDistance",	// 敵との距離が一定以上の時
 				"JumpPressed",			// ジャンプ可能かどうか
 				"StaminaEmpty",			// スタミナが空かどうか
 				"HasStamina",			// スタミナを持っているか
@@ -646,7 +642,8 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionConditionType::AnimationTimeIn:
 			case TransitionConditionType::MoveLengthOver:
 			case TransitionConditionType::MoveLengthUnder:
-				ImGui::DragFloat("Threshold", &cond.threshold, 0.01f, 0.0f, 10.0f);
+			case TransitionConditionType::EnemyFromDistance:
+				ImGui::DragFloat("Threshold", &cond.threshold, 0.01f);
 				break;
 
 			case TransitionConditionType::ButtonPressed:
@@ -675,11 +672,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 					cond.buttonMask = buttonMasks[currentIndex];
 				break;
 			}
-			case TransitionConditionType::BHold:
-			case TransitionConditionType::BTap:
-			case TransitionConditionType::RBTap:
-			case TransitionConditionType::RTHold:
-			case TransitionConditionType::RTTap:
 			case TransitionConditionType::JumpPressed:
 				ImGui::TextDisabled(u8"（追加設定なし）");
 				break;

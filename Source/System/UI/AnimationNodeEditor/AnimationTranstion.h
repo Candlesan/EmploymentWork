@@ -16,12 +16,14 @@ enum class TransitionConditionType
 	MoveLengthOver,		// スティックの入力値が一定以上だったら
 	MoveLengthUnder,	// スティックの入力値が一定以下だったら
 
-	BHold,				// Bボタン長押し（走り）
-	BTap,				// Bボタン短押し（回避）
-	RBTap,				// Bボタン短押し（バックステップ）
+	EnemyFromDistance,
 
-	RTHold,				// RT長押し（溜め攻撃）
-	RTTap,				// RT短押し（強攻撃）
+	//BHold,				// Bボタン長押し（走り）
+	//BTap,				// Bボタン短押し（回避）
+	//RBTap,				// Bボタン短押し（バックステップ）
+
+	//RTHold,				// RT長押し（溜め攻撃）
+	//RTTap,				// RT短押し（強攻撃）
 
 	JumpPressed,		// ジャンプ入力
 	StaminaEmpty,		// スタミナ切れ
@@ -78,14 +80,15 @@ struct TransitionContext
 	float animSeconds;
 	float animLength;
 	float moveLength;
+	float enemyFromdistance;
 	int   buttonDown;
 	int   buttonHeld;
 	int   buttonUp;
-	bool  bHold;
-	bool  bTap;
-	bool  rbTap;
-	bool  rtHold;
-	bool  rtTap;
+	//bool  bHold;
+	//bool  bTap;
+	//bool  rbTap;
+	//bool  rtHold;
+	//bool  rtTap;
 	bool  jumpPressed;
 	bool  haveStamina;
 	bool  isStaminaEmpty;

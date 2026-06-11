@@ -94,11 +94,89 @@
                     "negate": false,
                     "threshold": 0.0,
                     "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 12.0,
+                    "type": 8
                 }
             ],
             "fromState": "State_Move",
             "priority": 0,
             "toState": "State_Attack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "threshold": 12.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toState": "State_Attack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 12.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 1,
+            "toState": "State_Magic"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "threshold": 0.0,
+                    "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 12.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 1,
+            "toState": "State_Magic"
         },
         {
             "Actions": [],
@@ -116,7 +194,7 @@
             ],
             "fromState": "State_Attack",
             "priority": 0,
-            "toState": "State_Move"
+            "toState": "State_Idle"
         },
         {
             "Actions": [],
@@ -126,15 +204,15 @@
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 64,
+                    "buttonMask": 0,
                     "negate": false,
-                    "threshold": 0.0,
-                    "type": 3
+                    "threshold": 1.0,
+                    "type": 1
                 }
             ],
-            "fromState": "State_Idle",
+            "fromState": "State_Magic",
             "priority": 0,
-            "toState": "State_Attack"
+            "toState": "State_Idle"
         }
     ],
     "nodes": [
@@ -147,8 +225,6 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "position.x": 100.0,
-            "position.y": 100.0,
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
             "type": 1
         },
@@ -161,8 +237,6 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "position.x": 300.0,
-            "position.y": 100.0,
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
             "type": 1
         },
@@ -175,8 +249,6 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "position.x": 500.0,
-            "position.y": 100.0,
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Avoid.json",
             "type": 1
         },
@@ -189,9 +261,19 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "position.x": 700.0,
-            "position.y": 100.0,
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Attack.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Magic",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Magic.json",
             "type": 1
         }
     ]

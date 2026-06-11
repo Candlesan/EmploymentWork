@@ -126,6 +126,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = (ctx.moveLength < cond.threshold);
 			break;
 
+		case TransitionConditionType::EnemyFromDistance:
+			result = (ctx.enemyFromdistance >= cond.threshold);
+			break;
+
 		case TransitionConditionType::ButtonPressed:
 			result = (ctx.buttonDown & cond.buttonMask) != 0;
 			break;
@@ -138,25 +142,25 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = (ctx.buttonHeld & cond.buttonMask) != 0;
 			break;
 
-		case TransitionConditionType::BHold:
-			result = ctx.bHold;
-			break;
+		//case TransitionConditionType::BHold:
+		//	result = ctx.bHold;
+		//	break;
 
-		case TransitionConditionType::BTap:
-			result = ctx.bTap;
-			break;
+		//case TransitionConditionType::BTap:
+		//	result = ctx.bTap;
+		//	break;
 
-		case TransitionConditionType::RBTap:
-			result = ctx.rbTap;
-			break;
+		//case TransitionConditionType::RBTap:
+		//	result = ctx.rbTap;
+		//	break;
 
-		case TransitionConditionType::RTHold:
-			result = ctx.rtHold;
-			break;
+		//case TransitionConditionType::RTHold:
+		//	result = ctx.rtHold;
+		//	break;
 
-		case TransitionConditionType::RTTap:
-			result = ctx.rtTap;
-			break;
+		//case TransitionConditionType::RTTap:
+		//	result = ctx.rtTap;
+		//	break;
 
 		case TransitionConditionType::JumpPressed:
 			result = ctx.jumpPressed;

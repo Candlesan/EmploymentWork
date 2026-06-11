@@ -156,6 +156,8 @@ private:
 	float dropStartT = 0.0f;
 	float dropEndT = 0.0f;
 
+	float pushLT = 0.0f;
+
 	enum class MoveMode {
 		Walk,   // ’Êí
 		Jog,	// ¬‘–‚è
@@ -188,6 +190,9 @@ private:
 	int jumpLimit = 1;
 
 	float moveLength = 0.0f;
+	float EnemyfromDistance = 0.0f;
+	float lockedEnemyDistance = 0.0f;
+	bool isMagicAttack = true;
 
 	// ƒƒbƒNƒIƒ“ŠÖŒW
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;

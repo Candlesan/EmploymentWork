@@ -201,6 +201,29 @@ void Player::Update(float elapsedTime)
 		}
 	}
 
+	pushLT = gamePad.GetTriggerL();
+
+
+	// 敵との距離の計算
+	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());
+	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Epos, Ppos);
+	EnemyfromDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
+
+	if (gamePad.GetButtonDown() & GamePad::BTN_X || gamePad.GetButtonDown() & GamePad::BTN_Y)
+	{
+		if (currentState != "State_Attack")
+		{
+			lockedEnemyDistance = EnemyfromDistance;
+		}
+
+		// 敵との距離が12.0f以上だったら魔法を撃つ
+		if (lockedEnemyDistance > 12.0f)
+		{
+			MagicInput();
+		}
+	}
+
 	// 無敵時間更新
 	UpdateInvincibleTimer(elapsedTime);
 	// スタミナ回復処理
@@ -209,7 +232,7 @@ void Player::Update(float elapsedTime)
 	if (!isTyping && !isPreviewMode)
 	{
 		InputMove(elapsedTime);
-		//MagicInput();
+
 		if (!IsGuarding) Heal(elapsedTime);
 
 		UpdateStateTransitions(elapsedTime);
@@ -232,9 +255,6 @@ void Player::Update(float elapsedTime)
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
-	// 武器のアタッチメント処理
-	WeaponAttachment();
-
 	// 根本と剣先を求める関数
 	CalculationRootAndTip();
 
@@ -243,7 +263,6 @@ void Player::Update(float elapsedTime)
 
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
-
 
 	// シーケンサーとアニメーションの再生を同期させる
 	animSequence.Update(currentState, GetCurrentAnimationSeconds());
@@ -261,6 +280,9 @@ void Player::Update(float elapsedTime)
 	// モデル更新処理
 	UpdateTransform();
 	player->UpdateTransform(transform);
+
+	// 武器のアタッチメント処理
+	WeaponAttachment();
 }
 
 // 描画処理
@@ -269,7 +291,7 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 	renderer->Draw(ShaderId::PBR, player); 
 	renderer->Draw(ShaderId::PBR, weapon[0].model); // 杖
 
-	if(weapon[1].isVisible) 
+	if (weapon[1].isVisible)
 	renderer->Draw(ShaderId::PBR, weapon[1].model); // 剣
 
 	// 魔法描画
@@ -312,6 +334,9 @@ void Player::DrawGUI()
 			ImGui::Text("Move Speed: %f.0", moveSpeed); // 移動速度
 			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 			ImGui::Text("moveLength: %.3f", moveLength);
+			ImGui::Text("EnemyfromDistance: %.3f", EnemyfromDistance);
+			ImGui::Text("pushLT: %.3f", pushLT);
+
 
 			ImGui::Separator();
 
@@ -365,17 +390,14 @@ void Player::DrawGUI()
 		// 武器のアタッチメント情報
 		if (ImGui::CollapsingHeader("Weapon Attachment", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			for (int i = 0; i < 2; ++i)
-			{
-				ImGui::DragFloat3("Position" + i, &weapon[i].position.x, 0.01f);
-				ImGui::DragFloat3("Angle" + i,    &weapon[i].angle.x, 0.01f);
-				ImGui::DragFloat3("Scale" + i,    &weapon[i].scale.x, 0.01f);
+			ImGui::DragFloat3("Position##1", &weapon[0].position.x, 0.01f);
+			ImGui::DragFloat3("Angle##1", &weapon[0].angle.x, 0.01f);
+			ImGui::DragFloat3("Scale##1",    &weapon[0].scale.x, 0.01f);
 
-				ImGui::DragFloat3("Weapon HitOffset" + i,       &weapon[i].weaponHitOffset.x, 0.1f);
-				ImGui::DragFloat3("Weapon AngleOffset" + i,     &weapon[i].weaponAngleOffset.x, 0.1f);
-				ImGui::DragFloat("Weapon Collision Radius" + i, &weapon[i].weaponRadius, 0.1f);
-				ImGui::DragFloat("Weapon Collision Height" + i, &weapon[i].weaponHeight, 0.1f);
-			}
+			ImGui::DragFloat3("Weapon HitOffset##1",       &weapon[0].weaponHitOffset.x, 0.1f);
+			ImGui::DragFloat3("Weapon AngleOffset##1",     &weapon[0].weaponAngleOffset.x, 0.1f);
+			ImGui::DragFloat("Weapon Collision Radius##1", &weapon[0].weaponRadius, 0.1f);
+			ImGui::DragFloat("Weapon Collision Height##1", &weapon[0].weaponHeight, 0.1f);
 
 			ImGui::DragFloat(u8"武器の回転速度", &RotationSpeed, 0.1, 0.0f, 100.0f);
 			ImGui::DragFloat(u8"剣の落下速度", &DropSpeed, 0.1, 0.0f, 100.0f);
@@ -887,14 +909,15 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.animSeconds = GetCurrentAnimationSeconds();
 	ctx.animLength = GetCurrentAnimationLength();
 	ctx.moveLength = moveLength;
+	ctx.enemyFromdistance = EnemyfromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown();
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
-	ctx.bHold = bButtonHoldTime >= RUN_THRESHOLD;
-	ctx.bTap = (gamePad.GetButtonUp() & GamePad::BTN_B) && !ctx.bHold;
-	ctx.rbTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER) && !ctx.bHold;
-	ctx.rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD;
-	ctx.rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER) && !ctx.rtHold;
+	//ctx.bHold = bButtonHoldTime >= RUN_THRESHOLD;
+	//ctx.bTap = (gamePad.GetButtonUp() & GamePad::BTN_B) && !ctx.bHold;
+	//ctx.rbTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER) && !ctx.bHold;
+	//ctx.rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD;
+	//ctx.rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER) && !ctx.rtHold;
 	ctx.jumpPressed = jumpPressed;
 	ctx.haveStamina = HaveStamina;
 	ctx.isStaminaEmpty = IsStaminaEmpty;
