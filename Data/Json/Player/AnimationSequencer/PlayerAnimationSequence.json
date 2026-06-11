@@ -67,6 +67,143 @@
                     "time": 0.6833333373069763
                 }
             ]
+        },
+        {
+            "events": [],
+            "name": "AS_Combo_Attack_03_01_Seq_0",
+            "ranges": [
+                {
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.6097044348716736,
+                    "hand": 0,
+                    "invincible": 0.30000001192092896,
+                    "name": "ShowSword",
+                    "poiseRate": 1.0,
+                    "sphereOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "sphereRadius": 0.5,
+                    "start": 0.12684692442417145
+                }
+            ],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "State_Attack",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Combo_Attack_01_03_Seq_0",
+            "ranges": [
+                {
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.6065124273300171,
+                    "hand": 0,
+                    "invincible": 0.30000001192092896,
+                    "name": "ShowSword",
+                    "poiseRate": 1.0,
+                    "sphereOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "sphereRadius": 0.5,
+                    "start": 0.15967676043510437
+                }
+            ],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Combo_Attack_05_03_Start_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Combo_Attack_05_03_Loop_Seq_0",
+            "ranges": [
+                {
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.75,
+                    "hand": 0,
+                    "invincible": 0.30000001192092896,
+                    "name": "ShowSword",
+                    "poiseRate": 1.0,
+                    "sphereOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "sphereRadius": 0.5,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Combo_Attack_05_04_Seq_0",
+            "ranges": [
+                {
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.720086693763733,
+                    "hand": 0,
+                    "invincible": 0.30000001192092896,
+                    "name": "ShowSword",
+                    "poiseRate": 1.0,
+                    "sphereOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "sphereRadius": 0.5,
+                    "start": 0.0
+                },
+                {
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.7200000286102295,
+                    "hand": 0,
+                    "invincible": 0.30000001192092896,
+                    "name": "DropSword",
+                    "poiseRate": 1.0,
+                    "sphereOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "sphereRadius": 0.5,
+                    "start": 0.4000000059604645
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 0.6624999642372131,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.4374997615814209,
+                    "time": 0.24461980164051056
+                },
+                {
+                    "speed": 2.012500524520874,
+                    "time": 0.9908878207206726
+                },
+                {
+                    "speed": 1.0,
+                    "time": 1.899999976158142
+                }
+            ]
         }
     ]
 }

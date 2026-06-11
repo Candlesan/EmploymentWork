@@ -66,7 +66,7 @@ private:
 		Debug   // フリーカメラ
 	};
 	CameraMode cameraMode = CameraMode::Game; // 初期状態はゲーム用
-	float cameraRange = 5.0f;
+	float cameraRange = 7.0f;
 	DirectX::XMFLOAT3 cameraAngle = { 0, 0, 0 };
 
 	LightManager lightManager;

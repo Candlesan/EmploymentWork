@@ -20,13 +20,14 @@ void Player::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// プレイヤーモデル読み込み
-	//player = std::make_shared<Model>(device, "Data/Model/Player/Player1/SKM_DKM_Full.gltf");
 	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 
 	// 武器モデル読み込み
-	//weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon1/GreatSword.gltf");
-	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
-	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.01f;
+	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
+	weapon[0].scale.x = weapon[0].scale.y = weapon[0].scale.z = 0.01f;
+
+	weapon[1].model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon1/GreatSword.gltf");
+	weapon[1].scale.x = weapon[1].scale.y = weapon[1].scale.z = 0.2;
 
 	 // プレイヤーパラメーター初期化
 	moveSpeed = 2.0f; // 移動速度
@@ -45,19 +46,21 @@ void Player::Initialize()
 	invincibleTimer = 0.0f;
 
 
-	// 当たり判定パラメーター初期化
+	// 当たり判定パラメーター初期化(Player)
 	weight = 0.5f;
 	radius = 0.7f;
 	height = 1.6f;
 	debugOffset = 0.8;
-	weapon.weaponHitOffset = { 0.0f, 0.0f, 0.0f };
-	weapon.weaponAngleOffset = { 0.0f, 0, -0.26f };
-	weapon.weaponRadius = 0.3f;
-	weapon.weaponHeight = 1.7f;
 
-	// 武器のパラメーター初期化
-	weapon.position = { -0.03f, -0.04f, 0.06f };
-	weapon.angle = { -0.06, 0.23f, -1.13f };
+	// 武器のパラメーター初期化(杖)
+	weapon[0].position = { 0.07f, 0.0f, 0.03f };
+	weapon[0].angle = { -0.06, 0.23f, -1.13f };
+
+	// 武器のパラメーター初期化(杖)
+	weapon[1].position = { 0.0f, 1.0f, 3.0f };
+	weapon[1].angle = { -1.64, 4.75, 89.44f };
+
+	// 武器のパラメーター初期化(剣)
 
 	// Jsonファイルの初期化
 	InitializeAttackData();
@@ -235,6 +238,9 @@ void Player::Update(float elapsedTime)
 	// 根本と剣先を求める関数
 	CalculationRootAndTip();
 
+	// 魔法剣の挙動を作る関数
+	UpdateMagicSwordTrasform(elapsedTime);
+
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
 
@@ -261,7 +267,10 @@ void Player::Update(float elapsedTime)
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, player); 
-	renderer->Draw(ShaderId::PBR, weapon.model);
+	renderer->Draw(ShaderId::PBR, weapon[0].model); // 杖
+
+	if(weapon[1].isVisible) 
+	renderer->Draw(ShaderId::PBR, weapon[1].model); // 剣
 
 	// 魔法描画
 	magicManager.Render(rc);
@@ -356,14 +365,23 @@ void Player::DrawGUI()
 		// 武器のアタッチメント情報
 		if (ImGui::CollapsingHeader("Weapon Attachment", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat3("Position##1", &weapon.position.x, 0.01f);
-			ImGui::DragFloat3("Angle##1", &weapon.angle.x, 0.01f);
-			ImGui::DragFloat3("Scale##1", &weapon.scale.x, 0.01f);
+			for (int i = 0; i < 2; ++i)
+			{
+				ImGui::DragFloat3("Position" + i, &weapon[i].position.x, 0.01f);
+				ImGui::DragFloat3("Angle" + i,    &weapon[i].angle.x, 0.01f);
+				ImGui::DragFloat3("Scale" + i,    &weapon[i].scale.x, 0.01f);
 
-			ImGui::DragFloat3("Weapon HitOffset", &weapon.weaponHitOffset.x, 0.1f);
-			ImGui::DragFloat3("Weapon AngleOffset", &weapon.weaponAngleOffset.x, 0.1f);
-			ImGui::DragFloat("Weapon Collision Radius", &weapon.weaponRadius, 0.1f);
-			ImGui::DragFloat("Weapon Collision Height", &weapon.weaponHeight, 0.1f);
+				ImGui::DragFloat3("Weapon HitOffset" + i,       &weapon[i].weaponHitOffset.x, 0.1f);
+				ImGui::DragFloat3("Weapon AngleOffset" + i,     &weapon[i].weaponAngleOffset.x, 0.1f);
+				ImGui::DragFloat("Weapon Collision Radius" + i, &weapon[i].weaponRadius, 0.1f);
+				ImGui::DragFloat("Weapon Collision Height" + i, &weapon[i].weaponHeight, 0.1f);
+			}
+
+			ImGui::DragFloat(u8"武器の回転速度", &RotationSpeed, 0.1, 0.0f, 100.0f);
+			ImGui::DragFloat(u8"剣の落下速度", &DropSpeed, 0.1, 0.0f, 100.0f);
+			ImGui::DragFloat3(u8"回転中の杖の位置", &SwingPosition.x, 0.1f);
+			ImGui::DragFloat3(u8"回転中の杖の向き", &SwingAngle.x, 0.1f, -360.0f, 360.0f);
+			ImGui::DragFloat3(u8"回転軸", &SwingOriginOffset.x, 0.1f);
 		}
 
 		// トレイル
@@ -394,21 +412,6 @@ void Player::DrawGUI()
 	ImGui::Begin("Animation Transition Editor");
 	std::string clickedNode = transitionEditor.Draw(transitionGraphs, currentState);
 	ImGui::End();
-
-	//ImGui::Begin("Debug Transition");
-	//ImGui::Text("currentState: %s", currentState.c_str());
-	//ImGui::Text("stack size: %d", (int)activeGraphStack.size());
-	//for (int i = 0; i < (int)activeGraphStack.size(); i++)
-	//{
-	//	int gIdx = activeGraphStack[i];
-	//	// このグラフで evalState が何になるか計算して表示
-	//	std::string evalS = currentState;
-	//	if (i < (int)activeGraphStack.size() - 1)
-	//		evalS = transitionGraphs[activeGraphStack[i + 1]].graphName;
-	//	ImGui::Text("  graph[%d]=%s  evalState='%s'", i, transitionGraphs[gIdx].graphName.c_str(), evalS.c_str());
-	//}
-	//ImGui::End();
-
 
 	// ノードがダブルクリックされたらプレビューモードに切り替える
 	if (clickedNode != "")
@@ -477,25 +480,28 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 	{
 		DirectX::XMFLOAT4X4 weaponTransform;
 
-		DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
+		for (int i = 0; i < 2; ++i)
+		{
+			DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[i].transform);
 
-		// 武器の現在の位置と回転だけを取り出す（スケールを無視する）
-		DirectX::XMVECTOR scale, rot, pos;
-		DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
-		DirectX::XMMATRIX baseMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
+			// 武器の現在の位置と回転だけを取り出す（スケールを無視する）
+			DirectX::XMVECTOR scale, rot, pos;
+			DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
+			DirectX::XMMATRIX baseMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
 
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-			weapon.angle.x + weapon.weaponAngleOffset.x,
-			weapon.angle.y + weapon.weaponAngleOffset.y,
-			weapon.angle.z + weapon.weaponAngleOffset.z);
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
-			weapon.position.x + weapon.weaponHitOffset.x,
-			weapon.position.y + weapon.weaponHitOffset.y,
-			weapon.position.z + weapon.weaponHitOffset.z);
-		DirectX::XMMATRIX WorldWeapon = R * T * baseMatrix;
-		DirectX::XMStoreFloat4x4(&weaponTransform, WorldWeapon);
+			DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+				weapon[i].angle.x + weapon[i].weaponAngleOffset.x,
+				weapon[i].angle.y + weapon[i].weaponAngleOffset.y,
+				weapon[i].angle.z + weapon[i].weaponAngleOffset.z);
+			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
+				weapon[i].position.x + weapon[i].weaponHitOffset.x,
+				weapon[i].position.y + weapon[i].weaponHitOffset.y,
+				weapon[i].position.z + weapon[i].weaponHitOffset.z);
+			DirectX::XMMATRIX WorldWeapon = R * T * baseMatrix;
+			DirectX::XMStoreFloat4x4(&weaponTransform, WorldWeapon);
 
-		renderer->DrawCapsule(weaponTransform, weapon.weaponRadius, weapon.weaponHeight, { 1, 0, 0, 1 });
+			renderer->DrawCapsule(weaponTransform, weapon[i].weaponRadius, weapon[i].weaponHeight, {1, 0, 0, 1});
+		}
 	}
 
 	// 魔法の当たり判定描画
@@ -503,9 +509,9 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 }
 
 //　武器の位置を取得
-DirectX::XMFLOAT3 Player::GetWeaponPosition() const
+DirectX::XMFLOAT3 Player::GetWeaponPosition(int index) const
 {
-	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
+	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[index].transform);
 
 	// スケールを除去（描画側と同じ処理）
 	DirectX::XMVECTOR scale, rot, pos;
@@ -516,14 +522,14 @@ DirectX::XMFLOAT3 Player::GetWeaponPosition() const
 
 	// 描画側と完全に同じ行列を作る
 	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-		weapon.angle.x + weapon.weaponAngleOffset.x,
-		weapon.angle.y + weapon.weaponAngleOffset.y,
-		weapon.angle.z + weapon.weaponAngleOffset.z);
+		weapon[index].angle.x + weapon[index].weaponAngleOffset.x,
+		weapon[index].angle.y + weapon[index].weaponAngleOffset.y,
+		weapon[index].angle.z + weapon[index].weaponAngleOffset.z);
 
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
-		weapon.position.x + weapon.weaponHitOffset.x,
-		weapon.position.y + weapon.weaponHitOffset.y,
-		weapon.position.z + weapon.weaponHitOffset.z);
+		weapon[index].position.x + weapon[index].weaponHitOffset.x,
+		weapon[index].position.y + weapon[index].weaponHitOffset.y,
+		weapon[index].position.z + weapon[index].weaponHitOffset.z);
 
 	DirectX::XMMATRIX finalMatrix = R * T * baseMatrix;
 
@@ -536,16 +542,16 @@ DirectX::XMFLOAT3 Player::GetWeaponPosition() const
 }
 
 // 武器の向きを取得
-DirectX::XMFLOAT3 Player::GetWeaponDirection() const
+DirectX::XMFLOAT3 Player::GetWeaponDirection(int index) const
 {
 	// transformから上方向ベクトルを取得する
-	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
+	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[index].transform);
 
 	// 回転値オフセットを適用
 	DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(
-		weapon.weaponAngleOffset.x,
-		weapon.weaponAngleOffset.y,
-		weapon.weaponAngleOffset.z
+		weapon[index].weaponAngleOffset.x,
+		weapon[index].weaponAngleOffset.y,
+		weapon[index].weaponAngleOffset.z
 	);
 
 	DirectX::XMMATRIX finalMatrix = rotation * weaponWorld;
@@ -835,47 +841,6 @@ void Player::InputMove(float elapsedTime)
 		}
 	}
 }
-
-// ジャンプ出来るかどうか
-//bool Player::CanJump() const
-//{
-//	//// Jump_End 中はジャンプ不可（着地の瞬間のフレームのズレ対策）
-//	//if (currentState == PlayerAnimationState::Jump_End)
-//	//{
-//	//	return IsAnimationOutTimeRange(0.238f);
-//	//}
-//
-//	//if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
-//	//// 溜め攻撃の開始直後などは絶対にジャンプ不可
-//	//if (currentState == PlayerAnimationState::Charge_Attack_Start) return false;
-//
-//	//// 通常攻撃の場合
-//	//if (currentState == PlayerAnimationState::Attack_01) 
-//	//{
-//	//	return IsAnimationOutTimeRange(0.82f);
-//	//}
-//	//else if (currentState == PlayerAnimationState::Attack_02)
-//	//{
-//	//	return IsAnimationOutTimeRange(0.82f);
-//	//}
-//	//else if (currentState == PlayerAnimationState::Charge_Attack)
-//	//{
-//	//	return IsAnimationOutTimeRange(1.2f);
-//
-//	//}
-//	//else if (currentState == PlayerAnimationState::Run_Attack)
-//	//{
-//	//	return IsAnimationOutTimeRange(1.248f);
-//
-//	//}
-//	//else if (currentState == PlayerAnimationState::Jump_Attack)
-//	//{
-//	//	return IsAnimationOutTimeRange(0.986);
-//
-//	//}
-//
-//	//return true;
-//}
 
 // 状態遷移更新処理
 void Player::UpdateStateTransitions(float elapsedTime)
@@ -1211,27 +1176,28 @@ std::string Player::DetermineRollState()
 // 武器のアタッチメント処理
 void Player::WeaponAttachment()
 {
-	const char* rightHandName = "hand_r";
-	//const char* rightHandName = "ik_hand_gun";
+	const char* AttachName = "hand_r";
 
-	// 武器のローカル行列を計算する
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon.scale.x, weapon.scale.y, weapon.scale.z);
-	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon.position.x, weapon.position.y, weapon.position.z);
-	DirectX::XMMATRIX weaponLocal = S * R * T;
-
-	// キャラクターモデルから右手ノードを検索する
-	for (const Model::Node& node : player->GetNodes())
 	{
-		if (strcmp(node.name.c_str(), rightHandName) == 0)
+		// 武器のローカル行列を計算する
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[0].scale.x, weapon[0].scale.y, weapon[0].scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[0].angle.x, weapon[0].angle.y, weapon[0].angle.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon[0].position.x, weapon[0].position.y, weapon[0].position.z);
+		DirectX::XMMATRIX weaponLocal = S * R * T;
+
+		// キャラクターモデルから右手ノードを検索する
+		for (const Model::Node& node : player->GetNodes())
 		{
-			// 右手ノードと武器のローカル行列から武器のワールド行列を求める
-			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
-			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
-			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
-			DirectX::XMStoreFloat4x4(&weapon.transform, weaponWorld);
-			weapon.model->UpdateTransform(weapon.transform);
-			break;
+			if (strcmp(node.name.c_str(), AttachName) == 0)
+			{
+				// 右手ノードと武器のローカル行列から武器のワールド行列を求める
+				DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
+				DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+				DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
+				DirectX::XMStoreFloat4x4(&weapon[0].transform, weaponWorld);
+				weapon[0].model->UpdateTransform(weapon[0].transform);
+				break;
+			}
 		}
 	}
 }
@@ -1239,20 +1205,201 @@ void Player::WeaponAttachment()
 // 剣先と根本を求める関数
 void Player::CalculationRootAndTip()
 {
-	// 剣の根本・先端の座標を計算
-	DirectX::XMVECTOR RootOffset = DirectX::XMLoadFloat3(&rootOffset);
-	DirectX::XMVECTOR TipOffset = DirectX::XMLoadFloat3(&tipOffset);
+	for (int i = 0; i < 2; ++i)
+	{
+		// 剣の根本・先端の座標を計算
+		DirectX::XMVECTOR RootOffset = DirectX::XMLoadFloat3(&rootOffset);
+		DirectX::XMVECTOR TipOffset = DirectX::XMLoadFloat3(&tipOffset);
 
-	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&weapon.transform);
+		DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&weapon[i].transform);
 
-	DirectX::XMVECTOR Root = DirectX::XMVector3TransformCoord(RootOffset, W);
-	DirectX::XMVECTOR Tip = DirectX::XMVector3TransformCoord(TipOffset, W);
+		DirectX::XMVECTOR Root = DirectX::XMVector3TransformCoord(RootOffset, W);
+		DirectX::XMVECTOR Tip = DirectX::XMVector3TransformCoord(TipOffset, W);
 
-	DirectX::XMFLOAT3 rootF3, tipF3;
-	DirectX::XMStoreFloat3(&rootF3, Root);
-	DirectX::XMStoreFloat3(&tipF3, Tip);
+		DirectX::XMFLOAT3 rootF3, tipF3;
+		DirectX::XMStoreFloat3(&rootF3, Root);
+		DirectX::XMStoreFloat3(&tipF3, Tip);
 
-	trail.Update(rootF3, tipF3);
+		trail.Update(rootF3, tipF3);
+	}
+}
+
+// 魔法剣の挙動を作る関数
+void Player::UpdateMagicSwordTrasform(float elapsedTime)
+{
+	// 剣は最初は消しておく
+	weapon[1].isVisible = false;
+
+	if (!animSequence.GetRange("ShowSword"))
+	{
+		weapon[1].isVisible = false; // 範囲外なら消す！
+		return;                      // これ以降の計算はしない
+	}
+
+	weapon[1].isVisible = true;
+
+	// プレイヤー自身の今のワールド行列を取得
+	DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+	float time = GetCurrentAnimationSeconds();
+
+	// ShowSwordのStratからEndまでの時間を取得する
+	float rangeStart = 0.0f;
+	float rangeEnd = 1.0f;
+
+	for (auto& data : animSequence.GetAnimations())
+	{
+		if (data.name == currentState)
+		{
+			for (auto& r : data.ranges)
+			{
+				rangeStart = r.start;
+				rangeEnd = r.end;
+				break;
+			}
+		}
+	}
+
+	// 進行度を計算する
+	float duration = rangeEnd - rangeStart;
+	if (duration <= 0.0f) duration = 1.0f;
+
+	float t = (time - rangeStart) / duration;
+
+	// 0.0~1.0の間になるようにクランプする
+	if (t < 0.0f) t = 0.0f;
+	if (t > 1.0f) t = 1.0f;
+
+	if (currentState == "AS_Combo_Attack_03_01_Seq_0")
+	{
+		t = t * 2.5f;
+		if (t > 1.0f) t = 1.0f;
+
+		constexpr float startAngle = DirectX::XMConvertToRadians(-90.0f);
+		constexpr float endAngle = DirectX::XMConvertToRadians(90.0f);
+		float currentAngle = startAngle + (endAngle - startAngle) * t; 
+
+		constexpr float tiltAngle = DirectX::XMConvertToRadians(30.0f);
+
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[1].scale.x, weapon[1].scale.y, weapon[1].scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[1].angle.x, weapon[1].angle.y, weapon[1].angle.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(0.0f, 1.0f, 2);
+
+		DirectX::XMMATRIX R_Swing = DirectX::XMMatrixRotationY(currentAngle);
+
+		DirectX::XMMATRIX R_Tilt = DirectX::XMMatrixRotationZ(tiltAngle);
+
+		DirectX::XMMATRIX swordWorld = S * R * T * R_Swing * R_Tilt * playerWorld;
+
+		DirectX::XMStoreFloat4x4(&weapon[1].transform, swordWorld);
+		weapon[1].model->UpdateTransform(weapon[1].transform);
+	}
+	else if (currentState == "AS_Combo_Attack_01_03_Seq_0")
+	{
+		t = t * 2.5f;
+		if (t > 1.0f) t = 1.0f;
+
+		constexpr float startAngle = DirectX::XMConvertToRadians(90.0f);
+		constexpr float endAngle = DirectX::XMConvertToRadians(-90.0f);
+		float currentAngle = startAngle + (endAngle - startAngle) * t;
+
+		constexpr float tiltAngle = DirectX::XMConvertToRadians(-30.0f);
+
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[1].scale.x, weapon[1].scale.y, weapon[1].scale.z);
+		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[1].angle.x, weapon[1].angle.y, weapon[1].angle.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(0.0f, 1.0f, 2);
+
+		DirectX::XMMATRIX R_Swing = DirectX::XMMatrixRotationY(currentAngle);
+
+		DirectX::XMMATRIX R_Tilt = DirectX::XMMatrixRotationZ(tiltAngle);
+
+		DirectX::XMMATRIX swordWorld = S * R * T * R_Swing * R_Tilt * playerWorld;
+
+		DirectX::XMStoreFloat4x4(&weapon[1].transform, swordWorld);
+		weapon[1].model->UpdateTransform(weapon[1].transform);
+	}
+	else if (currentState == "AS_Combo_Attack_05_03_Loop_Seq_0")
+	{
+		// 杖
+		// 現在の回転値を保存しておく
+		DirectX::XMVECTOR SaveRad = DirectX::XMLoadFloat3(&weapon[0].angle);
+
+		// 杖を回転させる
+		Rotation += RotationSpeed * elapsedTime;
+
+		DirectX::XMMATRIX StaffS = DirectX::XMMatrixScaling(weapon[0].scale.x, weapon[0].scale.y, weapon[0].scale.z);
+		DirectX::XMMATRIX StaffR = DirectX::XMMatrixRotationRollPitchYaw(SwingAngle.x, SwingAngle.y, SwingAngle.z);
+		DirectX::XMMATRIX StaffT = DirectX::XMMatrixTranslation(weapon[0].position.x + SwingPosition.x, weapon[0].position.y + SwingPosition.y, weapon[0].position.z + SwingPosition.z);
+
+		DirectX::XMMATRIX R_Swing = DirectX::XMMatrixRotationY(Rotation);
+
+		DirectX::XMMATRIX staffWorld = StaffS * StaffR * StaffT * R_Swing * playerWorld;
+
+		DirectX::XMStoreFloat4x4(&weapon[0].transform, staffWorld);
+		weapon[0].model->UpdateTransform(weapon[0].transform);
+
+		// 剣
+		DirectX::XMMATRIX SwordS = DirectX::XMMatrixScaling(weapon[1].scale.x, weapon[1].scale.y, weapon[1].scale.z);
+		DirectX::XMMATRIX SwordR = DirectX::XMMatrixRotationRollPitchYaw(weapon[1].angle.x, weapon[1].angle.y, weapon[1].angle.z);
+		DirectX::XMMATRIX SwordT = DirectX::XMMatrixTranslation(0.0f + SwingOriginOffset.x, 1.0f + SwingOriginOffset.y, 4 + SwingOriginOffset.z);
+
+		DirectX::XMMATRIX swordWorld = SwordS * SwordR * R_Swing * SwordT * playerWorld;
+
+		DirectX::XMStoreFloat4x4(&weapon[1].transform, swordWorld);
+		weapon[1].model->UpdateTransform(weapon[1].transform);
+	}
+	else if (currentState == "AS_Combo_Attack_05_04_Seq_0")
+	{
+		for (auto& data : animSequence.GetAnimations())
+		{
+			if (data.name == currentState)
+			{
+				for (auto& r : data.ranges)
+				{
+					if (r.name == "DrapSword")
+					{
+						rangeStart = r.start;
+						rangeEnd = r.end;
+						break;
+					}
+				}
+			}
+		}
+
+
+		float dropRangeEnd = rangeEnd;
+
+		constexpr float StartPosY = 5.0f;
+		constexpr float EndPosY = 1.5f;
+
+		t = t * DropSpeed;
+		if (t > 1.0f) t = 1.0f;
+
+		float currentPosY = StartPosY + (EndPosY - StartPosY) * t;
+
+		if (animSequence.GetRange("DropSword"))
+		{
+
+			DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[1].scale.x, weapon[1].scale.y, weapon[1].scale.z);
+			DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(0, 0, 0);
+			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(0.0f, currentPosY, 4);
+
+			DirectX::XMMATRIX swordWorld = S * R * T * playerWorld;
+
+			DirectX::XMStoreFloat4x4(&weapon[1].transform, swordWorld);
+			weapon[1].model->UpdateTransform(weapon[1].transform);
+		}
+		else
+		{
+			DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[1].scale.x, weapon[1].scale.y, weapon[1].scale.z);
+			DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(0, 0, 0);
+			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(0.0f, 7, 4);
+
+			DirectX::XMMATRIX swordWorld = S * R * T * playerWorld;
+
+			DirectX::XMStoreFloat4x4(&weapon[1].transform, swordWorld);
+			weapon[1].model->UpdateTransform(weapon[1].transform);
+		}
+	}
 }
 
 // 音を取得（無ければ自動ロード）する関数

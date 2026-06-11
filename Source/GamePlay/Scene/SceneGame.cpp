@@ -293,7 +293,7 @@ void SceneGame::Render()
 		// エフェクト描画 
 		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
 
-		player.RenderTrail(rc);
+		//player.RenderTrail(rc);
 
 		// プリミティブ描画
 		primitiveRenderer->Render(dc, camera.GetView(), camera.GetProjection(),
@@ -620,37 +620,40 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 
 	if (!isHit || !activeRange) return;
 
-	DirectX::XMFLOAT3 outPositionA, outPositionB;
-	if (Collision::IntersectCapsuleVsCapsule(
-		player.GetWeaponPosition(),
-		player.GetWeaponDirection(),
-		player.GetWeaponHeight(),
-		player.GetWeaponRadius(),
-		1.0f, // 武器の重さ(適当に設定)
-		enemy->GetPosition(),
-		enemy->GetCapsuleDirection(),
-		enemy->GetHeight(),
-		enemy->GetRadius(),
-		enemy->GetWeight(),
-		outPositionA,
-		outPositionB
-	))
+	for (int i = 0; i < 2; ++i)
 	{
-		// ダメージ処理
-		auto state = player.GetCurrentState();
-	const AnimationConfig* config = player.GetAnimationConfig(state);
-
-		float finalDamage = activeRange->damageRate;
-		float finalPoiseValue = activeRange->poiseRate;
-
-		if (activeRange->damageRate > 0.0f)
+		DirectX::XMFLOAT3 outPositionA, outPositionB;
+		if (Collision::IntersectCapsuleVsCapsule(
+			player.GetWeaponPosition(i),
+			player.GetWeaponDirection(i),
+			player.GetWeaponHeight(i),
+			player.GetWeaponRadius(i),
+			1.0f, // 武器の重さ(適当に設定)
+			enemy->GetPosition(),
+			enemy->GetCapsuleDirection(),
+			enemy->GetHeight(),
+			enemy->GetRadius(),
+			enemy->GetWeight(),
+			outPositionA,
+			outPositionB
+		))
 		{
-			// CalculateAttackResult に「実数値」を渡す
-			AttackResult res = player.CalculateAttackResult(activeRange->damageRate, activeRange->poiseRate);
+			// ダメージ処理
+			auto state = player.GetCurrentState();
+			const AnimationConfig* config = player.GetAnimationConfig(state);
 
-			// 敵の強靭値を実数値（res.poiseDamage）で減らす
-			enemy->SetLastDamage(res.damage);
-			enemy->ApplyDamage(res.damage, activeRange->invincible, res.poiseDamage);
+			float finalDamage = activeRange->damageRate;
+			float finalPoiseValue = activeRange->poiseRate;
+
+			if (activeRange->damageRate > 0.0f)
+			{
+				// CalculateAttackResult に「実数値」を渡す
+				AttackResult res = player.CalculateAttackResult(activeRange->damageRate, activeRange->poiseRate);
+
+				// 敵の強靭値を実数値（res.poiseDamage）で減らす
+				enemy->SetLastDamage(res.damage);
+				enemy->ApplyDamage(res.damage, activeRange->invincible, res.poiseDamage);
+			}
 		}
 	}
 }

@@ -42,10 +42,10 @@ public:
 	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox = false);
 
 	// 武器の当たり判定情報
-	DirectX::XMFLOAT3 GetWeaponPosition() const;
-	DirectX::XMFLOAT3 GetWeaponDirection() const;
-	float GetWeaponRadius() const { return weapon.weaponRadius; }
-	float GetWeaponHeight() const { return weapon.weaponHeight; }
+	DirectX::XMFLOAT3 GetWeaponPosition(int index) const;
+	DirectX::XMFLOAT3 GetWeaponDirection(int index) const;
+	float GetWeaponRadius(int index) const { return weapon[index].weaponRadius; }
+	float GetWeaponHeight(int index) const { return weapon[index].weaponHeight; }
 
 	// 魔法発動処理
 	void MagicInput();
@@ -113,6 +113,9 @@ private:
 	// 剣先と根本を求める関数
 	void CalculationRootAndTip();
 
+	// 魔法剣の挙動を作る関数
+	void UpdateMagicSwordTrasform(float elapsedTime);
+
 	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 private:
@@ -122,7 +125,7 @@ private:
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
-	// 武器のアタッチメqaント関係
+	// 武器のアタッチメメント関係
 	struct Weapon
 	{
 		std::shared_ptr<Model> model;
@@ -139,9 +142,19 @@ private:
 		DirectX::XMFLOAT3 weaponAngleOffset = { 0, 0, 0 };
 		float weaponRadius = 0.5f;
 		float weaponHeight = 1.0f;
+		bool isVisible = false;
 	};
-	Weapon weapon;
+	Weapon weapon[2];
 	float lastDamage = 0.0f;
+
+	DirectX::XMFLOAT3 SwingAngle = { 0, 0, 1.6 };
+	DirectX::XMFLOAT3 SwingPosition = { 0, 2.0f, 0 };
+	DirectX::XMFLOAT3 SwingOriginOffset = { 0, 0, 0 };
+	float RotationSpeed = 25.0f;
+	float Rotation = 0.0f;
+	float DropSpeed = 5.0f;
+	float dropStartT = 0.0f;
+	float dropEndT = 0.0f;
 
 	enum class MoveMode {
 		Walk,   // 通常時

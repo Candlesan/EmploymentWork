@@ -17,7 +17,7 @@ AnimationSequencer::AnimationSequencer(const std::string& jsonPath)
     }
 }
 
-// 更新処理（友達のシステムそのまま！）
+// 更新処理
 void AnimationSequencer::Update(const std::string& animName, float animTime)
 {
 #if _DEBUG
@@ -52,6 +52,9 @@ void AnimationSequencer::Update(const std::string& animName, float animTime)
         }
     }
 
+    // 前の状態を保存する
+    prevActiveFlags = activeFlags;
+
     // フラグ判定（現在時刻が範囲内か）
     activeFlags.clear();
     for (const Range& r : data->ranges)
@@ -59,6 +62,25 @@ void AnimationSequencer::Update(const std::string& animName, float animTime)
         if (animTime >= r.start && animTime <= r.end)
         {
             activeFlags[r.name] = true;
+        }
+    }
+
+    rangeStarted.clear();
+    rangeEnded.clear();
+
+    for (const Range& r : data->ranges)
+    {
+        bool wasOn = (prevActiveFlags.count(r.name) > 0);
+        bool isOn = (activeFlags.count(r.name) > 0);
+
+        if (!wasOn && isOn)
+        {
+            rangeStarted[r.name] = true;
+        }
+
+        if (wasOn && !isOn)
+        {
+            rangeEnded[r.name] = true;
         }
     }
 
@@ -114,6 +136,18 @@ bool AnimationSequencer::GetRange(const std::string& flagName) const
     return it != activeFlags.end() && it->second;
 }
 
+bool AnimationSequencer::GetRangeStart(const std::string& name) const
+{
+    auto it = rangeStarted.find(name);
+    return it != rangeStarted.end() && it->second;
+}
+
+bool AnimationSequencer::GetRangeEnd(const std::string& name) const
+{
+    auto it = rangeEnded.find(name);
+    return it != rangeEnded.end() && it->second;
+}
+
 float AnimationSequencer::GetSpeed() const
 {
     return currentSpeed;
@@ -132,7 +166,6 @@ AnimationSequencer::AnimationData* AnimationSequencer::FindAnimationData(const s
     return nullptr;
 }
 
-// ★君のnlohmann::jsonを使った最強のSave処理
 void AnimationSequencer::Save(const std::string& filepath)
 {
     // フォルダが無ければ作る（君の元のコードの賢い処理を残したで！）

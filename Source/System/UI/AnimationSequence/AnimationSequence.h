@@ -35,6 +35,8 @@ public:
     // 結果取得
     bool GetEvent(const std::string& eventName) const;
     bool GetRange(const std::string& flagName) const;
+    bool GetRangeStart(const std::string& name) const;  // 入った瞬間だけtrue
+    bool GetRangeEnd(const std::string& name) const;    // 出た瞬間だけtrue
     float GetSpeed() const;
 
     // 構造体
@@ -64,6 +66,8 @@ public:
         float damageRate = 1.0f;     // ダメージ倍率
         float poiseRate = 1.0f;      // 削り値
         float invincible = 0.3f;     // 無敵時間
+
+        bool isHitBox = true;
     };
 
     struct SpeedKey
@@ -100,6 +104,10 @@ private:
     // 前フレームのアニメーション時刻
     float prevAnimTime = 0.0f;
     float currentSpeed = 1.0f;
+
+    std::unordered_map<std::string, bool> prevActiveFlags; // 前の状態
+    std::unordered_map<std::string, bool> rangeStarted;  // 前フレームOFF→今フレームON
+    std::unordered_map<std::string, bool> rangeEnded;    // 前フレームON→今フレームOFF
 
     // 使用済みイベント
     std::unordered_map<std::string, bool> firedEvents;

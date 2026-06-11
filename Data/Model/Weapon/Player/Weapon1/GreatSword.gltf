@@ -6,13 +6,13 @@
       "count": 420,
       "max": [
         1.296712040901184,
-        11.665144920349121,
-        0.27823540568351746
+        -0.09485435485839844,
+        0.3182353973388672
       ],
       "min": [
         -1.296712040901184,
-        -5.988326549530029,
-        -0.278234601020813
+        -17.74832534790039,
+        -0.23823459446430206
       ],
       "type": "VEC3"
     },
@@ -21,12 +21,12 @@
       "componentType": 5126,
       "count": 420,
       "max": [
-        0.9997277855873108,
+        0.9997285008430481,
         1.0,
         1.0
       ],
       "min": [
-        -0.9997277855873108,
+        -0.9997285008430481,
         -1.0,
         -1.0
       ],
@@ -60,7 +60,7 @@
       ],
       "min": [
         0.0003859999997075647,
-        0.0019920000340789557
+        0.0019919872283935547
       ],
       "type": "VEC2"
     },
@@ -119,13 +119,16 @@
   ],
   "images": [
     {
-      "uri": "textures/blinn1_baseColor.png"
+      "uri": "blinn1_Base.png"
     },
     {
-      "uri": "textures/blinn1_metallicRoughness.png"
+      "uri": "blinn1_MetallicRoughness.png"
     },
     {
-      "uri": "textures/blinn1_normal.png"
+      "uri": "blinn1_Normal.png"
+    },
+    {
+      "uri": "blinn1_Occlusion.png"
     }
   ],
   "materials": [
@@ -135,7 +138,7 @@
         "index": 2
       },
       "occlusionTexture": {
-        "index": 1
+        "index": 3
       },
       "pbrMetallicRoughness": {
         "baseColorTexture": {
@@ -211,6 +214,10 @@
     {
       "sampler": 0,
       "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
     }
   ]
 }

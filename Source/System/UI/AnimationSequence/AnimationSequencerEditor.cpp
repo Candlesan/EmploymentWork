@@ -535,27 +535,36 @@ void AnimationSequencerEditor::DrawDetailPanel(AnimationSequencer::AnimationData
 		ImGui::DragFloat("Start Time", &r.start, 0.001f, r.start, 100.0f);
 		ImGui::DragFloat("End Time", &r.end, 0.001f, 0.0f, r.end);
 
+		ImGui::Checkbox(u8"Is HitBox(当たり判定として使う)", &r.isHitBox);
+
 		ImGui::Separator();
 
-		const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body", "Magic" };
-		int handIndex = (int)r.hand;
-		if (ImGui::Combo(u8"Hand(判定部位)", &handIndex, handItems, IM_ARRAYSIZE(handItems)));
+		if (r.isHitBox)
 		{
-			r.hand = (HandType)handIndex;
-		}
+			const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body", "Magic" };
+			int handIndex = (int)r.hand;
+			if (ImGui::Combo(u8"Hand(判定部位)", &handIndex, handItems, IM_ARRAYSIZE(handItems)));
+			{
+				r.hand = (HandType)handIndex;
+			}
 
-		// Bodyの時はボーン追従の設定を出す
-		if (r.hand == HandType::Body) {
-			char boneBuf[128];
-			strncpy_s(boneBuf, r.boneName.c_str(), sizeof(boneBuf));
-			if (ImGui::InputText(u8"Bone Name", boneBuf, sizeof(boneBuf))) r.boneName = boneBuf;
-			ImGui::DragFloat(u8"Sphere Radius", &r.sphereRadius, 0.01f, 0.1f, 5.0f);
-			ImGui::DragFloat3(u8"Sphere Offset", &r.sphereOffset.x, 0.01f);
-		}
+			// Bodyの時はボーン追従の設定を出す
+			if (r.hand == HandType::Body) {
+				char boneBuf[128];
+				strncpy_s(boneBuf, r.boneName.c_str(), sizeof(boneBuf));
+				if (ImGui::InputText(u8"Bone Name", boneBuf, sizeof(boneBuf))) r.boneName = boneBuf;
+				ImGui::DragFloat(u8"Sphere Radius", &r.sphereRadius, 0.01f, 0.1f, 5.0f);
+				ImGui::DragFloat3(u8"Sphere Offset", &r.sphereOffset.x, 0.01f);
+			}
 
-		ImGui::DragFloat(u8"Damage Rate", &r.damageRate, 0.01f, 0.1f, 10.0f);
-		ImGui::DragFloat(u8"Poise Rate (削り)", &r.poiseRate, 0.01f);
-		ImGui::DragFloat(u8"Invincible (無敵)", &r.invincible, 0.01f);
+			ImGui::DragFloat(u8"Damage Rate", &r.damageRate, 0.01f, 0.1f, 10.0f);
+			ImGui::DragFloat(u8"Poise Rate (削り)", &r.poiseRate, 0.01f);
+			ImGui::DragFloat(u8"Invincible (無敵)", &r.invincible, 0.01f);
+		}
+		else
+		{
+			ImGui::TextDisabled(u8"※この範囲は汎用フラグとして通知されます。");
+		}
 
 		ImGui::Spacing();
 		ImGui::Separator();
