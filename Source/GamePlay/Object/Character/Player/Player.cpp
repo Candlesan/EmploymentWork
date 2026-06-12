@@ -7,9 +7,10 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
-#include "GamePlay/Object/Character/Player/Magic/StraightMagic/StraightMagic.h"
-#include "GamePlay/Object/Character/Player/Magic/HommingMagic/HommingMagic.h"
+#include "GamePlay/Object/Character/Player/Magic/MagicMove/StraightMagic/StraightMagic.h"
+#include "GamePlay/Object/Character/Player/Magic/MagicMove/HommingMagic/HommingMagic.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
+#include "GamePlay/Object/Character/Player/Magic/MagicType/WindBladeMagic/WindBladeMagic.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -413,6 +414,12 @@ void Player::DrawGUI()
 			ImGui::DragFloat3("Tip Offset", &tipOffset.x, 0.01f);
 		}
 
+		// 魔法関係
+		if (ImGui::CollapsingHeader("Magic", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::SliderInt("Level", &level, 1, 3);
+		}
+
 		// アニメーション遷移状態
 		if (ImGui::CollapsingHeader("Animation/State", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -598,62 +605,9 @@ void Player::MagicInput()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	
-	// 直進弾丸発射
-	if (gamePad.GetButtonDown() & GamePad::BTN_Y)
-	{
-		// 前方向
-		DirectX::XMFLOAT3 dir;
-		dir.x = sinf(angle.y);
-		dir.y = 0.0f;
-		dir.z = cosf(angle.y);
-		// 発射位置（仮でプレイヤーの腰当たり）
-		DirectX::XMFLOAT3 pos;
-		pos.x = position.x;
-		pos.y = position.y + 1.0f;// 仮で腰当たりに配置
-		pos.z = position.z;
-		// 発射
-		StraightMagic* magic = new StraightMagic(&magicManager);
-		magic->Launch(dir, pos);
-	}
-
-	// 追尾弾丸発射
 	if (gamePad.GetButtonDown() & GamePad::BTN_X)
 	{
-		// 前方向
-		DirectX::XMFLOAT3 dir;
-		dir.x = sinf(angle.y);
-		dir.y = 0.0f;
-		dir.z = cosf(angle.y);
-		// 発射位置（仮でプレイヤーの腰当たり）
-		DirectX::XMFLOAT3 pos;
-		pos.x = position.x;
-		pos.y = position.y + 1.0f;// 仮で腰当たりに配置
-		pos.z = position.z;
-		//ターゲットを追尾する
-		DirectX::XMFLOAT3 target;
-		target.x = pos.x + dir.x * 1000.0f;
-		target.y = pos.y + dir.y * 1000.0f;
-		target.z = pos.z + dir.z * 1000.0f;
-
-		//一番近くの敵をターゲットにする
-		float dist = FLT_MAX;
-		// 敵との距離判定
-		DirectX::XMVECTOR Postion = DirectX::XMLoadFloat3(&position);
-		DirectX::XMVECTOR EPosition = DirectX::XMLoadFloat3(&enemy->GetPosition());
-		DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Postion, EPosition);
-		DirectX::XMVECTOR Length = DirectX::XMVector3LengthSq(Vec);
-		float d;
-		DirectX::XMStoreFloat(&d, Length);
-		if (d < dist)
-		{
-			dist = d;
-			target = enemy->GetPosition();
-			target.y += enemy->GetHeight() * 0.5f;
-		}
-
-		// 発射
-		HommingMagic* magic = new HommingMagic(&magicManager);
-		magic->Launch(dir, pos, target);
+		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level);
 	}
 }
 

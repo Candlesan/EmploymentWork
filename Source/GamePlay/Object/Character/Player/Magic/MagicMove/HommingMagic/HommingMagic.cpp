@@ -1,4 +1,4 @@
-#include "GamePlay/Object/Character/Player/Magic/HommingMagic/HommingMagic.h"
+#include "HommingMagic.h"
 
 
 // コンストラクタ
@@ -109,7 +109,7 @@ void HommingMagic::Update(float elapsedTime)
 
 	if (OnEffect)
 	{
-		handle = testEffect->Play(position, 1.0f);
+		handle = testEffect->Play(position, 0.5);
 		OnEffect = false;
 	}
 

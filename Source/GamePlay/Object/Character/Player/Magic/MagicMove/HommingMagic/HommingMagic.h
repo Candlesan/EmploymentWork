@@ -32,7 +32,7 @@ private:
 
 	float damage = 2.0f; // ダメージ量
 	float power = 10; // 出力
-	float radius = 1; // 大きさ
+	float radius = 0.5; // 大きさ
 	float Magic_Consumption = 1; // 魔力消費量
 
 	DirectX::XMFLOAT3 target = { 0, 0, 0 };

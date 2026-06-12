@@ -160,17 +160,29 @@
     <Filter Include="Source\GamepPlay\Object\Character\Player\Magic">
       <UniqueIdentifier>{b244fe4a-d912-4992-a63c-bd84ffdea295}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\StraightMagic">
-      <UniqueIdentifier>{a006f896-8810-4346-a644-1da25361df80}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\HommingMangic">
-      <UniqueIdentifier>{fb1f6bfb-b133-4043-8798-c2c53a67dbcf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\System\Effect">
       <UniqueIdentifier>{e1dbfc57-1ef7-4492-9e9c-ed5619b5cd33}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\System\UI\AnimationSequence">
       <UniqueIdentifier>{07c8bc3f-779b-457a-a04c-f1ee86ab8db6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicMove">
+      <UniqueIdentifier>{4848e84f-c51a-4b39-bf52-32469419295a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicMove\StraightMagic">
+      <UniqueIdentifier>{a006f896-8810-4346-a644-1da25361df80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicMove\HommingMangic">
+      <UniqueIdentifier>{fb1f6bfb-b133-4043-8798-c2c53a67dbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicType">
+      <UniqueIdentifier>{f989ee99-016b-4ecf-8d35-97da2587d692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindSpearMagic">
+      <UniqueIdentifier>{2bf5dd5d-72c0-4d28-8594-dfe06adb6fec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindBladeMagic">
+      <UniqueIdentifier>{99e0d4e1-0b97-4b34-aae2-9d25b75a5bd0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -402,12 +414,6 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicManager.h">
       <Filter>Source\GamepPlay\Object\Character\Player\Magic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\StraightMagic\StraightMagic.h">
-      <Filter>Source\GamepPlay\Object\Character\Player\Magic\StraightMagic</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\HommingMagic\HommingMagic.h">
-      <Filter>Source\GamepPlay\Object\Character\Player\Magic\HommingMangic</Filter>
-    </ClInclude>
     <ClInclude Include="Source\System\Effect\Effect.h">
       <Filter>Source\System\Effect</Filter>
     </ClInclude>
@@ -419,6 +425,15 @@
     </ClInclude>
     <ClInclude Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.h">
       <Filter>Source\System\UI\AnimationSequence</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicMove\HommingMagic\HommingMagic.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicMove\HommingMangic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicMove\StraightMagic\StraightMagic.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicMove\StraightMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicType\WindBladeMagic\WindBladeMagic.h">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindBladeMagic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -614,12 +629,6 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicManager.cpp">
       <Filter>Source\GamepPlay\Object\Character\Player\Magic</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\StraightMagic\StraightMagic.cpp">
-      <Filter>Source\GamepPlay\Object\Character\Player\Magic\StraightMagic</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\HommingMagic\HommingMagic.cpp">
-      <Filter>Source\GamepPlay\Object\Character\Player\Magic\HommingMangic</Filter>
-    </ClCompile>
     <ClCompile Include="Source\System\Effect\Effect.cpp">
       <Filter>Source\System\Effect</Filter>
     </ClCompile>
@@ -631,6 +640,15 @@
     </ClCompile>
     <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.cpp">
       <Filter>Source\System\UI\AnimationSequence</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicMove\HommingMagic\HommingMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicMove\HommingMangic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicMove\StraightMagic\StraightMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicMove\StraightMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicType\WindBladeMagic\WindBladeMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindBladeMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

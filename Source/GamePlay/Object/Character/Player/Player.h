@@ -238,4 +238,5 @@ private:
 
 	// –‚–@ŠÖŒW
 	MagicManager magicManager;
+	int level = 1;
 };

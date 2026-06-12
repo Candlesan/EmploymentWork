@@ -30,10 +30,10 @@ public:
 	float GetDamage() const override { return damage; }
 private:
 	float damage = 1.0f; // ダメージ量
-	float power = 10; // 出力
-	float radius = 1; // 大きさ
-	float Magic_Consumption = 1; // 魔力消費量
-	float speed = 5; // 速度
+	float power = 10.0f; // 出力
+	float radius = 0.2f; // 大きさ
+	float Magic_Consumption = 1.0f; // 魔力消費量
+	float speed = 5.0f; // 速度
 	float lifeTimer = 3.0f;
 
 	bool isAlive = false; // まだ存在しているか
