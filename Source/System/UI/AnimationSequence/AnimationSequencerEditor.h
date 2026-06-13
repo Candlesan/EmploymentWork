@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "System/UI/AnimationSequence/AnimationSequence.h"
 #include <string>
 

@@ -97,6 +97,8 @@ NodeBase* NodeBase::Inference(BehaviorData* data)
 // —Dæ‡ˆÊ‚Åƒm[ƒh‘I‘ğ
 NodeBase* NodeBase::SelectPriority(std::vector<NodeBase*>* list)
 {
+    if (list->empty()) return nullptr;
+
     NodeBase* selectNode = nullptr;
     int priority = INT_MAX;
 

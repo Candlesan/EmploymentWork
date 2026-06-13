@@ -1,19 +1,10 @@
 #pragma once
 #include "System/UI/AnimationNodeEditor/AnimationTranstion.h"
+#include "GamePlay/Object/Character/Animation/AnimationConfig.h"
 #include <imgui_node_editor.h>
 #include "json.hpp"
 #include <fstream>
 namespace ed = ax::NodeEditor;
-
-// アニメーションの設定
-struct AnimationConfig
-{
-	std::string animationName = "";	// アニメーション名
-	bool loop = false;				// アニメーションをループするか
-	bool useRootMotion = false;		// ルートモーションするか
-	bool useRootMotionEx = false;	// 腰骨に対応したルートモーション
-	float blendTime = 0.2f;			// 補間時間
-};
 
 // ノードのタイプ
 enum class NodeType {

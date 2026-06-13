@@ -2,6 +2,7 @@
 #include "System/Renderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence/AnimationSequence.h"
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
+#include "System/UI/BehaviorTreeEditor/BehaviorTreeEditor.h"
 #include "System/Audio/AudioSource.h"
 
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
@@ -106,7 +107,6 @@ private:
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
 	// アニメーション関係
-
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
 
@@ -177,6 +177,10 @@ private:
 	float attackCoolTimer = 0.0f;
 
 	// SE関係
-// 音の名前と実体を紐づけるマップ
+	// 音の名前と実体を紐づけるマップ
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
+
+	// ビヘイビアツリーノードエディター
+	BehaviorTreeGraph btGraph;
+	BehaviorTreeEditor btEditor;
 };

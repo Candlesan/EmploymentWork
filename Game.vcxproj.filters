@@ -136,9 +136,6 @@
     <Filter Include="Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base">
       <UniqueIdentifier>{45eeee66-534e-480a-a3f2-a22f5294bafe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\NodeEdeiter">
-      <UniqueIdentifier>{d6ab45af-d410-4a73-8a6c-b486cb4ab745}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\System\UI\AnimationNodeEditor">
       <UniqueIdentifier>{66af326e-e5aa-428e-8462-82135e6f3af2}</UniqueIdentifier>
     </Filter>
@@ -183,6 +180,12 @@
     </Filter>
     <Filter Include="Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindBladeMagic">
       <UniqueIdentifier>{99e0d4e1-0b97-4b34-aae2-9d25b75a5bd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\UI\BehaviorTreeEditor">
+      <UniqueIdentifier>{ec8dcbac-1402-4490-adf2-0eb2690216aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\NodeEditor">
+      <UniqueIdentifier>{d6ab45af-d410-4a73-8a6c-b486cb4ab745}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -361,22 +364,22 @@
       <Filter>Source\System\Core</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-node-editor-master\crude_json.h">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-node-editor-master\imgui_bezier_math.h">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-node-editor-master\imgui_canvas.h">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-node-editor-master\imgui_extra_math.h">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-node-editor-master\imgui_node_editor.h">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-node-editor-master\imgui_node_editor_internal.h">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTranstion.h">
       <Filter>Source\System\UI\AnimationNodeEditor</Filter>
@@ -434,6 +437,15 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Magic\MagicType\WindBladeMagic\WindBladeMagic.h">
       <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindBladeMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeGraph.h">
+      <Filter>Source\System\UI\BehaviorTreeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeEditor.h">
+      <Filter>Source\System\UI\BehaviorTreeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationConfig.h">
+      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -585,16 +597,16 @@
       <Filter>Source\System\Core</Filter>
     </ClCompile>
     <ClCompile Include="External\imgui-node-editor-master\crude_json.cpp">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="External\imgui-node-editor-master\imgui_canvas.cpp">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="External\imgui-node-editor-master\imgui_node_editor.cpp">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="External\imgui-node-editor-master\imgui_node_editor_api.cpp">
-      <Filter>External\NodeEdeiter</Filter>
+      <Filter>External\NodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp">
       <Filter>Source\System\UI\AnimationNodeEditor</Filter>
@@ -649,6 +661,12 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Magic\MagicType\WindBladeMagic\WindBladeMagic.cpp">
       <Filter>Source\GamepPlay\Object\Character\Player\Magic\MagicType\WindBladeMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeGraph.cpp">
+      <Filter>Source\System\UI\BehaviorTreeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeEditor.cpp">
+      <Filter>Source\System\UI\BehaviorTreeEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,68 @@
+{
+    "links": [
+        {
+            "from": "Root",
+            "to": "Idle"
+        },
+        {
+            "from": "Root",
+            "to": "Pursuit"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "NewNode",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "Root",
+            "parentName": "",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "Idle_2",
+            "config": {
+                "animationName": "Idle_2",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "Idle",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 0,
+            "selectRule": 1
+        },
+        {
+            "StateName": "Walk_InPlace",
+            "config": {
+                "animationName": "Walk_InPlace",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "Pursuit",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 1,
+            "selectRule": 1
+        }
+    ]
+}

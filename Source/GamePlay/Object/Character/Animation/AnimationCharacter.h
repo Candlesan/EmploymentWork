@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
+
 // アニメーション機能を持つキャラクター基底クラス
 class AnimationCharacter : public Character
 {

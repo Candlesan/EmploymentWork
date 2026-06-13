@@ -137,6 +137,7 @@
     <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationConfig.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Character.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\ActionBase.h" />
@@ -195,6 +196,8 @@
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTranstion.h" />
     <ClInclude Include="Source\System\UI\AnimationSequence\AnimationSequence.h" />
     <ClInclude Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.h" />
+    <ClInclude Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeEditor.h" />
+    <ClInclude Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeGraph.h" />
     <ClInclude Include="Source\System\UI\Dialog.h" />
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +271,8 @@
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp" />
     <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequence.cpp" />
     <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.cpp" />
+    <ClCompile Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeEditor.cpp" />
+    <ClCompile Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeGraph.cpp" />
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
   </ItemGroup>
   <ItemGroup>

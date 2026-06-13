@@ -26,10 +26,6 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	//enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Werewolf/SK_Werewolf.gltf");
-
-	//weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Werewolf/SK_Werewolf_Type_C_Weapon.gltf");
-	//weapon[1].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Werewolf/SK_Werewolf_Type_C_Weapon.gltf");
 	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss/SKM_Hairy_Beast.gltf");
 
 	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Boss/SKM_Hairy_Beast_Hammer.gltf");
@@ -72,164 +68,45 @@ void Enemy::Initialize()
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
-	//rootMotionNodeName = "Root";
 	upperBodyNodeName = "pelvis";
-	//upperBodyNodeName = "Bip001-Pelvis";
 	ChangeAnimationState("Idle_2");
-
-	// 攻撃とかの情報を初期化
-	//InitializeAttackData();
-
-	// ビヘイビアツリーの設定
 	behaviorData = new BehaviorData();
 	aiTree = new BehaviorTree();
 
 	// Root
-	aiTree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, nullptr, nullptr);
+	//aiTree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, nullptr, nullptr);
 
-	aiTree->AddNode("Root", "Attack" , 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this), new AttackAction(this));
-	aiTree->AddNode("Root", "Pursuit", 2, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
-	aiTree->AddNode("Root", "Wander", 3, BehaviorTree::SelectRule::Priority, new WanderJudgment(this), new WanderAction(this));
-	aiTree->AddNode("Root", "Idle", 4, BehaviorTree::SelectRule::Priority, /*new IdleJudgment(this)*/nullptr, new IdleAction(this));
-}
+	//aiTree->AddNode("Root", "Attack" , 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this), new AttackAction(this));
+	//aiTree->AddNode("Root", "Pursuit", 2, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
+	//aiTree->AddNode("Root", "Wander", 3, BehaviorTree::SelectRule::Priority, new WanderJudgment(this), new WanderAction(this));
+	//aiTree->AddNode("Root", "Idle", 4, BehaviorTree::SelectRule::Priority, /*new IdleJudgment(this)*/nullptr, new IdleAction(this));
 
-// 攻撃とかの情報を初期化
-void Enemy::InitializeAttackData()
-{
-	std::string path = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
-	sequencerEditor.SetJsonPath(path);
-	animSequence.Load(path);
-	
-	{
-	 //// Jsonがあれば読み込む、無ければデフォルト値を設定
- //std::ifstream file("Data/Json/Enemy/AttackData/AttackSequence.json");
- //if (file.is_open())
- //{
- //	file.close();
- //	animSequence.Load("Data/Json/Enemy/AttackData/AttackSequence.json");
- //}
- //else
- //{
- //	animSequence.attackData[EnemyAnimationState::Light_Attack_01] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
- //	animSequence.attackData[EnemyAnimationState::Light_Attack_02] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
- //	animSequence.attackData[EnemyAnimationState::Light_Attack_03] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
+	// モデルからアニメーション名一覧を取得してエディターに渡す
+	std::vector<std::string> animNames;
+	for (auto& anim : enemy->GetAnimations())
+		animNames.push_back(anim.name);
+	btEditor.SetAnimationList(animNames);
 
- //	animSequence.attackData[EnemyAnimationState::Dodge_FU] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body }
- //	};
-
- //	animSequence.attackData[EnemyAnimationState::Heavy_Attack_01] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
- //	animSequence.attackData[EnemyAnimationState::Heavy_Attack_02] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
-
- //	animSequence.attackData[EnemyAnimationState::Skill_BlockBreaker] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_DoubleSwings_Root] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand }
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_EndlessStabs] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
- //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
- //	{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::LeftHand },
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_HeavyStomp] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::Body },
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_Leaping] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_QuickStab] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_ShoulderBarge_Root] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::Body },
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_UpperCut] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	};
- //	animSequence.attackData[EnemyAnimationState::Skill_WieldDagger] = {
- //	{ 40, 90, u8"当たり判定1", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定2", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定3", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定4", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	{ 40, 90, u8"当たり判定5", 0xFF0000FF, TrackType::HitBox, HandType::RightHand },
- //	};
-
- //}
-
- //// 始動技の初期化
- //firstAttackList.push_back({ EnemyAnimationState::Light_Attack_01, 0.0f, Short_Distance });
- //firstAttackList.push_back({ EnemyAnimationState::Skill_QuickStab, 0.0f, Short_Distance });
- //firstAttackList.push_back({ EnemyAnimationState::Skill_EndlessStabs, 0.0f, Short_Distance });
- //firstAttackList.push_back({ EnemyAnimationState::Skill_WieldDagger, 0.0f, Short_Distance });
-
- //firstAttackList.push_back({ EnemyAnimationState::Skill_BlockBreaker, Short_Distance, Long_Distance });
- //firstAttackList.push_back({ EnemyAnimationState::Skill_HeavyStomp, Short_Distance, Long_Distance });
- //firstAttackList.push_back({ EnemyAnimationState::Skill_DoubleSwings_Root, Short_Distance, Long_Distance });
- //firstAttackList.push_back({ EnemyAnimationState::Skill_ShoulderBarge_Root, Short_Distance, Long_Distance });
-
-
- //// コンボとその派生先の初期化
-
- //// 近距離
- //attackComboMap[EnemyAnimationState::Light_Attack_01] = {
- //	{ EnemyAnimationState::Light_Attack_02, 0.0f, Short_Distance, 80 },
- //	{ EnemyAnimationState::Dodge_FU, 0.0f, Short_Distance, 80 },
- //	{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
- //};
- //attackComboMap[EnemyAnimationState::Light_Attack_02] = {
- //	{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
- //	{ EnemyAnimationState::Heavy_Attack_02, 0.0f, Short_Distance, 40 },
- //};
- //attackComboMap[EnemyAnimationState::Dodge_FU] = {
- //	{ EnemyAnimationState::Light_Attack_03, 0.0f, Short_Distance, 80 },
- //};
-
- //attackComboMap[EnemyAnimationState::Light_Attack_03] = {
- //	{ EnemyAnimationState::Heavy_Attack_01, 0.0f, Short_Distance, 40 },
- //};
-
- //// 中距離
-
- //attackComboMap[EnemyAnimationState::Dodge_Backward] = {
- //	{ EnemyAnimationState::Skill_Leaping, 0.0f, Middle_Distance, 50 },
- //	{ EnemyAnimationState::Skill_UpperCut, 0.0f, Short_Distance, 50 },
- //	{ EnemyAnimationState::Dodge_Backward, 0.0f, Short_Distance, 50 },
- //};
- }
+	btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+	btEditor.ApplyToTree(aiTree, this, btGraph);
 }
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
-	////現在実行されているノードが無ければ
-	//if (activeNode == nullptr)
-	//{
-	//	//次に実行するノードを推論する。
-	//	activeNode = aiTree->ActiveNodeInference(behaviorData);
-	//}
-	////現在実行するノードがあれば
-	//if (activeNode != nullptr)
-	//{
-	//	//ビヘイビアツリーからノードを実行。
-	//	activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
-	//}
+	//現在実行されているノードが無ければ
+	if (activeNode == nullptr)
+	{
+		//次に実行するノードを推論する。
+		activeNode = aiTree->ActiveNodeInference(behaviorData);
+	}
+	//現在実行するノードがあれば
+	if (activeNode != nullptr)
+	{
+		//ビヘイビアツリーからノードを実行。
+		activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+	}
 
 	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
 
@@ -351,6 +228,7 @@ void Enemy::DrawGUI()
 	}
 	ImGui::End();
 
+	btEditor.Draw(btGraph);
 }
 
 // デバックプリミティブ描画
@@ -576,66 +454,7 @@ DirectX::XMFLOAT3 Enemy::GetWeaponDirection(int index) const
 	return Direction;
 }
 
-// 技の派生があるか確認する関数
-std::string Enemy::DecideNextAttack(std::string currentState)
-{
-	// 今の技から派生できるものがあるかを確認
-	if (attackComboMap.count(currentState) == 0) return "";
-
-	// プレイヤーとの距離を取得
-	float dist = GetDistanceToPlayer();
-	auto& derivations = attackComboMap[currentState];
-
-	// 候補をいったん保存する
-	std::vector<std::string> candidates;
-
-	for (const auto& der : derivations)
-	{
-		// 技の範囲内か
-		if (dist >= der.minDistance && dist <= der.maxDistance)
-		{
-			if ((rand() % 100) < der.probability)
-			{
-				candidates.push_back(der.nextState);
-			}
-		}
-	}
-
-	// 候補が無ければIdleを返す
-	if (candidates.empty()) return "";
-
-	// 候補の中からされにランダムに一つ選ぶ
-	return candidates[rand() % candidates.size()];
-}
-
-// スタンプ攻撃
-void Enemy::HeavyStompAttack()
-{
-	moveSpeed = 10;
-
-	// プレイヤーを取得
-	Player& player = Player::Instance();
-
-	// 位置情報を取得する
-	DirectX::XMFLOAT3 bossPos = GetPosition();
-	DirectX::XMFLOAT3 playerPos = player.GetPosition();
-
-	// プレイヤーへの方向ベクトルを計算
-	float vx = playerPos.x - bossPos.x;
-	float vz = playerPos.z - bossPos.z;
-	float distance = GetDistanceToPlayer();
-
-
-	if (IsAnimationInTimeRange(0.0f, 0.843f))
-	{
-		Move(vx, vz, moveSpeed);
-	}
-	else
-	{
-		moveSpeed = 0;
-	}
-}
-
+// 球の当たり判定
 std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 {
 	std::vector<SphereHitInfo> result;
@@ -683,28 +502,6 @@ std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 	}
 	return result;
 }
-// 始動技を決める関数
-std::string Enemy::DecideFirstAttack()
-{
-	float dist = GetDistanceToPlayer();
-	std::vector<std::string> validAttacks;
-
-	// 現在の距離に適合する技をすべてリストアップ
-	for (auto& attack : firstAttackList) {
-		if (dist >= attack.minRange && dist <= attack.maxRange) {
-			validAttacks.push_back(attack.state);
-		}
-	}
-
-	// もし候補が一つもなかったら、とりあえず基本攻撃を返すか -1 を返す
-	if (validAttacks.empty()) {
-		return ""; // または (EnemyAnimationState)-1;
-	}
-
-	// 候補の中からランダムに1つ選んで返す
-	int randomIndex = rand() % validAttacks.size();
-	return validAttacks[randomIndex];
-}
 
 // アニメーション更新処理
 void Enemy::UpdateStateTransitions(float elapsedTime)
@@ -745,6 +542,7 @@ void Enemy::UpdateSounds(const std::string& state)
 		break;
 	}
 }
+
 // 音を取得（無ければ自動ロード）する関数
 AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 {

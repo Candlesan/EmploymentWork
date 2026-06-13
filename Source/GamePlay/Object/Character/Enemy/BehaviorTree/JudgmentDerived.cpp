@@ -6,27 +6,18 @@
 // UŒ‚‚É‘JˆÚ‚Å‚«‚é‚©”»’è
 bool AttackJudgment::Judgment()
 {
-    // 1. ƒN[ƒ‹ƒ^ƒCƒ€’†‚È‚çUŒ‚‚µ‚È‚¢
-    if (owner->GetAttackCoolTimer() > 0.0f) return false;
-
-    // 2. ‹——£ƒ`ƒFƒbƒN
-    float dist = owner->GetDistanceToPlayer();
-    if (dist >= 0 && dist < Long_Distance) return true;
-
     return false;
 }
 
 // ’ÇÕ‚É‘JˆÚ‚Å‚«‚é‚©”»’è
 bool PursuitJudgment::Judgment()
 {
+    // ƒvƒŒƒCƒ„[‚Ì‹——£‚ðŽæ“¾
     float dist = owner->GetDistanceToPlayer();
 
-    if (dist <= Short_Distance) {
-        return false;
-    }
-
-    
-    if (dist >= Middle_Distance) {
+    // Short_Distance‚æ‚è—£‚ê‚Ä‚¢‚½‚ç‘JˆÚ
+    if (dist > Short_Distance)
+    {
         return true;
     }
 
@@ -36,12 +27,5 @@ bool PursuitJudgment::Judgment()
 // œpœj‚É‘JˆÚ‚Å‚«‚é‚©”»’è
 bool WanderJudgment::Judgment()
 {
-    float dist = owner->GetDistanceToPlayer();
-
-    if (dist < Long_Distance && owner->GetAttackCoolTimer() > 0.0f)
-    {
-        return true;
-    }
-
     return false;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class Enemy;
 
@@ -6,7 +7,8 @@ class Enemy;
 class ActionBase
 {
 public:
-	ActionBase(Enemy* enemy):owner(enemy){}
+	ActionBase(Enemy* enemy, std::string animName = "")
+		:owner(enemy), animName(animName) {}
 	// Àsˆ—
 	enum class State
 	{
@@ -17,7 +19,9 @@ public:
 
 	// Àsˆ—(ƒˆ‰¼‘zŠÖ”)
 	virtual ActionBase::State Run(float elapsedTime) = 0;
+
 protected:
 	Enemy* owner;
 	int step = 0;
+	std::string animName;
 };
