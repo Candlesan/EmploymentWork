@@ -100,6 +100,10 @@ void Enemy::Update(float elapsedTime)
 	{
 		//次に実行するノードを推論する。
 		activeNode = aiTree->ActiveNodeInference(behaviorData);
+		if (activeNode != nullptr)
+		{
+			lastInferredNode = activeNode;
+		}
 	}
 	//現在実行するノードがあれば
 	if (activeNode != nullptr)
@@ -228,7 +232,7 @@ void Enemy::DrawGUI()
 	}
 	ImGui::End();
 
-	btEditor.Draw(btGraph);
+	btEditor.Draw(btGraph, aiTree, this);
 }
 
 // デバックプリミティブ描画

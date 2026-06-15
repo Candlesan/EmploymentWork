@@ -10,24 +10,37 @@
 
 namespace ed = ax::NodeEditor;
 
+// 中間ノードの判断条件の種類
+enum class BTConditionType
+{
+	Distance,	// プレイヤーとの距離
+	BossHpRate,	// ボスのHPの割合
+	timer,		// クールダウンなどのタイマー
+	Count,		// enumの総数
+};
+
 // ノードデータ
 struct BTNode
 {
-	ed::NodeId nodeId;
+	ed::NodeId nodeId; // 識別番号
 	ed::PinId pinIn; // 親から繋げる
 	ed::PinId pinOut; // 子へ繋げる
 
 	std::string name; // ノード名
-	std::string parentName; // 親の名前""ならRoot（これはRootと書く方がいいかも）
+	std::string parentName; // 親の名前
 
 	BehaviorTree::SelectRule selectRule = BehaviorTree::SelectRule::Non;
 	int priority = 1; // 優先順位
 
+	float judgmentValue = 0.0f; // 距離を判定する条件
+
 	std::string animState; // アニメーション名
 
-	ImVec2 position = { 0, 0 };
+	ImVec2 position = { 0, 0 }; // ノードの位置
 
-	AnimationConfig config;
+	AnimationConfig config; // アニメーション設定
+
+	int conditionType = 0; // 条件の種類を格納する変数
 };
 
 // 親子を繋ぐ線

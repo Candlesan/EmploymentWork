@@ -42,6 +42,12 @@ public:
 	void SetMoveSpeed(float s) { moveSpeed = s; }
 	float GetMoveSpeed() const { return moveSpeed; }
 
+	// 体力
+	void SetHealth(float h) { health = h; }
+	float GetHealth() { return health; }
+	void SetMaxHealth(float h) { MaxHealth = h; }
+	float GetMaxHealth() { return MaxHealth; }
+
 	// 旋回速度取得
 	float GetTurnSpeed() const { return turnSpeed; }
 
@@ -78,6 +84,10 @@ public:
 
 	// シーケンサーを取得
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
+
+	void ClearActiveNode() { activeNode = nullptr; }
+	NodeBase* GetActiveNode() const { return activeNode; }
+	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
@@ -149,6 +159,7 @@ private:
 	BehaviorTree* aiTree = nullptr;
 	BehaviorData* behaviorData = nullptr;
 	NodeBase* activeNode = nullptr;
+	NodeBase* lastInferredNode = nullptr;
 	float runTimer = 0.0f;
 
 	// シーケンサー関係

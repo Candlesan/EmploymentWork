@@ -107,6 +107,8 @@ void BehaviorTreeGraph::Save(const std::string& path)
 			{"priority", node.priority},
 			{"StateName", node.animState},
 			{"position", {node.position.x, node.position.y}},
+			{"judgmentValue", node.judgmentValue},
+			{"conditionType", node.conditionType},
 
 				{"config", {
 				   {"animationName", node.config.animationName},
@@ -175,6 +177,8 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.selectRule = (BehaviorTree::SelectRule)nodeJson.value("selectRule", 0);
 			newNode.priority = nodeJson.value("priority", 1);
 			newNode.animState = nodeJson.value("StateName", "");
+			newNode.judgmentValue = nodeJson.value("judgmentValue", 0.0f);
+			newNode.conditionType = nodeJson.value("conditionType", 0);
 
 			if (nodeJson.count("position") > 0 && nodeJson["position"].is_array() && nodeJson["position"].size() == 2)
 			{

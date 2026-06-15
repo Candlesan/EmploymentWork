@@ -7,7 +7,7 @@ public:
 	BehaviorTreeEditor() { context = ed::CreateEditor(); }
 	~BehaviorTreeEditor() { ed::DestroyEditor(context); }
 
-	void Draw(BehaviorTreeGraph& graph);
+	void Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy);
 
 	void SetAnimationList(const std::vector<std::string>& list)
 	{
@@ -17,7 +17,7 @@ public:
 	void ApplyToTree(BehaviorTree* tree, Enemy* enemy, const BehaviorTreeGraph& graph);
 
 private:
-	void DrawToolbar(BehaviorTreeGraph& graph);
+	void DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy);
 	void DrawInspector(BehaviorTreeGraph& graph);
 
 	// ƒsƒ“‚Ì•`‰æƒwƒ‹ƒp[ŠÖ”
@@ -27,4 +27,6 @@ private:
 	int selectedNodeIndex = -1;
 
 	std::vector<std::string> animationNames; 
+
+	bool m_isLoadedThisFrame = false;
 };

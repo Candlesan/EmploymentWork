@@ -29,3 +29,20 @@ bool WanderJudgment::Judgment()
 {
     return false;
 }
+
+bool FloatConditionJudgment::Judgment()
+{
+    BTConditionType type = static_cast<BTConditionType>(ConditionType);
+
+    switch (type)
+    {
+    case BTConditionType::Distance:     // プレイヤーとの距離判定
+        return owner->GetDistanceToPlayer() > Threshold;
+    case BTConditionType::BossHpRate:   // ボスのHPの割合
+        return (owner->GetHealth() / owner->GetMaxHealth() * 100.0f) <= Threshold;
+    case BTConditionType::timer:        // タイマー
+        return owner->GetRunTimer() >= Threshold;
+    default:
+        return false;
+    }
+}

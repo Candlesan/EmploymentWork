@@ -6,12 +6,17 @@
         },
         {
             "from": "Root",
+            "to": "PlayerToDistance"
+        },
+        {
+            "from": "PlayerToDistance",
             "to": "Pursuit"
         }
     ],
     "nodes": [
         {
             "StateName": "NewNode",
+            "conditionType": 0,
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
@@ -19,6 +24,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "judgmentValue": 0.0,
             "name": "Root",
             "parentName": "",
             "position": [
@@ -30,6 +36,7 @@
         },
         {
             "StateName": "Idle_2",
+            "conditionType": 0,
             "config": {
                 "animationName": "Idle_2",
                 "blendTime": 0.20000000298023224,
@@ -37,6 +44,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "judgmentValue": 0.0,
             "name": "Idle",
             "parentName": "Root",
             "position": [
@@ -44,10 +52,11 @@
                 100.0
             ],
             "priority": 1,
-            "selectRule": 4
+            "selectRule": 0
         },
         {
             "StateName": "Walk_InPlace",
+            "conditionType": 0,
             "config": {
                 "animationName": "Walk_InPlace",
                 "blendTime": 0.20000000298023224,
@@ -55,13 +64,34 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "judgmentValue": 0.0,
             "name": "Pursuit",
+            "parentName": "PlayerToDistance",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 0,
+            "selectRule": 0
+        },
+        {
+            "StateName": "NewNode",
+            "conditionType": 0,
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "judgmentValue": 10.0,
+            "name": "PlayerToDistance",
             "parentName": "Root",
             "position": [
                 100.0,
                 100.0
             ],
-            "priority": 1,
+            "priority": 0,
             "selectRule": 1
         }
     ]
