@@ -28,7 +28,7 @@ private:
 class AttackAction : public ActionBase
 {
 public:
-	AttackAction(Enemy* enemy) : ActionBase(enemy) {}
+	AttackAction(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
 	ActionBase::State Run(float elapsedTime);
 };
 

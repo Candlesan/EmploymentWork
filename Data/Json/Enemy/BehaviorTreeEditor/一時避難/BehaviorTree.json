@@ -11,6 +11,14 @@
         {
             "from": "PlayerToDistance",
             "to": "Pursuit"
+        },
+        {
+            "from": "Root",
+            "to": "AttackDistance"
+        },
+        {
+            "from": "AttackDistance",
+            "to": "Attack"
         }
     ],
     "nodes": [
@@ -51,17 +59,17 @@
                 100.0,
                 100.0
             ],
-            "priority": 1,
+            "priority": 2,
             "selectRule": 0
         },
         {
-            "StateName": "Walk_InPlace",
+            "StateName": "Walk",
             "conditionType": 0,
             "config": {
-                "animationName": "Walk_InPlace",
+                "animationName": "Walk",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
-                "useRootMotion": false,
+                "useRootMotion": true,
                 "useRootMotionEx": false
             },
             "judgmentValue": 0.0,
@@ -91,8 +99,48 @@
                 100.0,
                 100.0
             ],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "NewNode",
+            "conditionType": 0,
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "judgmentValue": 5.400000095367432,
+            "name": "AttackDistance",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
             "priority": 0,
             "selectRule": 1
+        },
+        {
+            "StateName": "NewNode",
+            "conditionType": 0,
+            "config": {
+                "animationName": "Attack_1",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": true,
+                "useRootMotionEx": false
+            },
+            "judgmentValue": 0.0,
+            "name": "Attack",
+            "parentName": "AttackDistance",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 1,
+            "selectRule": 0
         }
     ]
 }

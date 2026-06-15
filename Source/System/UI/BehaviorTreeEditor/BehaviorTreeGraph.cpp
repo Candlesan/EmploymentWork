@@ -9,6 +9,7 @@ void BehaviorTreeGraph::AddNode(const std::string& StateName, ImVec2 pos)
 	node.nodeId = NextId();
 	node.pinIn = NextId();
 	node.pinOut = NextId();
+	node.name = "Node_" + std::to_string(node.nodeId.Get());
 	node.animState = StateName;
 	node.position = pos;
 	nodes.push_back(node);

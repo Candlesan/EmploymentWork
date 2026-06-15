@@ -86,6 +86,7 @@ public:
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
 
 	void ClearActiveNode() { activeNode = nullptr; }
+	void ClearLastInferredNode() { lastInferredNode = nullptr; }
 	NodeBase* GetActiveNode() const { return activeNode; }
 	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
 private:

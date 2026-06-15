@@ -6,7 +6,13 @@
 // 攻撃に遷移できるか判定
 bool AttackJudgment::Judgment()
 {
-    return false;
+    // プレイヤーの距離を取得
+    float dist = owner->GetDistanceToPlayer();
+
+    if (dist > Short_Distance)
+    {
+        return true;
+    }
 }
 
 // 追跡に遷移できるか判定
@@ -37,7 +43,12 @@ bool FloatConditionJudgment::Judgment()
     switch (type)
     {
     case BTConditionType::Distance:     // プレイヤーとの距離判定
-        return owner->GetDistanceToPlayer() > Threshold;
+        if (owner->GetAttackCoolTimer() > 0.0f)
+        {
+            return false; // クールダウン中だから、今は攻撃条件を不成立（false）にする！
+        }
+
+    return owner->GetDistanceToPlayer() <= Threshold;
     case BTConditionType::BossHpRate:   // ボスのHPの割合
         return (owner->GetHealth() / owner->GetMaxHealth() * 100.0f) <= Threshold;
     case BTConditionType::timer:        // タイマー
