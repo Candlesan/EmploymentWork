@@ -242,8 +242,8 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
 		if (node.selectRule == BehaviorTree::SelectRule::Non)
 		{
-			if (node.name == "Attack" || node.name == "Swing") { finalAction = new AttackAction(enemy, node.animState); }
-			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.animState); }
+			if (node.name == "Attack" || node.name == "Swing") { finalAction = new AttackAction(enemy, node.config.animationName); }
+			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.config.animationName); }
 			else if (node.name == "Wander") { finalAction = new WanderAction(enemy); }
 			else if (node.name == "Idle") { finalAction = new IdleAction(enemy, node.config.animationName); }
 		}
@@ -326,22 +326,27 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 
 		if (!animationNames.empty())
 		{
-			std::vector<const char*> items;
-			for (auto& s : animationNames) items.push_back(s.c_str());
-
-			int current = 0;
-			for (int i = 0; i < (int)animationNames.size(); i++)
-				if (animationNames[i] == node.animState) { current = i; break; }
-
-			if (ImGui::Combo("AnimState", &current, items.data(), (int)items.size()))
-				node.animState = animationNames[current];
-
-			// アニメーション名 (GLTFの本当の名前)
-			char nameBuf[256] = "";
-			strncpy_s(nameBuf, node.config.animationName.c_str(), sizeof(nameBuf));
-			if (ImGui::InputText(u8"アニメーション名 (GLTF)", nameBuf, sizeof(nameBuf)))
+			std::vector<const char*> comboItems;
+			for (const auto& name : animationNames)
 			{
-				node.config.animationName = nameBuf;
+				comboItems.push_back(name.c_str());
+			}
+
+			// 現在ノードに設定されているアニメーションが、リストの何番目にあるかを探す
+			int currentSelection = 0;
+			for (int i = 0; i < (int)animationNames.size(); i++)
+			{
+				if (animationNames[i] == node.config.animationName)
+				{
+					currentSelection = i;
+					break;
+				}
+			}
+
+			// 安全な Combo ボックスを表示して、選択されたら config.animationName を書き換える！
+			if (ImGui::Combo(u8"再生するアニメーション", &currentSelection, comboItems.data(), (int)comboItems.size()))
+			{
+				node.config.animationName = animationNames[currentSelection];
 			}
 
 			// ループ設定
@@ -353,6 +358,11 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 
 			// ブレンド時間
 			ImGui::DragFloat(u8"ブレンド時間(秒)", &node.config.blendTime, 0.01f, 0.0f, 2.0f);
+		}
+		else
+		{
+			// もしモデルのアニメーションリストが空っぽだった時のための安全対策
+			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), u8"※アニメーションリストが読み込まれていません。");
 		}
 
 		// AnimStateの編集

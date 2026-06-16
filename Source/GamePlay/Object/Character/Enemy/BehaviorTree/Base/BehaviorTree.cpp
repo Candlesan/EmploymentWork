@@ -81,6 +81,8 @@ NodeBase* BehaviorTree::Run(NodeBase* actionNode, BehaviorData* data, float elap
 // “o˜^‚³‚ê‚½ƒm[ƒh‚ð‚·‚×‚Äíœ‚·‚é
 void BehaviorTree::NodeAllClear(NodeBase* delNode)
 {
+	if (delNode == nullptr) return;
+
 	size_t count = delNode->children.size();
 	if (count > 0)
 	{
