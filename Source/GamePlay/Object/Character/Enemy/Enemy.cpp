@@ -38,19 +38,19 @@ void Enemy::Initialize()
 	debugOffset = 0.8;
 
 	// 武器モデルの設定
-	//weapon[0].position = { -0.06, 0.0, -0.01 };
-	//weapon[0].angle = { 9.54, 9.48, -15.74 };
-	//weapon[0].weaponHitOffset = { -0.89, -0.11, -0.01 };
-	//weapon[0].weaponAngleOffset = { 1.6, 6.76, 1.06 };
-	//weapon[0].weaponRadius = 0.59f;
-	//weapon[0].weaponHeight = 1.7f;
+	weapon[0].position = { -0.06, 0.0, -0.01 };
+	weapon[0].angle = { 9.54, 9.48, -15.74 };
+	weapon[0].weaponHitOffset = { -0.89, -0.11, -0.01 };
+	weapon[0].weaponAngleOffset = { 1.6, 6.76, 1.06 };
+	weapon[0].weaponRadius = 0.59f;
+	weapon[0].weaponHeight = 1.7f;
 
-	//weapon[1].position = { -0.03, 0.01, 0.01 };
-	//weapon[1].angle = { -3.57, 3.39, 3.12 };
-	//weapon[1].weaponHitOffset = { -0.82, -0.1, -0.04 };
-	//weapon[1].weaponAngleOffset = { 1.96, 4.3, 0.17 };
-	//weapon[1].weaponRadius = 0.59f;
-	//weapon[1].weaponHeight = 1.7f;
+	weapon[1].position = { -0.03, 0.01, 0.01 };
+	weapon[1].angle = { -3.57, 3.39, 3.12 };
+	weapon[1].weaponHitOffset = { -0.82, -0.1, -0.04 };
+	weapon[1].weaponAngleOffset = { 1.96, 4.3, 0.17 };
+	weapon[1].weaponRadius = 0.59f;
+	weapon[1].weaponHeight = 1.7f;
 
 	// ステータスの設定
 	health = 30000;
@@ -62,7 +62,7 @@ void Enemy::Initialize()
 	invincibleTimer = 0.0f;
 
 	// アニメーション設定
-	//LoadAnimationData("Data/Json/Enemy/Enemy_AnimationGraph.json");
+	LoadAnimationData("Data/Json/Enemy/Enemy_AnimationGraph.json");
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
@@ -85,30 +85,30 @@ void Enemy::Initialize()
 		animNames.push_back(anim.name);
 	btEditor.SetAnimationList(animNames);
 
-	//btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-	//LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-	//btEditor.ApplyToTree(aiTree, this, btGraph);
+	btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+	btEditor.ApplyToTree(aiTree, this, btGraph);
 }
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
-	////現在実行されているノードが無ければ
-	//if (activeNode == nullptr)
-	//{
-	//	//次に実行するノードを推論する。
-	//	activeNode = aiTree->ActiveNodeInference(behaviorData);
-	//	if (activeNode != nullptr)
-	//	{
-	//		lastInferredNode = activeNode;
-	//	}
-	//}
-	////現在実行するノードがあれば
-	//if (activeNode != nullptr)
-	//{
-	//	//ビヘイビアツリーからノードを実行。
-	//	activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
-	//}
+	//現在実行されているノードが無ければ
+	if (activeNode == nullptr)
+	{
+		//次に実行するノードを推論する。
+		activeNode = aiTree->ActiveNodeInference(behaviorData);
+		if (activeNode != nullptr)
+		{
+			lastInferredNode = activeNode;
+		}
+	}
+	//現在実行するノードがあれば
+	if (activeNode != nullptr)
+	{
+		//ビヘイビアツリーからノードを実行。
+		activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+	}
 
 	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
 
@@ -122,7 +122,7 @@ void Enemy::Update(float elapsedTime)
 	UpdateVelocity(elapsedTime);
 
 	// 武器のアタッチメント処理
-	//WeaponAttachment();
+	WeaponAttachment();
 
 	// 状態遷移更新処理
 	UpdateStateTransitions(elapsedTime);

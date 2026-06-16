@@ -1,4 +1,117 @@
 {
-    "links": [],
-    "nodes": []
+    "links": [
+        {
+            "from": "Root",
+            "to": "Idle"
+        },
+        {
+            "from": "Root",
+            "to": "Swing"
+        },
+        {
+            "from": "Root",
+            "to": "Pursuit"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "NewNode",
+            "conditions": [],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "Root",
+            "parentName": "",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "Idle",
+            "conditions": [
+                {
+                    "compareType": 0,
+                    "conditionType": 3,
+                    "judgmentValue": 0.0
+                }
+            ],
+            "config": {
+                "animationName": "Idle",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "Idle",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "Run_Fwd",
+            "conditions": [
+                {
+                    "compareType": 0,
+                    "conditionType": 0,
+                    "judgmentValue": 4.0
+                }
+            ],
+            "config": {
+                "animationName": "Run_Fwd",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "Pursuit",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "Swing1_Medium",
+            "conditions": [
+                {
+                    "compareType": 0,
+                    "conditionType": 0,
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": 0,
+                    "judgmentValue": 4.0
+                }
+            ],
+            "config": {
+                "animationName": "Swing1_Medium",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "name": "Swing",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 0,
+            "selectRule": 0
+        }
+    ]
 }
