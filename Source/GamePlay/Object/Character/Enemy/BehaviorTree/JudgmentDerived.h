@@ -20,11 +20,11 @@ private:
 class PursuitJudgment : public JudgmentBase
 {
 public:
-	PursuitJudgment(Enemy* enemy, float threshold) : JudgmentBase(enemy), Short_Distance(threshold) {}
+	PursuitJudgment(Enemy* enemy) : JudgmentBase(enemy){}
 	// ”»’è
 	bool Judgment();
 private:
-	float Short_Distance;  // ‹ß‹——£
+	float Short_Distance = 4.0f;  // ‹ß‹——£
 	float Middle_Distance = 12.0; // ’†‹——£
 	float Long_Distance = 20.0; // ‰“‹——£
 };

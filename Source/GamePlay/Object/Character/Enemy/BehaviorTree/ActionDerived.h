@@ -7,7 +7,7 @@
 class IdleAction : public ActionBase
 {
 public:
-	IdleAction(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	IdleAction(Enemy* enemy) : ActionBase(enemy) {}
 	ActionBase::State Run(float elapsedTime);
 };
 
@@ -28,7 +28,7 @@ private:
 class AttackAction : public ActionBase
 {
 public:
-	AttackAction(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	AttackAction(Enemy* enemy) : ActionBase(enemy) {}
 	ActionBase::State Run(float elapsedTime);
 };
 
@@ -36,7 +36,7 @@ public:
 class PursuitAction : public ActionBase
 {
 public:
-	PursuitAction(Enemy* enemy, std::string anim) : ActionBase(enemy, anim){}
+	PursuitAction(Enemy* enemy) : ActionBase(enemy){}
 	ActionBase::State Run(float elapsedTime);
 private:
 	float Short_Distance = 4.0f; // ‹ß‹——£

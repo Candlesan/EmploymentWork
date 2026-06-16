@@ -52,10 +52,10 @@ public:
 	float GetTurnSpeed() const { return turnSpeed; }
 
 	// 武器の当たり判定情報
-	DirectX::XMFLOAT3 GetWeaponPosition(int index) const;
-	DirectX::XMFLOAT3 GetWeaponDirection(int index) const;
-	float GetWeaponRadius(int index) const { return weapon[index].weaponRadius; }
-	float GetWeaponHeight(int index) const { return weapon[index].weaponHeight; }
+	DirectX::XMFLOAT3 GetWeaponPosition() const;
+	DirectX::XMFLOAT3 GetWeaponDirection() const;
+	float GetWeaponRadius() const { return weapon.weaponRadius; }
+	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
 	// アクティブな球判定をすべて取得する
 	struct SphereHitInfo {
@@ -141,7 +141,7 @@ private:
 		float weaponRadius = 0.5f;
 		float weaponHeight = 1.0f;
 	};
-	Weapon weapon[2];
+	Weapon weapon;
 
 
 	// 当たり判定関係

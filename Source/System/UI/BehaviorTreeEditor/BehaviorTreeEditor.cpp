@@ -230,10 +230,10 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 			ActionBase* action = nullptr;
 
 			// ノード名で対応するアクションを選ぶ
-			if (node.name == "Attack") { action = new AttackAction(enemy, node.animState); }
-			else if (node.name == "Pursuit") { action = new PursuitAction(enemy, node.animState); }
-			else if (node.name == "Wander") { action = new WanderAction(enemy); }
-			else if (node.name == "Idle") { action = new IdleAction(enemy, node.config.animationName); }
+			//if (node.name == "Attack") { action = new AttackAction(enemy, node.animState); }
+			//else if (node.name == "Pursuit") { action = new PursuitAction(enemy, node.animState); }
+			//else if (node.name == "Wander") { action = new WanderAction(enemy); }
+			//else if (node.name == "Idle") { action = new IdleAction(enemy, node.config.animationName); }
 
 			if (action != nullptr)
 			{

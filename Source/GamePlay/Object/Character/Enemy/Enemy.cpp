@@ -26,10 +26,7 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	//enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss/SKM_Hairy_Beast.gltf");
-	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Test/SevarogBloodred.gltf");
-
-	//weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Boss/SKM_Hairy_Beast_Hammer.gltf");
+	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss2/SevarogBloodred.gltf");
 
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
@@ -39,21 +36,6 @@ void Enemy::Initialize()
 	radius = 1.0f;
 	height = 1.6f;
 	debugOffset = 0.8;
-
-	// 武器モデルの設定
-	//weapon[0].position = { -0.06, 0.0, -0.01 };
-	//weapon[0].angle = { 9.54, 9.48, -15.74 };
-	//weapon[0].weaponHitOffset = { -0.89, -0.11, -0.01 };
-	//weapon[0].weaponAngleOffset = { 1.6, 6.76, 1.06 };
-	//weapon[0].weaponRadius = 0.59f;
-	//weapon[0].weaponHeight = 1.7f;
-
-	//weapon[1].position = { -0.03, 0.01, 0.01 };
-	//weapon[1].angle = { -3.57, 3.39, 3.12 };
-	//weapon[1].weaponHitOffset = { -0.82, -0.1, -0.04 };
-	//weapon[1].weaponAngleOffset = { 1.96, 4.3, 0.17 };
-	//weapon[1].weaponRadius = 0.59f;
-	//weapon[1].weaponHeight = 1.7f;
 
 	// ステータスの設定
 	health = 30000;
@@ -65,32 +47,26 @@ void Enemy::Initialize()
 	invincibleTimer = 0.0f;
 
 	// アニメーション設定
-	//LoadAnimationData("Data/Json/Enemy/Enemy_AnimationGraph.json");
+	LoadAnimationData("Data/Json/Enemy/Enemy_AnimationGraph.json");
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "pelvis";
-	//ChangeAnimationState("Idle_2");
+	ChangeAnimationState("Idle");
+
+	// 攻撃とかの情報を初期化
+
+	// ビヘイビアツリーの設定
 	behaviorData = new BehaviorData();
 	aiTree = new BehaviorTree();
 
 	// Root
-	//aiTree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, nullptr, nullptr);
+	aiTree->AddNode("", "Root", 0, BehaviorTree::SelectRule::Priority, nullptr, nullptr);
 
-	//aiTree->AddNode("Root", "Attack" , 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this), new AttackAction(this));
-	//aiTree->AddNode("Root", "Pursuit", 2, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
-	//aiTree->AddNode("Root", "Wander", 3, BehaviorTree::SelectRule::Priority, new WanderJudgment(this), new WanderAction(this));
-	//aiTree->AddNode("Root", "Idle", 4, BehaviorTree::SelectRule::Priority, /*new IdleJudgment(this)*/nullptr, new IdleAction(this));
-
-	// モデルからアニメーション名一覧を取得してエディターに渡す
-	std::vector<std::string> animNames;
-	for (auto& anim : enemy->GetAnimations())
-		animNames.push_back(anim.name);
-	btEditor.SetAnimationList(animNames);
-
-	//btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-	//LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-	//btEditor.ApplyToTree(aiTree, this, btGraph);
+	aiTree->AddNode("Root", "Attack" , 1, BehaviorTree::SelectRule::Priority, new AttackJudgment(this), new AttackAction(this));
+	aiTree->AddNode("Root", "Pursuit", 2, BehaviorTree::SelectRule::Priority, new PursuitJudgment(this), new PursuitAction(this));
+	aiTree->AddNode("Root", "Wander", 3, BehaviorTree::SelectRule::Priority, new WanderJudgment(this), new WanderAction(this));
+	aiTree->AddNode("Root", "Idle", 4, BehaviorTree::SelectRule::Priority, nullptr, new IdleAction(this));
 }
 
 // 更新処理
@@ -101,10 +77,6 @@ void Enemy::Update(float elapsedTime)
 	//{
 	//	//次に実行するノードを推論する。
 	//	activeNode = aiTree->ActiveNodeInference(behaviorData);
-	//	if (activeNode != nullptr)
-	//	{
-	//		lastInferredNode = activeNode;
-	//	}
 	//}
 	////現在実行するノードがあれば
 	//if (activeNode != nullptr)
@@ -136,6 +108,7 @@ void Enemy::Update(float elapsedTime)
 	animSequence.Update(currentState, GetCurrentAnimationSeconds());
 
 	UpdateSounds(this->currentState);
+
 	// エリア移動制限
 	AreaRestriction();
 
@@ -148,10 +121,6 @@ void Enemy::Update(float elapsedTime)
 void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, enemy);
-
-	//renderer->Draw(ShaderId::PBR, weapon[0].model);
-
-	//if(!weapon->LeftHandInvincible) renderer->Draw(ShaderId::PBR, weapon[1].model);
 }
 
 // GUI描画
@@ -184,11 +153,6 @@ void Enemy::DrawGUI()
 		ImGui::Text(u8"Behavior　%s", str.c_str());
 
 
-		if (ImGui::Button(u8"左手武器表示"))
-		{
-			weapon->LeftHandInvincible = !weapon->LeftHandInvincible;
-		}
-
 		// トランスフォーム情報
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -217,23 +181,16 @@ void Enemy::DrawGUI()
 
 		// 武器の位置
 		if (ImGui::CollapsingHeader("Weapon Attachment")) {
-			for (int i = 0; i < 2; ++i) {
-				ImGui::PushID(i);
-				ImGui::Text(i == 0 ? "Right Hand" : "Left Hand");
-				ImGui::DragFloat3("Pos", &weapon[i].position.x, 0.01f);
-				ImGui::DragFloat3("Ang", &weapon[i].angle.x, 0.01f);
-				ImGui::DragFloat3("Scale", &weapon[i].scale.x, 0.01f);
-				ImGui::DragFloat3("Weapon HitPos", &weapon[i].weaponHitOffset.x, 0.01f);
-				ImGui::DragFloat3("Weapon HitAng", &weapon[i].weaponAngleOffset.x, 0.01f);
-				ImGui::DragFloat("Weapon HitRad", &weapon[i].weaponRadius, 0.01f);
-				ImGui::DragFloat("Weapon HitHeight", &weapon[i].weaponHeight, 0.01f);
-				ImGui::PopID();
-			}
+				ImGui::DragFloat3("Pos", &weapon.position.x, 0.01f);
+				ImGui::DragFloat3("Ang", &weapon.angle.x, 0.01f);
+				ImGui::DragFloat3("Scale", &weapon.scale.x, 0.01f);
+				ImGui::DragFloat3("Weapon HitPos", &weapon.weaponHitOffset.x, 0.01f);
+				ImGui::DragFloat3("Weapon HitAng", &weapon.weaponAngleOffset.x, 0.01f);
+				ImGui::DragFloat("Weapon HitRad", &weapon.weaponRadius, 0.01f);
+				ImGui::DragFloat("Weapon HitHeight", &weapon.weaponHeight, 0.01f);
 		}
 	}
 	ImGui::End();
-
-	btEditor.Draw(btGraph, aiTree, this);
 }
 
 // デバックプリミティブ描画
@@ -252,49 +209,6 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 	// 武器の当たり判定
 	if (showWeaponHitBox)
 	{
-		for (int i = 0; i < 2; ++i)
-		{
-			HandType currentHand = (i == 0) ? HandType::RightHand : HandType::LeftHand;
-
-			// 新しいシーケンサーから、今有効な判定（Range）を探す
-			bool isHit = false;
-			for (auto& data : animSequence.GetAnimations()) {
-				if (data.name == currentState) {
-					for (auto& r : data.ranges) {
-						// その手の判定が存在し、かつ現在時刻が有効範囲内(GetRangeがtrue)か？
-						if (r.hand == currentHand && animSequence.GetRange(r.name)) {
-							isHit = true;
-							break;
-						}
-					}
-					break;
-				}
-			}
-
-			if (i == 0 && weapon[i].RightHandInvincible && !isHit) continue;
-			if (i == 1 && weapon[i].LeftHandInvincible && !isHit) continue;
-
-			DirectX::XMFLOAT4X4 weaponTransform;
-			DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[i].transform);
-
-			// 武器の現在の位置と回転だけを取り出す（スケールを無視する）
-			DirectX::XMVECTOR scale, rot, pos;
-			DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
-			DirectX::XMMATRIX baseMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
-
-			DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-				weapon[i].angle.x + weapon[i].weaponAngleOffset.x,
-				weapon[i].angle.y + weapon[i].weaponAngleOffset.y,
-				weapon[i].angle.z + weapon[i].weaponAngleOffset.z);
-			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
-				weapon[i].position.x + weapon[i].weaponHitOffset.x,
-				weapon[i].position.y + weapon[i].weaponHitOffset.y,
-				weapon[i].position.z + weapon[i].weaponHitOffset.z);
-			DirectX::XMMATRIX WorldWeapon = R * T * baseMatrix;
-			DirectX::XMStoreFloat4x4(&weaponTransform, WorldWeapon);
-
-			renderer->DrawCapsule(weaponTransform, weapon[i].weaponRadius, weapon[i].weaponHeight, { 1, 0, 0, 1 });
-		}
 	}
 	// 武器以外の攻撃の当たり判定
 	{
@@ -398,9 +312,9 @@ bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegr
 }
 
 // 武器の位置を取得
-DirectX::XMFLOAT3 Enemy::GetWeaponPosition(int index) const
+DirectX::XMFLOAT3 Enemy::GetWeaponPosition() const
 {
-	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[index].transform);
+	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
 
 	// スケールを除去
 	DirectX::XMVECTOR scale, rot, pos;
@@ -410,14 +324,14 @@ DirectX::XMFLOAT3 Enemy::GetWeaponPosition(int index) const
 		DirectX::XMMatrixTranslationFromVector(pos);
 
 	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-		weapon[index].angle.x + weapon[index].weaponAngleOffset.x,
-		weapon[index].angle.y + weapon[index].weaponAngleOffset.y,
-		weapon[index].angle.z + weapon[index].weaponAngleOffset.z);
+		weapon.angle.x + weapon.weaponAngleOffset.x,
+		weapon.angle.y + weapon.weaponAngleOffset.y,
+		weapon.angle.z + weapon.weaponAngleOffset.z);
 
 	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
-		weapon[index].position.x + weapon[index].weaponHitOffset.x,
-		weapon[index].position.y + weapon[index].weaponHitOffset.y,
-		weapon[index].position.z + weapon[index].weaponHitOffset.z);
+		weapon.position.x + weapon.weaponHitOffset.x,
+		weapon.position.y + weapon.weaponHitOffset.y,
+		weapon.position.z + weapon.weaponHitOffset.z);
 
 	DirectX::XMMATRIX finalMatrix = R * T * baseMatrix;
 
@@ -430,16 +344,16 @@ DirectX::XMFLOAT3 Enemy::GetWeaponPosition(int index) const
 }
 
 // 武器の向きを取得する
-DirectX::XMFLOAT3 Enemy::GetWeaponDirection(int index) const
+DirectX::XMFLOAT3 Enemy::GetWeaponDirection() const
 {
 	// transformから上方向ベクトルを取得する
-	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[index].transform);
+	DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
 
 	// 回転値オフセットを適用
 	DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(
-		weapon[index].weaponAngleOffset.x,
-		weapon[index].weaponAngleOffset.y,
-		weapon[index].weaponAngleOffset.z
+		weapon.weaponAngleOffset.x,
+		weapon.weaponAngleOffset.y,
+		weapon.weaponAngleOffset.z
 	);
 
 	DirectX::XMMATRIX finalMatrix = rotation * weaponWorld;
@@ -459,7 +373,38 @@ DirectX::XMFLOAT3 Enemy::GetWeaponDirection(int index) const
 	return Direction;
 }
 
-// 球の当たり判定
+// 技の派生があるか確認する関数
+std::string Enemy::DecideNextAttack(std::string currentState)
+{
+	// 今の技から派生できるものがあるかを確認
+	if (attackComboMap.count(currentState) == 0) return "";
+
+	// プレイヤーとの距離を取得
+	float dist = GetDistanceToPlayer();
+	auto& derivations = attackComboMap[currentState];
+
+	// 候補をいったん保存する
+	std::vector<std::string> candidates;
+
+	for (const auto& der : derivations)
+	{
+		// 技の範囲内か
+		if (dist >= der.minDistance && dist <= der.maxDistance)
+		{
+			if ((rand() % 100) < der.probability)
+			{
+				candidates.push_back(der.nextState);
+			}
+		}
+	}
+
+	// 候補が無ければIdleを返す
+	if (candidates.empty()) return "";
+
+	// 候補の中からされにランダムに一つ選ぶ
+	return candidates[rand() % candidates.size()];
+}
+
 std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 {
 	std::vector<SphereHitInfo> result;
@@ -506,6 +451,28 @@ std::vector<Enemy::SphereHitInfo> Enemy::GetActiveSphereHits() const
 		break;
 	}
 	return result;
+}
+// 始動技を決める関数
+std::string Enemy::DecideFirstAttack()
+{
+	float dist = GetDistanceToPlayer();
+	std::vector<std::string> validAttacks;
+
+	// 現在の距離に適合する技をすべてリストアップ
+	for (auto& attack : firstAttackList) {
+		if (dist >= attack.minRange && dist <= attack.maxRange) {
+			validAttacks.push_back(attack.state);
+		}
+	}
+
+	// もし候補が一つもなかったら、とりあえず基本攻撃を返すか -1 を返す
+	if (validAttacks.empty()) {
+		return ""; // または (EnemyAnimationState)-1;
+	}
+
+	// 候補の中からランダムに1つ選んで返す
+	int randomIndex = rand() % validAttacks.size();
+	return validAttacks[randomIndex];
 }
 
 // アニメーション更新処理
@@ -584,14 +551,12 @@ AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 // 武器のアタッチメント処理
 void Enemy::WeaponAttachment()
 {
-	//const char* HandName[2] = { "Bip001-R-Hand", "Bip001-L-Hand" };
-	//const char* HandName[2] = { "Bip001-Prop1", "Bip001-Prop2" };
-	const char* HandName = "Bip001-Prop1";
+	const char* HandName = "root_weapon_r";
 
 	// 武器のローカル行列を計算
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[0].scale.x, weapon[0].scale.y, weapon[0].scale.z);
-	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[0].angle.x, weapon[0].angle.y, weapon[0].angle.z);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon[0].position.x, weapon[0].position.y, weapon[0].position.z);
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon.scale.x, weapon.scale.y, weapon.scale.z);
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon.position.x, weapon.position.y, weapon.position.z);
 	DirectX::XMMATRIX weaponLocal = S * R * T;
 
 	// モデルから両手のノードを検索する
@@ -603,33 +568,9 @@ void Enemy::WeaponAttachment()
 			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
 			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
 			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
-			DirectX::XMStoreFloat4x4(&weapon[0].transform, weaponWorld);
-			weapon[0].model->UpdateTransform(weapon[0].transform);
+			DirectX::XMStoreFloat4x4(&weapon.transform, weaponWorld);
+			weapon.model->UpdateTransform(weapon.transform);
 			break;
 		}
 	}
-
-	//for (int i = 0; i < 2; ++i)
-	//{
-	//	// 武器のローカル行列を計算
-	//	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon[i].scale.x, weapon[i].scale.y, weapon[i].scale.z);
-	//	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon[i].angle.x, weapon[i].angle.y, weapon[i].angle.z);
-	//	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon[i].position.x, weapon[i].position.y, weapon[i].position.z);
-	//	DirectX::XMMATRIX weaponLocal = S * R * T;
-
-	//	// モデルから両手のノードを検索する
-	//	for (const Model::Node& node : enemy->GetNodes())
-	//	{
-	//		if (strcmp(node.name.c_str(), HandName[i]) == 0)
-	//		{
-	//			// 右手ノードと武器のローカル行列から武器のワールド行列を求める
-	//			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
-	//			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
-	//			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
-	//			DirectX::XMStoreFloat4x4(&weapon[i].transform, weaponWorld);
-	//			weapon[i].model->UpdateTransform(weapon[i].transform);
-	//			break;
-	//		}
-	//	}
-	//}
 }

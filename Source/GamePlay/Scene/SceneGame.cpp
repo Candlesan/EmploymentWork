@@ -698,10 +698,10 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 		if (!isHit || !activeRange) return;
 
 		if (Collision::IntersectCapsuleVsCapsule(
-			enemy->GetWeaponPosition(i),    
-			enemy->GetWeaponDirection(i),   
-			enemy->GetWeaponHeight(i),      
-			enemy->GetWeaponRadius(i),      
+			enemy->GetWeaponPosition(),    
+			enemy->GetWeaponDirection(),   
+			enemy->GetWeaponHeight(),      
+			enemy->GetWeaponRadius(),      
 			1.0f,                           
 			player.GetPosition(),
 			player.GetCapsuleDirection(),
