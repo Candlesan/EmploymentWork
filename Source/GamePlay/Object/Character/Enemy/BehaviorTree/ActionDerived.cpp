@@ -36,9 +36,6 @@ ActionBase::State AttackAction::Run(float elapsedTime)
     return ActionBase::State::Complete;
 }
 
-    return ActionBase::State::Run;
-}
-
 // í«ê’çsìÆ
 ActionBase::State PursuitAction::Run(float elapsedTime)
 {
