@@ -26,10 +26,7 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	//enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss/SKM_Hairy_Beast.gltf");
-	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Test/SevarogBloodred.gltf");
-
-	//weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Boss/SKM_Hairy_Beast_Hammer.gltf");
+	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss2/SevarogBloodred.gltf");
 
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
@@ -70,7 +67,7 @@ void Enemy::Initialize()
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "pelvis";
-	//ChangeAnimationState("Idle_2");
+	ChangeAnimationState("Idle");
 	behaviorData = new BehaviorData();
 	aiTree = new BehaviorTree();
 

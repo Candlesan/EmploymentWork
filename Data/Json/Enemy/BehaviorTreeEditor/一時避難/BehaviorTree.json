@@ -6,10 +6,10 @@
         },
         {
             "from": "Root",
-            "to": "PlayerToDistance"
+            "to": "Swing"
         },
         {
-            "from": "PlayerToDistance",
+            "from": "Root",
             "to": "Pursuit"
         },
         {
@@ -24,7 +24,7 @@
     "nodes": [
         {
             "StateName": "NewNode",
-            "conditionType": 0,
+            "conditions": [],
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
@@ -32,7 +32,6 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "judgmentValue": 0.0,
             "name": "Root",
             "parentName": "",
             "position": [
@@ -43,16 +42,21 @@
             "selectRule": 1
         },
         {
-            "StateName": "Idle_2",
-            "conditionType": 0,
+            "StateName": "Idle",
+            "conditions": [
+                {
+                    "compareType": 0,
+                    "conditionType": 3,
+                    "judgmentValue": 0.0
+                }
+            ],
             "config": {
-                "animationName": "Idle_2",
+                "animationName": "Idle",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "judgmentValue": 0.0,
             "name": "Idle",
             "parentName": "Root",
             "position": [
@@ -63,37 +67,52 @@
             "selectRule": 0
         },
         {
-            "StateName": "Walk",
-            "conditionType": 0,
+            "StateName": "Run_Fwd",
+            "conditions": [
+                {
+                    "compareType": 0,
+                    "conditionType": 0,
+                    "judgmentValue": 4.0
+                }
+            ],
             "config": {
-                "animationName": "Walk",
+                "animationName": "Run_Fwd",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": true,
                 "useRootMotionEx": false
             },
-            "judgmentValue": 0.0,
             "name": "Pursuit",
-            "parentName": "PlayerToDistance",
+            "parentName": "Root",
             "position": [
                 100.0,
                 100.0
             ],
-            "priority": 0,
+            "priority": 1,
             "selectRule": 0
         },
         {
-            "StateName": "NewNode",
-            "conditionType": 0,
+            "StateName": "Swing1_Medium",
+            "conditions": [
+                {
+                    "compareType": 0,
+                    "conditionType": 0,
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": 0,
+                    "judgmentValue": 4.0
+                }
+            ],
             "config": {
-                "animationName": "",
+                "animationName": "Swing1_Medium",
                 "blendTime": 0.20000000298023224,
-                "loop": false,
+                "loop": true,
                 "useRootMotion": false,
-                "useRootMotionEx": false
+                "useRootMotionEx": true
             },
-            "judgmentValue": 10.0,
-            "name": "PlayerToDistance",
+            "name": "Swing",
             "parentName": "Root",
             "position": [
                 100.0,
@@ -120,26 +139,6 @@
                 100.0
             ],
             "priority": 0,
-            "selectRule": 1
-        },
-        {
-            "StateName": "NewNode",
-            "conditionType": 0,
-            "config": {
-                "animationName": "Attack_1",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "useRootMotion": true,
-                "useRootMotionEx": false
-            },
-            "judgmentValue": 0.0,
-            "name": "Attack",
-            "parentName": "AttackDistance",
-            "position": [
-                100.0,
-                100.0
-            ],
-            "priority": 1,
             "selectRule": 0
         }
     ]

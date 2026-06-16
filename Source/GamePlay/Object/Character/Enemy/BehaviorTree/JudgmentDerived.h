@@ -42,16 +42,42 @@ private:
 	float Long_Distance = 20.0; // 遠距離
 };
 
-// 判定
+// Float型の条件判定
 class FloatConditionJudgment : public JudgmentBase
 {
 public:
-	FloatConditionJudgment(Enemy* enemy, int type, float threshold)
-		:JudgmentBase(enemy), ConditionType(type), Threshold(threshold){ }
+	FloatConditionJudgment(Enemy* enemy, int type, float threshold, int compareType)
+		:JudgmentBase(enemy), ConditionType(type), Threshold(threshold), CompareType(compareType){ }
 
 	bool Judgment() override;
 
 private:
 	int ConditionType;
+	int CompareType;
 	float Threshold;
+};
+
+// 条件なし用
+class NoneJudgment : public JudgmentBase
+{
+public:
+	NoneJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+	bool Judgment() override;
+};
+
+// 複数の条件のJudgment
+class AndJudgment : public JudgmentBase
+{
+public:
+
+	AndJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+
+	// 外部から条件を1つづつ追加する溜めの関数
+	void AddJudgment(JudgmentBase* j);
+
+	// 内部の全ての条件がクリアしているかを確認する
+	bool Judgment() override;
+
+private:
+	std::vector<JudgmentBase*> judgments; // 条件の配列
 };

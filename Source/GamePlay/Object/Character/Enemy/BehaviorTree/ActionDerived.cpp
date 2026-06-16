@@ -30,11 +30,11 @@ ActionBase::State AttackAction::Run(float elapsedTime)
 {
     owner->ChangeAnimationState(animName);
 
-    if (owner->IsAnimationFinished())
-    {
-        owner->SetAttackCoolTimer(1.0f);
-        return ActionBase::State::Complete;
-    }
+    // プレイヤーの方をじっと見つめる
+    owner->TurnToPosition(elapsedTime);
+
+    return ActionBase::State::Complete;
+}
 
     return ActionBase::State::Run;
 }
@@ -48,6 +48,7 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
 
     // プレイヤーの方をじっと見つめる
     owner->TurnToPosition(elapsedTime);
+
 
     if (dist <= Short_Distance) {
         return ActionBase::State::Complete;

@@ -199,6 +199,7 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 
 void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const BehaviorTreeGraph& graph)
 {
+	// まず Root ノードだけ最初に追加する
 	for (auto& node : graph.nodes)
 	{
 		if (node.name == "Root")
@@ -208,39 +209,47 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		}
 	}
 
-	// graph.nodes を一度コピーして、エディターの Priority 順に並び替える！
+	// 残りの全ノードを処理する（条件とアクションを同時に作る）
 	for (auto& node : graph.nodes)
 	{
 		if (node.name == "Root") continue;
 
-		if (node.selectRule != BehaviorTree::SelectRule::Non)
+		// 条件（Judgment）の構築
+		JudgmentBase* finalJudgment = nullptr;
+
+		if (!node.conditions.empty())
 		{
-			// 条件と基準値をそのまま渡す
-			JudgmentBase* j = new FloatConditionJudgment(enemy, node.conditionType, node.judgmentValue);
-			tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, j, nullptr);
+			AndJudgment* andJ = new AndJudgment(enemy);
+			for (auto& cond : node.conditions)
+			{
+				if (cond.conditionType == (int)BTConditionType::None) {
+					andJ->AddJudgment(new NoneJudgment(enemy));
+				}
+				else {
+					andJ->AddJudgment(new FloatConditionJudgment(enemy, cond.conditionType, cond.judgmentValue, cond.compareType));
+				}
+			}
+			finalJudgment = andJ;
 		}
-	}
+		else
+		{
+			finalJudgment = new NoneJudgment(enemy);
+		}
 
-	for (auto& node : graph.nodes)
-	{
-		if (node.name == "Root") continue;
+		// アクション（Action）の構築
+		ActionBase* finalAction = nullptr;
 
+		// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
 		if (node.selectRule == BehaviorTree::SelectRule::Non)
 		{
-			ActionBase* action = nullptr;
-
-			// ノード名で対応するアクションを選ぶ
-			if (node.name == "Attack") { action = new AttackAction(enemy, node.animState); }
-			else if (node.name == "Pursuit") { action = new PursuitAction(enemy, node.animState); }
-			else if (node.name == "Wander") { action = new WanderAction(enemy); }
-			else if (node.name == "Idle") { action = new IdleAction(enemy, node.config.animationName); }
-
-			if (action != nullptr)
-			{
-				// タスクは条件を持たないので Judgment は nullptr
-				tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, nullptr, action);
-			}
+			if (node.name == "Attack" || node.name == "Swing") { finalAction = new AttackAction(enemy, node.config.animationName); }
+			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.config.animationName); }
+			else if (node.name == "Wander") { finalAction = new WanderAction(enemy); }
+			else if (node.name == "Idle") { finalAction = new IdleAction(enemy, node.config.animationName); }
 		}
+
+		// ツリーに登録（条件とアクションをセットで渡す！）
+		tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, finalJudgment, finalAction);
 	}
 }
 
@@ -251,39 +260,43 @@ void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tr
 		graph.AddNode("NewNode", { 100, 100 });
 	}
 	ImGui::SameLine();
+
 	if (ImGui::Button("Save"))
 	{
 		graph.Save("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 	}
 	ImGui::SameLine();
+
 	if (ImGui::Button("Load"))
 	{
-		// これをしないと、Loadしたときに古いノードデータの後ろに新しいノードが重複して追記されてしまいます。
+		// 重複防止のためにグラフをクリア
 		graph.nodes.clear();
 		graph.links.clear();
 
 		graph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 
+		// 参照渡しの tree を安全にリセットする
 		if (tree != nullptr)
 		{
-			// ① いま持っているツリーを丸ごとポインタごと削除！
-			// （これにより、Subクラスのデストラクタが走り、内部の全ノードが安全に解放されます）
 			delete tree;
-
-			// ② まっさらな新しいツリーをその場で再生成！
-			tree = new BehaviorTree();
-
-			enemy->ClearActiveNode();// 敵が持っている古い実行ノードの記憶を消す！
-			enemy->ClearLastInferredNode();
+			tree = nullptr; // 一度完全に nullptr にして安全を確保する
 		}
 
-		// 2. まっさらになったツリーに最新データを適用する
+		// まっさらな状態から再生成
+		tree = new BehaviorTree();
+
+		if (enemy != nullptr)
+		{
+			enemy->ClearActiveNode(); // 敵の実行状態の記憶を消す
+		}
+
+		// まっさらになったツリーに最新データを適用する
 		ApplyToTree(tree, enemy, graph);
 
-		// 3. アニメーションデータも最新の数値で読み直す
+		// アニメーションデータも最新の数値で読み直す
 		enemy->LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 
-		// 4. ロードしたノードの座標を画面に反映する
+		// ロードしたノードの座標を画面に反映する
 		m_isLoadedThisFrame = true;
 	}
 }
@@ -311,50 +324,90 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 
 		ImGui::InputInt("Priority", &node.priority);
 
+		if (!animationNames.empty())
+		{
+			std::vector<const char*> comboItems;
+			for (const auto& name : animationNames)
+			{
+				comboItems.push_back(name.c_str());
+			}
+
+			// 現在ノードに設定されているアニメーションが、リストの何番目にあるかを探す
+			int currentSelection = 0;
+			for (int i = 0; i < (int)animationNames.size(); i++)
+			{
+				if (animationNames[i] == node.config.animationName)
+				{
+					currentSelection = i;
+					break;
+				}
+			}
+
+			// 安全な Combo ボックスを表示して、選択されたら config.animationName を書き換える！
+			if (ImGui::Combo(u8"再生するアニメーション", &currentSelection, comboItems.data(), (int)comboItems.size()))
+			{
+				node.config.animationName = animationNames[currentSelection];
+			}
+
+			// ループ設定
+			ImGui::Checkbox(u8"ループ再生", &node.config.loop);
+
+			// ルートモーション設定
+			ImGui::Checkbox(u8"ルートモーションを使用", &node.config.useRootMotion);
+			ImGui::Checkbox(u8"ルートモーション(拡張)", &node.config.useRootMotionEx);
+
+			// ブレンド時間
+			ImGui::DragFloat(u8"ブレンド時間(秒)", &node.config.blendTime, 0.01f, 0.0f, 2.0f);
+		}
+		else
+		{
+			// もしモデルのアニメーションリストが空っぽだった時のための安全対策
+			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), u8"※アニメーションリストが読み込まれていません。");
+		}
+
 		// AnimStateの編集
-		if (node.selectRule != BehaviorTree::SelectRule::Non)
 		{
 			ImGui::Separator();
 			ImGui::Text(u8"--- 中間ノードの遷移条件 (Judgment) ---");
 
-			// 条件の名前のリスト
-			const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)" };
-			ImGui::Combo(u8"条件の種類", &node.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
-
-			// 基準にする数値
-			ImGui::DragFloat(u8"判定する基準値", &node.judgmentValue, 0.1f);
-		}
-		else
-		{
-			if (!animationNames.empty())
+			for (size_t i = 0; i < node.conditions.size(); i++)
 			{
-				std::vector<const char*> items;
-				for (auto& s : animationNames) items.push_back(s.c_str());
+				ImGui::PushID(static_cast<int>(i));
 
-				int current = 0;
-				for (int i = 0; i < (int)animationNames.size(); i++)
-					if (animationNames[i] == node.animState) { current = i; break; }
+				auto& cond = node.conditions[i];
 
-				if (ImGui::Combo("AnimState", &current, items.data(), (int)items.size()))
-					node.animState = animationNames[current];
+				// 条件の名前のリスト
+				const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)", u8"条件なし" };
+				ImGui::Combo(u8"条件の種類", &cond.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
 
-				// アニメーション名 (GLTFの本当の名前)
-				char nameBuf[256] = "";
-				strncpy_s(nameBuf, node.config.animationName.c_str(), sizeof(nameBuf));
-				if (ImGui::InputText(u8"アニメーション名 (GLTF)", nameBuf, sizeof(nameBuf)))
+				if (cond.conditionType != (int)BTConditionType::None)
 				{
-					node.config.animationName = nameBuf;
+					const char* compareNames[] = { ">", "<", ">=", "<=", "==", "!=" };
+					ImGui::Combo(u8"比較演算子", &cond.compareType, compareNames, IM_ARRAYSIZE(compareNames));
+
+					ImGui::DragFloat(u8"判定する基準値", &cond.judgmentValue, 0.1f);
+				}
+				else
+				{
+					ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), u8"条件なし");
 				}
 
-				// ループ設定
-				ImGui::Checkbox(u8"ループ再生", &node.config.loop);
+				if (ImGui::Button(u8"条件を削除"))
+				{
+					node.conditions.erase(node.conditions.begin() + i);
+					ImGui::PopID();
+					break;
+				}
 
-				// ルートモーション設定
-				ImGui::Checkbox(u8"ルートモーションを使用", &node.config.useRootMotion);
-				ImGui::Checkbox(u8"ルートモーション(拡張)", &node.config.useRootMotionEx);
+				ImGui::PopID();
+				ImGui::Separator();
+			}
 
-				// ブレンド時間
-				ImGui::DragFloat(u8"ブレンド時間(秒)", &node.config.blendTime, 0.01f, 0.0f, 2.0f);
+			if (ImGui::Button(u8"+ 条件を追加"))
+			{
+				BTCondition newCond;
+				newCond.conditionType = (int)BTConditionType::None; // デフォで条件なしにしておく
+				node.conditions.push_back(newCond);
 			}
 		}
 	}
