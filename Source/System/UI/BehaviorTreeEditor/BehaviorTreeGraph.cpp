@@ -9,7 +9,8 @@ void BehaviorTreeGraph::AddNode(const std::string& StateName, ImVec2 pos)
 	node.nodeId = NextId();
 	node.pinIn = NextId();
 	node.pinOut = NextId();
-	node.animState = StateName;
+	node.name = StateName;
+	node.animState = "animName";
 	node.position = pos;
 	nodes.push_back(node);
 }
@@ -109,6 +110,7 @@ void BehaviorTreeGraph::Save(const std::string& path)
 			{"position", {node.position.x, node.position.y}},
 			{"judgmentValue", node.judgmentValue},
 			{"conditionType", node.conditionType},
+			{"compareType", node.compareType},
 
 				{"config", {
 				   {"animationName", node.config.animationName},
@@ -179,6 +181,7 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.animState = nodeJson.value("StateName", "");
 			newNode.judgmentValue = nodeJson.value("judgmentValue", 0.0f);
 			newNode.conditionType = nodeJson.value("conditionType", 0);
+			newNode.compareType = nodeJson.value("compareType", 0);
 
 			if (nodeJson.count("position") > 0 && nodeJson["position"].is_array() && nodeJson["position"].size() == 2)
 			{

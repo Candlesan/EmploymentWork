@@ -213,12 +213,18 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 	{
 		if (node.name == "Root") continue;
 
-		if (node.selectRule != BehaviorTree::SelectRule::Non)
+		JudgmentBase* j = nullptr;
+
+		if (node.conditionType == (int)BTConditionType::None)
 		{
-			// 条件と基準値をそのまま渡す
-			JudgmentBase* j = new FloatConditionJudgment(enemy, node.conditionType, node.judgmentValue);
-			tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, j, nullptr);
 		}
+		else
+		{
+			j = new FloatConditionJudgment(enemy, node.conditionType, node.judgmentValue, node.compareType);
+		}
+
+		// 条件と基準値をそのまま渡す
+		tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, j, nullptr);
 	}
 
 	for (auto& node : graph.nodes)
@@ -317,11 +323,20 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			ImGui::Text(u8"--- 中間ノードの遷移条件 (Judgment) ---");
 
 			// 条件の名前のリスト
-			const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)" };
+			const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)", u8"条件なし"};
 			ImGui::Combo(u8"条件の種類", &node.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
 
-			// 基準にする数値
-			ImGui::DragFloat(u8"判定する基準値", &node.judgmentValue, 0.1f);
+			if (node.conditionType != 3)
+			{
+				const char* compareNames[] = { ">", "<", ">=", "<=", "==", "!=" };
+				ImGui::Combo(u8"比較演算子", &node.compareType, compareNames, IM_ARRAYSIZE(compareNames));
+
+				ImGui::DragFloat(u8"判定する基準値", &node.judgmentValue, 0.1f);
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), u8"条件なし");
+			}
 		}
 		else
 		{

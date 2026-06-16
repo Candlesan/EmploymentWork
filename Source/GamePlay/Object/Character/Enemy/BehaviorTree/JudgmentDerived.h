@@ -42,16 +42,25 @@ private:
 	float Long_Distance = 20.0; // ‰“‹——£
 };
 
-// ”»’è
+// FloatŒ^‚ÌğŒ”»’è
 class FloatConditionJudgment : public JudgmentBase
 {
 public:
-	FloatConditionJudgment(Enemy* enemy, int type, float threshold)
-		:JudgmentBase(enemy), ConditionType(type), Threshold(threshold){ }
+	FloatConditionJudgment(Enemy* enemy, int type, float threshold, int compareType)
+		:JudgmentBase(enemy), ConditionType(type), Threshold(threshold), CompareType(compareType){ }
 
 	bool Judgment() override;
 
 private:
 	int ConditionType;
+	int CompareType;
 	float Threshold;
+};
+
+// ğŒ‚È‚µ—p
+class NoneJudgment : public JudgmentBase
+{
+public:
+	NoneJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+	bool Judgment() override;
 };

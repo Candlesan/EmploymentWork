@@ -11,11 +11,20 @@
         {
             "from": "PlayerToDistance",
             "to": "Pursuit"
+        },
+        {
+            "from": "Root",
+            "to": "AttackDistance"
+        },
+        {
+            "from": "AttackDistance",
+            "to": "Swing"
         }
     ],
     "nodes": [
         {
             "StateName": "NewNode",
+            "compareType": 0,
             "conditionType": 0,
             "config": {
                 "animationName": "",
@@ -35,10 +44,11 @@
             "selectRule": 1
         },
         {
-            "StateName": "Idle_2",
+            "StateName": "Idle",
+            "compareType": 0,
             "conditionType": 0,
             "config": {
-                "animationName": "Idle_2",
+                "animationName": "Idle",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": false,
@@ -51,14 +61,15 @@
                 100.0,
                 100.0
             ],
-            "priority": 1,
+            "priority": 2,
             "selectRule": 0
         },
         {
-            "StateName": "Walk_InPlace",
+            "StateName": "Run_Fwd",
+            "compareType": 0,
             "conditionType": 0,
             "config": {
-                "animationName": "Walk_InPlace",
+                "animationName": "Run_Fwd",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": false,
@@ -76,6 +87,7 @@
         },
         {
             "StateName": "NewNode",
+            "compareType": 2,
             "conditionType": 0,
             "config": {
                 "animationName": "",
@@ -91,8 +103,50 @@
                 100.0,
                 100.0
             ],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "NewNode",
+            "compareType": 3,
+            "conditionType": 0,
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "judgmentValue": 4.0,
+            "name": "AttackDistance",
+            "parentName": "Root",
+            "position": [
+                100.0,
+                100.0
+            ],
             "priority": 0,
             "selectRule": 1
+        },
+        {
+            "StateName": "Swing1_Medium",
+            "compareType": 0,
+            "conditionType": 0,
+            "config": {
+                "animationName": "Swing1_Medium",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "judgmentValue": 0.0,
+            "name": "Swing",
+            "parentName": "AttackDistance",
+            "position": [
+                100.0,
+                100.0
+            ],
+            "priority": 0,
+            "selectRule": 0
         }
     ]
 }

@@ -16,7 +16,19 @@ enum class BTConditionType
 	Distance,	// プレイヤーとの距離
 	BossHpRate,	// ボスのHPの割合
 	timer,		// クールダウンなどのタイマー
+	None,		//	条件なし
 	Count,		// enumの総数
+};
+
+// 比較演算子
+enum class BTCompareType
+{
+	Greater,       // >
+	Less,          // <
+	GreaterEqual,  // >=
+	LessEqual,     // <=
+	Equal,         // ==
+	NotEqual       // !=
 };
 
 // ノードデータ
@@ -32,15 +44,14 @@ struct BTNode
 	BehaviorTree::SelectRule selectRule = BehaviorTree::SelectRule::Non;
 	int priority = 1; // 優先順位
 
-	float judgmentValue = 0.0f; // 距離を判定する条件
-
 	std::string animState; // アニメーション名
+	AnimationConfig config; // アニメーション設定
 
 	ImVec2 position = { 0, 0 }; // ノードの位置
 
-	AnimationConfig config; // アニメーション設定
-
 	int conditionType = 0; // 条件の種類を格納する変数
+	int compareType = 0; // 比較演算子の種類
+	float judgmentValue = 0.0f; // 判定値
 };
 
 // 親子を繋ぐ線

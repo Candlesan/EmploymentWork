@@ -26,14 +26,12 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss/SKM_Hairy_Beast.gltf");
-
-	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Enemy/Boss/SKM_Hairy_Beast_Hammer.gltf");
+	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss2/SevarogBloodred.gltf");
 
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
 	angle = {0, 3, 0};
-	scale.x = scale.y = scale.z = 6.0f;
+	scale.x = scale.y = scale.z = 2.0f;
 	weight = 100.0f;
 	radius = 1.0f;
 	height = 1.6f;
@@ -69,7 +67,7 @@ void Enemy::Initialize()
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "pelvis";
-	ChangeAnimationState("Idle_2");
+	ChangeAnimationState("Idle");
 	behaviorData = new BehaviorData();
 	aiTree = new BehaviorTree();
 
@@ -148,9 +146,9 @@ void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, enemy);
 
-	renderer->Draw(ShaderId::PBR, weapon[0].model);
+	//renderer->Draw(ShaderId::PBR, weapon[0].model);
 
-	if(!weapon->LeftHandInvincible) renderer->Draw(ShaderId::PBR, weapon[1].model);
+	//if(!weapon->LeftHandInvincible) renderer->Draw(ShaderId::PBR, weapon[1].model);
 }
 
 // GUI描画

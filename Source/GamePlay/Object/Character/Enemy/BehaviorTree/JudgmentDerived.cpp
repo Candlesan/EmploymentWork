@@ -2,6 +2,8 @@
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "System/Core/Mathf.h"
 
+#include <cmath>
+
 
 // 攻撃に遷移できるか判定
 bool AttackJudgment::Judgment()
@@ -30,19 +32,46 @@ bool WanderJudgment::Judgment()
     return false;
 }
 
+// Float型の条件判定
 bool FloatConditionJudgment::Judgment()
 {
-    BTConditionType type = static_cast<BTConditionType>(ConditionType);
+    BTConditionType conditionType = static_cast<BTConditionType>(ConditionType);
+    float currentValue = 0.0f;
 
-    switch (type)
+    // 条件なしの場合はThreshold・CompareTypeを見ずに即true
+    if (conditionType == BTConditionType::None)
+    {
+        return true;
+    }
+
+    switch (conditionType)
     {
     case BTConditionType::Distance:     // プレイヤーとの距離判定
-        return owner->GetDistanceToPlayer() > Threshold;
+        currentValue = owner->GetDistanceToPlayer();
+        break;
     case BTConditionType::BossHpRate:   // ボスのHPの割合
         return (owner->GetHealth() / owner->GetMaxHealth() * 100.0f) <= Threshold;
+        break;
     case BTConditionType::timer:        // タイマー
-        return owner->GetRunTimer() >= Threshold;
-    default:
-        return false;
+        currentValue = owner->GetRunTimer();
+        break;
     }
+
+    BTCompareType compareType = static_cast<BTCompareType>(CompareType);
+    switch (compareType)
+    {
+    case BTCompareType::Greater:      return currentValue > Threshold;
+    case BTCompareType::Less:         return currentValue < Threshold;
+    case BTCompareType::GreaterEqual: return currentValue >= Threshold;
+    case BTCompareType::LessEqual:    return currentValue <= Threshold;
+    case BTCompareType::Equal:        return fabsf(currentValue == Threshold) <= 0.0001f;
+    case BTCompareType::NotEqual:     return fabsf(currentValue != Threshold) >= 0.0001f;
+    default: return false;
+    }
+}
+
+// 条件なし用
+bool NoneJudgment::Judgment()
+{
+    return true;
 }
