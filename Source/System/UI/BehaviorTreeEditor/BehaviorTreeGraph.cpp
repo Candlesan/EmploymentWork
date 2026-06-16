@@ -101,26 +101,34 @@ void BehaviorTreeGraph::Save(const std::string& path)
 	j["nodes"] = json::array();
 	for (auto& node : nodes)
 	{
-		j["nodes"].push_back({
-			{"name", node.name},
-			{"parentName", node.parentName},
-			{"selectRule", (int)node.selectRule},
-			{"priority", node.priority},
-			{"StateName", node.animState},
-			{"position", {node.position.x, node.position.y}},
-			{"judgmentValue", node.judgmentValue},
-			{"conditionType", node.conditionType},
-			{"compareType", node.compareType},
+		nlohmann::json nodeJson = {
+		   {"name", node.name},
+		   {"parentName", node.parentName},
+		   {"selectRule", (int)node.selectRule},
+		   {"priority", node.priority},
+		   {"StateName", node.animState},
+		   {"position", {node.position.x, node.position.y}},
 
-				{"config", {
-				   {"animationName", node.config.animationName},
-				   {"loop", node.config.loop},
-				   {"useRootMotion", node.config.useRootMotion},
-				   {"useRootMotionEx", node.config.useRootMotionEx},
-				   {"blendTime", node.config.blendTime}}
-				}
-						
-		});
+		   {"config", {
+		   {"animationName", node.config.animationName},
+		   {"loop", node.config.loop},
+		   {"useRootMotion", node.config.useRootMotion},
+		   {"useRootMotionEx", node.config.useRootMotionEx},
+		   {"blendTime", node.config.blendTime}
+		  }}
+		};
+
+		nodeJson["conditions"] = json::array();
+		for (auto& cond : node.conditions)
+		{
+			nodeJson["conditions"].push_back({
+				{"judgmentValue", cond.judgmentValue},
+				{"conditionType", cond.conditionType},
+				{"compareType", cond.compareType}
+			});
+		}
+
+		j["nodes"].push_back(nodeJson);
 	}
 
 	j["links"] = json::array();
@@ -136,7 +144,6 @@ void BehaviorTreeGraph::Save(const std::string& path)
 			{"from", fromName},
 			{"to",   toName}
 		});
-
 	}
 		
 	std::ofstream file(path);
@@ -166,7 +173,7 @@ void BehaviorTreeGraph::Load(const std::string& path)
 		for (auto& nodeJson : j["nodes"])
 		{
 			float px = 0.0f, py = 0.0f;
-			if (nodeJson.count("position") > 0 && nodeJson["position"].is_array())
+			if (nodeJson.count("position") > 0 && nodeJson["position"].is_array() && nodeJson["position"].size() == 2) 
 			{
 				px = nodeJson["position"][0].get<float>();
 				py = nodeJson["position"][1].get<float>();
@@ -179,23 +186,23 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.selectRule = (BehaviorTree::SelectRule)nodeJson.value("selectRule", 0);
 			newNode.priority = nodeJson.value("priority", 1);
 			newNode.animState = nodeJson.value("StateName", "");
-			newNode.judgmentValue = nodeJson.value("judgmentValue", 0.0f);
-			newNode.conditionType = nodeJson.value("conditionType", 0);
-			newNode.compareType = nodeJson.value("compareType", 0);
 
-			if (nodeJson.count("position") > 0 && nodeJson["position"].is_array() && nodeJson["position"].size() == 2)
+			// conditionsデータが存在すれば読み込む
+			if (nodeJson.count("conditions") > 0)
 			{
-				newNode.position.x = nodeJson["position"][0].get<float>();
-				newNode.position.y = nodeJson["position"][1].get<float>();
-			}
-			else
-			{
-				newNode.position.x = 0.0f;
-				newNode.position.y = 0.0f;
+				for (auto& cond : nodeJson["conditions"])
+				{
+					BTCondition c;
+					c.judgmentValue = cond.value("judgmentValue", 0.0f);
+					c.compareType =   cond.value("compareType", 0);
+					c.conditionType = cond.value("conditionType", 0);
+					newNode.conditions.push_back(c);
+				}
 			}
 
 			// configデータが存在すれば読み込む
-			if (nodeJson.count("config") > 0) {
+			if (nodeJson.count("config") > 0)
+			{
 				auto& c = nodeJson["config"];
 				newNode.config.animationName = c.value("animationName", "");
 				newNode.config.loop = c.value("loop", false);
@@ -203,7 +210,6 @@ void BehaviorTreeGraph::Load(const std::string& path)
 				newNode.config.useRootMotionEx = c.value("useRootMotionEx", false);
 				newNode.config.blendTime = c.value("blendTime", 0.2f);
 			}
-
 		}
 	}
 

@@ -28,6 +28,11 @@ ActionBase::State WanderAction::Run(float elapsedTime)
 // 攻撃行動
 ActionBase::State AttackAction::Run(float elapsedTime)
 {
+    owner->ChangeAnimationState(animName);
+
+    // プレイヤーの方をじっと見つめる
+    owner->TurnToPosition(elapsedTime);
+
     return ActionBase::State::Complete;
 }
 
@@ -37,6 +42,10 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
 	owner->ChangeAnimationState(animName);
 
     float dist = owner->GetDistanceToPlayer();
+
+    // プレイヤーの方をじっと見つめる
+    owner->TurnToPosition(elapsedTime);
+
 
     if (dist <= Short_Distance) {
         return ActionBase::State::Complete;

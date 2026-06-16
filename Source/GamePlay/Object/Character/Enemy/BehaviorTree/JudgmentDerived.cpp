@@ -8,6 +8,15 @@
 // UŒ‚‚É‘JˆÚ‚Å‚«‚é‚©”»’è
 bool AttackJudgment::Judgment()
 {
+    // ƒvƒŒƒCƒ„[‚Ì‹——£‚ðŽæ“¾
+    float dist = owner->GetDistanceToPlayer();
+
+    // Short_Distance‚æ‚è—£‚ê‚Ä‚¢‚½‚ç‘JˆÚ
+    if (dist <= Short_Distance)
+    {
+        return true;
+    }
+
     return false;
 }
 
@@ -73,5 +82,26 @@ bool FloatConditionJudgment::Judgment()
 // ðŒ‚È‚µ—p
 bool NoneJudgment::Judgment()
 {
+    return true;
+}
+
+// ŠO•”‚©‚çðŒ‚ð1‚Â‚Ã‚Â’Ç‰Á‚·‚é—­‚ß‚ÌŠÖ”
+void AndJudgment::AddJudgment(JudgmentBase* j)
+{
+    if (j != nullptr) judgments.push_back(j);
+}
+
+// “à•”‚Ì‘S‚Ä‚ÌðŒ‚ªƒNƒŠƒA‚µ‚Ä‚¢‚é‚©‚ðŠm”F‚·‚é
+bool AndJudgment::Judgment()
+{
+    // ðŒ‚ª‚P‚Â‚à‚È‚©‚Á‚½‚çTrue‚ð•Ô‚·
+    if (judgments.empty()) return true;
+
+    for (auto* j : judgments)
+    {
+        // ‚P‚Â‚Å‚àfalse‚¾‚Á‚½‚çfalse‚ð•Ô‚·
+        if (!j->Judgment()) return false;
+    }
+
     return true;
 }

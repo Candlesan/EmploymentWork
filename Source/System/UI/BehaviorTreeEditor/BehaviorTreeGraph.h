@@ -31,6 +31,14 @@ enum class BTCompareType
 	NotEqual       // !=
 };
 
+// 条件構造体
+struct BTCondition
+{
+	int conditionType = 0; // 条件の種類を格納する変数
+	int compareType = 0; // 比較演算子の種類
+	float judgmentValue = 0.0f; // 判定値
+};
+
 // ノードデータ
 struct BTNode
 {
@@ -49,9 +57,7 @@ struct BTNode
 
 	ImVec2 position = { 0, 0 }; // ノードの位置
 
-	int conditionType = 0; // 条件の種類を格納する変数
-	int compareType = 0; // 比較演算子の種類
-	float judgmentValue = 0.0f; // 判定値
+	std::vector<BTCondition> conditions; // 条件情報郡
 };
 
 // 親子を繋ぐ線
