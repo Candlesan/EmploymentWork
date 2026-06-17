@@ -52,29 +52,29 @@ NodeBase* BehaviorTree::Run(NodeBase* actionNode, BehaviorData* data, float elap
 	// ノード実行
 	ActionBase::State state = actionNode->Run(elapsedTime);
 
-	// 正常終了
+	// 正常終了（ここを元々の1つにまとめる）
 	if (state == ActionBase::State::Complete)
 	{
-		// シーケンスの途中かを判断
+		// シーケンスの途中（連続行動のノード）があるかを確認
 		NodeBase* sequenceNode = data->PopSequenceNode();
 
-		// 途中じゃないなら終了
+		// 途中じゃない（次の行動が決まっていない）なら終了
 		if (sequenceNode == nullptr)
 		{
 			return nullptr;
 		}
 		else {
-			// 途中ならそこから始める
+			// 途中の連続行動があるならそこから始める
 			return SequenceBack(sequenceNode, data);
 		}
 	}
-	else if (state == ActionBase::State::Failed)
+	else if (state == ActionBase::State::Failed) // ※FailedかFailureかはActionBaseの定義に合わせてな
 	{
 		// 失敗は終了
 		return nullptr;
 	}
 
-	// 現状維持
+	// まだアニメーション中（State::Run）なら現状維持
 	return actionNode;
 }
 

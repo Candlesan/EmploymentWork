@@ -13,11 +13,12 @@ namespace ed = ax::NodeEditor;
 // 中間ノードの判断条件の種類
 enum class BTConditionType
 {
-	Distance,	// プレイヤーとの距離
-	BossHpRate,	// ボスのHPの割合
-	timer,		// クールダウンなどのタイマー
-	None,		//	条件なし
-	Count,		// enumの総数
+	Distance,		// プレイヤーとの距離
+	BossHpRate,		// ボスのHPの割合
+	timer,			// タイマー
+	AttackCoolDown,	//
+	None,			//	条件なし
+	Count,			// enumの総数
 };
 
 // 比較演算子
@@ -73,6 +74,7 @@ struct BehaviorTreeGraph
 public:
 	std::vector<BTNode> nodes;
 	std::vector<BTLink> links;
+	bool justLoad = false;
 
 	void AddNode(const std::string& StateName, ImVec2 pos); // ノードの追加
 	void AddLink(ed::PinId from, ed::PinId to); // 矢印の追加

@@ -34,9 +34,13 @@ public:
 	float GetDistanceToPlayer() const;
 
 	// ターゲットの座標に向かって旋回する
-	void Enemy::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
-	void Enemy::TurnToPosition(float elapsedTime);
-	bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree);
+	void TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
+	void TurnToPosition(float elapsedTime);
+	bool IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree);
+
+	// ターゲットの座標に向かって進む
+	void MoveToTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
+	void MoveToTarget(float elapsedTime);
 
 	// 移動速度セッター・ゲッター
 	void SetMoveSpeed(float s) { moveSpeed = s; }

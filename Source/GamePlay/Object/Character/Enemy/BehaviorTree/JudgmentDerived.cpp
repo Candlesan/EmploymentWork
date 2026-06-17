@@ -11,8 +11,8 @@ bool AttackJudgment::Judgment()
     // プレイヤーの距離を取得
     float dist = owner->GetDistanceToPlayer();
 
-    // Short_Distanceより離れていたら遷移
-    if (dist <= Short_Distance)
+    // Short_Distanceより離れているかつクールダウンが無いときに遷移
+    if (dist <= Short_Distance && owner->GetAttackCoolTimer() <= 0.0f)
     {
         return true;
     }
@@ -63,6 +63,9 @@ bool FloatConditionJudgment::Judgment()
         break;
     case BTConditionType::timer:        // タイマー
         currentValue = owner->GetRunTimer();
+        break;
+    case BTConditionType::AttackCoolDown:        // タイマー
+        currentValue = owner->GetAttackCoolTimer();
         break;
     }
 

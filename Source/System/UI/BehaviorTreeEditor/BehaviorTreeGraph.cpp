@@ -243,4 +243,6 @@ void BehaviorTreeGraph::Load(const std::string& path)
 				AddLink(fromPin, toPin);
 		}
 	}
+
+	justLoad = true;
 }

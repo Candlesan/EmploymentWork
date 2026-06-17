@@ -6,7 +6,7 @@
         },
         {
             "from": "Root",
-            "to": "Swing"
+            "to": "Attack"
         },
         {
             "from": "Root",
@@ -27,8 +27,8 @@
             "name": "Root",
             "parentName": "",
             "position": [
-                100.0,
-                100.0
+                -102.0,
+                50.0
             ],
             "priority": 1,
             "selectRule": 1
@@ -38,7 +38,7 @@
             "conditions": [
                 {
                     "compareType": 0,
-                    "conditionType": 3,
+                    "conditionType": 4,
                     "judgmentValue": 0.0
                 }
             ],
@@ -52,8 +52,8 @@
             "name": "Idle",
             "parentName": "Root",
             "position": [
-                100.0,
-                100.0
+                -182.0,
+                196.0
             ],
             "priority": 2,
             "selectRule": 0
@@ -77,8 +77,8 @@
             "name": "Pursuit",
             "parentName": "Root",
             "position": [
-                100.0,
-                100.0
+                -86.0,
+                196.0
             ],
             "priority": 1,
             "selectRule": 0
@@ -87,28 +87,28 @@
             "StateName": "Swing1_Medium",
             "conditions": [
                 {
-                    "compareType": 0,
-                    "conditionType": 0,
-                    "judgmentValue": 0.0
-                },
-                {
                     "compareType": 3,
                     "conditionType": 0,
                     "judgmentValue": 4.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": 3,
+                    "judgmentValue": 0.0
                 }
             ],
             "config": {
                 "animationName": "Swing1_Medium",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
+                "blendTime": 0.550000011920929,
+                "loop": false,
                 "useRootMotion": false,
-                "useRootMotionEx": true
+                "useRootMotionEx": false
             },
-            "name": "Swing",
+            "name": "Attack",
             "parentName": "Root",
             "position": [
-                100.0,
-                100.0
+                -6.0,
+                196.0
             ],
             "priority": 0,
             "selectRule": 0

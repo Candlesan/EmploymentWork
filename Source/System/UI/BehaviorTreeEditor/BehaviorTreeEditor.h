@@ -27,6 +27,4 @@ private:
 	int selectedNodeIndex = -1;
 
 	std::vector<std::string> animationNames; 
-
-	bool m_isLoadedThisFrame = false;
 };

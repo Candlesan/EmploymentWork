@@ -179,7 +179,8 @@ void Enemy::DrawGUI()
 		ImGui::Text("runTimer: %f.0", runTimer);
 		ImGui::Separator();
 		ImGui::Text(u8"Behavior　%s", str.c_str());
-
+		std::string animState = GetCurrentState();
+		ImGui::Text(u8"AnimState: %s", animState.c_str());
 
 		if (ImGui::Button(u8"左手武器表示"))
 		{
@@ -392,6 +393,31 @@ bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegr
 
 	// 4. 差分が指定した角度（epsilonDegree）以内なら true
 	return fabsf(diff) < DirectX::XMConvertToRadians(epsilonDegree);
+}
+
+// ターゲットの座標に向かって進む
+void Enemy::MoveToTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
+{
+	// 位置を取得する
+	DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&targetPos);
+	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
+	Vec = DirectX::XMVector3Normalize(Vec); // 正規化
+
+	DirectX::XMFLOAT3 moveVec;
+	DirectX::XMStoreFloat3(&moveVec, Vec);
+
+	// ターゲットの方向を向く
+	Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+
+	//　その方向へ進む
+	Move(moveVec.x, moveVec.z, moveSpeed);
+}
+
+void Enemy::MoveToTarget(float elapsedTime)
+{
+	Player& player = Player::Instance();
+	MoveToTarget(elapsedTime, player.GetPosition());
 }
 
 // 武器の位置を取得

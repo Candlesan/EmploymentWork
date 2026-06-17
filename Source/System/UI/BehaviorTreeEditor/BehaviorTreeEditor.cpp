@@ -72,16 +72,20 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 			if (isActive) {
 				ed::PopStyleColor(2); // 背景 + 枠線
 			}
+
+			if (!graph.justLoad)
+			{
+				node.position = ed::GetNodePosition(node.nodeId);
+			}
 		}
 
-		if (m_isLoadedThisFrame)
+		if (graph.justLoad)
 		{
 			for (auto& node : graph.nodes)
 			{
-				// 画面にノードが存在している状態なので、絶対にクラッシュしません！
 				ed::SetNodePosition(node.nodeId, node.position);
 			}
-			m_isLoadedThisFrame = false; // 用が済んだらフラグを戻す
+			graph.justLoad = false; // 用が済んだらフラグを戻す
 		}
 
 		// リンクを描画
@@ -295,9 +299,6 @@ void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tr
 
 		// アニメーションデータも最新の数値で読み直す
 		enemy->LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-
-		// ロードしたノードの座標を画面に反映する
-		m_isLoadedThisFrame = true;
 	}
 }
 
@@ -377,7 +378,7 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 				auto& cond = node.conditions[i];
 
 				// 条件の名前のリスト
-				const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)", u8"条件なし" };
+				const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)", u8"攻撃のクールダウン", u8"条件なし"};
 				ImGui::Combo(u8"条件の種類", &cond.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
 
 				if (cond.conditionType != (int)BTConditionType::None)
