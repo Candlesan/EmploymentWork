@@ -122,6 +122,7 @@ private:
 	NodeBase* activeNode = nullptr;
 	NodeBase* lastInferredNode = nullptr;
 	float runTimer = 0.0f;
+	bool AISwitch = false;
 
 	// SEŠÖŒW
 	// ‰¹‚Ì–¼‘O‚ÆŽÀ‘Ì‚ð•R‚Ã‚¯‚éƒ}ƒbƒv

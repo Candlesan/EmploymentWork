@@ -31,11 +31,13 @@ void Enemy::Initialize()
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
 	angle = {0, 3, 0};
-	scale.x = scale.y = scale.z = 1.0f;
+	scale.x = scale.y = scale.z = 1.3f;
 	weight = 100.0f;
 	radius = 1.0f;
 	height = 1.6f;
 	debugOffset = 0.8;
+	gravity = 0.0f;
+
 
 	// ステータスの設定
 	health = 30000;
@@ -51,9 +53,9 @@ void Enemy::Initialize()
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "pelvis";
-	ChangeAnimationState("Idle");
 	behaviorData = new BehaviorData();
 	aiTree = new BehaviorTree();
+	AISwitch = false;
 
 	// モデルからアニメーション名一覧を取得してエディターに渡す
 	std::vector<std::string> animNames;
@@ -68,17 +70,18 @@ void Enemy::Initialize()
 	// シーケンサーのセーブデータ用パスを設定して読み込む
 	std::string seqPath = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
 	sequencerEditor.SetJsonPath(seqPath);
-
 	sequencerEditor.SetWindowName("Enemy Sequencer");
-
 	animSequence.Load(seqPath);
+
+	ChangeAnimationState("Idle");
+
 }
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
 	// プレビュー中はAIを止める
-	if (!isPreviewMode)
+	if (!isPreviewMode && AISwitch)
 	{
 		//現在実行されているノードが無ければ
 		if (activeNode == nullptr)
@@ -206,6 +209,10 @@ void Enemy::DrawGUI()
 	ImGui::End();
 
 	ImGui::Begin("BTEditor");
+	if (ImGui::Button("AI:ON/OFF"))
+	{
+		AISwitch = !AISwitch;
+	}
 	btEditor.Draw(btGraph, aiTree, this);
 	ImGui::End();
 
