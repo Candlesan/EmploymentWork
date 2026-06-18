@@ -3,6 +3,14 @@
 #include <DirectXCollision.h>
 #include <vector>
 
+
+// “–‚½‚è”»’è‚ÌŒ`ó
+enum class HitBoxShape
+{
+	Sphere,
+	Capsule
+};
+
 //ƒRƒŠƒWƒ‡ƒ“
 class Collision
 {

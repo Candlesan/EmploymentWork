@@ -1069,9 +1069,6 @@ std::string Player::DetermineWalkState()
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	float lx = gamePad.GetAxisLX(), ly = gamePad.GetAxisLY();
 
-	//float power = sqrtf(lx * lx + ly * ly);
-	//if (power < 0.1f) return AnimationState::Idle;
-
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
 	//ベクトルの長さを計算

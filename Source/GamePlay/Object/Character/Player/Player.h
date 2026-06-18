@@ -72,6 +72,7 @@ public:
 
 	void SetEnemy(Enemy* e) { enemy = e; }
 	MagicManager& GetMagicManager() { return magicManager; }
+
 public:
 	// ƒOƒ‰ƒt‚ğ’Ç‰Á‚·‚é
 	void AddGraph(std::string name);

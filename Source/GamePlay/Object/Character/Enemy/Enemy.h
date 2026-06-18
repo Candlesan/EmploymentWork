@@ -55,27 +55,8 @@ public:
 	// 旋回速度取得
 	float GetTurnSpeed() const { return turnSpeed; }
 
-	// 武器の当たり判定情報
-	DirectX::XMFLOAT3 GetWeaponPosition(int index) const;
-	DirectX::XMFLOAT3 GetWeaponDirection(int index) const;
-	float GetWeaponRadius(int index) const { return weapon[index].weaponRadius; }
-	float GetWeaponHeight(int index) const { return weapon[index].weaponHeight; }
-
-	// アクティブな球判定をすべて取得する
-	struct SphereHitInfo {
-		DirectX::XMFLOAT3 position;
-		float radius;
-	};
-	std::vector<SphereHitInfo> GetActiveSphereHits() const;
-
-	// 始動技を決める関数
-	std::string Enemy::DecideFirstAttack();
-
-	// 技の派生があるか確認する関数
-	std::string Enemy::DecideNextAttack(std::string currentState);
-
-	// スタンプ攻撃
-	void HeavyStompAttack();
+	// 今使ってるHitBoxを計算して返す関数
+	std::vector<HitBoxInfo> GetActiveHitBoxes() const;
 
 	// 実行タイマー取得(仮実装)
 	float GetRunTimer() { return runTimer; }
@@ -95,17 +76,12 @@ public:
 	}
 	NodeBase* GetActiveNode() const { return activeNode; }
 	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
+
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
 
 private:
-	// 状態遷移更新処理
-	void UpdateStateTransitions(float elapsedTime);
-
-	// 武器のアタッチメント処理
-	void WeaponAttachment();
-
 	// ダウン状態
 	void OnDown() override;
 
@@ -126,29 +102,6 @@ private:
 	// アニメーション関係
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
-
-	// 武器のアタッチメント関係
-	struct Weapon
-	{
-		std::shared_ptr<Model> model;
-		DirectX::XMFLOAT3 position = { 0,0,0 };
-		DirectX::XMFLOAT3 angle = { 0,0,0 };
-		DirectX::XMFLOAT3 scale = { 1.5,1,1 };
-		DirectX::XMFLOAT4X4 transform = {
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
-		DirectX::XMFLOAT3 weaponHitOffset = { 0, 0, 0 };
-		DirectX::XMFLOAT3 weaponAngleOffset = { 0, 0, 0 };
-		bool RightHandInvincible = false;
-		bool LeftHandInvincible = true;
-		float weaponRadius = 0.5f;
-		float weaponHeight = 1.0f;
-	};
-	Weapon weapon[2];
-
 
 	// 当たり判定関係
 	float debugOffset = 0.5;

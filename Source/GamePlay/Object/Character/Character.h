@@ -1,9 +1,14 @@
 #pragma once
 #include <DirectXMath.h>
+#include <vector>
 #include "System/Renderer/ModelRenderer.h"
 #include "System/Renderer/ShapeRenderer.h"
+#include "GamePlay/Object/Collision/Collision.h"
 
-struct AttackResult {
+
+// ダメージの種類（返り値用の構造体）
+struct AttackResult
+{
 	float damage;
 	float poiseDamage;
 };
@@ -11,98 +16,114 @@ struct AttackResult {
 class Character
 {
 public:
+	// 当たり判定情報
+	struct HitBoxInfo
+	{
+		HitBoxShape shape;
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT3 direction;
+		float radius;
+		float height;
+
+		// ヒット時の係数
+		float damageRate;
+		float poiseRate;
+		float invincibleTime;
+	};
+	// 必要なら書いてもいいよ（デフォルトは空っぽ）っていう書き方
+	virtual std::vector<HitBoxInfo> GetActiveHitBoxes() const { return {}; }
+
 	Character() {}
 	virtual ~Character() = default;
 
-	// 行列更新
+	// ----- 基本操作 -----
+
+	// 行列（transform）更新
 	void UpdateTransform();
 
-	// 位置取得
-	const DirectX::XMFLOAT3& GetPosition()const { return position; }
-
-	// 位置設定
+	// 位置取得 / 設定
+	const DirectX::XMFLOAT3& GetPosition() const { return position; }
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
 
-	// 回転取得
-	const DirectX::XMFLOAT3& GetAngle()const { return angle; }
-
-	// 回転設定
+	// 回転取得 / 設定
+	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
 
-	// スケール取得
-	const DirectX::XMFLOAT3& GetScale()const { return scale; }
-
-	// スケール取得
+	// スケール取得 / 設定
+	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 
-	// 行列取得
+	// 行列取得 / 設定
 	const DirectX::XMFLOAT4X4& GetTransform() const { return transform; }
-
-	// 行列設定
 	void Set_Transform(DirectX::XMFLOAT4X4 new_transform) { this->transform = new_transform; }
 
-	// 速力取得
+	// 速度取得 / 設定
 	const DirectX::XMFLOAT3& GetVelocity() const { return velocity; }
-
-	// 速力設定
 	void SetVelocity(const DirectX::XMFLOAT3& v) { velocity = v; }
 
-	// 半径取得
+	// 当たり判定情報取得
 	float GetRadius() const { return radius; }
-
-	// 高さ取得
 	float GetHeight() const { return height; }
-
-	// 重さ取得
 	float GetWeight() const { return weight; }
 
-	// 地面に接地しているか
+	// 地面状態
 	bool IsGround() const { return isGround; }
-
-	// 接地フラグ取得
 	bool SetIsGround(bool flag) { return isGround = flag; }
 
-	// ダメージを与える
+	// ----- ダメージ / ステータス -----
+
+	// ダメージを与える（無敵時間・体幹ダメージを考慮）
 	virtual bool ApplyDamage(float damage, float invincibleTime, float poiseDamage = 0.0f);
 
-	// 移動処理
-	void Move(float vx, float vz, float speed);
-
-	// 旋回処理
-	void Turn(float elapsedTime, float vx, float vz, float speed);
-
-	// カプセルの方向取得
-	DirectX::XMFLOAT3 GetCapsuleDirection() const
-	{ return DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f); }
-
-	// 体幹削り計算用（プレイヤーが呼ぶ用）
+	// 体幹削り計算（プレイヤーが呼ぶ用）
 	AttackResult CalculateAttackResult(float damageRate, float poiseValue);
 
-	// ステータス更新
+	// ステータス更新（毎フレーム呼ぶ）
 	void UpdateStatus(float elapsedTime);
 
-	// エリア制限
+	// ----- 移動 / 回転 -----
+
+	// 移動処理（入力 vx, vz, speed を受け取る）
+	void Move(float vx, float vz, float speed);
+
+	// 旋回処理（経過時間と入力）
+	void Turn(float elapsedTime, float vx, float vz, float speed);
+
+	// カプセルの方向取得（上方向）
+	DirectX::XMFLOAT3 GetCapsuleDirection() const
+	{
+		return DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+	}
+
+	// ステージ外移動制限
 	void AreaRestriction();
+
 private:
+	// ----- 内部：移動・速度更新ヘルパー -----
+
 	// 水平速力更新処理
 	void UpdateHorizontalVelocity(float elapsedTime);
 
 	// 水平移動更新処理
 	void UpdateHorizontalMove(float elapsedTime);
 
-	//垂直速力更新処理
+	// 垂直速力更新処理
 	void UpdateVerticalVelocity(float elapsedTime);
 
-	//垂直移動更新処理
+	// 垂直移動更新処理
 	void UpdateVerticalMove(float elapsedTime);
 
 protected:
-
-	// ジャンプ処理
+	// ジャンプ処理（派生で呼ぶ）
 	void Jump(float speed);
 
-	// 速力処理更新
+	// 速度処理の総合更新
 	void UpdateVelocity(float elapsedTime);
+
+	// 無敵時間の更新
+	void UpdateInvincibleTimer(float elapsedTime);
+
+	// ----- 継承先フック -----
 
 	// 着地したときに呼ばれる
 	virtual void OnLanding() {}
@@ -113,56 +134,59 @@ protected:
 	// 死亡した時に呼ばれる
 	virtual void OnDead() {}
 
-	// 体幹が削りきられた（ダウンした）時に呼ばれる仮想関数
+	// 体幹が削り切られた（ダウンした）時に呼ばれる
 	virtual void OnDown() {}
 
-	// 無敵時間更新
-	void UpdateInvincibleTimer(float elapsedTime);
-
-
 protected:
-	DirectX::XMFLOAT3 position = { 0,0,0 };
-	DirectX::XMFLOAT3 angle = { 0,0,0 };
-	DirectX::XMFLOAT3 scale = { 1,1,1 };
-	DirectX::XMFLOAT4X4 transform = {
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1
+	// 位置・回転・スケール・行列
+	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 angle    = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 scale    = { 1.0f, 1.0f, 1.0f };
+	DirectX::XMFLOAT4X4 transform =
+	{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
 	};
 
-	DirectX::XMFLOAT3 velocity = { 0, 0, 0 }; 
+	// 速度
+	DirectX::XMFLOAT3 velocity = { 0.0f, 0.0f, 0.0f };
 
-	float maxMoveSpeed = 5.0f; // 最大速度
-	float moveVecX = 0.0f; // 移動ベクトル（X軸方向）
-	float moveVecZ = 0.0f; // 移動ベクトル（Z軸方向）
+	// 移動関連
+	float maxMoveSpeed = 5.0f;   // 最大速度
+	float moveVecX     = 0.0f;   // 移動ベクトル（X軸方向）
+	float moveVecZ     = 0.0f;   // 移動ベクトル（Z軸方向）
 
-	float friction = 15.0f; // 摩擦力
-	float acceleration = 50.0f; // 加速度
-	float gravity = -9.8; // 重力
+	float friction     = 15.0f;  // 摩擦力
+	float acceleration = 50.0f;  // 加速度
+	float gravity      = -9.8f;  // 重力
 
-	//当たり判定関係
-	float radius = 0.5f; // 半径
-	float height = 2.0f; // 高さ
-	float weight = 0.5f; // 重さ
+	// 当たり判定
+	float radius = 0.5f;  // 半径
+	float height = 2.0f;  // 高さ
+	float weight = 0.5f;  // 重さ
 
-	bool isGround = false; // 地面と接地してるか
+	bool isGround = false; // 地面と接地しているか
 
-	float health = 10; // 体力
-	float MaxHealth = 10; // 最大体力
+	// ステータス
+	float health    = 10.0f; // 現在体力
+	float MaxHealth = 10.0f; // 最大体力
 
-	float Stamina = 150; // 持久力
-	float MaxStamina = 150; // 最大持久力
+	float Stamina    = 150.0f; // 現在持久力
+	float MaxStamina = 150.0f; // 最大持久力
 
-	float maxPoise = 100.0f;        // 最大体幹値
-	float currentPoise = 100.0f;    // 現在の体幹値
+	// 体幹（Poise）
+	float maxPoise           = 100.0f; // 最大体幹値
+	float currentPoise       = 100.0f; // 現在の体幹値
+	float baseAttackPower    = 1.0f;   // 基本攻撃力
+	float basePoisePower     = 50.0f;  // 基本体幹削り値
+	float poiseRecoveryDelay = 0.0f;   // 回復開始までの猶予タイマー
+	float poiseFullResetTimer= 0.0f;   // 30秒後に強制全回復用
 
-	float baseAttackPower = 1; // 基本攻撃力
-	float basePoisePower = 50.0f;    // 基本体幹削り値
-	float poiseRecoveryDelay = 0.0f;  // 回復が始まるまでの猶予タイマー
-	float poiseFullResetTimer = 0.0f; // 30秒後に強制全回復する用
+	// 無敵時間
+	float invincibleTimer = 0.0f;
 
-	float invincibleTimer = 0.0f; // 無敵時間
-
+	// ステージの広さ
 	float stageRadius = 97.5f;
 };

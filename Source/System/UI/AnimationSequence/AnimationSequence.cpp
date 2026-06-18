@@ -203,10 +203,9 @@ void AnimationSequencer::Save(const std::string& filepath)
                 {"name", r.name},
                 {"start", r.start},
                 {"end", r.end},
-                {"hand", (int)r.hand},
                 {"boneName", r.boneName},
-                {"sphereRadius", r.sphereRadius},
-                {"sphereOffset", {r.sphereOffset.x, r.sphereOffset.y, r.sphereOffset.z}},
+                {"Radius", r.radius},
+                {"Offset", {r.offset.x, r.offset.y, r.offset.z}},
                 {"damageRate", r.damageRate},
                 {"poiseRate", r.poiseRate},
                 {"invincible", r.invincible}
@@ -274,15 +273,14 @@ void AnimationSequencer::Load(const std::string& filepath)
                         r.name = jr.value("name", "NewRange");
                         r.start = jr.value("start", 0.0f);
                         r.end = jr.value("end", 0.0f);
-                        r.hand = (HandType)jr.value("hand", 0);
                         r.boneName = jr.value("boneName", "");
-                        r.sphereRadius = jr.value("sphereRadius", 0.5f);
+                        r.radius = jr.value("radius", 0.5f);
 
                         if (jr.count("sphereOffset") > 0 && jr["sphereOffset"].is_array() && jr["sphereOffset"].size() == 3)
                         {
-                            r.sphereOffset.x = jr["sphereOffset"][0];
-                            r.sphereOffset.y = jr["sphereOffset"][1];
-                            r.sphereOffset.z = jr["sphereOffset"][2];
+                            r.offset.x = jr["offset"][0];
+                            r.offset.y = jr["offset"][1];
+                            r.offset.z = jr["offset"][2];
                         }
 
                         r.damageRate = jr.value("damageRate", 1.0f);

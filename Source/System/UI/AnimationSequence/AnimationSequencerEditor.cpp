@@ -541,21 +541,29 @@ void AnimationSequencerEditor::DrawDetailPanel(AnimationSequencer::AnimationData
 
 		if (r.isHitBox)
 		{
-			const char* handItems[] = { "None", "RightHand", "LeftHand", "Both", "Body", "Magic" };
-			int handIndex = (int)r.hand;
-			if (ImGui::Combo(u8"Hand(判定部位)", &handIndex, handItems, IM_ARRAYSIZE(handItems)));
+			// 形状を選択するコンボボックス
+			const char* shapeItems[] = { "Sphere", "Capsule" };
+			int shapeIndex = (int)r.shapeType;
+			if (ImGui::Combo(u8"当たり判定の形", &shapeIndex, shapeItems, IM_ARRAYSIZE(shapeItems)))
 			{
-				r.hand = (HandType)handIndex;
+				r.shapeType = (HitBoxShape)shapeIndex;
 			}
 
-			// Bodyの時はボーン追従の設定を出す
-			if (r.hand == HandType::Body) {
-				char boneBuf[128];
-				strncpy_s(boneBuf, r.boneName.c_str(), sizeof(boneBuf));
-				if (ImGui::InputText(u8"Bone Name", boneBuf, sizeof(boneBuf))) r.boneName = boneBuf;
-				ImGui::DragFloat(u8"Sphere Radius", &r.sphereRadius, 0.01f, 0.1f, 5.0f);
-				ImGui::DragFloat3(u8"Sphere Offset", &r.sphereOffset.x, 0.01f);
+			// ボーン名の入力
+			char boneBuf[128];
+			strncpy_s(boneBuf, r.boneName.c_str(), sizeof(boneBuf));
+			if (ImGui::InputText(u8"Bone Name", boneBuf, sizeof(boneBuf))) r.boneName = boneBuf;
+
+			// 3. 形状に合わせてサイズ入力欄を切り替える
+			ImGui::DragFloat(u8"Radius (半径)", &r.radius, 0.01f, 0.1f, 5.0f);
+
+			// カプセルが選ばれている時だけ高さを表示する
+			if (r.shapeType == HitBoxShape::Capsule)
+			{
+				ImGui::DragFloat(u8"Height (高さ)", &r.height, 0.01f, 0.1f, 10.0f);
 			}
+
+			ImGui::DragFloat3(u8"Offset (オフセット)", &r.offset.x, 0.01f);
 
 			ImGui::DragFloat(u8"Damage Rate", &r.damageRate, 0.01f, 0.1f, 10.0f);
 			ImGui::DragFloat(u8"Poise Rate (削り)", &r.poiseRate, 0.01f);

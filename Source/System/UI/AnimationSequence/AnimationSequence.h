@@ -5,21 +5,14 @@
 #include <filesystem>
 #include <DirectXMath.h>
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
+#include "GamePlay/Object/Collision/Collision.h"
 
 
+// イベントタイプ
 enum class EventType {
     Sound,
     Effect,
     Particle, // 作ったパーティクルを出す
-};
-
-enum class HandType {
-    None,
-    RightHand,
-    LeftHand,
-    Both, // 両手攻撃
-    Body, // 体当たりなど
-    Magic,
 };
 
 class AnimationSequencer
@@ -59,10 +52,12 @@ public:
         float       end = 0.0f;   // 終了時刻
 
         // 攻撃の当たり判定用
-        HandType hand = HandType::None;
+        HitBoxShape shapeType = HitBoxShape::Sphere; // 形状
+        float radius = 0.5f;                         // 球の半径 / カプセルの半径
+        float height = 1.0f;                         // カプセルの高さ
+        DirectX::XMFLOAT3 offset = { 0, 0, 0 };      // ボーンからのオフセット
         std::string boneName = "";   // 追従するボーン名
-        float sphereRadius = 0.5f;   // 球の半径
-        DirectX::XMFLOAT3 sphereOffset = { 0, 0, 0 }; // ボーンからのオフセット
+
         float damageRate = 1.0f;     // ダメージ倍率
         float poiseRate = 1.0f;      // 削り値
         float invincible = 0.3f;     // 無敵時間

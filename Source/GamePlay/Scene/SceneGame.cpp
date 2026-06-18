@@ -311,8 +311,7 @@ void SceneGame::Render()
 		for (auto& data : player.GetAnimSequence().GetAnimations()) {
 			if (data.name == player.GetCurrentState()) {
 				for (auto& r : data.ranges) {
-					// プレイヤーの右手武器の判定が今フレームで有効か？
-					if (r.hand == HandType::RightHand && player.GetAnimSequence().GetRange(r.name)) {
+					if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
 						showPlayerWeapon = true;
 						break;
 					}
@@ -321,23 +320,8 @@ void SceneGame::Render()
 			}
 		}
 
-		bool showEnemyWeapon = false;
-		for (auto& data : enemy->GetAnimSequence().GetAnimations()) {
-			if (data.name == enemy->GetCurrentState()) {
-				for (auto& r : data.ranges) {
-					// 敵の武器（右手・左手）の判定が今フレームで有効か？
-					if ((r.hand == HandType::RightHand || r.hand == HandType::LeftHand)
-						&& enemy->GetAnimSequence().GetRange(r.name)) {
-						showEnemyWeapon = true;
-						break;
-					}
-				}
-				break;
-			}
-		}
-
 		player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
-		enemy->RenderDebugPrimitive(shapeRenderer, showEnemyWeapon);
+		enemy->RenderDebugPrimitive(shapeRenderer, false);
 
 		// シェイプレンダラ描画
 		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
@@ -597,18 +581,18 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 {
 	// プレイヤーを取得
 	Player& player = Player::Instance();
-	float currentSec = player.GetCurrentAnimationSeconds(); // 既にある
 
 	bool isHit = false;
 	const AnimationSequencer::Range* activeRange = nullptr;
 
-	for(auto& data : player.GetAnimSequence().GetAnimations())
+	for (auto& data : player.GetAnimSequence().GetAnimations())
 	{
 		if (data.name == player.GetCurrentState())
 		{
 			for (auto& r : data.ranges)
 			{
-				if (r.hand == HandType::RightHand && player.GetAnimSequence().GetRange(r.name))
+				// ★変更：isHitBox と GetRange だけで判定
+				if (r.isHitBox && player.GetAnimSequence().GetRange(r.name))
 				{
 					isHit = true;
 					activeRange = &r;
@@ -639,18 +623,9 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 		))
 		{
 			// ダメージ処理
-			auto state = player.GetCurrentState();
-			const AnimationConfig* config = player.GetAnimationConfig(state);
-
-			float finalDamage = activeRange->damageRate;
-			float finalPoiseValue = activeRange->poiseRate;
-
 			if (activeRange->damageRate > 0.0f)
 			{
-				// CalculateAttackResult に「実数値」を渡す
 				AttackResult res = player.CalculateAttackResult(activeRange->damageRate, activeRange->poiseRate);
-
-				// 敵の強靭値を実数値（res.poiseDamage）で減らす
 				enemy->SetLastDamage(res.damage);
 				enemy->ApplyDamage(res.damage, activeRange->invincible, res.poiseDamage);
 			}
@@ -658,124 +633,46 @@ void SceneGame::CollisionPlayerWeaponVsEnemy()
 	}
 }
 
-// 敵の武器とプレイヤーの当たり判定
+// 敵の攻撃とプレイヤーの当たり判定
 void SceneGame::CollisionEnemyWeaponVsPlayer()
 {
 	Player& player = Player::Instance();
 
-	float currentSec = enemy->GetCurrentAnimationSeconds();
-	auto state = enemy->GetCurrentState();
+	// ★敵の現在有効な攻撃判定をすべて取得！
+	std::vector<Character::HitBoxInfo> enemyHits = enemy->GetActiveHitBoxes();
 
-	const AnimationConfig* config = enemy->GetAnimationConfig(state);
-
-	// 敵のi番目の武器 vs プレイヤーの本体
-	DirectX::XMFLOAT3 outPositionA, outPositionB;
-	for (int i = 0; i < 2; ++i)
+	for (const auto& hit : enemyHits)
 	{
-		// インデックスからHandTypeに変換（0＝右手、1＝左手）
-		HandType hand = (i == 0) ? HandType::RightHand : HandType::LeftHand;
-
-		// その手のHitBoxがアクティブか確認
 		bool isHit = false;
-		const AnimationSequencer::Range* activeRange = nullptr;
+		DirectX::XMFLOAT3 outPos, outPosA, outPosB;
 
-		for (auto& data : player.GetAnimSequence().GetAnimations())
-		{
-			if (data.name == player.GetCurrentState())
-			{
-				for (auto& r : data.ranges)
-				{
-					if (r.hand == HandType::RightHand && player.GetAnimSequence().GetRange(r.name))
-					{
-						isHit = true;
-						activeRange = &r;
-						break;
-					}
-				}
-			}
+		// 形状に合わせて判定関数を変える
+		if (hit.shape == HitBoxShape::Capsule) {
+			isHit = Collision::IntersectCapsuleVsCapsule(
+				hit.position, hit.direction, hit.height, hit.radius, 1.0f,
+				player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(), 1.0f,
+				outPosA, outPosB);
+		}
+		else if (hit.shape == HitBoxShape::Sphere) {
+			isHit = Collision::IntersectSphereVsCapsule(
+				hit.position, hit.radius,
+				player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(),
+				outPos);
 		}
 
-		if (!isHit || !activeRange) return;
-
-		if (Collision::IntersectCapsuleVsCapsule(
-			enemy->GetWeaponPosition(i),    
-			enemy->GetWeaponDirection(i),   
-			enemy->GetWeaponHeight(i),      
-			enemy->GetWeaponRadius(i),      
-			1.0f,                           
-			player.GetPosition(),
-			player.GetCapsuleDirection(),
-			player.GetHeight(),
-			player.GetRadius(),
-			player.GetWeight(),
-			outPositionA,
-			outPositionB
-		))
-		{
+		// 当たっていたらダメージ処理
+		if (isHit) {
 			player.SetIsHit(true);
-			// JsonからAttackDataのダメージを持ってくる
-			float finalDamage = activeRange->damageRate;
-			float finalPoiseValue = activeRange->poiseRate;
-			bool IsGuarding = player.GetIsGuarding();
-			if (IsGuarding) player.SetIsHit(true);
-			if (activeRange->damageRate > 0.0f && !IsGuarding)
-			{
-				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
+			bool isGuarding = player.GetIsGuarding();
+			bool isAvoid = player.GetIsAvoid();
+
+			if (isGuarding) player.SetIsHit(true);
+
+			if (!isGuarding && !isAvoid) {
+				// hitの中にダメージ情報が入っているのでそのまま使える！
+				AttackResult res = enemy->CalculateAttackResult(hit.damageRate, hit.poiseRate);
 				player.SetLastDamage(res.damage);
-				player.ApplyDamage(res.damage, activeRange->invincible, res.poiseDamage);
-			}
-		}
-	}
-
-	// 手や体の攻撃
-	for (auto& sphereInfo : enemy->GetActiveSphereHits())
-	{
-		// インデックスからHandTypeに変換（0＝右手、1＝左手）
-		HandType hand = HandType::Body;
-
-		// その手のHitBoxがアクティブか確認
-		bool isHit = false;
-		const AnimationSequencer::Range* activeRange = nullptr;
-
-		for (auto& data : player.GetAnimSequence().GetAnimations()) {
-			if (data.name == player.GetCurrentState()) {
-				for (auto& r : data.ranges) {
-					// 右手攻撃 かつ 今フレームで有効(GetRange)か？
-					if (r.hand == HandType::RightHand && player.GetAnimSequence().GetRange(r.name)) {
-						isHit = true;
-						activeRange = &r;
-						break;
-					}
-				}
-				break;
-			}
-		}
-
-		if (!isHit || !activeRange) return;
-
-		DirectX::XMFLOAT3 outPos;
-		if (Collision::IntersectSphereVsCapsule(
-			sphereInfo.position, sphereInfo.radius,
-			player.GetPosition(),
-			player.GetCapsuleDirection(),
-			player.GetHeight(),
-			player.GetRadius(),
-			outPos))
-		{
-			player.SetIsHit(true);
-
-			// JsonからAttackDataのダメージを持ってくる
-			float finalDamage = activeRange->damageRate;
-			float finalPoiseValue = activeRange->poiseRate;
-			bool IsGuarding = player.GetIsGuarding();
-			bool IsAvoid = player.GetIsAvoid();
-
-			if(IsGuarding) player.SetIsHit(true);
-			if (activeRange->damageRate > 0.0f && !IsGuarding && !IsAvoid)
-			{
-				AttackResult res = enemy->CalculateAttackResult(finalDamage, finalPoiseValue);
-				player.SetLastDamage(res.damage);
-				player.ApplyDamage(res.damage, activeRange->invincible, res.poiseDamage);
+				player.ApplyDamage(res.damage, hit.invincibleTime, res.poiseDamage);
 			}
 		}
 	}
