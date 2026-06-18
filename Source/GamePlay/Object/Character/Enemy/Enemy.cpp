@@ -31,7 +31,7 @@ void Enemy::Initialize()
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
 	angle = {0, 3, 0};
-	scale.x = scale.y = scale.z = 2.0f;
+	scale.x = scale.y = scale.z = 1.0f;
 	weight = 100.0f;
 	radius = 1.0f;
 	height = 1.6f;
@@ -47,7 +47,6 @@ void Enemy::Initialize()
 	invincibleTimer = 0.0f;
 
 	// アニメーション設定
-	LoadAnimationData("Data/Json/Enemy/Enemy_AnimationGraph.json");
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
@@ -65,26 +64,46 @@ void Enemy::Initialize()
 	btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 	btEditor.ApplyToTree(aiTree, this, btGraph);
+
+	// シーケンサーのセーブデータ用パスを設定して読み込む
+	std::string seqPath = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
+	sequencerEditor.SetJsonPath(seqPath);
+
+	sequencerEditor.SetWindowName("Enemy Sequencer");
+
+	animSequence.Load(seqPath);
 }
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
-	//現在実行されているノードが無ければ
-	if (activeNode == nullptr)
+	// プレビュー中はAIを止める
+	if (!isPreviewMode)
 	{
-		//次に実行するノードを推論する。
-		activeNode = aiTree->ActiveNodeInference(behaviorData);
+		//現在実行されているノードが無ければ
+		if (activeNode == nullptr)
+		{
+			//次に実行するノードを推論する。
+			activeNode = aiTree->ActiveNodeInference(behaviorData);
+			if (activeNode != nullptr)
+			{
+				lastInferredNode = activeNode;
+			}
+		}
+		//現在実行するノードがあれば
 		if (activeNode != nullptr)
 		{
-			lastInferredNode = activeNode;
+			//ビヘイビアツリーからノードを実行。
+			activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
 		}
 	}
-	//現在実行するノードがあれば
-	if (activeNode != nullptr)
+	else
 	{
-		//ビヘイビアツリーからノードを実行。
-		activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+		// プレビュー中のアニメーション強制ループ
+		if (GetCurrentAnimationSeconds() >= GetCurrentAnimationLength())
+		{
+			animationSeconds = 0.0f;
+		}
 	}
 
 	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
@@ -103,6 +122,7 @@ void Enemy::Update(float elapsedTime)
 
 	// シーケンサーの更新
 	animSequence.Update(currentState, GetCurrentAnimationSeconds());
+	SetBaseSpeed(animSequence.GetSpeed());
 
 	// 音の更新
 	UpdateSounds(this->currentState);
@@ -128,6 +148,7 @@ void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 // GUI描画
 void Enemy::DrawGUI()
 {
+	// 実行中のAIのステートを表示する
 	std::string str = "";
 	if (activeNode != nullptr)
 	{
@@ -184,7 +205,56 @@ void Enemy::DrawGUI()
 	}
 	ImGui::End();
 
+	ImGui::Begin("BTEditor");
 	btEditor.Draw(btGraph, aiTree, this);
+	ImGui::End();
+
+	if (btEditor.requestOpenSequencer)
+	{
+		isPreviewMode = true;
+		editingState = btEditor.selectedAnimName;
+
+		ChangeAnimationState(editingState); // アニメーションを対象の技に切り替え
+		ImGui::SetWindowFocus("Enemy Sequencer");
+
+		btEditor.requestOpenSequencer = false; // フラグを戻す
+	}
+
+	// プレビューモード用の小さな操作ウィンドウ
+	if (isPreviewMode)
+	{
+		ImGui::Begin("Preview Timeline");
+
+		if (ImGui::Button(u8"▶ ゲームに戻る"))
+		{
+			isPreviewMode = false;
+			ClearActiveNode(); // AIのステートをリセットして最初から考え直させる
+			ChangeAnimationState("Idle");
+		}
+		ImGui::SameLine();
+
+		float length = GetCurrentAnimationLength();
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
+		ImGui::SameLine();
+		ImGui::Text("  Time: %.2f / %.2f s", animationSeconds, length);
+
+		ImGui::SetNextItemWidth(-1);
+		if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
+		{
+			isBlending = false; // スライダー操作中はブレンドを切る
+		}
+
+		ImGui::End();
+	}
+
+	// シーケンサー本体の描画
+	std::string displayState = isPreviewMode ? editingState : currentState;
+	sequencerEditor.DrawEditor(
+		animSequence,
+		displayState,
+		GetCurrentAnimationSeconds(),
+		GetCurrentAnimationLength()
+	);
 }
 
 // デバックプリミティブ描画

@@ -170,6 +170,7 @@ void Player::InitializeAttackData()
 	// シーケンサーの初期化
 	std::string path = "Data/Json/Player/AnimationSequencer/PlayerAnimationSequence.json";
 	sequencerEditor.SetJsonPath(path);
+	sequencerEditor.SetWindowName("Player Sequencer");
 	animSequence.Load(path);
 }
 
@@ -448,7 +449,7 @@ void Player::DrawGUI()
 		editingState = clickedNode;
 		ChangeAnimationState(editingState);
 		isPreviewMode = true;
-		ImGui::SetWindowFocus("Sequencer");
+		ImGui::SetWindowFocus("Player Sequencer");
 	}
 
 	if (isPreviewMode)

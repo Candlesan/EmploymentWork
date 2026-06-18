@@ -15,7 +15,7 @@
     ],
     "nodes": [
         {
-            "StateName": "NewNode",
+            "StateName": "Root",
             "conditions": [],
             "config": {
                 "animationName": "",
@@ -27,11 +27,11 @@
             "name": "Root",
             "parentName": "",
             "position": [
-                -102.0,
-                50.0
+                -86.0,
+                66.0
             ],
             "priority": 1,
-            "selectRule": 1
+            "selectRule": 4
         },
         {
             "StateName": "Idle",
@@ -59,7 +59,7 @@
             "selectRule": 0
         },
         {
-            "StateName": "Run_Fwd",
+            "StateName": "Pursuit",
             "conditions": [
                 {
                     "compareType": 0,
@@ -84,7 +84,7 @@
             "selectRule": 0
         },
         {
-            "StateName": "Swing1_Medium",
+            "StateName": "Attack",
             "conditions": [
                 {
                     "compareType": 3,
@@ -98,8 +98,8 @@
                 }
             ],
             "config": {
-                "animationName": "Swing1_Medium",
-                "blendTime": 0.550000011920929,
+                "animationName": "Swing3_Medium",
+                "blendTime": 0.20000000298023224,
                 "loop": false,
                 "useRootMotion": false,
                 "useRootMotionEx": false
@@ -107,7 +107,7 @@
             "name": "Attack",
             "parentName": "Root",
             "position": [
-                -6.0,
+                10.0,
                 196.0
             ],
             "priority": 0,

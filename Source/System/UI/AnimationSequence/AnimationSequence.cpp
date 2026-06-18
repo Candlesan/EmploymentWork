@@ -168,7 +168,7 @@ AnimationSequencer::AnimationData* AnimationSequencer::FindAnimationData(const s
 
 void AnimationSequencer::Save(const std::string& filepath)
 {
-    // フォルダが無ければ作る（君の元のコードの賢い処理を残したで！）
+    // フォルダが無ければ作る
     std::filesystem::path path(filepath);
     if (path.has_parent_path() && !std::filesystem::exists(path.parent_path())) {
         std::filesystem::create_directories(path.parent_path());
@@ -203,9 +203,14 @@ void AnimationSequencer::Save(const std::string& filepath)
                 {"name", r.name},
                 {"start", r.start},
                 {"end", r.end},
-                {"boneName", r.boneName},
-                {"Radius", r.radius},
-                {"Offset", {r.offset.x, r.offset.y, r.offset.z}},
+
+                {"isHitBox", r.isHitBox},           // 追加：ヒットボックス有効化フラグ
+                {"shapeType", (int)r.shapeType},    // 追加：球かカプセルか
+                {"boneName", r.boneName},           // ボーン名
+                {"radius", r.radius},               // 修正：Radius(大文字)から radius(小文字)へ！
+                {"height", r.height},               // 追加：カプセルの高さ
+                {"offset", {r.offset.x, r.offset.y, r.offset.z}}, // 修正：Offsetから offsetへ！
+
                 {"damageRate", r.damageRate},
                 {"poiseRate", r.poiseRate},
                 {"invincible", r.invincible}
@@ -273,14 +278,27 @@ void AnimationSequencer::Load(const std::string& filepath)
                         r.name = jr.value("name", "NewRange");
                         r.start = jr.value("start", 0.0f);
                         r.end = jr.value("end", 0.0f);
-                        r.boneName = jr.value("boneName", "");
-                        r.radius = jr.value("radius", 0.5f);
 
-                        if (jr.count("sphereOffset") > 0 && jr["sphereOffset"].is_array() && jr["sphereOffset"].size() == 3)
+                        r.isHitBox = jr.value("isHitBox", true);
+                        r.shapeType = (HitBoxShape)jr.value("shapeType", 0);
+                        r.boneName = jr.value("boneName", "");
+
+                        // 古い"sphereRadius"という名前で保存されていても読み込めるようにする
+                        r.radius = jr.value("radius", jr.value("sphereRadius", 0.5f));
+                        r.height = jr.value("height", 1.0f);
+
+                        // オフセットの読み込み（名前のチグハグを修正）
+                        if (jr.count("offset") > 0 && jr["offset"].is_array() && jr["offset"].size() == 3)
                         {
                             r.offset.x = jr["offset"][0];
                             r.offset.y = jr["offset"][1];
                             r.offset.z = jr["offset"][2];
+                        }
+                        else if (jr.count("sphereOffset") > 0 && jr["sphereOffset"].is_array() && jr["sphereOffset"].size() == 3)
+                        {
+                            r.offset.x = jr["sphereOffset"][0];
+                            r.offset.y = jr["sphereOffset"][1];
+                            r.offset.z = jr["sphereOffset"][2];
                         }
 
                         r.damageRate = jr.value("damageRate", 1.0f);

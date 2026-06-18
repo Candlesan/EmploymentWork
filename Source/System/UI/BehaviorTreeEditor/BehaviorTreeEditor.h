@@ -16,6 +16,8 @@ public:
 
 	void ApplyToTree(BehaviorTree* tree, Enemy* enemy, const BehaviorTreeGraph& graph);
 
+	bool requestOpenSequencer = false;
+	std::string selectedAnimName = "";
 private:
 	void DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy);
 	void DrawInspector(BehaviorTreeGraph& graph);

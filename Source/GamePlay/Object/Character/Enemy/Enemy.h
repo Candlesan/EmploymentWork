@@ -109,6 +109,7 @@ private:
 	// ダメージ関係
 	float lastDamage = 0.0f;
 	bool Ondown = false;
+	float attackCoolTimer = 0.0f;
 
 	// 距離
 	float Short_Distance = 4.0f; // 近距離
@@ -122,34 +123,17 @@ private:
 	NodeBase* lastInferredNode = nullptr;
 	float runTimer = 0.0f;
 
+	// SE関係
+	// 音の名前と実体を紐づけるマップ
+	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
+
 	// シーケンサー関係
 	AnimationSequencer animSequence;
 	AnimationSequencerEditor sequencerEditor;
 
-	// 技のつながり
-	struct AttackDerivation
-	{
-		std::string nextState; // 次に出す技
-		float minDistance; // 派生するための最低距離
-		float maxDistance; // 派生するための最大距離
-		int probability; // 派生する確率（0～100）
-	};
-	std::unordered_map<std::string, std::vector<AttackDerivation>> attackComboMap;
-
-	// 始動技
-	struct FirstAttack
-	{
-		std::string state;
-		float minRange;
-		float maxRange;
-	};
-	std::vector<FirstAttack> firstAttackList;
-
-	float attackCoolTimer = 0.0f;
-
-	// SE関係
-	// 音の名前と実体を紐づけるマップ
-	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
+	// --- プレビューモード用 ---
+	bool isPreviewMode = false;
+	std::string editingState = "";
 
 	// ビヘイビアツリーノードエディター
 	BehaviorTreeGraph btGraph;

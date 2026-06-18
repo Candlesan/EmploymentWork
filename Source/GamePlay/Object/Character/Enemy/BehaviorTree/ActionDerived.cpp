@@ -53,7 +53,7 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
     float dist = owner->GetDistanceToPlayer();
 
     // パラメーターを設定する
-    owner->SetMoveSpeed(10.0f);
+    owner->SetMoveSpeed(5.0f);
     
     // ターゲットに向かって進む
     owner->MoveToTarget(elapsedTime);

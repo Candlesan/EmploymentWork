@@ -9,7 +9,7 @@ void AnimationSequencerEditor::DrawEditor(
 	float              animTime,
 	float              animLength)
 {
-	ImGui::Begin("Sequencer");
+	ImGui::Begin(windowName.c_str());
 
 	// アニメーションデータが存在しなければ自動追加
 	auto& animations = sequencer.GetAnimations();

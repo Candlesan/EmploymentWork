@@ -8,7 +8,7 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 	DrawToolbar(graph, tree, enemy);
 
 	ed::SetCurrentEditor(context);
-	ed::Begin("BehaviorTreeEditor");
+	ed::Begin("BehaviorTreeEditor",ImVec2(0,0));
 	{
 		// ノードを描画
 		for (auto& node : graph.nodes)
@@ -178,15 +178,14 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 	}
 
 	// クリックされたノードを選択する
-	ed::NodeId clickedNode;
-	if (ed::GetDoubleClickedNode() != ed::NodeId::Invalid) {}; // なんか今は無視らしい
-	clickedNode = ed::GetHoveredNode();
+	ed::NodeId hoveredNode = ed::GetHoveredNode();
 
-	if (ImGui::IsMouseClicked(0) && clickedNode != ed::NodeId::Invalid)
+	// シングルクリックはノード選択
+	if (ImGui::IsMouseClicked(0) && hoveredNode != ed::NodeId::Invalid)
 	{
 		for (int i = 0; i < (int)graph.nodes.size(); i++)
 		{
-			if (graph.nodes[i].nodeId == clickedNode)
+			if (graph.nodes[i].nodeId == hoveredNode)
 			{
 				selectedNodeIndex = i;
 				break;
@@ -194,6 +193,22 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 		}
 	}
 
+	// ダブルクリックでシーケンサーを開く
+	ed::NodeId doubleClickedNode = ed::GetDoubleClickedNode();
+	if (doubleClickedNode != ed::NodeId::Invalid)
+	{
+		for (auto& node : graph.nodes)
+		{
+			if (node.nodeId == doubleClickedNode)
+			{
+				if (node.selectRule == BehaviorTree::SelectRule::Non)
+				{
+					requestOpenSequencer = true;
+					selectedAnimName = node.name;
+				}
+			}
+		}
+	}
 
 	ed::End();
 	ed::SetCurrentEditor(nullptr);
@@ -246,10 +261,10 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
 		if (node.selectRule == BehaviorTree::SelectRule::Non)
 		{
-			if (node.name == "Attack" || node.name == "Swing") { finalAction = new AttackAction(enemy, node.config.animationName); }
-			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.config.animationName); }
+			if (node.name == "Attack" || node.name == "Swing") { finalAction = new AttackAction(enemy, node.name); }
+			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.name); }
 			else if (node.name == "Wander") { finalAction = new WanderAction(enemy); }
-			else if (node.name == "Idle") { finalAction = new IdleAction(enemy, node.config.animationName); }
+			else if (node.name == "Idle") { finalAction = new IdleAction(enemy, node.name); }
 		}
 
 		// ツリーに登録（条件とアクションをセットで渡す！）
@@ -359,6 +374,17 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 
 			// ブレンド時間
 			ImGui::DragFloat(u8"ブレンド時間(秒)", &node.config.blendTime, 0.01f, 0.0f, 2.0f);
+
+			if (node.selectRule == BehaviorTree::SelectRule::Non)
+			{
+				ImGui::Separator();
+				if (ImGui::Button(u8"シーケンサーを開く", ImVec2(-1, 0)))
+				{
+					requestOpenSequencer = true;
+					selectedAnimName = node.name;
+				}
+				ImGui::Separator();
+			}
 		}
 		else
 		{

@@ -106,7 +106,7 @@ void BehaviorTreeGraph::Save(const std::string& path)
 		   {"parentName", node.parentName},
 		   {"selectRule", (int)node.selectRule},
 		   {"priority", node.priority},
-		   {"StateName", node.animState},
+		   {"StateName", node.name},
 		   {"position", {node.position.x, node.position.y}},
 
 		   {"config", {

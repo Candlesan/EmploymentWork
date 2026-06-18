@@ -20,8 +20,10 @@ public:
 	// JSONパス設定
 	void SetJsonPath(const std::string& path) { jsonPath = path; }
 
+	void SetWindowName(const std::string& name) { windowName = name; }
 private:
 	std::string jsonPath;
+	std::string windowName = "Sequencer";
 
 	// 選択タイプ
 	enum class SelectionType { None, Event, Range, SpeedKey };

@@ -1,0 +1,54 @@
+{
+    "animations": [
+        {
+            "events": [],
+            "name": "Pursuit",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "Attack",
+            "ranges": [
+                {
+                    "boneName": "ik_hand_r",
+                    "damageRate": 0.10000000149011612,
+                    "end": 0.2940506041049957,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": true,
+                    "name": "HitBox",
+                    "offset": [
+                        0.6399999856948853,
+                        0.9200000166893005,
+                        -0.05999999865889549
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 1.0,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 0.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.9625000357627869,
+                    "time": 0.12790894508361816
+                },
+                {
+                    "speed": 1.4125001430511475,
+                    "time": 1.1333333253860474
+                }
+            ]
+        },
+        {
+            "events": [],
+            "name": "Idle",
+            "ranges": [],
+            "speedKeys": []
+        }
+    ]
+}
