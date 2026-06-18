@@ -1,4 +1,4 @@
-#include "AnimationTransitionEditor.h"
+ï»¿#include "AnimationTransitionEditor.h"
 
 #include "GamePlay/Object/Character/Player/Player.h"
 
@@ -6,17 +6,17 @@
 #include "System/Graphic/Graphics.h"
 #include "System/UI/Dialog.h"
 
-// ƒm[ƒhƒGƒfƒBƒ^•`‰æ
+// ãƒãƒ¼ãƒ‰ã‚¨ãƒ‡ã‚£ã‚¿æç”»
 std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs, const std::string& activeState)
 {
 	std::string doubleClickedState = "";
 
-	// Œ»İ‚ÌŠK‘w‚ğ•\¦
-	ImGui::Text(u8"Œ»İ’n:");
+	// ç¾åœ¨ã®éšå±¤ã‚’è¡¨ç¤º
+	ImGui::Text(u8"ç¾åœ¨åœ°:");
 	for (int i = 0; i <= (int)graphStack.size(); i++)
 	{
 		ImGui::SameLine();
-		// ƒXƒ^ƒbƒN‚Ì—š—ğ‚©AŒ»İ‚ÌƒOƒ‰ƒt‚©‚ğæ“¾
+		// ã‚¹ã‚¿ãƒƒã‚¯ã®å±¥æ­´ã‹ã€ç¾åœ¨ã®ã‚°ãƒ©ãƒ•ã‹ã‚’å–å¾—
 		int gIdx = (i < (int)graphStack.size()) ? graphStack[i] : currentGraphIndex;
 
 		if (i == (int)graphStack.size()) ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", graphs[gIdx].graphName.c_str());
@@ -28,23 +28,23 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		}
 	}
 
-	// ŠK‘w‚ğ–ß‚éƒ{ƒ^ƒ“
+	// éšå±¤ã‚’æˆ»ã‚‹ãƒœã‚¿ãƒ³
 	if (!graphStack.empty())
 	{
-		if (ImGui::Button(u8"<- eƒOƒ‰ƒt‚É–ß‚é"))
+		if (ImGui::Button(u8"<- è¦ªã‚°ãƒ©ãƒ•ã«æˆ»ã‚‹"))
 		{
-			currentGraphIndex = graphStack.back(); // e‚ÌƒCƒ“ƒfƒbƒNƒX‚É–ß‚·
-			graphStack.pop_back(); // —š—ğ‚ğ1‚ÂÁ‚·
+			currentGraphIndex = graphStack.back(); // è¦ªã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã«æˆ»ã™
+			graphStack.pop_back(); // å±¥æ­´ã‚’1ã¤æ¶ˆã™
 		}
 		ImGui::Separator();
 	}
 
-	// Json‚É•Û‘¶‚·‚é
+	// Jsonã«ä¿å­˜ã™ã‚‹
 	if (ImGui::Button("Save"))
 	{
 		if (graphs.empty()) return "";
 
-		// Œ»İ‘I‘ğ’†‚ÌƒOƒ‰ƒt‚ğQÆ‚µ‚Äæ“¾‚·‚é
+		// ç¾åœ¨é¸æŠä¸­ã®ã‚°ãƒ©ãƒ•ã‚’å‚ç…§ã—ã¦å–å¾—ã™ã‚‹
 		auto& editGraph = graphs[currentGraphIndex];
 
 		char filepath[MAX_PATH] = { 0 };
@@ -52,19 +52,19 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		HWND hwnd = Graphics::Instance().GetWindowHandle();
 
 		if (Dialog::SaveFileName(filepath, MAX_PATH,
-			"JSON File\0*.json\0\0",	// ƒtƒBƒ‹ƒ^[
-			u8"–¼‘O‚ğ•t‚¯‚Ä•Û‘¶",	// ƒ^ƒCƒgƒ‹
-			"json",// Šg’£q
+			"JSON File\0*.json\0\0",	// ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼
+			u8"åå‰ã‚’ä»˜ã‘ã¦ä¿å­˜",	// ã‚¿ã‚¤ãƒˆãƒ«
+			"json",// æ‹¡å¼µå­
 			hwnd)				
 			== DialogResult::OK)
 		{
-			editGraph.Save(filepath); // •ÒW’†‚Ì‚â‚Â‚ğ•Û‘¶
+			editGraph.Save(filepath); // ç·¨é›†ä¸­ã®ã‚„ã¤ã‚’ä¿å­˜
 		}
 	}
 
 	ImGui::SameLine();
 
-	// Json‚ğ“Ç‚İ‚Ş
+	// Jsonã‚’èª­ã¿è¾¼ã‚€
 	if (ImGui::Button("Load"))
 	{
 		char filepath[MAX_PATH] = { 0 };
@@ -72,30 +72,30 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		HWND hwnd = Graphics::Instance().GetWindowHandle();
 
 		if (Dialog::OpenFileName(filepath, MAX_PATH,
-			"JSON File\0*.json\0\0",	// ƒtƒBƒ‹ƒ^[
-			u8"ƒtƒ@ƒCƒ‹‚ğŠJ‚­",
-			hwnd)	// ƒ^ƒCƒgƒ‹
+			"JSON File\0*.json\0\0",	// ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼
+			u8"ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã",
+			hwnd)	// ã‚¿ã‚¤ãƒˆãƒ«
 			== DialogResult::OK)
 		{
 			AnimationTransitionGraph newGraph;
 			newGraph.Load(filepath);
 
-			// ƒtƒ@ƒCƒ‹–¼‚¾‚¯æ‚èo‚µ‚ÄgraphName‚ÉƒZƒbƒg‚·‚é
+			// ãƒ•ã‚¡ã‚¤ãƒ«åã ã‘å–ã‚Šå‡ºã—ã¦graphNameã«ã‚»ãƒƒãƒˆã™ã‚‹
 			char filename[MAX_PATH];
 			_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
 			newGraph.graphName = filename;
 
-			graphs.push_back(newGraph); // ƒŠƒXƒg‚É’Ç‰Á
-			currentGraphIndex = (int)graphs.size() - 1; // ’Ç‰Á‚µ‚½‚â‚Â‚ğ•\¦‚·‚é
+			graphs.push_back(newGraph); // ãƒªã‚¹ãƒˆã«è¿½åŠ 
+			currentGraphIndex = (int)graphs.size() - 1; // è¿½åŠ ã—ãŸã‚„ã¤ã‚’è¡¨ç¤ºã™ã‚‹
 		}
 	}
 
 	ImGui::Separator();
 
-	// ƒ^ƒu•`‰æ•”•ª‚ğ‚±‚¤•Ï‚¦‚é
-	int tabSelectedIndex = currentGraphIndex; // •Ê•Ï”‚Åó‚¯æ‚é
+	// ã‚¿ãƒ–æç”»éƒ¨åˆ†ã‚’ã“ã†å¤‰ãˆã‚‹
+	int tabSelectedIndex = currentGraphIndex; // åˆ¥å¤‰æ•°ã§å—ã‘å–ã‚‹
 
-	// ƒtƒ@ƒCƒ‹‚ğƒ^ƒu‚Å•\¦‚·‚é
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚¿ãƒ–ã§è¡¨ç¤ºã™ã‚‹
 	if (ImGui::BeginTabBar("GraphTabs"))
 	{
 
@@ -103,31 +103,31 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		{
 			if (ImGui::BeginTabItem(graphs[i].graphName.c_str()))
 			{
-				tabSelectedIndex = i; // © currentGraphIndex ‚Í’¼ÚG‚ç‚È‚¢
+				tabSelectedIndex = i; // â† currentGraphIndex ã¯ç›´æ¥è§¦ã‚‰ãªã„
 				ImGui::EndTabItem();
 			}
 		}
 	}
 	ImGui::EndTabBar();
 
-	// ƒ^ƒu‚ÌŒ‹‰Ê‚ğ”½‰f‚·‚é‚Ì‚ÍugraphStack‚ª‹ó‚Ì‚Æ‚«iƒgƒbƒvŠK‘wj‚Ì‚İv‚É‚·‚é
+	// ã‚¿ãƒ–ã®çµæœã‚’åæ˜ ã™ã‚‹ã®ã¯ã€ŒgraphStackãŒç©ºã®ã¨ãï¼ˆãƒˆãƒƒãƒ—éšå±¤ï¼‰ã®ã¿ã€ã«ã™ã‚‹
 	if (graphStack.empty())
 	{
 		currentGraphIndex = tabSelectedIndex;
 	}
 
-	// ‘I‘ğ’†‚ÌƒOƒ‰ƒt‚ğ•`‰æ‚·‚é
+	// é¸æŠä¸­ã®ã‚°ãƒ©ãƒ•ã‚’æç”»ã™ã‚‹
 	AnimationTransitionGraph& currentGraph = graphs[currentGraphIndex];
 
-	// ƒm[ƒh‚Ì’Ç‰Á
+	// ãƒãƒ¼ãƒ‰ã®è¿½åŠ 
 	if (ImGui::Button("+ Add Node"))
 	{
-		showSelectNodeWindow = !showSelectNodeWindow; // ’Ç‰Áƒm[ƒh‘I‘ğ‰æ–Ê‚ğŠJ‚­
+		showSelectNodeWindow = !showSelectNodeWindow; // è¿½åŠ ãƒãƒ¼ãƒ‰é¸æŠç”»é¢ã‚’é–‹ã
 	}
 
 	ImGui::SameLine();
 
-	// ƒm[ƒh‚Ì’Ç‰Á
+	// ãƒãƒ¼ãƒ‰ã®è¿½åŠ 
 	if (ImGui::Button("+ Add SubGraph Node"))
 	{
 		ImGui::OpenPopup("Add SubGraph");
@@ -135,13 +135,13 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 	ImGui::SameLine();
 
-	// ƒOƒ‰ƒt‚Ì’Ç‰Á
+	// ã‚°ãƒ©ãƒ•ã®è¿½åŠ 
 	if (ImGui::Button("+ Add Graph"))
 	{
 		ImGui::OpenPopup("Add Graph");
 	}
 
-	// Entryƒm[ƒh‚ğo‚·ƒ{ƒ^ƒ“
+	// Entryãƒãƒ¼ãƒ‰ã‚’å‡ºã™ãƒœã‚¿ãƒ³
 	if (ImGui::Button("+ Add Entry"))
 	{
 		currentGraph.AddNode("Entry", { 50, 200 });
@@ -149,36 +149,36 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 	ImGui::SameLine();
 
-	// Exitƒm[ƒh‚ğo‚·ƒ{ƒ^ƒ“
+	// Exitãƒãƒ¼ãƒ‰ã‚’å‡ºã™ãƒœã‚¿ãƒ³
 	if (ImGui::Button("+ Add Exit"))
 	{
 		currentGraph.AddNode("Exit", { 400, 200 });
 	}
 
-	// ©“®®—ñ
+	// è‡ªå‹•æ•´åˆ—
 	if (ImGui::Button("Auto Layout"))
 	{
-		needAutoLayout = true; // ƒtƒ‰ƒO‚ğ—§‚Ä‚é‚¾‚¯
+		needAutoLayout = true; // ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹ã ã‘
 	}
 
-	// ’Ç‰Áƒm[ƒh‘I‘ğ‰æ–Ê
+	// è¿½åŠ ãƒãƒ¼ãƒ‰é¸æŠç”»é¢
 	if (showSelectNodeWindow)
 	{
 		ImGui::Begin("SelectNode");
 
-		//ModelƒNƒ‰ƒX‚©‚çæ“¾‚·‚é‚æ‚¤‚É•ÏX‚·‚é
+		//Modelã‚¯ãƒ©ã‚¹ã‹ã‚‰å–å¾—ã™ã‚‹ã‚ˆã†ã«å¤‰æ›´ã™ã‚‹
 		auto model = Player::Instance().GetModel();
 
 		if (model)
 		{
-			// ƒ‚ƒfƒ‹‚É‚ ‚éƒAƒjƒ[ƒVƒ‡ƒ“‚ğæ“¾‚·‚é
+			// ãƒ¢ãƒ‡ãƒ«ã«ã‚ã‚‹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å–å¾—ã™ã‚‹
 			for (const auto& anim : model->GetAnimations())
 			{
-				// Šù‚É’Ç‰ÁÏ‚İ‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚©‚ğƒ`ƒFƒbƒN‚·‚é
+				// æ—¢ã«è¿½åŠ æ¸ˆã¿ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 				bool alreadyAnimation = false;
 				for (auto& node : currentGraph.nodes)
 				{
-					// ƒAƒjƒ[ƒVƒ‡ƒ“–¼‚ªˆê’v‚·‚é‚©‚ğƒ`ƒFƒbƒN
+					// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åãŒä¸€è‡´ã™ã‚‹ã‹ã‚’ãƒã‚§ãƒƒã‚¯
 					if (node.config.animationName == anim.name)
 					{
 						alreadyAnimation = true;
@@ -189,12 +189,12 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 				if (ImGui::Selectable(anim.name.c_str()))
 				{
-					currentGraph.AddNode(anim.name, { 100, 100 }); // ‘I‚ñ‚¾‚çƒm[ƒh’Ç‰Á
+					currentGraph.AddNode(anim.name, { 100, 100 }); // é¸ã‚“ã ã‚‰ãƒãƒ¼ãƒ‰è¿½åŠ 
 
-					// ’Ç‰Á‚µ‚½ƒm[ƒh‚ÉƒAƒjƒ[ƒVƒ‡ƒ“–¼‚ğİ’è‚·‚é
+					// è¿½åŠ ã—ãŸãƒãƒ¼ãƒ‰ã«ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åã‚’è¨­å®šã™ã‚‹
 					currentGraph.nodes.back().config.animationName = anim.name;
 
-					showSelectNodeWindow = false; // ‘I‚ñ‚¾‚ç•Â‚¶‚é
+					showSelectNodeWindow = false; // é¸ã‚“ã ã‚‰é–‰ã˜ã‚‹
 				}
 			}
 		}
@@ -206,7 +206,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	{
 		static char newSubGraphName[64] = "";
 
-		ImGui::Text(u8"ŠK‘wƒm[ƒh‚Ì–¼‘O‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢");
+		ImGui::Text(u8"éšå±¤ãƒãƒ¼ãƒ‰ã®åå‰ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
 		ImGui::InputText("##subgraph_name_input", newSubGraphName, IM_ARRAYSIZE(newSubGraphName));
 		ImGui::Separator();
 
@@ -214,14 +214,14 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		{
 			if (strlen(newSubGraphName) > 0)
 			{
-				// V‚µ‚¢ƒm[ƒh‚ğ’Ç‰Á
+				// æ–°ã—ã„ãƒãƒ¼ãƒ‰ã‚’è¿½åŠ 
 				currentGraph.AddNode(newSubGraphName, { 100, 100 });
 
-				// ì‚Á‚½ƒm[ƒh‚ğæ“¾‚µ‚ÄAÅ‰‚©‚çuŠK‘wƒ^ƒCƒvv‚É‚·‚é
+				// ä½œã£ãŸãƒãƒ¼ãƒ‰ã‚’å–å¾—ã—ã¦ã€æœ€åˆã‹ã‚‰ã€Œéšå±¤ã‚¿ã‚¤ãƒ—ã€ã«ã™ã‚‹
 				AnimNode& newNode = currentGraph.nodes.back();
 				newNode.type = NodeType::SubGraph;
 
-				// ƒpƒX‚ğİ’è‚·‚é
+				// ãƒ‘ã‚¹ã‚’è¨­å®šã™ã‚‹
 				newNode.subGraphPath = "Data/Json/Player/AnimationNodeEditor/" + std::string(newSubGraphName) + ".json";
 			}
 
@@ -240,10 +240,10 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	ed::SetCurrentEditor(context);
 	ed::Begin("Animation Transition Editor");
 
-	// ƒm[ƒh•`‰æ
+	// ãƒãƒ¼ãƒ‰æç”»
 	for (auto& node : currentGraph.nodes)
 	{
-		// SubGraphƒm[ƒh‚È‚ç”wŒi‚ğÂ‚Á‚Û‚­‚·‚é
+		// SubGraphãƒãƒ¼ãƒ‰ãªã‚‰èƒŒæ™¯ã‚’é’ã£ã½ãã™ã‚‹
 		if (node.type == NodeType::SubGraph)
 			ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.2f, 0.4f, 0.6f, 1.0f));
 
@@ -275,20 +275,20 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 			ed::PopStyleVar();
 		}
 
-		// F‚ğ‚à‚Æ‚É–ß‚·
+		// è‰²ã‚’ã‚‚ã¨ã«æˆ»ã™
 		if (node.type == NodeType::SubGraph)
 		{
 			ed::PopStyleColor();
 		}
 	}
 
-	// ƒŠƒ“ƒN•`‰æ
+	// ãƒªãƒ³ã‚¯æç”»
 	for (auto& link : currentGraph.links)
 	{
 		ed::Link(link.linkId, link.startPin, link.endPin, link.color);
 	}
 
-	// ƒhƒ‰ƒbƒN‚ÅƒŠƒ“ƒN‚ğì¬
+	// ãƒ‰ãƒ©ãƒƒã‚¯ã§ãƒªãƒ³ã‚¯ã‚’ä½œæˆ
 	if (ed::BeginCreate())
 	{
 		ed::PinId startPin, endPin;
@@ -300,7 +300,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	}
 	ed::EndCreate();
 
-	// ƒm[ƒhíœ
+	// ãƒãƒ¼ãƒ‰å‰Šé™¤
 	if (ed::BeginDelete())
 	{
 		ed::NodeId deletedNode;
@@ -312,7 +312,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	}
 	ed::EndDelete();
 
-	// ƒŠƒ“ƒNíœ
+	// ãƒªãƒ³ã‚¯å‰Šé™¤
 	if (ed::BeginDelete())
 	{
 		ed::LinkId deletedLink;
@@ -324,11 +324,11 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	}
 	ed::EndDelete();
 
-	// ‰EƒNƒŠƒbƒNƒƒjƒ…[
+	// å³ã‚¯ãƒªãƒƒã‚¯ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 	ed::LinkId rightClickedLinkId;
 	if (ed::ShowLinkContextMenu(&rightClickedLinkId))
 	{
-		// ƒNƒŠƒbƒN‚³‚ê‚½ƒŠƒ“ƒN‚ğ’T‚µ‚Äƒƒ“ƒo•Ï”‚É•Û‘¶
+		// ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸãƒªãƒ³ã‚¯ã‚’æ¢ã—ã¦ãƒ¡ãƒ³ãƒå¤‰æ•°ã«ä¿å­˜
 		for (auto& link : currentGraph.links)
 		{
 			if (link.linkId == rightClickedLinkId)
@@ -342,41 +342,41 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 	ed::End();
 
-	// ©“®®—ñ
+	// è‡ªå‹•æ•´åˆ—
 	if (needAutoLayout)
 	{
 		currentGraph.AutoLayout();
 		needAutoLayout = false;
 	}
 
-	// AddGraph‚Ìƒ|ƒbƒv
+	// AddGraphã®ãƒãƒƒãƒ—
 	if (ImGui::BeginPopupModal("Add Graph", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		static char newName[64] = ""; // “ü—Í—p‚Ìˆêƒoƒbƒtƒ@
+		static char newName[64] = ""; // å…¥åŠ›ç”¨ã®ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡
 
-		ImGui::Text(u8"ƒOƒ‰ƒt–¼‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢");
+		ImGui::Text(u8"ã‚°ãƒ©ãƒ•åã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
 
 		ImGui::InputText("##graph_name_input", newName, IM_ARRAYSIZE(newName));
 
 		ImGui::Separator();
 
-		// OK‚ğ‰Ÿ‚µ‚½‚Ìˆ—
+		// OKã‚’æŠ¼ã—ãŸæ™‚ã®å‡¦ç†
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			// AddGraph‚ğŒÄ‚Ô
+			// AddGraphã‚’å‘¼ã¶
 			Player::Instance().AddGraph(newName);
 
-			// ƒOƒ‰ƒt‚ğ’Ç‰Á‚µ‚½‚çƒoƒbƒtƒ@‚ğƒNƒŠƒA‚µƒ|ƒbƒv‚ğ•Â‚¶‚é
+			// ã‚°ãƒ©ãƒ•ã‚’è¿½åŠ ã—ãŸã‚‰ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢ã—ãƒãƒƒãƒ—ã‚’é–‰ã˜ã‚‹
 			newName[0] = '\0';
 			ImGui::CloseCurrentPopup();
 		}
 
 		ImGui::SameLine();
 
-		// Cancel‚ğ‰Ÿ‚µ‚½‚Ìˆ—
+		// Cancelã‚’æŠ¼ã—ãŸæ™‚ã®å‡¦ç†
 		if (ImGui::Button("CANCEL", ImVec2(120, 0)))
 		{
-			// ‰½‚à‚¹‚¸ƒ|ƒbƒv‚ğ•Â‚¶‚é
+			// ä½•ã‚‚ã›ãšãƒãƒƒãƒ—ã‚’é–‰ã˜ã‚‹
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -386,24 +386,24 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	if (OpenCopyMenu)
 	{
 		ImGui::Begin("CopeMenu");
-		ImGui::Text(u8"ƒRƒs[æ‚ÌƒOƒ‰ƒt");
+		ImGui::Text(u8"ã‚³ãƒ”ãƒ¼å…ˆã®ã‚°ãƒ©ãƒ•");
 		ImGui::Separator();
 
 		for (int i = 0; i < (int)graphs.size(); i++)
 		{
-			if (i == currentGraphIndex) continue; // ©•ª©g‚ÍƒXƒLƒbƒv‚·‚é
+			if (i == currentGraphIndex) continue; // è‡ªåˆ†è‡ªèº«ã¯ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹
 
 			bool selected = ImGui::MenuItem(graphs[i].graphName.c_str());
 
 			if (selected)
 			{
-				// ƒRƒs[ˆ—
+				// ã‚³ãƒ”ãƒ¼å‡¦ç†
 				if (copiedLink)
 				{
-					// ƒRƒs[æƒOƒ‰ƒt
+					// ã‚³ãƒ”ãƒ¼å…ˆã‚°ãƒ©ãƒ•
 					auto& targetGraph = graphs[i];
 
-					// ƒRƒs[æ‚ÉfromState‚ÆtoState‚Ìƒm[ƒh‚ğ’T‚·
+					// ã‚³ãƒ”ãƒ¼å…ˆã«fromStateã¨toStateã®ãƒãƒ¼ãƒ‰ã‚’æ¢ã™
 					ed::PinId fromPin, toPin;
 					bool foundFrom = false, foundTo = false;
 
@@ -422,23 +422,23 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 						}
 					}
 
-					// —¼•ûŒ©‚Â‚©‚Á‚½‚çƒŠƒ“ƒN‚ğ’Ç‰Á
+					// ä¸¡æ–¹è¦‹ã¤ã‹ã£ãŸã‚‰ãƒªãƒ³ã‚¯ã‚’è¿½åŠ 
 					if (foundFrom && foundTo)
 					{
-						// ƒŠƒ“ƒN’Ç‰Á
+						// ãƒªãƒ³ã‚¯è¿½åŠ 
 						targetGraph.AddLink(fromPin, toPin);
 
-						// ğŒ‚ÆƒAƒNƒVƒ‡ƒ“‚ğƒRƒs[
-						// ’Ç‰Á‚µ‚½ƒŠƒ“ƒN‚ğæ“¾‚·‚é
+						// æ¡ä»¶ã¨ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’ã‚³ãƒ”ãƒ¼
+						// è¿½åŠ ã—ãŸãƒªãƒ³ã‚¯ã‚’å–å¾—ã™ã‚‹
 						AnimLink& newLink = targetGraph.links.back();
 
-						// ğŒ‚ğƒRƒs[‚·‚é
+						// æ¡ä»¶ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 						newLink.transition.conditions = copiedLink->transition.conditions;
 
-						// ƒAƒNƒVƒ‡ƒ“‚ğƒRƒs[‚·‚é
+						// ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 						newLink.transition.actions = copiedLink->transition.actions;
 
-						// F‚ğƒRƒs[‚·‚é
+						// è‰²ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 						newLink.color = copiedLink->color;
 
 						OpenCopyMenu = false;
@@ -447,17 +447,17 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 			}
 		}
 
-		if (ImGui::Button(u8"•Â‚¶‚é")) OpenCopyMenu = false;
+		if (ImGui::Button(u8"é–‰ã˜ã‚‹")) OpenCopyMenu = false;
 
 		ImGui::End();
 	}
 
-	// ƒm[ƒh‚ğƒ_ƒuƒ‹ƒNƒŠƒbƒN‚·‚é‚ÆƒV[ƒPƒ“ƒT[‚ğ‹N“®
+	// ãƒãƒ¼ãƒ‰ã‚’ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã™ã‚‹ã¨ã‚·ãƒ¼ã‚±ãƒ³ã‚µãƒ¼ã‚’èµ·å‹•
 	ed::NodeId doubleClickedNode = ed::GetDoubleClickedNode();
 
 	if (doubleClickedNode)
 	{
-		// ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚³‚ê‚½ƒm[ƒh‚ğ’T‚·
+		// ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸãƒãƒ¼ãƒ‰ã‚’æ¢ã™
 		for (auto& node : currentGraph.nodes)
 		{
 			if (node.nodeId == doubleClickedNode)
@@ -466,12 +466,12 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 				{
 					if (node.subGraphPath.empty()) break;
 
-					// qƒOƒ‰ƒt‚ğì‚Á‚Ä“Ç‚İ‚Ş
+					// å­ã‚°ãƒ©ãƒ•ã‚’ä½œã£ã¦èª­ã¿è¾¼ã‚€
 					char filename[MAX_PATH];
 					_splitpath_s(node.subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
 					std::string targetName = filename;
 
-					// Šù‚Éƒ[ƒh‚³‚ê‚Ä‚¢‚éƒOƒ‰ƒt‚Ì’†‚©‚ç’T‚·
+					// æ—¢ã«ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹ã‚°ãƒ©ãƒ•ã®ä¸­ã‹ã‚‰æ¢ã™
 					int targetIdx = -1;
 					for (int i = 0; i < (int)graphs.size(); i++)
 					{
@@ -485,24 +485,24 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 					if (targetIdx == -1)
 					{
 						AnimationTransitionGraph newGraph;
-						newGraph.Load(node.subGraphPath); // Šù‘¶ƒtƒ@ƒCƒ‹‚ª‚ ‚ê‚Îƒ[ƒhA–³‚¯‚ê‚Î‹ó
+						newGraph.Load(node.subGraphPath); // æ—¢å­˜ãƒ•ã‚¡ã‚¤ãƒ«ãŒã‚ã‚Œã°ãƒ­ãƒ¼ãƒ‰ã€ç„¡ã‘ã‚Œã°ç©º
 						newGraph.graphName = targetName;
 						graphs.push_back(newGraph);
-						targetIdx = (int)graphs.size() - 1; // ˆê”ÔÅŒã‚É’Ç‰Á‚³‚ê‚½ƒCƒ“ƒfƒbƒNƒX
+						targetIdx = (int)graphs.size() - 1; // ä¸€ç•ªæœ€å¾Œã«è¿½åŠ ã•ã‚ŒãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 					}
 
-					// Œ©‚Â‚©‚Á‚½‚ç‚»‚ÌƒOƒ‰ƒt‚ÉˆÚ“®‚·‚é
+					// è¦‹ã¤ã‹ã£ãŸã‚‰ãã®ã‚°ãƒ©ãƒ•ã«ç§»å‹•ã™ã‚‹
 					if (targetIdx != -1)
 					{
-						graphStack.push_back(currentGraphIndex); // ¡‚ÌƒCƒ“ƒfƒbƒNƒX‚ğ—š—ğ‚ÉÏ‚Ş
-						currentGraphIndex = targetIdx;           // ƒOƒ‰ƒt‚ğØ‚è‘Ö‚¦‚é
-						ed::NavigateToContent();                 // ƒJƒƒ‰‚ğ‡‚í‚¹‚é
+						graphStack.push_back(currentGraphIndex); // ä»Šã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å±¥æ­´ã«ç©ã‚€
+						currentGraphIndex = targetIdx;           // ã‚°ãƒ©ãƒ•ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
+						ed::NavigateToContent();                 // ã‚«ãƒ¡ãƒ©ã‚’åˆã‚ã›ã‚‹
 					}
 				}
 				else
 				{
-					// ƒV[ƒPƒ“ƒT[‚ÌŒ»İ‚ÌƒXƒe[ƒg‚ğ‚±‚Ìƒm[ƒh‚Ì–¼‘O‚É•Ï‚¦‚é
-					doubleClickedState = node.StateName; // Œ©‚Â‚¯‚½‚ç–¼‘O‚ğ•Û‘¶‚·‚é
+					// ã‚·ãƒ¼ã‚±ãƒ³ã‚µãƒ¼ã®ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ã“ã®ãƒãƒ¼ãƒ‰ã®åå‰ã«å¤‰ãˆã‚‹
+					doubleClickedState = node.StateName; // è¦‹ã¤ã‘ãŸã‚‰åå‰ã‚’ä¿å­˜ã™ã‚‹
 				}
 				break;
 			}
@@ -517,14 +517,14 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	return doubleClickedState;
 }
 
-// ƒŠƒ“ƒN‘I‘ğ
+// ãƒªãƒ³ã‚¯é¸æŠ
 void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph& graph)
 {
-	// ‘I‘ğ’†‚ÌƒŠƒ“ƒN‚ğæ“¾
+	// é¸æŠä¸­ã®ãƒªãƒ³ã‚¯ã‚’å–å¾—
 	ed::LinkId selectedLinkId;
-	if (ed::GetSelectedLinks(&selectedLinkId, 1) == 0) return; // ‰½‚à‘I‘ğ‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
+	if (ed::GetSelectedLinks(&selectedLinkId, 1) == 0) return; // ä½•ã‚‚é¸æŠã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½•ã‚‚ã—ãªã„
 
-	// ‘I‘ğ‚³‚ê‚½ƒŠƒ“ƒN‚ğgraph.links‚©‚ç’T‚·
+	// é¸æŠã•ã‚ŒãŸãƒªãƒ³ã‚¯ã‚’graph.linksã‹ã‚‰æ¢ã™
 	AnimLink* selectedLink = nullptr;
 	for (auto& link : graph.links)
 	{
@@ -538,7 +538,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 
 	AnimationTransition& trans = selectedLink->transition;
 
-	// ğŒ•ÒWƒEƒBƒ“ƒhƒE
+	// æ¡ä»¶ç·¨é›†ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 	ImGui::Begin("Transition Condition Editor");
 	{
 		ImGui::Text("From State: %s -> To State: %s", trans.fromState.c_str(), trans.toState.c_str());
@@ -546,11 +546,11 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 		ImGui::DragInt("Priority", &trans.priority);
 		ImGui::Separator();
 
-		ImGui::Text(u8"Actions(‘JˆÚ‚ÉÀs‚·‚éˆ—)");
+		ImGui::Text(u8"Actions(é·ç§»æ™‚ã«å®Ÿè¡Œã™ã‚‹å‡¦ç†)");
 		for (int i = 0; i < (int)trans.actions.size(); i++)
 		{
 			auto& action = trans.actions[i];
-			ImGui::PushID(i + 1000); // conditions‚ÆID‚ğ”í‚ç‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß
+			ImGui::PushID(i + 1000); // conditionsã¨IDã‚’è¢«ã‚‰ãªã„ã‚ˆã†ã«ã™ã‚‹ãŸã‚
 
 			const char* actionTypes[] = {
 				"None",
@@ -600,42 +600,42 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 
 		ImGui::Separator();
 
-		// ğŒƒŠƒXƒg‚ğ•\¦
-		ImGui::Text(u8"Condition(ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì‘JˆÚğŒ)");
+		// æ¡ä»¶ãƒªã‚¹ãƒˆã‚’è¡¨ç¤º
+		ImGui::Text(u8"Condition(ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®é·ç§»æ¡ä»¶)");
 		for (int i = 0; i < (int)trans.conditions.size(); i++)
 		{
 			TransitionCondition& cond = trans.conditions[i];
 			ImGui::PushID(i);
 
-			// ğŒƒ^ƒCƒv‚Ìƒhƒƒbƒvƒ_ƒEƒ“
+			// æ¡ä»¶ã‚¿ã‚¤ãƒ—ã®ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³
 			const char* condTypes[] = {
-				"AnimationFinished",	// ƒAƒjƒ[ƒVƒ‡ƒ“‚ªI—¹‚µ‚½‚ç
-				"AnimationTimeOver",	// w’è‚ÌÄ¶ŠÔƒI‚ğ‰ß‚¬‚½‚ç
-				"AnimationTimeIn",		// w’è‚ÌÄ¶ŠÔ“à‚¾‚Á‚½‚ç
-				"ButtonPressed",		// ƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½uŠÔ
-				"ButtonReleased",		// ƒ{ƒ^ƒ“‚ğ—£‚µ‚½uŠÔ
-				"ButtonHeld",			// ƒ{ƒ^ƒ“‚ğ’·‰Ÿ‚µ‚µ‚Ä‚¢‚é‚Æ‚«
-				"MoveLengthOver",		// “ü—Í‚ªˆê’èˆÈã‚Ì
-				"MoveLengthUnder",		// “ü—Í‚ªˆê’èˆÈ‰º‚Ì
-				"EnemyFromDistance",	// “G‚Æ‚Ì‹——£‚ªˆê’èˆÈã‚Ì
-				"JumpPressed",			// ƒWƒƒƒ“ƒv‰Â”\‚©‚Ç‚¤‚©
-				"StaminaEmpty",			// ƒXƒ^ƒ~ƒi‚ª‹ó‚©‚Ç‚¤‚©
-				"HasStamina",			// ƒXƒ^ƒ~ƒi‚ğ‚Á‚Ä‚¢‚é‚©
-				"IsLockOn",				// ƒƒbƒNƒIƒ“’†‚©‚Ç‚¤‚©
-				"CanRun",				// ‘–‚ê‚é‚©‚Ç‚¤‚©
-				"HavePotion",			// ƒ|[ƒVƒ‡ƒ“‚ğ‚Á‚Ä‚¢‚é‚©
-				"HealCooldownReady",	// ‰ñ•œ‚ÌƒN[ƒ‹ƒ_ƒEƒ“’†‚©
-				"IsGuarding",			// ƒK[ƒh’†‚©
-				"PoaitionX",			// X²‚ª`‚È‚ç
-				"PoaitionY",			// Y²‚ª`‚È‚ç
-				"PoaitionZ",			// Z²‚ª`‚È‚ç
-				"Always",				// –³ğŒ
+				"AnimationFinished",	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚äº†ã—ãŸã‚‰
+				"AnimationTimeOver",	// æŒ‡å®šã®å†ç”Ÿæ™‚é–“ã‚ªã‚’éããŸã‚‰
+				"AnimationTimeIn",		// æŒ‡å®šã®å†ç”Ÿæ™‚é–“å†…ã ã£ãŸã‚‰
+				"ButtonPressed",		// ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸç¬é–“
+				"ButtonReleased",		// ãƒœã‚¿ãƒ³ã‚’é›¢ã—ãŸç¬é–“
+				"ButtonHeld",			// ãƒœã‚¿ãƒ³ã‚’é•·æŠ¼ã—ã—ã¦ã„ã‚‹ã¨ã
+				"MoveLengthOver",		// å…¥åŠ›ãŒä¸€å®šä»¥ä¸Šã®æ™‚
+				"MoveLengthUnder",		// å…¥åŠ›ãŒä¸€å®šä»¥ä¸‹ã®æ™‚
+				"EnemyFromDistance",	// æ•µã¨ã®è·é›¢ãŒä¸€å®šä»¥ä¸Šã®æ™‚
+				"JumpPressed",			// ã‚¸ãƒ£ãƒ³ãƒ—å¯èƒ½ã‹ã©ã†ã‹
+				"StaminaEmpty",			// ã‚¹ã‚¿ãƒŸãƒŠãŒç©ºã‹ã©ã†ã‹
+				"HasStamina",			// ã‚¹ã‚¿ãƒŸãƒŠã‚’æŒã£ã¦ã„ã‚‹ã‹
+				"IsLockOn",				// ãƒ­ãƒƒã‚¯ã‚ªãƒ³ä¸­ã‹ã©ã†ã‹
+				"CanRun",				// èµ°ã‚Œã‚‹ã‹ã©ã†ã‹
+				"HavePotion",			// ãƒãƒ¼ã‚·ãƒ§ãƒ³ã‚’æŒã£ã¦ã„ã‚‹ã‹
+				"HealCooldownReady",	// å›å¾©ã®ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³ä¸­ã‹
+				"IsGuarding",			// ã‚¬ãƒ¼ãƒ‰ä¸­ã‹
+				"PoaitionX",			// Xè»¸ãŒï½ãªã‚‰
+				"PoaitionY",			// Yè»¸ãŒï½ãªã‚‰
+				"PoaitionZ",			// Zè»¸ãŒï½ãªã‚‰
+				"Always",				// ç„¡æ¡ä»¶
 			};
 			int typeIdx = (int)cond.type;
 			if (ImGui::Combo("Type", &typeIdx, condTypes, IM_ARRAYSIZE(condTypes)))
 				cond.type = (TransitionConditionType)typeIdx;
 
-			// ƒ^ƒCƒv‚É‚æ‚Á‚Ä’Ç‰Á“ü—Í—“‚ğo‚·
+			// ã‚¿ã‚¤ãƒ—ã«ã‚ˆã£ã¦è¿½åŠ å…¥åŠ›æ¬„ã‚’å‡ºã™
 			switch (cond.type)
 			{
 			case TransitionConditionType::AnimationTimeOver:
@@ -650,7 +650,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionConditionType::ButtonReleased:
 			case TransitionConditionType::ButtonHeld:
 			{
-				// ƒ{ƒ^ƒ“‘I‘ğCombo‚ğ•\¦
+				// ãƒœã‚¿ãƒ³é¸æŠComboã‚’è¡¨ç¤º
 				const char* buttonNames[] = { "A","B","X","Y","LB","RB","LT","RT" };
 				const int   buttonMasks[] = {
 					GamePad::BTN_A, GamePad::BTN_B,
@@ -673,7 +673,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				break;
 			}
 			case TransitionConditionType::JumpPressed:
-				ImGui::TextDisabled(u8"i’Ç‰Áİ’è‚È‚µj");
+				ImGui::TextDisabled(u8"ï¼ˆè¿½åŠ è¨­å®šãªã—ï¼‰");
 				break;
 
 			case TransitionConditionType::PositionX:
@@ -683,28 +683,28 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				break;
 			}
 
-			// ğŒ‚Ì”½“]ƒ`ƒFƒbƒNƒ{ƒbƒNƒX
-			ImGui::Checkbox(u8"NegateiğŒ‚ğ”½“]j", &cond.negate);
+			// æ¡ä»¶ã®åè»¢ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹
+			ImGui::Checkbox(u8"Negateï¼ˆæ¡ä»¶ã‚’åè»¢ï¼‰", &cond.negate);
 
-			// ğŒ‚ğíœ‚·‚éƒ{ƒ^ƒ“
+			// æ¡ä»¶ã‚’å‰Šé™¤ã™ã‚‹ãƒœã‚¿ãƒ³
 			if (ImGui::Button("Remove"))
 			{
 				trans.conditions.erase(trans.conditions.begin() + i);
 				ImGui::PopID();
-				break; // ƒCƒeƒŒ[ƒ^[‚ª‰ó‚ê‚é‚©‚çbreak‚É‚·‚é
+				break; // ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ãƒ¼ãŒå£Šã‚Œã‚‹ã‹ã‚‰breakã«ã™ã‚‹
 			}
 
 			ImGui::Separator();
 			ImGui::PopID();
 		}
 
-		// ğŒ‚ğ’Ç‰Á‚·‚éƒ{ƒ^ƒ“
+		// æ¡ä»¶ã‚’è¿½åŠ ã™ã‚‹ãƒœã‚¿ãƒ³
 		if (ImGui::Button("+ Add Condition"))
 		{
 			trans.conditions.push_back(TransitionCondition{});
 		}
 
-		// ‘JˆÚ‚ÌğŒ‚Ì’Ç‰Á
+		// é·ç§»æ™‚ã®æ¡ä»¶ã®è¿½åŠ 
 		if (ImGui::Button("+ Add Action"))
 		{
 			trans.actions.push_back(TransitionAction{});
@@ -714,14 +714,14 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 	ImGui::End();
 }
 
-// ƒm[ƒh‘I‘ğ
+// ãƒãƒ¼ãƒ‰é¸æŠ
 void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph& graph)
 {
-	// ‘I‘ğ’†‚Ìƒm[ƒh‚ğæ“¾i1‚Â‚¾‚¯j
+	// é¸æŠä¸­ã®ãƒãƒ¼ãƒ‰ã‚’å–å¾—ï¼ˆ1ã¤ã ã‘ï¼‰
 	ed::NodeId selectedNodeId;
-	if (ed::GetSelectedNodes(&selectedNodeId, 1) == 0) return; // ‰½‚à‘I‘ğ‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
+	if (ed::GetSelectedNodes(&selectedNodeId, 1) == 0) return; // ä½•ã‚‚é¸æŠã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½•ã‚‚ã—ãªã„
 
-	// ‘I‘ğ‚³‚ê‚½ƒm[ƒh‚ğgraph.nodes‚©‚ç’T‚·
+	// é¸æŠã•ã‚ŒãŸãƒãƒ¼ãƒ‰ã‚’graph.nodesã‹ã‚‰æ¢ã™
 	AnimNode* selectedNode = nullptr;
 	for (auto& node : graph.nodes)
 	{
@@ -733,54 +733,101 @@ void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph&
 	}
 	if (!selectedNode) return;
 
-	// ƒvƒƒpƒeƒB•ÒWƒEƒBƒ“ƒhƒE‚ğ•\¦
+	// ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ç·¨é›†ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¡¨ç¤º
 	ImGui::Begin("Node Properties (Animation Config)");
 	{
-		ImGui::Text(u8"ƒXƒe[ƒg–¼: %s", selectedNode->StateName.c_str());
+		ImGui::Text(u8"ã‚¹ãƒ†ãƒ¼ãƒˆå: %s", selectedNode->StateName.c_str());
 		ImGui::Separator();
 
-		// ƒm[ƒh‚Ìí—Ş‚ğØ‚è‘Ö‚¦‚éƒ{ƒ^ƒ“
-		if (ImGui::Button(selectedNode->type == NodeType::Animation ? u8"ŠK‘w(SubGraph)‚É•ÏŠ·" : u8"’Êí(Animation)‚É•ÏŠ·"))
+		// ãƒãƒ¼ãƒ‰ã®ç¨®é¡ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ãƒœã‚¿ãƒ³
+		if (ImGui::Button(selectedNode->type == NodeType::Animation ? u8"éšå±¤(SubGraph)ã«å¤‰æ›" : u8"é€šå¸¸(Animation)ã«å¤‰æ›"))
 		{
 			selectedNode->type = (selectedNode->type == NodeType::Animation) ? NodeType::SubGraph : NodeType::Animation;
 		}
 
 		ImGui::Separator();
 
-		// í—Ş‚É‚æ‚Á‚Ä•\¦‚·‚éUI‚ğ•Ï‚¦‚é
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::TextColored(ImVec4(0.8f, 1.0f, 0.8f, 1.0f), u8"ã€ã“ã®ãƒãƒ¼ãƒ‰ã‹ã‚‰å‡ºã¦ã„ã‚‹çŸ¢å°ä¸€è¦§ã€‘");
+
+		int linkIndex = 1;
+		for (auto& link : graph.links)
+		{
+			// é¸æŠä¸­ã®ãƒãƒ¼ãƒ‰ã®å‡ºåŠ›ãƒ”ãƒ³ã‹ã‚‰å‡ºã¦ã„ã‚‹çŸ¢å°ã‚’æ¢ã™
+			if (link.startPin == selectedNode->pinOut)
+			{
+				ImGui::PushID((int)link.linkId.Get());
+
+				// é·ç§»å…ˆã®ãƒãƒ¼ãƒ‰åã‚’å–å¾—
+				std::string toName = "Unknown";
+				for (auto& n : graph.nodes) {
+					if (n.pinIn == link.endPin) {
+						toName = n.StateName;
+						break;
+					}
+				}
+
+				// ãƒœã‚¿ãƒ³ã®ãƒ©ãƒ™ãƒ«ã‚’ä½œæˆ
+				char btnLabel[128];
+				snprintf(btnLabel, sizeof(btnLabel), u8"â–¶ To: %s (çŸ¢å° %d)", toName.c_str(), linkIndex);
+
+				// ä»Šé¸æŠã•ã‚Œã¦ã„ã‚‹çŸ¢å°ãªã‚‰ç·‘è‰²ã£ã½ãã—ã¦åˆ†ã‹ã‚Šã‚„ã™ãã™ã‚‹
+				bool isSelected = ed::IsLinkSelected(link.linkId);
+				if (isSelected) {
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f));
+				}
+
+				// ãƒœã‚¿ãƒ³ã‚’è¡¨ç¤º
+				if (ImGui::Button(btnLabel, ImVec2(-1, 0)))
+				{
+					ed::ClearSelection();
+					ed::SelectLink(link.linkId);
+				}
+
+				if (isSelected) {
+					ImGui::PopStyleColor();
+				}
+
+				ImGui::PopID();
+				linkIndex++;
+			}
+		}
+
+		// ç¨®é¡ã«ã‚ˆã£ã¦è¡¨ç¤ºã™ã‚‹UIã‚’å¤‰ãˆã‚‹
 		if (selectedNode->type == NodeType::SubGraph)
 		{
-			ImGui::TextColored(ImVec4(0.5f, 0.8f, 1.0f, 1.0f), u8"yŠK‘wƒm[ƒhz");
-			ImGui::Text(u8"ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Å‚±‚Ìƒtƒ@ƒCƒ‹‚ğŠJ‚«‚Ü‚·B");
+			ImGui::TextColored(ImVec4(0.5f, 0.8f, 1.0f, 1.0f), u8"ã€éšå±¤ãƒãƒ¼ãƒ‰ã€‘");
+			ImGui::Text(u8"ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã§ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ãã¾ã™ã€‚");
 
 			char pathBuf[MAX_PATH] = "";
 			strncpy_s(pathBuf, selectedNode->subGraphPath.c_str(), sizeof(pathBuf));
-			if (ImGui::InputText(u8"qƒOƒ‰ƒt‚Ìƒtƒ@ƒCƒ‹ƒpƒX", pathBuf, sizeof(pathBuf)))
+			if (ImGui::InputText(u8"å­ã‚°ãƒ©ãƒ•ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹", pathBuf, sizeof(pathBuf)))
 			{
 				selectedNode->subGraphPath = pathBuf;
 			}
 		}
 		else
 		{
-			ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.5f, 1.0f), u8"yƒAƒjƒ[ƒVƒ‡ƒ“ƒm[ƒhz");
+			ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.5f, 1.0f), u8"ã€ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒãƒ¼ãƒ‰ã€‘");
 
-			// ƒAƒjƒ[ƒVƒ‡ƒ“–¼ (GLTF‚Ì–{“–‚Ì–¼‘O)
+			// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å (GLTFã®æœ¬å½“ã®åå‰)
 			char nameBuf[256] = "";
 			strncpy_s(nameBuf, selectedNode->config.animationName.c_str(), sizeof(nameBuf));
-			if (ImGui::InputText(u8"ƒAƒjƒ[ƒVƒ‡ƒ“–¼ (GLTF)", nameBuf, sizeof(nameBuf)))
+			if (ImGui::InputText(u8"ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å (GLTF)", nameBuf, sizeof(nameBuf)))
 			{
 				selectedNode->config.animationName = nameBuf;
 			}
 
-			// ƒ‹[ƒvİ’è
-			ImGui::Checkbox(u8"ƒ‹[ƒvÄ¶", &selectedNode->config.loop);
+			// ãƒ«ãƒ¼ãƒ—è¨­å®š
+			ImGui::Checkbox(u8"ãƒ«ãƒ¼ãƒ—å†ç”Ÿ", &selectedNode->config.loop);
 
-			// ƒ‹[ƒgƒ‚[ƒVƒ‡ƒ“İ’è
-			ImGui::Checkbox(u8"ƒ‹[ƒgƒ‚[ƒVƒ‡ƒ“‚ğg—p", &selectedNode->config.useRootMotion);
-			ImGui::Checkbox(u8"ƒ‹[ƒgƒ‚[ƒVƒ‡ƒ“(Šg’£)", &selectedNode->config.useRootMotionEx);
+			// ãƒ«ãƒ¼ãƒˆãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³è¨­å®š
+			ImGui::Checkbox(u8"ãƒ«ãƒ¼ãƒˆãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ä½¿ç”¨", &selectedNode->config.useRootMotion);
+			ImGui::Checkbox(u8"ãƒ«ãƒ¼ãƒˆãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³(æ‹¡å¼µ)", &selectedNode->config.useRootMotionEx);
 
-			// ƒuƒŒƒ“ƒhŠÔ
-			ImGui::DragFloat(u8"ƒuƒŒƒ“ƒhŠÔ(•b)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);
+			// ãƒ–ãƒ¬ãƒ³ãƒ‰æ™‚é–“
+			ImGui::DragFloat(u8"ãƒ–ãƒ¬ãƒ³ãƒ‰æ™‚é–“(ç§’)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);
 		}
 	}
 	ImGui::End();

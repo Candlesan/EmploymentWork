@@ -671,8 +671,6 @@ void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
 }
 
 // 今使ってるHitBoxを計算して返す関数
-// Player.cpp の下の方に追加
-
 std::vector<Character::HitBoxInfo> Player::GetActiveHitBoxes() const
 {
 	std::vector<HitBoxInfo> result;

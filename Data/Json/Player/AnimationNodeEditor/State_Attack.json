@@ -185,6 +185,24 @@
             "fromState": "AS_Combo_Attack_03_01_Seq_0",
             "priority": 0,
             "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "threshold": 0.5,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Combo_Attack_05_03_Loop_Seq_0",
+            "priority": 1,
+            "toState": "AS_Combo_Attack_05_04_Seq_0"
         }
     ],
     "nodes": [
