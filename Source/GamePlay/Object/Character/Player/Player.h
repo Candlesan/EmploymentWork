@@ -239,4 +239,7 @@ private:
 	// –‚–@ŠÖŒW
 	MagicManager magicManager;
 	int level = 1;
+
+	// æs“ü—Í
+	int bufferedButton = 0;
 };

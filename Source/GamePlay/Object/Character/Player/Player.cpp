@@ -906,6 +906,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
+	if (animSequence.GetRange("InputBuffer"))
+	{
+		// 既に記憶しているボタンに今フレームでおされたボタンを追加
+		bufferedButton |= gamePad.GetButtonDown();
+	}
+
 	std::string moveState = DetermineWalkState(); // 歩きの遷移条件を取得
 	std::string rollState = DetermineRollState(); // 回避の遷移条件を取得
 
@@ -945,7 +951,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.animLength = GetCurrentAnimationLength();
 	ctx.moveLength = moveLength;
 	ctx.enemyFromdistance = EnemyfromDistance;
-	ctx.buttonDown = gamePad.GetButtonDown();
+	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.jumpPressed = jumpPressed;
@@ -968,7 +974,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	std::string nextState = currentGraph->EvaluateTransitions(currentState, ctx);
 
 	// 親の割り込み処理
-	//for (int i = 0; i < (int)activeGraphStack.size(); i++)
 	for (int i = (int)activeGraphStack.size() - 1; i >= 0; i--) 
 	{
 		int gIdx = activeGraphStack[i];
@@ -1062,6 +1067,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
 			std::string targetName = filename;
 
+
 			// Initializeで既に全ロードされているグラフ群から探す
 			for (int i = 0; i < (int)transitionGraphs.size(); i++)
 			{
@@ -1098,6 +1104,12 @@ void Player::UpdateStateTransitions(float elapsedTime)
 							}
 						}
 					}
+					// 最初のステートへ切り替え！
+					if (firstState != "")
+					{
+						ChangeAnimationState(firstState);
+						bufferedButton = 0; // ★追加：サブグラフへ潜り込んだ時のリセット
+					}
 				}
 				else
 				{
@@ -1121,6 +1133,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		{
 			// 通常のアニメーション遷移
 			ChangeAnimationState(nextState);
+			bufferedButton = 0;
 		}
 	}
 }
