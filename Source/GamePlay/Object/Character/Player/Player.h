@@ -73,6 +73,8 @@ public:
 	void SetEnemy(Enemy* e) { enemy = e; }
 	MagicManager& GetMagicManager() { return magicManager; }
 
+	// 今使ってるHitBoxを計算して返す関数
+	std::vector<HitBoxInfo> GetActiveHitBoxes() const override;
 public:
 	// グラフを追加する
 	void AddGraph(std::string name);
@@ -92,9 +94,6 @@ private:
 
 	// 入力処理
 	void InputMove(float elapsedTime);
-
-	// ジャンプ出来るかどうか
-	//bool CanJump() const;
 
 	// 状態遷移更新処理
 	void UpdateStateTransitions(float elapsedTime);

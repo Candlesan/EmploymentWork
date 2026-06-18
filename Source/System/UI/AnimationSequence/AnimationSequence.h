@@ -56,6 +56,7 @@ public:
         float radius = 0.5f;                         // 球の半径 / カプセルの半径
         float height = 1.0f;                         // カプセルの高さ
         DirectX::XMFLOAT3 offset = { 0, 0, 0 };      // ボーンからのオフセット
+        DirectX::XMFLOAT3 angleOffset = { 0, 0, 0 };      // ボーンからのオフセット
         std::string boneName = "";   // 追従するボーン名
 
         float damageRate = 1.0f;     // ダメージ倍率

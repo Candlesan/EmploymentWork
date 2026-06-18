@@ -563,7 +563,9 @@ void AnimationSequencerEditor::DrawDetailPanel(AnimationSequencer::AnimationData
 				ImGui::DragFloat(u8"Height (高さ)", &r.height, 0.01f, 0.1f, 10.0f);
 			}
 
-			ImGui::DragFloat3(u8"Offset (オフセット)", &r.offset.x, 0.01f);
+			ImGui::DragFloat3(u8"Offset (位置ズレ)", &r.offset.x, 0.01f);
+
+			ImGui::DragFloat3(u8"Angle Offset (回転)", &r.angleOffset.x, 1.0f);
 
 			ImGui::DragFloat(u8"Damage Rate", &r.damageRate, 0.01f, 0.1f, 10.0f);
 			ImGui::DragFloat(u8"Poise Rate (削り)", &r.poiseRate, 0.01f);

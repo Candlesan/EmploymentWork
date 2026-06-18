@@ -508,29 +508,18 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 	// 武器の当たり判定
 	if (showWeaponHitBox)
 	{
-		DirectX::XMFLOAT4X4 weaponTransform;
-
-		for (int i = 0; i < 2; ++i)
+		// ★ 新しいGetActiveHitBoxesを使って描画する
+		for (auto& info : GetActiveHitBoxes())
 		{
-			DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[i].transform);
-
-			// 武器の現在の位置と回転だけを取り出す（スケールを無視する）
-			DirectX::XMVECTOR scale, rot, pos;
-			DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
-			DirectX::XMMATRIX baseMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
-
-			DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-				weapon[i].angle.x + weapon[i].weaponAngleOffset.x,
-				weapon[i].angle.y + weapon[i].weaponAngleOffset.y,
-				weapon[i].angle.z + weapon[i].weaponAngleOffset.z);
-			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
-				weapon[i].position.x + weapon[i].weaponHitOffset.x,
-				weapon[i].position.y + weapon[i].weaponHitOffset.y,
-				weapon[i].position.z + weapon[i].weaponHitOffset.z);
-			DirectX::XMMATRIX WorldWeapon = R * T * baseMatrix;
-			DirectX::XMStoreFloat4x4(&weaponTransform, WorldWeapon);
-
-			renderer->DrawCapsule(weaponTransform, weapon[i].weaponRadius, weapon[i].weaponHeight, {1, 0, 0, 1});
+			if (info.shape == HitBoxShape::Capsule)
+			{
+				// 位置を反映する簡易的な描画（Enemyと同じ方式）
+				renderer->DrawCapsule(info.hitTransform, info.radius, info.height, { 1, 0, 0, 1 });
+			}
+			else if (info.shape == HitBoxShape::Sphere)
+			{
+				renderer->DrawSphere(info.position, info.radius, { 1, 0, 0, 1 });
+			}
 		}
 	}
 
@@ -679,6 +668,99 @@ void Player::RecoveryStamina(float elapsedTime)
 void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos) 
 {
 	lockOnTargetPos = pos;
+}
+
+// 今使ってるHitBoxを計算して返す関数
+// Player.cpp の下の方に追加
+
+std::vector<Character::HitBoxInfo> Player::GetActiveHitBoxes() const
+{
+	std::vector<HitBoxInfo> result;
+	auto state = GetCurrentState();
+
+	for (auto& data : animSequence.GetAnimations()) {
+		if (data.name != state) continue;
+
+		for (auto& r : data.ranges)
+		{
+			if (r.isHitBox && animSequence.GetRange(r.name)) {
+				HitBoxInfo info;
+				info.shape = r.shapeType;
+				info.radius = r.radius;
+				info.height = r.height;
+				info.damageRate = r.damageRate;
+				info.poiseRate = r.poiseRate;
+				info.invincibleTime = r.invincible;
+
+				DirectX::XMMATRIX finalMatrix = DirectX::XMMatrixIdentity();
+				bool isMatrixFound = false;
+
+				// 名前で追従先を振り分ける！
+				if (r.boneName == "Sword" || r.boneName == "Staff")
+				{
+					// 剣か杖かを判定 (Swordなら1、Staffなら0)
+					int weaponIndex = (r.boneName == "Sword") ? 1 : 0;
+
+					// 武器の計算済みワールド行列を読み込む
+					DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon[weaponIndex].transform);
+
+					// 【重要】スケール（縮小）成分を除去する！
+					// これをやらないとシーケンサーのオフセット値まで一緒に縮んでしまう
+					DirectX::XMVECTOR scale, rot, pos;
+					DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
+					finalMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
+
+					isMatrixFound = true;
+				}
+				else
+				{
+					// SwordやStaff以外（右手など）は従来通りキャラクターのボーンに追従
+					int nodeIndex = player->GetNodeIndex(r.boneName.c_str());
+					if (nodeIndex >= 0) {
+						auto& node = player->GetNodes()[nodeIndex];
+						DirectX::XMMATRIX local = DirectX::XMLoadFloat4x4(&node.globalTransform);
+						DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+						finalMatrix = local * playerWorld;
+						isMatrixFound = true;
+					}
+				}
+
+				// 行列から位置と向きを抽出
+				if (isMatrixFound) {
+					// 1. エディタの回転（度数法）をラジアンに変換して、回転行列(R)を作る
+					DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+						DirectX::XMConvertToRadians(r.angleOffset.x),
+						DirectX::XMConvertToRadians(r.angleOffset.y),
+						DirectX::XMConvertToRadians(r.angleOffset.z)
+					);
+
+					// 2. エディタの位置ズレから、平行移動行列(T)を作る
+					DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(r.offset.x, r.offset.y, r.offset.z);
+
+					// 3. 【最重要】回転 → 移動 → 親行列（剣）の順で掛け合わせて、最終的なヒットボックスの行列を作る！
+					DirectX::XMMATRIX hitBoxMatrix = R * T * finalMatrix;
+
+					DirectX::XMStoreFloat4x4(&info.hitTransform, hitBoxMatrix);
+
+					// 行列の4行目（.r[3]）には、最終的なワールド座標が入っている
+					DirectX::XMVECTOR pos = hitBoxMatrix.r[3];
+					DirectX::XMStoreFloat3(&info.position, pos);
+
+					// 行列の2行目（.r[1]）には、最終的なY軸方向（カプセルの上向き）のベクトルが入っている
+					DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(hitBoxMatrix.r[1]);
+					DirectX::XMStoreFloat3(&info.direction, dir);
+				}
+				else {
+					info.position = position;
+					info.direction = { 0.0f, 1.0f, 0.0f };
+				}
+
+				result.push_back(info);
+			}
+		}
+		break;
+	}
+	return result;
 }
 
 // グラフを追加する
@@ -868,11 +950,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.buttonDown = gamePad.GetButtonDown();
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
-	//ctx.bHold = bButtonHoldTime >= RUN_THRESHOLD;
-	//ctx.bTap = (gamePad.GetButtonUp() & GamePad::BTN_B) && !ctx.bHold;
-	//ctx.rbTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER) && !ctx.bHold;
-	//ctx.rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD;
-	//ctx.rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER) && !ctx.rtHold;
 	ctx.jumpPressed = jumpPressed;
 	ctx.haveStamina = HaveStamina;
 	ctx.isStaminaEmpty = IsStaminaEmpty;

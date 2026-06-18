@@ -210,6 +210,7 @@ void AnimationSequencer::Save(const std::string& filepath)
                 {"radius", r.radius},               // 修正：Radius(大文字)から radius(小文字)へ！
                 {"height", r.height},               // 追加：カプセルの高さ
                 {"offset", {r.offset.x, r.offset.y, r.offset.z}}, // 修正：Offsetから offsetへ！
+                {"angleOffset", {r.angleOffset.x, r.angleOffset.y, r.angleOffset.z}}, // 修正：Offsetから offsetへ！
 
                 {"damageRate", r.damageRate},
                 {"poiseRate", r.poiseRate},
@@ -294,11 +295,12 @@ void AnimationSequencer::Load(const std::string& filepath)
                             r.offset.y = jr["offset"][1];
                             r.offset.z = jr["offset"][2];
                         }
-                        else if (jr.count("sphereOffset") > 0 && jr["sphereOffset"].is_array() && jr["sphereOffset"].size() == 3)
+
+                        if (jr.count("angleOffset") > 0 && jr["angleOffset"].is_array() && jr["angleOffset"].size() == 3)
                         {
-                            r.offset.x = jr["sphereOffset"][0];
-                            r.offset.y = jr["sphereOffset"][1];
-                            r.offset.z = jr["sphereOffset"][2];
+                            r.angleOffset.x = jr["angleOffset"][0];
+                            r.angleOffset.y = jr["angleOffset"][1];
+                            r.angleOffset.z = jr["angleOffset"][2];
                         }
 
                         r.damageRate = jr.value("damageRate", 1.0f);

@@ -25,6 +25,8 @@ public:
 		float radius;
 		float height;
 
+		DirectX::XMFLOAT4X4 hitTransform;
+
 		// ƒqƒbƒg‚ÌŒW”
 		float damageRate;
 		float poiseRate;

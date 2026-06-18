@@ -579,55 +579,37 @@ void SceneGame::CollisonPlayervsEnemy()
 // 武器と敵の当たり判定
 void SceneGame::CollisionPlayerWeaponVsEnemy()
 {
-	// プレイヤーを取得
 	Player& player = Player::Instance();
 
-	bool isHit = false;
-	const AnimationSequencer::Range* activeRange = nullptr;
+	// プレイヤーの現在有効な攻撃判定をすべて取得！
+	std::vector<Character::HitBoxInfo> playerHits = player.GetActiveHitBoxes();
 
-	for (auto& data : player.GetAnimSequence().GetAnimations())
+	for (const auto& hit : playerHits)
 	{
-		if (data.name == player.GetCurrentState())
-		{
-			for (auto& r : data.ranges)
-			{
-				// ★変更：isHitBox と GetRange だけで判定
-				if (r.isHitBox && player.GetAnimSequence().GetRange(r.name))
-				{
-					isHit = true;
-					activeRange = &r;
-					break;
-				}
-			}
+		bool isHit = false;
+		DirectX::XMFLOAT3 outPosA, outPosB, outPos;
+
+		if (hit.shape == HitBoxShape::Capsule) {
+			isHit = Collision::IntersectCapsuleVsCapsule(
+				hit.position, hit.direction, hit.height, hit.radius, 1.0f,
+				enemy->GetPosition(), enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(), enemy->GetWeight(),
+				outPosA, outPosB
+			);
 		}
-	}
+		else if (hit.shape == HitBoxShape::Sphere) {
+			isHit = Collision::IntersectSphereVsCapsule(
+				hit.position, hit.radius,
+				enemy->GetPosition(), enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(),
+				outPos
+			);
+		}
 
-	if (!isHit || !activeRange) return;
-
-	for (int i = 0; i < 2; ++i)
-	{
-		DirectX::XMFLOAT3 outPositionA, outPositionB;
-		if (Collision::IntersectCapsuleVsCapsule(
-			player.GetWeaponPosition(i),
-			player.GetWeaponDirection(i),
-			player.GetWeaponHeight(i),
-			player.GetWeaponRadius(i),
-			1.0f, // 武器の重さ(適当に設定)
-			enemy->GetPosition(),
-			enemy->GetCapsuleDirection(),
-			enemy->GetHeight(),
-			enemy->GetRadius(),
-			enemy->GetWeight(),
-			outPositionA,
-			outPositionB
-		))
-		{
+		if (isHit) {
 			// ダメージ処理
-			if (activeRange->damageRate > 0.0f)
-			{
-				AttackResult res = player.CalculateAttackResult(activeRange->damageRate, activeRange->poiseRate);
+			if (hit.damageRate > 0.0f) {
+				AttackResult res = player.CalculateAttackResult(hit.damageRate, hit.poiseRate);
 				enemy->SetLastDamage(res.damage);
-				enemy->ApplyDamage(res.damage, activeRange->invincible, res.poiseDamage);
+				enemy->ApplyDamage(res.damage, hit.invincibleTime, res.poiseDamage);
 			}
 		}
 	}
@@ -638,7 +620,7 @@ void SceneGame::CollisionEnemyWeaponVsPlayer()
 {
 	Player& player = Player::Instance();
 
-	// ★敵の現在有効な攻撃判定をすべて取得！
+	// 敵の現在有効な攻撃判定をすべて取得！
 	std::vector<Character::HitBoxInfo> enemyHits = enemy->GetActiveHitBoxes();
 
 	for (const auto& hit : enemyHits)
