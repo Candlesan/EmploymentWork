@@ -174,6 +174,9 @@ private:
 	float bButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
 	static constexpr float RUN_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
 
+	float rbButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
+	static constexpr float RB_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
+
 	// 攻撃用の条件
 	float rtButtonHoldTime = 0.0f;          // RTボタンを押し続けた時間
 	static constexpr float ATTACK_THRESHOLD = 0.25f; // 何秒以上で溜め攻撃と判定するか

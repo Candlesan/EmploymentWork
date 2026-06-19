@@ -30,7 +30,7 @@ void Player::Initialize()
 	weapon[1].model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon1/GreatSword.gltf");
 	weapon[1].scale.x = weapon[1].scale.y = weapon[1].scale.z = 0.2;
 
-	 // プレイヤーパラメーター初期化
+	// プレイヤーパラメーター初期化
 	moveSpeed = 2.0f; // 移動速度
 	maxMoveSpeed = 7.0f; // 最大移動速度
 
@@ -49,7 +49,7 @@ void Player::Initialize()
 
 	// 当たり判定パラメーター初期化(Player)
 	weight = 0.5f;
-	radius = 0.7f;
+	radius = 0.4f;
 	height = 1.6f;
 	debugOffset = 0.8;
 
@@ -290,11 +290,11 @@ void Player::Update(float elapsedTime)
 // 描画処理
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
-	renderer->Draw(ShaderId::PBR, player); 
+	renderer->Draw(ShaderId::PBR, player);
 	renderer->Draw(ShaderId::PBR, weapon[0].model); // 杖
 
 	if (weapon[1].isVisible)
-	renderer->Draw(ShaderId::PBR, weapon[1].model); // 剣
+		renderer->Draw(ShaderId::PBR, weapon[1].model); // 剣
 
 	// 魔法描画
 	magicManager.Render(rc);
@@ -348,9 +348,10 @@ void Player::DrawGUI()
 			}
 			ImGui::Text("Potion: %d", Potion);
 			ImGui::Separator();
-			if (IsGuarding){
+			if (IsGuarding) {
 				ImGui::Text(u8"ガード中");
-			}else{
+			}
+			else {
 				ImGui::Text(u8"ガードしてない");
 			}
 
@@ -394,10 +395,10 @@ void Player::DrawGUI()
 		{
 			ImGui::DragFloat3("Position##1", &weapon[0].position.x, 0.01f);
 			ImGui::DragFloat3("Angle##1", &weapon[0].angle.x, 0.01f);
-			ImGui::DragFloat3("Scale##1",    &weapon[0].scale.x, 0.01f);
+			ImGui::DragFloat3("Scale##1", &weapon[0].scale.x, 0.01f);
 
-			ImGui::DragFloat3("Weapon HitOffset##1",       &weapon[0].weaponHitOffset.x, 0.1f);
-			ImGui::DragFloat3("Weapon AngleOffset##1",     &weapon[0].weaponAngleOffset.x, 0.1f);
+			ImGui::DragFloat3("Weapon HitOffset##1", &weapon[0].weaponHitOffset.x, 0.1f);
+			ImGui::DragFloat3("Weapon AngleOffset##1", &weapon[0].weaponAngleOffset.x, 0.1f);
 			ImGui::DragFloat("Weapon Collision Radius##1", &weapon[0].weaponRadius, 0.1f);
 			ImGui::DragFloat("Weapon Collision Height##1", &weapon[0].weaponHeight, 0.1f);
 
@@ -495,7 +496,7 @@ void Player::DrawGUI()
 void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 {
 	// プレイヤーの当たり判定
-	if(!IsAvoid)
+	if (!IsAvoid)
 	{
 		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
@@ -594,7 +595,7 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection(int index) const
 void Player::MagicInput()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
-	
+
 	if (gamePad.GetButtonDown() & GamePad::BTN_X)
 	{
 		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level);
@@ -618,7 +619,7 @@ void Player::Heal(float elapsedTime)
 		HealCoolDownTimer -= elapsedTime;
 	}
 
-	if(RegeneTimer > 0.0f)
+	if (RegeneTimer > 0.0f)
 	{
 		float healStep = HealValue * elapsedTime;
 
@@ -665,7 +666,7 @@ void Player::RecoveryStamina(float elapsedTime)
 }
 
 // ロックオン対象の位置を取得
-void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos) 
+void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
 {
 	lockOnTargetPos = pos;
 }
@@ -870,23 +871,65 @@ void Player::InputMove(float elapsedTime)
 
 	// 回転処理
 
-	if (currentState == "Run")
-	{
-		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-	}
-	else if (lockOnTargetPos != nullptr)
-	{
-		float dx = lockOnTargetPos->x - position.x;
-		float dz = lockOnTargetPos->z - position.z;
-		float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
+	//if (currentState == "Run")
+	//{
+	//	Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+	//}
+	//else if (lockOnTargetPos != nullptr)
+	//{
+	//	float dx = lockOnTargetPos->x - position.x;
+	//	float dz = lockOnTargetPos->z - position.z;
+	//	float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
 
-		float diff = targetAngleY - angle.y;
-		diff = DirectX::XMScalarModAngle(diff);
-		angle.y += diff * turnSpeed * elapsedTime;
-	}
-	else
+	//	float diff = targetAngleY - angle.y;
+	//	diff = DirectX::XMScalarModAngle(diff);
+	//	angle.y += diff * turnSpeed * elapsedTime;
+	//}
+	//else
 	{
 		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+	}
+
+	// 魔法レベル切り替え
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
+	{
+		rbButtonHoldTime += elapsedTime;
+		bool rbHold = rbButtonHoldTime >= RB_THRESHOLD; // 長押し判定
+
+		if (rbHold)
+		{
+			// スティック入力値
+			float rx = gamePad.GetAxisRX();
+			float ry = gamePad.GetAxisRY();
+
+			// 0.5以上なら入力受付(デットゾーン)
+			float power = sqrt(rx * rx + ry * ry);
+			if (power > 0.5)
+			{
+				// 入力角度を決める
+				// アークタンジェントでラジアンを求める
+				float radians = atan2f(rx, ry);
+
+				// 度数法（0〜360度）に変換・補正する
+				float StickAngle = DirectX::XMConvertToDegrees(radians);
+				if (StickAngle < 0.0f) StickAngle += 360.0f;
+
+				// 補正された角度（0〜360）に合わせて3等分する
+
+				if (StickAngle >= 300.0f || StickAngle <= 60.0f)
+				{
+					level = 1; // 上
+				}
+				else if (StickAngle > 60.0f && StickAngle <= 180.0f)
+				{
+					level = 2; // 右下
+				}
+				else if (StickAngle > 180.0f && StickAngle < 300.0f)
+				{
+					level = 3; // 左下
+				}
+			}
+		}
 	}
 
 	if (jumpPressed)
@@ -974,7 +1017,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	std::string nextState = currentGraph->EvaluateTransitions(currentState, ctx);
 
 	// 親の割り込み処理
-	for (int i = (int)activeGraphStack.size() - 1; i >= 0; i--) 
+	for (int i = (int)activeGraphStack.size() - 1; i >= 0; i--)
 	{
 		int gIdx = activeGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
@@ -1339,7 +1382,7 @@ void Player::UpdateMagicSwordTrasform(float elapsedTime)
 
 		constexpr float startAngle = DirectX::XMConvertToRadians(-90.0f);
 		constexpr float endAngle = DirectX::XMConvertToRadians(90.0f);
-		float currentAngle = startAngle + (endAngle - startAngle) * t; 
+		float currentAngle = startAngle + (endAngle - startAngle) * t;
 
 		constexpr float tiltAngle = DirectX::XMConvertToRadians(30.0f);
 

@@ -3,6 +3,7 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Audio/Audio.h"
 #include "System/Effect/EffectManager.h"
+#include "System/Core/Input/Input.h"
 
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
@@ -91,8 +92,8 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-	float delta = elapsedTime * timeScale;
-	
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
@@ -102,6 +103,7 @@ void SceneGame::Update(float elapsedTime)
 
 	// プレイヤーを取得
 	Player& player = Player::Instance();
+
 
 	// GUIの操作でゲーム用とデバック用のカメラを切り替え
 	if (cameraMode == CameraMode::Game)
@@ -133,6 +135,18 @@ void SceneGame::Update(float elapsedTime)
 		debugCamera->Update();
 		debugCamera->SyncControllerToCamera(camera);
 	}
+
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
+	{
+		timeScale = 0.5f;
+	}
+	else
+	{
+		timeScale = 1.0f;
+	}
+
+	float delta = elapsedTime * timeScale;
+
 
 	if (shouldUpdate)
 	{
