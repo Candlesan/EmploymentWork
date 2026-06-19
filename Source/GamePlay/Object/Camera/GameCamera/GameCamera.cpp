@@ -24,6 +24,12 @@ void GameCamera::Update(float elapsedTime)
 
 	float ax = gamePad.GetAxisRX();
 	float ay = gamePad.GetAxisRY();
+
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
+	{
+		ax = ay = 0.0f;
+	}
+
 	// ƒJƒƒ‰‚Ì‰ñ“]‘¬“x
 	float speed = rollSpeed * elapsedTime;
 

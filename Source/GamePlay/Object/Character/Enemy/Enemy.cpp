@@ -35,7 +35,7 @@ void Enemy::Initialize()
 	weight = 100.0f;
 	radius = 1.0f;
 	height = 1.6f;
-	debugOffset = 0.8;
+	debugOffset = 1.8;
 	gravity = 0.0f;
 
 
