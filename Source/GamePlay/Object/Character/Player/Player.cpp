@@ -915,16 +915,16 @@ void Player::InputMove(float elapsedTime)
 				if (StickAngle < 0.0f) StickAngle += 360.0f;
 
 				// 補正された角度（0〜360）に合わせて3等分する
-				
-				if (StickAngle >= 300.0f || StickAngle <= 60.0f) 
+
+				if (StickAngle >= 300.0f || StickAngle <= 60.0f)
 				{
 					level = 1; // 上
 				}
-				else if (StickAngle > 60.0f && StickAngle <= 180.0f) 
+				else if (StickAngle > 60.0f && StickAngle <= 180.0f)
 				{
 					level = 2; // 右下
 				}
-				else if (StickAngle > 180.0f && StickAngle < 300.0f) 
+				else if (StickAngle > 180.0f && StickAngle < 300.0f)
 				{
 					level = 3; // 左下
 				}

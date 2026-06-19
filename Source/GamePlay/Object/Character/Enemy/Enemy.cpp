@@ -30,7 +30,7 @@ void Enemy::Initialize()
 
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
-	angle = {0, 3, 0};
+	angle = { 0, 3, 0 };
 	scale.x = scale.y = scale.z = 1.3f;
 	weight = 100.0f;
 	radius = 1.0f;
@@ -486,7 +486,7 @@ void Enemy::UpdateSounds(const std::string& state)
 			if (e.type != EventType::Sound) continue;
 
 			// 今フレームで発火したか？
-			if (animSequence.GetEvent(e.name)) 
+			if (animSequence.GetEvent(e.name))
 			{
 				AudioSource* se = GetOrLoadSound(e.soundName);
 				if (se) {
