@@ -556,9 +556,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"None",
 				"MoveSpeed",
 				"TurnSpeed",
-				"Stamina",
 				"Avoid",
-				"AnimationSpeed",
 			};
 			int actionIndex = (int)action.type;
 			if (ImGui::Combo("Action", &actionIndex, actionTypes, IM_ARRAYSIZE(actionTypes)))
@@ -568,7 +566,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			{
 			case TransitionActionType::MoveSpeed:
 			case TransitionActionType::TurnSpeed:
-			case TransitionActionType::ConsumeStamina:
 				ImGui::DragFloat("Amout", &action.value, 0.1f, 0.0f, 1000.0f);
 				break;
 
@@ -579,12 +576,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{
 					action.value = avoidFlag ? 1.0f : 0.0f;
 				}
-				break;
-			}
-
-			case TransitionActionType::SetAnimationSpeed:
-			{
-				float AnimSpeed = ImGui::DragFloat("Amout", &action.value, 0.01f, 0.0f, 10.0f);
 				break;
 			}
 			}
@@ -617,12 +608,13 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"ButtonHeld",			// ボタンを長押ししているとき
 				"MoveLengthOver",		// 入力が一定以上の時
 				"MoveLengthUnder",		// 入力が一定以下の時
+				"InputIsForward",
+				"InputIsRight",
+				"InputIsBackward",
+				"InputIsLeft",
 				"EnemyFromDistance",	// 敵との距離が一定以上の時
 				"JumpPressed",			// ジャンプ可能かどうか
-				"StaminaEmpty",			// スタミナが空かどうか
-				"HasStamina",			// スタミナを持っているか
 				"IsLockOn",				// ロックオン中かどうか
-				"CanRun",				// 走れるかどうか
 				"HavePotion",			// ポーションを持っているか
 				"HealCooldownReady",	// 回復のクールダウン中か
 				"IsGuarding",			// ガード中か

@@ -16,21 +16,16 @@ enum class TransitionConditionType
 	MoveLengthOver,		// スティックの入力値が一定以上だったら
 	MoveLengthUnder,	// スティックの入力値が一定以下だったら
 
-	EnemyFromDistance,
+	InputIsForward, // 入力方向が「前」か
+	InputIsRight,   // 入力方向が「右」か
+	InputIsBackward,// 入力方向が「後」か
+	InputIsLeft,    // 入力方向が「左」か
 
-	//BHold,				// Bボタン長押し（走り）
-	//BTap,				// Bボタン短押し（回避）
-	//RBTap,				// Bボタン短押し（バックステップ）
-
-	//RTHold,				// RT長押し（溜め攻撃）
-	//RTTap,				// RT短押し（強攻撃）
+	EnemyFromDistance,	// 敵との距離
 
 	JumpPressed,		// ジャンプ入力
-	StaminaEmpty,		// スタミナ切れ
-	HasStamina,			// スタミナあり
 
 	IsLockOn,			// ロックオン中
-	CanRun,				// 走れる状態
 	HavePotion,			// ポーションがある
 	HealCooldownReady,	// 回復のクールダウン中か
 	IsGuarding,			// ガード中
@@ -46,9 +41,16 @@ enum class TransitionActionType
 	None,
 	MoveSpeed, // 移動速度
 	TurnSpeed, // 旋回速度
-	ConsumeStamina, // スタミナ消費
 	SetIsAvoid, // 回避フラグ
-	SetAnimationSpeed, // アニメーション再生速度
+};
+
+enum class RelativeInputDir
+{
+	None,     // 入力なし
+	Forward,  // 前
+	Right,    // 右
+	Backward, // 後ろ
+	Left      // 左
 };
 
 struct TransitionAction
@@ -84,17 +86,10 @@ struct TransitionContext
 	int   buttonDown;
 	int   buttonHeld;
 	int   buttonUp;
-	//bool  bHold;
-	//bool  bTap;
-	//bool  rbTap;
-	//bool  rtHold;
-	//bool  rtTap;
 	bool  jumpPressed;
-	bool  haveStamina;
-	bool  isStaminaEmpty;
-	bool  canRunTrigger;
 	bool  isLockOn;
 	bool  havePotion;
 	bool  healCooldownReady;
 	bool  isGuarding;
+	RelativeInputDir inputDir;
 };

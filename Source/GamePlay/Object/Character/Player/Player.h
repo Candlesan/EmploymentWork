@@ -53,12 +53,6 @@ public:
 	// 回復
 	void Heal(float elapsedTime);
 
-	// スタミナ計算処理
-	void calculationStamina(float stamina);
-
-	// スタミナ回復処理
-	void RecoveryStamina(float elapsedTime);
-
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 
@@ -100,12 +94,6 @@ private:
 
 	// 遷移以外の細かい条件
 	void UpdateStateBehavior();
-
-	// 歩きのアニメションを決める関数
-	std::string DetermineWalkState();
-
-	// 回避のアニメションを決める関数
-	std::string DetermineRollState();
 
 	// 武器のアタッチメント処理
 	void WeaponAttachment();

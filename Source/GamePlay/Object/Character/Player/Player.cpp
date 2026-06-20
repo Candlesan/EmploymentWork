@@ -228,8 +228,6 @@ void Player::Update(float elapsedTime)
 
 	// 無敵時間更新
 	UpdateInvincibleTimer(elapsedTime);
-	// スタミナ回復処理
-	RecoveryStamina(elapsedTime);
 
 	if (!isTyping && !isPreviewMode)
 	{
@@ -509,7 +507,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 	// 武器の当たり判定
 	if (showWeaponHitBox)
 	{
-		// ★ 新しいGetActiveHitBoxesを使って描画する
+		// 新しいGetActiveHitBoxesを使って描画する
 		for (auto& info : GetActiveHitBoxes())
 		{
 			if (info.shape == HitBoxShape::Capsule)
@@ -630,38 +628,6 @@ void Player::Heal(float elapsedTime)
 		if (health > MaxHealth) health = MaxHealth;
 
 		if (RegeneTimer < 0.0f) RegeneTimer = 0.0f;
-	}
-}
-
-// スタミナ計算処理
-void Player::calculationStamina(float stamina)
-{
-	Stamina -= stamina;
-	if (Stamina <= 0.0f)
-	{
-		Stamina = 0.0f;
-		IsStaminaEmpty = true; // スタミナが空になったと通知する
-		runDisableTimer = 3.0f;
-	}
-	staminaCooldownTimer = 1.5f; // 1.5秒経ったらスタミナを回復させる
-}
-
-// スタミナ回復処理
-void Player::RecoveryStamina(float elapsedTime)
-{
-	if (staminaCooldownTimer > 0.0f)
-	{
-		staminaCooldownTimer -= elapsedTime;
-		if (staminaCooldownTimer < 0.0f)
-		{
-			staminaCooldownTimer = 0.0f;
-		}
-	}
-	else
-	{
-		IsStaminaEmpty = false;
-		Stamina += elapsedTime * 20.0f;
-		if (Stamina >= MaxStamina) Stamina = MaxStamina;
 	}
 }
 
@@ -871,21 +837,17 @@ void Player::InputMove(float elapsedTime)
 
 	// 回転処理
 
-	//if (currentState == "Run")
-	//{
-	//	Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-	//}
-	//else if (lockOnTargetPos != nullptr)
-	//{
-	//	float dx = lockOnTargetPos->x - position.x;
-	//	float dz = lockOnTargetPos->z - position.z;
-	//	float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
+	if (lockOnTargetPos != nullptr)
+	{
+		float dx = lockOnTargetPos->x - position.x;
+		float dz = lockOnTargetPos->z - position.z;
+		float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
 
-	//	float diff = targetAngleY - angle.y;
-	//	diff = DirectX::XMScalarModAngle(diff);
-	//	angle.y += diff * turnSpeed * elapsedTime;
-	//}
-	//else
+		float diff = targetAngleY - angle.y;
+		diff = DirectX::XMScalarModAngle(diff);
+		angle.y += diff * turnSpeed * elapsedTime;
+	}
+	else
 	{
 		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
 	}
@@ -932,6 +894,7 @@ void Player::InputMove(float elapsedTime)
 		}
 	}
 
+	// ジャンプ
 	if (jumpPressed)
 	{
 		if (jumpCount < jumpLimit)
@@ -955,31 +918,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		bufferedButton |= gamePad.GetButtonDown();
 	}
 
-	std::string moveState = DetermineWalkState(); // 歩きの遷移条件を取得
-	std::string rollState = DetermineRollState(); // 回避の遷移条件を取得
-
-	bool bHold = bButtonHoldTime >= RUN_THRESHOLD; // 長押し判定
-
-	// 短押し判定：離した瞬間 かつ 長押しじゃなかった
-	bool bTap = (gamePad.GetButtonUp() & GamePad::BTN_B)
-		&& !bHold;
-
-	bool rtHold = rtButtonHoldTime >= ATTACK_THRESHOLD; // 長押し判定
-	bool rtTap = (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
-		&& !rtHold; // 短押し判定
-
-	// Bボタンの長押し時間を計測
-	if (gamePad.GetButton() & GamePad::BTN_B)
-		bButtonHoldTime += elapsedTime;
-	else
-		bButtonHoldTime = 0.0f;
-
-	// RTトリガーの長押し時間を計測
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
-		rtButtonHoldTime += elapsedTime;
-	else
-		rtButtonHoldTime = 0.0f;
-
 	IsGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
 
 	HaveStamina = (Stamina > 0.1f);
@@ -995,16 +933,48 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.moveLength = moveLength;
 	ctx.enemyFromdistance = EnemyfromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
+	ctx.inputDir = RelativeInputDir::None;
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.jumpPressed = jumpPressed;
-	ctx.haveStamina = HaveStamina;
-	ctx.isStaminaEmpty = IsStaminaEmpty;
-	ctx.canRunTrigger = canRunTrigger;
 	ctx.isLockOn = (lockOnTargetPos != nullptr);
 	ctx.havePotion = (Potion > 0);
 	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
 	ctx.isGuarding = IsGuarding;
+
+	if (moveLength > 0.01f) // ある程度入力がある場合のみ判定
+	{
+		// キャラクターの前・右ベクトル
+		float ForwardX = sinf(angle.y), ForwardZ = cosf(angle.y);
+		float RightX = cosf(angle.y), RightZ = -sinf(angle.y);
+
+		// 入力ベクトルとの内積
+		float dotForward = moveVec.x * ForwardX + moveVec.z * ForwardZ;
+		float dotRight = moveVec.x * RightX + moveVec.z * RightZ;
+
+		// 相対角度を求める
+		float relativeAngle = atan2f(dotRight, dotForward);
+		float degree = DirectX::XMConvertToDegrees(relativeAngle);
+		if (degree < 0) degree += 360.0; // 0 ～ 360度に補正
+
+		// 角度を4等分して前後左右を判定する
+		if (degree >= 315.0f || degree < 45.0f)
+		{
+			ctx.inputDir = RelativeInputDir::Forward;
+		}
+		else if (degree >= 45.0f && degree < 135.0f) 
+		{
+			ctx.inputDir = RelativeInputDir::Right;
+		}
+		else if (degree >= 135.0f && degree < 225.0f)
+		{
+			ctx.inputDir = RelativeInputDir::Backward;
+		}
+		else if (degree >= 225.0f && degree < 315.0f)
+		{
+			ctx.inputDir = RelativeInputDir::Left;
+		}
+	}
 
 	if (activeGraphStack.empty()) return;
 
@@ -1067,13 +1037,9 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			{
 				switch (action.type)
 				{
-				case TransitionActionType::MoveSpeed:
-					moveSpeed = action.value;
-					break;
+				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-				case TransitionActionType::ConsumeStamina: calculationStamina(action.value); break;
 				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
-				case TransitionActionType::SetAnimationSpeed: SetBaseSpeed(action.value); break;
 				}
 			}
 		}
@@ -1141,9 +1107,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 							{
 							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-							case TransitionActionType::ConsumeStamina: calculationStamina(action.value); break;
 							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
-							case TransitionActionType::SetAnimationSpeed: SetBaseSpeed(action.value); break;
 							}
 						}
 					}
@@ -1184,99 +1148,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 // 遷移以外の細かい条件
 void Player::UpdateStateBehavior()
 {
-	if (currentState == "Run")
-	{
-		calculationStamina(0.1f);
-	}
-	else if (currentState == "Charge_Attack_Start")
-	{
-		calculationStamina(0.5f);
-		AnimationLerp(0.188f, 0.583f, 0.4f);
-	}
-}
-
-// 歩きのアニメーションを決める関数
-std::string Player::DetermineWalkState()
-{
-	GamePad& gamePad = Input::Instance().GetGamePad();
-	float lx = gamePad.GetAxisLX(), ly = gamePad.GetAxisLY();
-
-	DirectX::XMFLOAT3 moveVec = GetMoveVec();
-
-	//ベクトルの長さを計算
-	float power = sqrtf((moveVec.x * moveVec.x) + (moveVec.z * moveVec.z));
-
-	//入力がほぼなければIdleを返す
-	if (power < 0.01f)return "Idle";
-
-	// キャラクターの前・右ベクトルを算出
-	float charForwardX = sinf(angle.y), charForwardZ = cosf(angle.y);
-	float charRightX = cosf(angle.y), charRightZ = -sinf(angle.y);
-
-	// 内積により相対的な移動方向を判定
-	float dotForward = moveVec.x * charForwardX + moveVec.z * charForwardZ;
-	float dotRight = moveVec.x * charRightX + moveVec.z * charRightZ;
-
-	//アークタンジェントで角度を算出
-	float relativeAngle = atan2f(dotRight, dotForward);
-	float degree = DirectX::XMConvertToDegrees(relativeAngle);
-	if (degree < 0) degree += 360.0f;
-
-	//デバッグ用変数更新
-	int dirIndex = static_cast<int>((degree + 30.0f) / 60.0f) % 6;
-
-	// 移動方向テーブル (通常 / ガード中)
-	static const std::string moveAnimTable[4][6] = {
-	{ "Walk_F", "Walk_R", "Walk_BR", "Walk_B", "Walk_BL", "Walk_L" },
-	{ "Jog_F", "Jog_R", "Jog_BR", "Jog_B", "Jog_BL", "Jog_L" },
-	{ "Guard_Walk_F", "Guard_Walk_BR", "Guard_Walk_R", "Guard_Walk_B", "Guard_Walk_BL", "Guard_Walk_L" },
-	{ "Guard_Jog_F", "Guard_Jog_R", "Guard_Jog_BR", "Guard_Jog_B", "Guard_Jog_BL", "Guard_Jog_L" } };
-
-	return moveAnimTable[static_cast<int>(mode)][dirIndex];
-}
-
-// 回避のアニメーションを決める関数
-std::string Player::DetermineRollState()
-{
-	GamePad& gamePad = Input::Instance().GetGamePad();
-	float lx = gamePad.GetAxisLX(), ly = gamePad.GetAxisLY();
-
-	DirectX::XMFLOAT3 moveVec = GetMoveVec();
-
-	//ベクトルの長さを計算
-	float power = sqrtf((moveVec.x * moveVec.x) + (moveVec.z * moveVec.z));
-
-	//入力がほぼなければIdleを返す
-	if (power < 0.01f)return "Idle";
-
-	// キャラクターの前・右ベクトルを算出
-	float charForwardX = sinf(angle.y), charForwardZ = cosf(angle.y);
-	float charRightX = cosf(angle.y), charRightZ = -sinf(angle.y);
-
-	// 内積により相対的な移動方向を判定
-	float dotForward = moveVec.x * charForwardX + moveVec.z * charForwardZ;
-	float dotRight = moveVec.x * charRightX + moveVec.z * charRightZ;
-
-	//アークタンジェントで角度を算出
-	float relativeAngle = atan2f(dotRight, dotForward);
-	float degree = DirectX::XMConvertToDegrees(relativeAngle);
-	if (degree < 0) degree += 360.0f;
-
-	//デバッグ用変数更新
-	debug_degree = degree;
-	int dirIndex = static_cast<int>((degree + 36.0f) / 72.0f) % 5;
-	debug_dirIndex = dirIndex;
-
-	// 移動方向テーブル (通常 / ガード中)
-	static const std::string moveAnimTable[5] = {
-		"Roll_F",
-		"Roll_R",
-		"Roll_BR",
-		"Roll_BL",
-		"Roll_L",
-	};
-
-	return moveAnimTable[dirIndex];
 }
 
 // 武器のアタッチメント処理
