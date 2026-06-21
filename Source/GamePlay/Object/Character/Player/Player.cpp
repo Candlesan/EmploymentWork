@@ -7,10 +7,10 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicMove/StraightMagic/StraightMagic.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicMove/HommingMagic/HommingMagic.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
-#include "GamePlay/Object/Character/Player/Magic/MagicType/WindBladeMagic/WindBladeMagic.h"
+#include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMagic.h"
+#include "GamePlay/Object/Magic/MagicMove/HommingMagic/HommingMagic.h"
+#include "GamePlay/Object/Magic/MagicType/Player/WindBladeMagic/WindBladeMagic.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>

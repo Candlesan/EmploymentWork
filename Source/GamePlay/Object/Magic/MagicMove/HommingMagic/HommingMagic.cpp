@@ -1,12 +1,13 @@
 #include "HommingMagic.h"
+#include "System/Effect/EffectManager.h"
 
 
 // コンストラクタ
-HommingMagic::HommingMagic(MagicManager* manager)
+HommingMagic::HommingMagic(MagicManager* manager, const std::string& effectPath)
 	:MagicBase(manager)
 {
 	// エフェクト初期化
-	testEffect = std::make_unique<Effect>("Data/Effect/Enemy_Bullet.efk");
+	testEffect = EffectManager::Instance().GetOrLoadEffect(effectPath);
 	handle = -1;
 
 	OnEffect = true;

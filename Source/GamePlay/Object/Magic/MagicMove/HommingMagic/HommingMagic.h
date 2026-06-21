@@ -1,12 +1,12 @@
 #pragma once
-#include "GamePlay/Object/Character/Player/Magic/MagicBase.h"
+#include "GamePlay/Object/Magic/MagicBase.h"
 #include "System/Effect/Effect.h"
 
 
 class HommingMagic : public MagicBase
 {
 public:
-	HommingMagic(MagicManager* manager);
+	HommingMagic(MagicManager* manager, const std::string& effectPath);
 	~HommingMagic() override;
 
 	//更新処理
@@ -44,7 +44,7 @@ private:
 	bool isHoming = true;
 
 	// エフェクト
-	std::unique_ptr<Effect> testEffect;
+	Effect* testEffect = nullptr;
 	int handle = -1;
 	bool OnEffect = true;
 };

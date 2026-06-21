@@ -1,6 +1,6 @@
 #pragma once
-#include "GamePlay/Object/Character/Player/Magic/MagicBase.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicManager.h"
+#include "GamePlay/Object/Magic/MagicBase.h"
+#include "GamePlay/Object/Magic/MagicManager.h"
 
 #include "System/Effect/Effect.h"
 
@@ -8,7 +8,7 @@
 class StraightMagic : public MagicBase
 {
 public:
-	StraightMagic(MagicManager* manager);
+	StraightMagic(MagicManager* manager, const std::string& effectPath);
 	~StraightMagic() override;
 
 	//更新処理
@@ -39,7 +39,7 @@ private:
 	bool isAlive = false; // まだ存在しているか
 
 	// エフェクト
-	std::unique_ptr<Effect> testEffect;
+	Effect* testEffect = nullptr;
 	int handle = -1;
 	bool OnEffect = true;
 };

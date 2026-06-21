@@ -1,6 +1,6 @@
 #include "WindBladeMagic.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicMove/StraightMagic/StraightMagic.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicMove/HommingMagic/HommingMagic.h"
+#include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMagic.h"
+#include "GamePlay/Object/Magic/MagicMove/HommingMagic/HommingMagic.h"
 
 
 // ‹…‚ğ¶¬‚·‚éŠÖ”
@@ -21,7 +21,7 @@ void WindBladeMagic::Emit(MagicManager* manager, DirectX::XMFLOAT3 playerPos, fl
 		pos.z = playerPos.z;
 
 		// ”­Ë
-		StraightMagic* magic = new StraightMagic(manager);
+		StraightMagic* magic = new StraightMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk");
 		magic->Launch(dir, pos);
 	}
 	else if (level == 2)
@@ -55,7 +55,7 @@ void WindBladeMagic::Emit(MagicManager* manager, DirectX::XMFLOAT3 playerPos, fl
 			pos.z = playerPos.z + rotatedZ;
 
 			// ¶¬‚µ‚Ä”­Ë
-			StraightMagic* magic = new StraightMagic(manager);
+			StraightMagic* magic = new StraightMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk");
 			magic->Launch(dir, pos);
 		}
 	}
@@ -100,7 +100,7 @@ void WindBladeMagic::Emit(MagicManager* manager, DirectX::XMFLOAT3 playerPos, fl
 			dir.z = cosf(currentAngle);
 
 			// ¶¬‚µ‚Ä”­ËI
-			HommingMagic* magic = new HommingMagic(manager);
+			HommingMagic* magic = new HommingMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk");
 			magic->Launch(dir, pos, target);
 
 			// Œ‚‚¿I‚í‚Á‚½‚ç +15“x ‘«‚·

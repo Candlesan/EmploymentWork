@@ -1,5 +1,5 @@
-#include "GamePlay/Object/Character/Player/Magic/MagicBase.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicManager.h"
+#include "GamePlay/Object/Magic/MagicBase.h"
+#include "GamePlay/Object/Magic/MagicManager.h"
 
 // コンストラクタ
 MagicBase::MagicBase(MagicManager* manager)

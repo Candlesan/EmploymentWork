@@ -1,5 +1,5 @@
 #pragma once
-#include "GamePlay/Object/Character/Player/Magic/MagicManager.h"
+#include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
 class WindBladeMagic

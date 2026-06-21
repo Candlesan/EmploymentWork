@@ -1,5 +1,25 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Effect/EffectManager.h"
+#include "System/Effect/Effect.h"
+
+	
+// コンストラクタ
+EffectManager::EffectManager()
+{
+}
+
+// デストラクタ
+EffectManager::~EffectManager()
+{
+	// 中身は空っぽでOK（unique_ptr が勝手に中身を解放してくれるため）
+}
+
+// 唯一のインスタンス
+EffectManager& EffectManager::Instance()
+{
+	static EffectManager instance;
+	return instance;
+}
 
 //初期化
 void EffectManager::Initialize()
@@ -58,4 +78,24 @@ void EffectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLO
 
 	//Effekseer描画終了
 	effekseerRenderer->EndRendering();
+}
+
+Effect* EffectManager::GetOrLoadEffect(const std::string& fileName)
+{
+	// なかったらnullを返す
+	if (fileName.empty()) return nullptr;
+
+	// 既に読み込まれているかを確認する
+	auto it = effectCache.find(fileName);
+	if (it != effectCache.end())
+	{
+		// 見つかったらそれを使いまわす
+		return it->second.get();
+	}
+
+	// 見つからなかった場合は新しく読み込んで登録する
+	effectCache[fileName] = std::make_unique<Effect>(fileName.c_str());
+
+	// 登録したものを返す
+	return effectCache[fileName].get();
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "GamePlay/Object/Character/Player/Magic/MagicBase.h"
+#include "GamePlay/Object/Magic/MagicBase.h"
 #include <vector>
 #include <set>
 

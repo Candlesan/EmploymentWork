@@ -1,11 +1,12 @@
 #include "StraightMagic.h"
+#include "System/Effect/EffectManager.h"
 
 // コンストラクタ
-StraightMagic::StraightMagic(MagicManager* manager)
+StraightMagic::StraightMagic(MagicManager* manager, const std::string& effectPath)
 	: MagicBase(manager) // 基底クラスのコンストラクタを呼び出す
 {
 	// エフェクト初期化
-	testEffect = std::make_unique<Effect>("Data/Effect/Enemy_Bullet.efk");
+	testEffect = EffectManager::Instance().GetOrLoadEffect(effectPath);
 	handle = -1;
 
 	OnEffect = true;
@@ -30,7 +31,7 @@ void StraightMagic::Update(float elapsedTime)
 
 	if (OnEffect)
 	{
-		handle = testEffect->Play(position, 0.2f);
+		//handle = testEffect->Play(position, 0.2f);
 		OnEffect = false;
 	}
 

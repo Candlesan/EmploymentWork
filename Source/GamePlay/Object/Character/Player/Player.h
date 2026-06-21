@@ -11,7 +11,7 @@
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Trail/Trail.h"
-#include "GamePlay/Object/Character/Player/Magic/MagicManager.h"
+#include "GamePlay/Object/Magic/MagicManager.h"
 
 // ‘O•ûéŒ¾
 #include <memory>
