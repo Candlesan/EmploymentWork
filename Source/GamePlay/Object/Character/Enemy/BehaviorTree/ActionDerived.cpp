@@ -14,7 +14,7 @@ ActionBase::State IdleAction::Run(float elapsedTime)
     switch (step)
     {
     case 0:
-        owner->SetRunTimer(Mathf::RandomRange(3.0f, 5.0f));
+        owner->SetRunTimer(Mathf::RandomRange(1.0f, 1.5f));
 
         // 待機アニメーションを再生
         owner->ChangeAnimationState(animName);
@@ -58,7 +58,7 @@ ActionBase::State AttackAction::Run(float elapsedTime)
     if (owner->IsAnimationFinished())
     {
         // クールダウンを設定する
-        owner->SetAttackCoolTimer(1.0f);
+        owner->SetAttackCoolTimer(0.5f);
 
         return ActionBase::State::Complete;
     }
@@ -125,7 +125,7 @@ ActionBase::State BloodSpearAction::Run(float elapsedTime)
     if (owner->IsAnimationFinished())
     {
         isAttacking = false;
-        owner->SetAttackCoolTimer(Mathf::RandomRange(1.0f, 3.0f));
+        owner->SetAttackCoolTimer(Mathf::RandomRange(1.0f, 1.2));
         return ActionBase::State::Complete;
     }
 

@@ -136,7 +136,7 @@
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "useRootMotion": false,
-                "useRootMotionEx": false
+                "useRootMotionEx": true
             },
             "name": "BloodSpear",
             "parentName": "Root",

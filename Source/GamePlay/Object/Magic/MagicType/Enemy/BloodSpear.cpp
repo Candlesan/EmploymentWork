@@ -163,7 +163,7 @@ void BloodSpearMagic::Launch(const DirectX::XMFLOAT3& position, float waitTime)
 	waitTimer = waitTime;
 
 	if (magicCircle != nullptr) {
-		magicCircleHandle = magicCircle->Play(this->position, 1.0f); // 1.0fはサイズ
+		magicCircleHandle = magicCircle->Play(this->position, 3.0f); // 1.0fはサイズ
 		magicCircle->SetAngle(magicCircleHandle, direction);
 	}
 }
