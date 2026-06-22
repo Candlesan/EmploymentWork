@@ -193,6 +193,18 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Enemy">
       <UniqueIdentifier>{64981090-fa45-4298-992c-4f015d289f71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Renderer\Shader\bloom">
+      <UniqueIdentifier>{9e774987-599a-48c4-90ba-91cdecf9bb40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\Shader\fullscreen_quad">
+      <UniqueIdentifier>{44ce5239-6417-4465-af87-1c002a2f14e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\Shader\FrameBuffer">
+      <UniqueIdentifier>{20218fa6-db37-4ee1-9049-284dbf8668e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Bloom">
+      <UniqueIdentifier>{f3542b1e-f6b8-46ee-a6d8-224807238f83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -456,6 +468,15 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.h">
+      <Filter>Source\System\Renderer\Shader\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.h">
+      <Filter>Source\System\Renderer\Shader\fullscreen_quad</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\bloom\bloom.h">
+      <Filter>Source\System\Renderer\Shader\bloom</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -680,6 +701,15 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.cpp">
+      <Filter>Source\System\Renderer\Shader\FrameBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.cpp">
+      <Filter>Source\System\Renderer\Shader\fullscreen_quad</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\bloom\bloom.cpp">
+      <Filter>Source\System\Renderer\Shader\bloom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -724,6 +754,12 @@
     </None>
     <None Include="Shader\Particle\compute_particle.hlsli">
       <Filter>Shader\Particle</Filter>
+    </None>
+    <None Include="Shader\Bloom\bloom.hlsli">
+      <Filter>Shader\Bloom</Filter>
+    </None>
+    <None Include="Shader\Common\fullscreen_quad.hlsli">
+      <Filter>Shader\Common</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -810,6 +846,30 @@
     </FxCompile>
     <FxCompile Include="Shader\Particle\compute_particle_update_cs.hlsl">
       <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\final_pass_ps.hlsl">
+      <Filter>Shader\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_downsampling_ps.hlsl">
+      <Filter>Shader\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_horizontal_ps.hlsl">
+      <Filter>Shader\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_upsampling_ps.hlsl">
+      <Filter>Shader\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_vertical_ps.hlsl">
+      <Filter>Shader\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\glow_extraction_ps.hlsl">
+      <Filter>Shader\Bloom</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Common\fullscreen_quad_ps.hlsl">
+      <Filter>Shader\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Common\fullscreen_quad_vs.hlsl">
+      <Filter>Shader\Common</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

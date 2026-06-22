@@ -9,7 +9,10 @@
 #include "Gameplay/Object/Stage/Stage.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
+#include "System/Renderer/Shader/FrameBuffer/FrameBuffer.h"
+#include "System/Renderer/Shader/fullscreen_quad/fullscreen_quad.h"
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
+#include "System/Renderer/Shader/bloom/bloom.h"
 
 
 // ゲームシーン
@@ -74,6 +77,11 @@ private:
 
 	float debugOffset = 0.5;
 
+	// デバック機能
+	bool isPaused = false;      // 一時停止中か
+	bool stepNextFrame = false; // 1フレームだけ進めるか
+	float timeScale = 1.0f; // 1.0が通常、0.1が10倍スロー
+
 	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 
 	// PBR調整用
@@ -85,10 +93,13 @@ private:
 	float shadowBias = 0.002f;
 	DirectX::XMFLOAT4X4 lightViewProjection;
 
-	// デバック機能
-	bool isPaused = false;      // 一時停止中か
-	bool stepNextFrame = false; // 1フレームだけ進めるか
-	float timeScale = 1.0f; // 1.0が通常、0.1が10倍スロー
+	// ブルーム調整用
+	std::unique_ptr<bloom> bloomer;
+	std::unique_ptr<framebuffer> framebuffers[8];
+	std::unique_ptr<fullscreen_quad> bit_block_transfer;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
+	float bloom_extraction = 1.0f;
+	float bloom_intensity = 0.29f;
 
 	// パーティクル
 	std::unique_ptr<Compute_Particle> particleManager;

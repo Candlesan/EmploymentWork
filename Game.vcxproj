@@ -183,6 +183,9 @@
     <ClInclude Include="Source\System\Renderer\ModelRenderer.h" />
     <ClInclude Include="Source\System\Renderer\PrimitiveRenderer.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Basic\BasicShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\bloom\bloom.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
@@ -261,6 +264,9 @@
     <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\bloom\bloom.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\PBR\PBRShader.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp" />
@@ -280,6 +286,8 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Shader\Basic\Basic.hlsli" />
+    <None Include="Shader\Bloom\bloom.hlsli" />
+    <None Include="Shader\Common\fullscreen_quad.hlsli" />
     <None Include="Shader\Common\physical_based_rendering_functions.hlsli" />
     <None Include="Shader\Common\Scene.hlsli" />
     <None Include="Shader\Common\shading_functions.hlsli" />
@@ -300,6 +308,38 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\Basic\BasicVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\final_pass_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_downsampling_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_horizontal_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_upsampling_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\gaussian_blur_vertical_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Bloom\glow_extraction_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Common\fullscreen_quad_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\Common\fullscreen_quad_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

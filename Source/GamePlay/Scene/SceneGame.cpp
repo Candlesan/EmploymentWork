@@ -72,6 +72,16 @@ void SceneGame::Initialize()
 
 	lightManager.SetDirectionalLight(light);
 
+	// フレームバッファ
+	framebuffers[0] = std::make_unique<framebuffer>(device, screenWidth, screenHeight, true);
+	bit_block_transfer = std::make_unique<fullscreen_quad>(device);
+
+	// ブルーム関連
+	bloomer = std::make_unique<bloom>(device, screenWidth, screenHeight);
+	GpuResourceUtils::LoadPixelShader(device, "Data/Shader/final_pass_ps.cso", pixel_shaders[0].ReleaseAndGetAddressOf());
+	bloomer->bloom_intensity = bloom_intensity;
+	bloomer->bloom_extraction_threshold = bloom_extraction;
+
 	// シャドウマップのパラメータ設定
 	shadowAttenuation = 0.125f;
 	shadowBias = 0.002f;
@@ -304,8 +314,25 @@ void SceneGame::Render()
 		// エネミー描画
 		enemy->Render(rc, modelRenderer);
 
+		framebuffers[0]->clear(dc);
+		framebuffers[0]->activate(dc);
+
 		// 全モデル描画
 		modelRenderer->Render(rc);
+
+		framebuffers[0]->deactivate(dc);
+
+		// ブルーム描画
+		bloomer->make(dc, framebuffers[0]->shader_resource_views[0].Get(), renderState);
+
+		ID3D11ShaderResourceView* shader_resource_views[] =
+		{
+			framebuffers[0]->shader_resource_views[0].Get(),
+			bloomer->shader_resource_view(),
+		};
+
+		bloomer->set_constant_buffer(dc);
+		bit_block_transfer->blit(dc, shader_resource_views, 0, 2, pixel_shaders[0].Get());
 
 		// エフェクト描画 
 		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
@@ -558,6 +585,31 @@ void SceneGame::DrawGUI()
 
 			ImGui::Text("texture");
 			ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+		}
+
+		if (ImGui::CollapsingHeader("Bloom", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat("bloom_extraction_threshold", &bloom_extraction, 0.01f, +0.0f, +5.0f);
+			ImGui::DragFloat("bloom_intensity", &bloom_intensity, 0.01f, +0.0f, +5.0f);
+			ImGui::DragFloat("exposure", &bloomer->exposure, 0.01f, 0.0f, 1.0f);
+
+			bloomer->bloom_extraction_threshold = bloom_extraction;
+			bloomer->bloom_intensity = bloom_intensity;
+
+			ImGui::Separator();
+
+			// グロー抽出
+			ImGui::Text("Glow Extraction");
+			ImGui::Image((ImTextureID)bloomer->get_glkow_extraction(), ImVec2(256, 256));
+
+			// ガウシアンブラー各段階
+			for (size_t i = 0; i < bloom::downsampled_count; ++i)
+			{
+				ImGui::Text("Gaussian Blur [%zu][0]", i);
+				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 0), ImVec2(256, 256));
+				ImGui::Text("Gaussian Blur [%zu][1]", i);
+				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
+			}
 		}
 	}
 	ImGui::End();
