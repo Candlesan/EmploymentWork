@@ -3,14 +3,19 @@
 
 
 // コンストラクタ
-HommingMagic::HommingMagic(MagicManager* manager, const std::string& effectPath)
+HommingMagic::HommingMagic(MagicManager* manager, const std::string& effectPath, const std::string& magicCirclePath)
 	:MagicBase(manager)
 {
-	// エフェクト初期化
-	testEffect = EffectManager::Instance().GetOrLoadEffect(effectPath);
-	handle = -1;
+	// 魔法のエフェクト初期化
+	Magic = EffectManager::Instance().GetOrLoadEffect(effectPath);
+	magicHandle = -1;
 
-	OnEffect = true;
+	// 魔法陣のエフェクト初期化
+	if (!magicCirclePath.empty())
+	{
+		Circle = EffectManager::Instance().GetOrLoadEffect(magicCirclePath);
+		circleHandle = -1;
+	}
 }
 
 // デストラクタ
@@ -24,97 +29,108 @@ void HommingMagic::Update(float elapsedTime)
 {
 	if (isAlive) return;
 
-	// 寿命処理
-	lifeTimer -= elapsedTime;
-	if (lifeTimer < 0.0f)
+	switch (state)
 	{
-		// 寿命が尽きたので、消滅処理を呼び出す
-		OnTerminate();
-
-		isHoming = true;
-		return;
-	}
-
-	// ターゲットとの距離を計算
-	float dx = target.x - position.x;
-	float dy = target.y - position.y;
-	float dz = target.z - position.z;
-	float dist = sqrtf(dx * dx + dy * dy + dz * dz);
-
-	//旋回
-	if (isHoming && dist < 1.0f)
-	{
-		isHoming = false;
-	}
-
-	if(isHoming)
-	{
-		float turnSpeed = this->turnSpeed * elapsedTime;
-
-		//ターゲットまでのベクトルを算出
-		DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&position);
-		DirectX::XMVECTOR Target = DirectX::XMLoadFloat3(&target);
-		DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Target, Position);
-
-		//ゼロベクトルでないなら回転処理
-		DirectX::XMVECTOR LengthSq = DirectX::XMVector3Length(Vec);
-		float lengthSq;
-		DirectX::XMStoreFloat(&lengthSq, LengthSq);
-		if (lengthSq > 0.001f)
+	case HommingMagicState::Wait:
+		waitTimer -= elapsedTime;
+		if (waitTimer <= 0.0f)
 		{
-			//ターゲットまでのベクトルを単位ベクトル化
-			Vec = DirectX::XMVector3Normalize(Vec);
-
-			//向いている方向ベクトルを算出
-			DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
-
-			//前方方向ベクトルとターゲットまでのベクトルの内積(内積)を算出
-			DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(Direction, Vec);
-
-			float dot;
-			DirectX::XMStoreFloat(&dot, Dot);
-
-			//2つの単位ベクトルの角度が小さいほど
-			//1.0fに近づくという性質を利用して回転速度を調整する
-			float rot = 1.0 - dot; //補正値
-			if (rot > turnSpeed) rot = turnSpeed;
-
-			//回転速度があるなら回転処理をする
-			if (fabsf(rot) > 0.0001f)
+			if (Magic != nullptr)
 			{
-				//回転軸を算出
-				DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(Direction, Vec);
-				Axis = DirectX::XMVector3Normalize(Axis);
-
-				//回転軸と回転量から回転行列を算出
-				DirectX::XMMATRIX Rotation = DirectX::XMMatrixRotationAxis(Axis, rot);
-
-				//現在の行列を回転させる
-				DirectX::XMMATRIX Transform = DirectX::XMLoadFloat4x4(&transform);
-				Transform = DirectX::XMMatrixMultiply(Transform, Rotation);
-
-				//回転後の前方方向を取り出し、単位ベクトル化する
-				Direction = DirectX::XMVector3Normalize(Transform.r[2]);
-				DirectX::XMStoreFloat3(&direction, Direction);
+				magicHandle = Magic->Play(position, 0.2f);
+				state = HommingMagicState::Fire;
 			}
-
 		}
+		break;
+	case HommingMagicState::Fire:
+
+		// ターゲットとの距離を計算
+		float dx = target.x - position.x;
+		float dy = target.y - position.y;
+		float dz = target.z - position.z;
+		float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+
+		//旋回
+		if (isHoming && dist < 1.0f)
+		{
+			isHoming = false;
+		}
+
+		if (isHoming)
+		{
+			float turnSpeed = this->turnSpeed * elapsedTime;
+
+			//ターゲットまでのベクトルを算出
+			DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&position);
+			DirectX::XMVECTOR Target = DirectX::XMLoadFloat3(&target);
+			DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Target, Position);
+
+			//ゼロベクトルでないなら回転処理
+			DirectX::XMVECTOR LengthSq = DirectX::XMVector3Length(Vec);
+			float lengthSq;
+			DirectX::XMStoreFloat(&lengthSq, LengthSq);
+			if (lengthSq > 0.001f)
+			{
+				//ターゲットまでのベクトルを単位ベクトル化
+				Vec = DirectX::XMVector3Normalize(Vec);
+
+				//向いている方向ベクトルを算出
+				DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
+
+				//前方方向ベクトルとターゲットまでのベクトルの内積(内積)を算出
+				DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(Direction, Vec);
+
+				float dot;
+				DirectX::XMStoreFloat(&dot, Dot);
+
+				//2つの単位ベクトルの角度が小さいほど
+				//1.0fに近づくという性質を利用して回転速度を調整する
+				float rot = 1.0 - dot; //補正値
+				if (rot > turnSpeed) rot = turnSpeed;
+
+				//回転速度があるなら回転処理をする
+				if (fabsf(rot) > 0.0001f)
+				{
+					//回転軸を算出
+					DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(Direction, Vec);
+					Axis = DirectX::XMVector3Normalize(Axis);
+
+					//回転軸と回転量から回転行列を算出
+					DirectX::XMMATRIX Rotation = DirectX::XMMatrixRotationAxis(Axis, rot);
+
+					//現在の行列を回転させる
+					DirectX::XMMATRIX Transform = DirectX::XMLoadFloat4x4(&transform);
+					Transform = DirectX::XMMatrixMultiply(Transform, Rotation);
+
+					//回転後の前方方向を取り出し、単位ベクトル化する
+					Direction = DirectX::XMVector3Normalize(Transform.r[2]);
+					DirectX::XMStoreFloat3(&direction, Direction);
+				}
+
+			}
+		}
+
+		// 移動
+		float speed = this->moveSpeed * elapsedTime;
+		position.x += direction.x * speed;
+		position.y += direction.y * speed;
+		position.z += direction.z * speed;
+
+
+		Magic->SetPosition(magicHandle, position);
+
+		// 寿命処理
+		lifeTimer -= elapsedTime;
+		if (lifeTimer < 0.0f)
+		{
+			// 寿命が尽きたので、消滅処理を呼び出す
+			OnTerminate();		
+			isHoming = true;
+			return;
+		}
+
+		break;
 	}
-
-
-	// 移動
-	float speed = this->moveSpeed * elapsedTime;
-	position.x += direction.x * speed;
-	position.y += direction.y * speed;
-	position.z += direction.z * speed;
-
-	if (OnEffect)
-	{
-		handle = testEffect->Play(position, 0.5);
-		OnEffect = false;
-	}
-
-	testEffect->SetPosition(handle, position);
 
 	//オブジェクト行列を更新
 	UpdateTransform();
@@ -133,11 +149,17 @@ void HommingMagic::RenderDebugPrimitive(ShapeRenderer* renderer)
 }
 
 // 発射
-void HommingMagic::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& target)
+void HommingMagic::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& target, float waitTime)
 {
 	this->direction = direction;
 	this->position = position;
 	this->target = target;
+	this->waitTimer = waitTime;
+	this->state = HommingMagicState::Wait;
+
+	if (Circle != nullptr) {
+		circleHandle = Circle->Play(this->position, 1.0f); // 1.0fはサイズ
+	}
 
 	UpdateTransform();
 }
@@ -146,10 +168,17 @@ void HommingMagic::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMF
 void HommingMagic::OnTerminate()
 {
 	isAlive = true;
-	if (handle != -1)
+
+	if (magicHandle != -1)
 	{
-		testEffect->Stop(handle);
-		handle = -1;
+		Magic->Stop(magicHandle);
+		magicHandle = -1;
+	}
+
+	if (circleHandle != -1)
+	{
+		Circle->Stop(circleHandle);
+		circleHandle = -1;
 	}
 
 	// 自分を削除

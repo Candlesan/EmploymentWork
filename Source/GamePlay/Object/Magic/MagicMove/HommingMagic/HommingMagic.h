@@ -2,11 +2,16 @@
 #include "GamePlay/Object/Magic/MagicBase.h"
 #include "System/Effect/Effect.h"
 
+enum class HommingMagicState
+{
+	Wait,
+	Fire
+};
 
 class HommingMagic : public MagicBase
 {
 public:
-	HommingMagic(MagicManager* manager, const std::string& effectPath);
+	HommingMagic(MagicManager* manager, const std::string& effectPath, const std::string& magicCirclePath = "");
 	~HommingMagic() override;
 
 	//更新処理
@@ -21,19 +26,18 @@ public:
 	//発射
 	void Launch(const DirectX::XMFLOAT3& direction,
 				const DirectX::XMFLOAT3& position,
-				const DirectX::XMFLOAT3& target);
+				const DirectX::XMFLOAT3& target,
+				float waitTime);
 
 	//消滅するときのリセット処理
 	void OnTerminate() override;
 
 
-	float GetDamage() const override { return damage; }
 private:
-
-	float damage = 2.0f; // ダメージ量
+	HommingMagicState state = HommingMagicState::Wait;
+	float waitTimer = 0.0f; // 発射までの時間
 	float power = 10; // 出力
 	float radius = 0.5; // 大きさ
-	float Magic_Consumption = 1; // 魔力消費量
 
 	DirectX::XMFLOAT3 target = { 0, 0, 0 };
 	float    moveSpeed = 10.0f;
@@ -44,8 +48,9 @@ private:
 	bool isHoming = true;
 
 	// エフェクト
-	Effect* testEffect = nullptr;
-	int handle = -1;
-	bool OnEffect = true;
+	Effect* Magic = nullptr;
+	Effect* Circle = nullptr;
+	int magicHandle = -1;
+	int circleHandle = -1;
 };
 

@@ -1,6 +1,7 @@
 #include "WindBladeMagic.h"
 #include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMagic.h"
 #include "GamePlay/Object/Magic/MagicMove/HommingMagic/HommingMagic.h"
+#include "System/Core/Mathf.h"
 
 
 // 球を生成する関数
@@ -21,8 +22,9 @@ void WindBladeMagic::Emit(MagicManager* manager, DirectX::XMFLOAT3 playerPos, fl
 		pos.z = playerPos.z;
 
 		// 発射
-		StraightMagic* magic = new StraightMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk");
-		magic->Launch(dir, pos);
+		StraightMagic* magic = new StraightMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk", "Data/Effect/magic_circle/magic_circle_wind.efk");
+		magic->SetDamage(100);
+		magic->Launch(dir, pos, 0.5);
 	}
 	else if (level == 2)
 	{
@@ -55,16 +57,17 @@ void WindBladeMagic::Emit(MagicManager* manager, DirectX::XMFLOAT3 playerPos, fl
 			pos.z = playerPos.z + rotatedZ;
 
 			// 生成して発射
-			StraightMagic* magic = new StraightMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk");
-			magic->Launch(dir, pos);
+			StraightMagic* magic = new StraightMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk", "Data/Effect/magic_circle/magic_circle_wind.efk");
+			magic->SetDamage(80);
+			magic->Launch(dir, pos, 1.5);
 		}
 	}
 	else if (level == 3)
 	{
 		DirectX::XMFLOAT3 pos;
-		pos.x = playerPos.x;
+		pos.x = playerPos.x + sinf(playerAngleY) * 2.0f;
 		pos.y = playerPos.y + 1.0f;
-		pos.z = playerPos.z;
+		pos.z = playerPos.z + 1.0f;
 
 		//  ターゲット（一番近い敵）を探す処理
 		DirectX::XMFLOAT3 target;
@@ -85,26 +88,27 @@ void WindBladeMagic::Emit(MagicManager* manager, DirectX::XMFLOAT3 playerPos, fl
 			target.y += enemy->GetHeight() * 0.5f;
 		}
 
-		// 5発撃つための角度の準備
-		// 足していく間隔は 15度
-		float angleStep = DirectX::XMConvertToRadians(15.0f);
-		// スタートは同じく -30度
-		float currentAngle = playerAngleY - DirectX::XMConvertToRadians(30.0f);
-
 		// 5回ループさせる
 		for (int i = 0; i < 5; ++i)
 		{
+			DirectX::XMFLOAT3 spawnPos = pos;
+			spawnPos.x += Mathf::RandomRange(-2.0f, 2.0f);
+			spawnPos.y += Mathf::RandomRange(-0.5f, 1.5f);
+			spawnPos.z += 0.0;
+
+			DirectX::XMVECTOR pVec = DirectX::XMLoadFloat3(&spawnPos);
+			DirectX::XMVECTOR tVec = DirectX::XMLoadFloat3(&target);
+			DirectX::XMVECTOR dirVec = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(tVec, pVec));
+
 			DirectX::XMFLOAT3 dir;
-			dir.x = sinf(currentAngle);
-			dir.y = 0.0f;
-			dir.z = cosf(currentAngle);
+			DirectX::XMStoreFloat3(&dir, dirVec);
+
+			float waitTime = 0.5f + (i * 0.2f);
 
 			// 生成して発射！
-			HommingMagic* magic = new HommingMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk");
-			magic->Launch(dir, pos, target);
-
-			// 撃ち終わったら +15度 足す
-			currentAngle += angleStep;
+			HommingMagic* magic = new HommingMagic(manager, "Data/Effect/Enemy_Bullet/Enemy_Bullet.efk", "Data/Effect/magic_circle/magic_circle_wind.efk");
+			magic->SetDamage(50);
+			magic->Launch(dir, spawnPos, target, waitTime);
 		}
 	}
 }

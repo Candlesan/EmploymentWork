@@ -42,6 +42,7 @@ public:
 
 	// ダメージ取得
 	virtual float GetDamage() const { return damage; }
+	void SetDamage(float d) { damage = d; }
 protected:
 	// 行列更新処理 
 	void UpdateTransform();

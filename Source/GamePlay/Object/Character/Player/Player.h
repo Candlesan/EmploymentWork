@@ -231,6 +231,7 @@ private:
 	// –‚–@ŠÖŒW
 	MagicManager magicManager;
 	int level = 1;
+	float magicCoolDownTimer = 0.0f;
 
 	// æs“ü—Í
 	int bufferedButton = 0;

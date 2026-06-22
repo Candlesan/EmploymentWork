@@ -203,6 +203,11 @@ void Player::Update(float elapsedTime)
 		}
 	}
 
+	if (magicCoolDownTimer > 0.0f)
+	{
+		magicCoolDownTimer -= elapsedTime;
+	}
+
 	pushLT = gamePad.GetTriggerL();
 
 
@@ -214,16 +219,17 @@ void Player::Update(float elapsedTime)
 
 	if (gamePad.GetButtonDown() & GamePad::BTN_X || gamePad.GetButtonDown() & GamePad::BTN_Y)
 	{
-		if (currentState != "State_Attack")
-		{
-			lockedEnemyDistance = EnemyfromDistance;
-		}
+		MagicInput();
+		//if (currentState != "State_Attack")
+		//{
+		//	lockedEnemyDistance = EnemyfromDistance;
+		//}
 
-		// 敵との距離が12.0f以上だったら魔法を撃つ
-		if (lockedEnemyDistance > 12.0f)
-		{
-			MagicInput();
-		}
+		//// 敵との距離が12.0f以上だったら魔法を撃つ
+		//if (lockedEnemyDistance > 12.0f)
+		//{
+		//	MagicInput();
+		//}
 	}
 
 	// 無敵時間更新
@@ -306,6 +312,7 @@ void Player::DrawGUI()
 		// パラメーター
 		if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			ImGui::Text("MagicCoolDown:%f", magicCoolDownTimer);
 			if (ImGui::Button(u8"HP前回"))
 			{
 				health = MaxHealth;
@@ -596,7 +603,22 @@ void Player::MagicInput()
 
 	if (gamePad.GetButtonDown() & GamePad::BTN_X)
 	{
+		if (magicCoolDownTimer > 0.0f) return;
+
 		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level);
+
+		if (level == 3)
+		{
+			magicCoolDownTimer = 1.0f;
+		}
+		else if (level == 2)
+		{
+			magicCoolDownTimer = 0.75f;
+		}
+		else
+		{
+			magicCoolDownTimer = 0.2f;
+		}
 	}
 }
 
