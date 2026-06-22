@@ -98,18 +98,13 @@ void BloodSpearAction::OnEnter()
     for (int i = 0; i < 4; ++i)
     {
         DirectX::XMFLOAT3 spawnPos = bossPos;
-        if (i / 2 == 0)
-        {
-            spawnPos.x = bossPos.x +  10; // 右側
-            spawnPos.y = bossPos.y + (Mathf::RandomRange(1.0f, 3.0f));
-            spawnPos.z = bossPos.z; // 前方向には動かさない
-        }
-        else
-        {
-            spawnPos.x = bossPos.x - 10; // 左側
-            spawnPos.y = bossPos.y + (Mathf::RandomRange(1.0f, 3.0f));
-            spawnPos.z = bossPos.z; // 前方向には動かさない
-        }
+        // 偶数(0, 2)は右、奇数(1, 3)は左に 10 離す
+        spawnPos.x += (i % 2 == 0) ? 10.0f : -10.0f;
+
+        spawnPos.z += 0;
+
+        // 高さを i に合わせて少しずつ高くする（確実に重ならないようにする）
+        spawnPos.y = bossPos.y + 2.0f + (i * 1.0f);
 
         // 生成時間をずらす
         float waitTime = 1.0f + (i * Mathf::RandomRange(0.1f, 0.5f));

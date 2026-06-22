@@ -109,6 +109,9 @@ void Enemy::Update(float elapsedTime)
 		}
 	}
 
+	// 魔法の更新処理
+	magicManager.Update(elapsedTime);
+
 	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
 
 	// ステータス更新
@@ -317,6 +320,9 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 			Long_Distance, thickness, { 0.0f, 1.0f, 0.0f, 1.0f }
 		);
 	}
+
+	// 魔法の当たり判定描画
+	magicManager.RenderDebugPrimitive(renderer);
 }
 
 // プレイヤーとの距離を取得

@@ -35,6 +35,7 @@ private:
 	// エフェクト関係
 	Effect* magicCircle = nullptr;
 	Effect* bloodSpear = nullptr;
-	int handle = -1;
+	int magicCircleHandle = -1;
+	int spearHandle = -1;
 	bool OnEffect = true;
 };

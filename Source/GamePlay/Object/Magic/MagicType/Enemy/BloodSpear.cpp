@@ -10,6 +10,9 @@ BloodSpearMagic::BloodSpearMagic(MagicManager* manager)
 	// 魔法陣
 	magicCircle = EffectManager::Instance().GetOrLoadEffect("Data/Effect/magic_circle/magicCircle_blood.efk");
 	bloodSpear = EffectManager::Instance().GetOrLoadEffect("Data/Effect/BloodSpear/spear.efk");
+	magicCircleHandle = -1;
+	spearHandle = -1;
+	OnEffect = true;
 }
 
 BloodSpearMagic::~BloodSpearMagic()
@@ -40,6 +43,8 @@ void BloodSpearMagic::Update(float elapsedTime)
 		// 待機時間が切れたら発射する方向を決める
 		if (waitTimer < 0.0f)
 		{
+			targetDistance = 10.0f;
+
 			state = BloodSpearState::Fire; // ステートを変える
 		}
 
@@ -53,7 +58,21 @@ void BloodSpearMagic::Update(float elapsedTime)
 		position.y += direction.y * speed;
 		position.z += direction.z * speed;
 
-		bloodSpear->Play(position, 1.0f);
+		if (OnEffect)
+		{
+			spearHandle = bloodSpear->Play(position, 1.0f);
+
+			// 向きを計算する
+			float angleY = atan2f(direction.x, direction.z);
+			float horizontalLength = sqrtf(direction.x * direction.x + direction.z * direction.z);
+			float angleX = -atan2f(direction.y, horizontalLength);
+			angleY += DirectX::XMConvertToRadians(180.0f);
+			bloodSpear->SetAngle(spearHandle, DirectX::XMFLOAT3(angleX, angleY, 0.0f));
+
+			OnEffect = false;
+		}
+
+		bloodSpear->SetPosition(spearHandle, position);
 
 		// 寿命を減らす
 		lifeTimer -= elapsedTime;
@@ -103,7 +122,7 @@ void BloodSpearMagic::RenderDebugPrimitive(ShapeRenderer* renderer)
 
 	// ※ もし描画したカプセルが「縦に立ったまま平行移動」してしまう場合は、
 	// カプセル自体のモデルがY軸基準で作られているため、以下の1行のコメントアウトを外して90度倒してください！
-	// world = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f)) * world;
+	 world = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f)) * world;
 
 	// 3. 計算した行列を XMFLOAT4X4 に変換して描画関数に渡す
 	DirectX::XMFLOAT4X4 capsuleTransform;
@@ -118,10 +137,18 @@ void BloodSpearMagic::OnTerminate()
 {
 	isAlive = true;
 
-	if (handle != -1)
+	// 魔法陣を止める
+	if (magicCircleHandle != -1 && magicCircle != nullptr)
 	{
-		magicCircle->Stop(handle);
-		handle = -1;
+		magicCircle->Stop(magicCircleHandle);
+		magicCircleHandle = -1;
+	}
+
+	// 槍を止める
+	if (spearHandle != -1 && bloodSpear != nullptr)
+	{
+		bloodSpear->Stop(spearHandle);
+		spearHandle = -1;
 	}
 
 	// 自分を削除
@@ -135,6 +162,6 @@ void BloodSpearMagic::Launch(const DirectX::XMFLOAT3& position, float waitTime)
 	waitTimer = waitTime;
 
 	if (magicCircle != nullptr) {
-		handle = magicCircle->Play(this->position, 1.0f); // 1.0fはサイズ
+		magicCircleHandle = magicCircle->Play(this->position, 1.0f); // 1.0fはサイズ
 	}
 }
