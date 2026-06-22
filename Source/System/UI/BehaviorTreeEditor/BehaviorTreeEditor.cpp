@@ -265,6 +265,7 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.name); }
 			else if (node.name == "Wander") { finalAction = new WanderAction(enemy); }
 			else if (node.name == "Idle") { finalAction = new IdleAction(enemy, node.name); }
+			else if (node.name == "BloodSpear") { finalAction = new BloodSpearAction(enemy, node.name); }
 		}
 
 		// ツリーに登録（条件とアクションをセットで渡す！）

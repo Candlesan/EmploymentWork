@@ -11,6 +11,10 @@
         {
             "from": "Root",
             "to": "Pursuit"
+        },
+        {
+            "from": "Root",
+            "to": "BloodSpear"
         }
     ],
     "nodes": [
@@ -55,7 +59,7 @@
                 -182.0,
                 196.0
             ],
-            "priority": 2,
+            "priority": 3,
             "selectRule": 0
         },
         {
@@ -80,7 +84,7 @@
                 -86.0,
                 196.0
             ],
-            "priority": 1,
+            "priority": 2,
             "selectRule": 0
         },
         {
@@ -108,6 +112,36 @@
             "parentName": "Root",
             "position": [
                 10.0,
+                196.0
+            ],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "BloodSpear",
+            "conditions": [
+                {
+                    "compareType": 2,
+                    "conditionType": 0,
+                    "judgmentValue": 10.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": 3,
+                    "judgmentValue": 0.0
+                }
+            ],
+            "config": {
+                "animationName": "FrontEndPose",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "name": "BloodSpear",
+            "parentName": "Root",
+            "position": [
+                106.0,
                 196.0
             ],
             "priority": 0,

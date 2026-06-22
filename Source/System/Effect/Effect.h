@@ -22,6 +22,11 @@ public:
 	//スケール設定
 	void SetScale(Effekseer::Handle handle, const DirectX::XMFLOAT3& scale);
 
+	// コピーとムーブを禁止
+	Effect(const Effect&) = delete;
+	Effect& operator=(const Effect&) = delete;
+	Effect(Effect&&) = delete;
+	Effect& operator=(Effect&&) = delete;
 private:
 	Effekseer::EffectRef effekseerEffect;
 };

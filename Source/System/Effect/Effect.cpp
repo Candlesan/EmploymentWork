@@ -5,21 +5,20 @@
 //コンストラクタ
 Effect::Effect(const char* filename)
 {
-	//エフェクトを読み込みをする前にロックする
-	//※マルチスレッドでEffectを作成するとDeviceContextを同時アクセスして
-	//フリーズする可能性があるので排他制御する
-	std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
+    OutputDebugStringA("Effectコンストラクタ開始\n");
 
- // Effekseerのリソースを読み込む 
- // EffekseerはUTF-16のファイルパス以外は対応していないため文字コード変換が必要 
-	char16_t utf16Filename[256];
-	Effekseer::ConvertUtf8ToUtf16(utf16Filename, 256, filename);
+    std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
+    OutputDebugStringA("ロック取得\n");
 
-	//Effekseer::Managerを取得
-	Effekseer::ManagerRef effekseerManager = EffectManager::Instance().GetEffekseerManager();
+    char16_t utf16Filename[256];
+    Effekseer::ConvertUtf8ToUtf16(utf16Filename, 256, filename);
+    OutputDebugStringA("UTF16変換完了\n");
 
-	//Effekseerエフェクトを読み込み
-	effekseerEffect = Effekseer::Effect::Create(effekseerManager, (EFK_CHAR*)utf16Filename);
+    Effekseer::ManagerRef effekseerManager = EffectManager::Instance().GetEffekseerManager();
+    OutputDebugStringA("マネージャー取得完了\n");
+
+    effekseerEffect = Effekseer::Effect::Create(effekseerManager, (EFK_CHAR*)utf16Filename);
+    OutputDebugStringA("Effect::Create完了\n");
 }
 
 //再生

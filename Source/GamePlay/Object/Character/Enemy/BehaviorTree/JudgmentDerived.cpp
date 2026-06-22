@@ -88,6 +88,16 @@ bool NoneJudgment::Judgment()
     return true;
 }
 
+AndJudgment::~AndJudgment()
+{
+    for (JudgmentBase* j : judgments)
+    {
+        delete j;
+    }
+
+    judgments.clear();
+}
+
 // ŠO•”‚©‚çğŒ‚ğ1‚Â‚Ã‚Â’Ç‰Á‚·‚é—­‚ß‚ÌŠÖ”
 void AndJudgment::AddJudgment(JudgmentBase* j)
 {

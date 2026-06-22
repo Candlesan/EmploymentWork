@@ -31,7 +31,7 @@ void StraightMagic::Update(float elapsedTime)
 
 	if (OnEffect)
 	{
-		//handle = testEffect->Play(position, 0.2f);
+		handle = testEffect->Play(position, 0.2f);
 		OnEffect = false;
 	}
 

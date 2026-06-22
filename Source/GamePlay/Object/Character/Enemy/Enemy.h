@@ -6,6 +6,7 @@
 #include "System/Audio/AudioSource.h"
 
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
+#include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorData.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
@@ -77,6 +78,8 @@ public:
 	NodeBase* GetActiveNode() const { return activeNode; }
 	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
 
+	MagicManager& GetMagicManager()  { return magicManager; }
+
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
@@ -139,4 +142,7 @@ private:
 	// ビヘイビアツリーノードエディター
 	BehaviorTreeGraph btGraph;
 	BehaviorTreeEditor btEditor;
+
+	// 魔法関係
+	MagicManager magicManager;
 };

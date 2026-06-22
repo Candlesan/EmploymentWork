@@ -181,11 +181,17 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType">
       <UniqueIdentifier>{f989ee99-016b-4ecf-8d35-97da2587d692}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\WindSpearMagic">
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Player">
+      <UniqueIdentifier>{9ef62409-9558-41ea-95c1-2d1acfffe8a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic">
+      <UniqueIdentifier>{99e0d4e1-0b97-4b34-aae2-9d25b75a5bd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Player\WindSpearMagic">
       <UniqueIdentifier>{2bf5dd5d-72c0-4d28-8594-dfe06adb6fec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\WindBladeMagic">
-      <UniqueIdentifier>{99e0d4e1-0b97-4b34-aae2-9d25b75a5bd0}</UniqueIdentifier>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Enemy">
+      <UniqueIdentifier>{64981090-fa45-4298-992c-4f015d289f71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -445,7 +451,10 @@
       <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.h">
-      <Filter>Source\GamepPlay\Object\Magic\MagicType\WindBladeMagic</Filter>
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -666,7 +675,10 @@
       <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.cpp">
-      <Filter>Source\GamepPlay\Object\Magic\MagicType\WindBladeMagic</Filter>
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

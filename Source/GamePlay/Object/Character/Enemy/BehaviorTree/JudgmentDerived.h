@@ -71,6 +71,7 @@ class AndJudgment : public JudgmentBase
 public:
 
 	AndJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
+	~AndJudgment() override;
 
 	// ŠO•”‚©‚çğŒ‚ğ1‚Â‚Ã‚Â’Ç‰Á‚·‚é—­‚ß‚ÌŠÖ”
 	void AddJudgment(JudgmentBase* j);

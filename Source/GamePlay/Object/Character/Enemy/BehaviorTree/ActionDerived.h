@@ -43,3 +43,17 @@ private:
 	float Middle_Distance = 12.0; // 中距離
 	float Long_Distance = 20.0; // 遠距離
 };
+
+// 血の槍
+class BloodSpearAction : public ActionBase
+{
+public:
+	BloodSpearAction(Enemy* enemy, std::string anim) : ActionBase(enemy, anim){}
+	ActionBase::State Run(float elpasedTime);
+
+	// アクションが選ばれた最初の１回だけ呼ばれる関数
+	void OnEnter();
+
+private:
+	bool isAttacking = false;
+};
