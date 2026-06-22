@@ -13,6 +13,7 @@ BloodSpearMagic::BloodSpearMagic(MagicManager* manager)
 	magicCircleHandle = -1;
 	spearHandle = -1;
 	OnEffect = true;
+	this->damage = 100.0f;
 }
 
 BloodSpearMagic::~BloodSpearMagic()
@@ -35,7 +36,7 @@ void BloodSpearMagic::Update(float elapsedTime)
 		DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&position);
 		DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Ppos, Epos);
 
-		DirectX::XMStoreFloat(&targetDistance, DirectX::XMVector3Length(Vec));
+		DirectX::XMStoreFloat(&height, DirectX::XMVector3Length(Vec));
 
 		Vec = DirectX::XMVector3Normalize(Vec);
 		DirectX::XMStoreFloat3(&direction, Vec);
@@ -43,7 +44,7 @@ void BloodSpearMagic::Update(float elapsedTime)
 		// 待機時間が切れたら発射する方向を決める
 		if (waitTimer < 0.0f)
 		{
-			targetDistance = 10.0f;
+			height = 10.0f;
 
 			state = BloodSpearState::Fire; // ステートを変える
 		}
@@ -97,14 +98,14 @@ void BloodSpearMagic::Render(const RenderContext& rc)
 // デバックプリミティブ描画
 void BloodSpearMagic::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	float spearRadius = 0.5f;
+	radius = 2.0f;
 
 	// カプセルの「中心位置」を計算する
 	// ※カプセルは中心から描画されることが多いので、自分の位置とプレイヤーの中間地点を求めます
 	DirectX::XMFLOAT3 centerPos;
-	centerPos.x = position.x + (direction.x * targetDistance * 0.5f);
-	centerPos.y = position.y + (direction.y * targetDistance * 0.5f);
-	centerPos.z = position.z + (direction.z * targetDistance * 0.5f);
+	centerPos.x = position.x + (direction.x * height * 0.5f);
+	centerPos.y = position.y + (direction.y * height * 0.5f);
+	centerPos.z = position.z + (direction.z * height * 0.5f);
 
 	// DirectXMath を使って、向き（回転）と位置を持った 4x4 行列を作る
 	DirectX::XMVECTOR cPos = DirectX::XMLoadFloat3(&centerPos);
@@ -129,7 +130,7 @@ void BloodSpearMagic::RenderDebugPrimitive(ShapeRenderer* renderer)
 	DirectX::XMStoreFloat4x4(&capsuleTransform, world);
 
 	// 赤色 { 1.0f, 0.0f, 0.0f, 1.0f } で描画！
-	renderer->DrawCapsule(capsuleTransform, spearRadius, targetDistance, { 1.0f, 0.0f, 0.0f, 1.0f });
+	renderer->DrawCapsule(capsuleTransform, radius, height, { 1.0f, 0.0f, 0.0f, 1.0f });
 }
 
 // 寿命が消えたらエフェクトを消す処理
@@ -163,5 +164,6 @@ void BloodSpearMagic::Launch(const DirectX::XMFLOAT3& position, float waitTime)
 
 	if (magicCircle != nullptr) {
 		magicCircleHandle = magicCircle->Play(this->position, 1.0f); // 1.0fはサイズ
+		magicCircle->SetAngle(magicCircleHandle, direction);
 	}
 }

@@ -37,8 +37,11 @@ public:
 	// 半径取得
 	float GetRadius() const { return radius; }
 
+	// 高さ
+	float GetHeight() const { return height; }
+
 	// ダメージ取得
-	virtual float GetDamage() const { return 0.0f; }
+	virtual float GetDamage() const { return damage; }
 protected:
 	// 行列更新処理 
 	void UpdateTransform();
@@ -49,6 +52,8 @@ protected:
 	DirectX::XMFLOAT3 scale = { 1, 1, 1 };
 	DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	float radius = 1.0f;
+	float height = 1.0f;
+	float damage = 1.0f;
 
 	MagicManager* manager = nullptr;
 };

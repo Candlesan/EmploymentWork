@@ -171,6 +171,9 @@ void SceneGame::Update(float elapsedTime)
 		// 魔法と敵の当たり判定
 		CollisionMagicVsEnemy();
 
+		// 敵の魔法とプレイヤーの当たり判定
+		CollisionEnemyMagicVsPlayer();
+
 		// Xキーを押した瞬間に降雪エフェクトを発生させる
 		if (GetAsyncKeyState('P') & 0x8000)
 		{
@@ -698,6 +701,53 @@ void SceneGame::CollisionMagicVsEnemy()
 			enemy->ApplyDamage(magic->GetDamage(), 0.3, 10.0f);
 
 			// 魔法自体を消滅させる
+			magic->OnTerminate();
+		}
+	}
+}
+
+// 敵の魔法とPlayerの当たり判定
+void SceneGame::CollisionEnemyMagicVsPlayer()
+{
+	Player& player = Player::Instance();
+	if (!enemy) return;
+
+	MagicManager& enemyMagicManger = enemy->GetMagicManager();
+
+	for (int i = 0; i < enemyMagicManger.GetMagicCount(); ++i)
+	{
+		// 槍のデータを取り出す
+		MagicBase* magic = enemyMagicManger.getMagic(i);
+		if (!magic) continue;
+
+		bool isHit = false;
+
+		DirectX::XMFLOAT3 outPosA, outPosB;
+		isHit = Collision::IntersectCapsuleVsCapsule(
+			magic->GetPosition(),
+			magic->GetDirection(),
+			magic->GetHeight(),
+			magic->GetRadius(),
+			0.0f,
+			player.GetPosition(),
+			player.GetCapsuleDirection(),
+			player.GetHeight(),
+			player.GetRadius(),
+			0.0f,
+			outPosA,
+			outPosB);
+
+		if (isHit)
+		{
+			bool isGuarding = player.GetIsGuarding();
+			bool isAvoid = player.GetIsAvoid();
+
+			if (!isGuarding && !isAvoid)
+			{
+				player.ApplyDamage(magic->GetDamage(), 0.5f, 10.0f);
+			}
+
+			// 当たった槍は消滅させる
 			magic->OnTerminate();
 		}
 	}

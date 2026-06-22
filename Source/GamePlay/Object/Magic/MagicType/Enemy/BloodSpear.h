@@ -23,12 +23,12 @@ public:
 	// 発射準備
 	void Launch(const DirectX::XMFLOAT3& position, float waitTime);
 
+	float GetDamage() { return damage; }
 private:
 	BloodSpearState state = BloodSpearState::Wait; // 待機状態
 	float waitTimer = 0.0f; // 発射までの時間
-	float speed = 25.0f; // 速さ
+	float speed = 50.0f; // 速さ
 	float lifeTimer = 5.0f; // 跳んでから寿命
-	float targetDistance = 5.0f; // プレイヤーまでの距離（カプセルの長さ）
 
 	bool isAlive = false; // まだ存在しているか
 

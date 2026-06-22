@@ -10,7 +10,6 @@
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
-//#include "System/UI/AnimationSequence/AnimationSequence.h"
 
 
 // ゲームシーン
@@ -24,7 +23,7 @@ public:
 	void Initialize() override;
 
 	// 終了化
-	void Finalize() override ;
+	void Finalize() override;
 
 	// 更新処理
 	void Update(float elapsedTime) override;
@@ -50,6 +49,8 @@ public:
 	// 敵と魔法の当たり判定
 	void CollisionMagicVsEnemy();
 
+	// 敵の魔法とPlayerの当たり判定
+	void CollisionEnemyMagicVsPlayer();
 private:
 	// 3Dモデル
 	std::unique_ptr<Stage> stage;
@@ -60,7 +61,7 @@ private:
 	std::unique_ptr<DebugCamera> debugCamera;
 
 	// カメラのモード定義
-	enum class CameraMode 
+	enum class CameraMode
 	{
 		Game,   // 三人称視点
 		Debug   // フリーカメラ
