@@ -92,6 +92,8 @@ void SceneGame::Initialize()
 
 	// パーティクル生成
 	particleManager = std::make_unique<Compute_Particle>(device);
+
+	Load("Data/Model/Json/Material/Player/player_material.json", &player);
 }
 
 // 終了化
@@ -642,15 +644,30 @@ void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
 		// ここにボタンを追加
 		if (ImGui::Button("Save"))
 		{
-			char path[MAX_PATH] = "Data/Model/Json/Material/Player/player_material.json";
+			char path[MAX_PATH] = "";
+			if (Dialog::SaveFileName(
+				path,
+				MAX_PATH,
+				"JSON Files\0*.json\0\0",
+				"マテリアルを保存",
+				"json") == DialogResult::OK)
+			{
+				Save(path, character);
+			}
 			// Dialogを使ってもええし、パス固定でもOK
-			Save(path, character);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Load"))
 		{
-			char path[MAX_PATH] = "Data/Model/Json/Material/Player/player_material.json";
-			Load(path, character);
+			char path[MAX_PATH] = "";
+			if (Dialog::OpenFileName(
+				path,
+				MAX_PATH,
+				"JSON Files\0*.json\0\0",
+				"マテリアルを保存") == DialogResult::OK)
+			{
+				Load(path, character);
+			}
 		}
 
 		for (size_t i = 0; i < materials.size(); ++i)
