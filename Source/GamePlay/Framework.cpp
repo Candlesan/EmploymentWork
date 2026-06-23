@@ -151,17 +151,33 @@ void Framework::ToggleFullscreen()
 		SetWindowPos(hWnd, HWND_TOP,
 			mi.rcMonitor.left, mi.rcMonitor.top, w, h,
 			SWP_FRAMECHANGED);
+
+		// GraphicsのOnResizeではなく、確定したw, hを直接シーンに伝える！
+		Scene* currentScene = SceneManager::Instance().GetCurrentScene();
+		if (currentScene != nullptr)
+		{
+			currentScene->OnResize(static_cast<float>(w), static_cast<float>(h));
+		}
 	}
 	else
 	{
 		// 元のウィンドウスタイルとサイズに戻す
 		SetWindowLong(hWnd, GWL_STYLE,
 			WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE);
+
+		int w = windowedRect.right - windowedRect.left;
+		int h = windowedRect.bottom - windowedRect.top;
+
 		SetWindowPos(hWnd, HWND_TOP,
-			windowedRect.left, windowedRect.top,
-			windowedRect.right - windowedRect.left,
-			windowedRect.bottom - windowedRect.top,
+			windowedRect.left, windowedRect.top, w, h,
 			SWP_FRAMECHANGED);
+
+		// ウィンドウモードに戻ったときも、元のサイズ（w, h）を直接伝える！
+		Scene* currentScene = SceneManager::Instance().GetCurrentScene();
+		if (currentScene != nullptr)
+		{
+			currentScene->OnResize(static_cast<float>(w), static_cast<float>(h));
+		}
 	}
 }
 
@@ -218,7 +234,17 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 	case WM_SIZE:
 		if (wParam != SIZE_MINIMIZED)
 		{
+			// グラフィック基盤をリサイズする
 			Graphics::Instance().OnResize();
+
+			float w = Graphics::Instance().GetScreenWidth();
+			float h = Graphics::Instance().GetScreenHeight();
+
+			Scene* currentScene = SceneManager::Instance().GetCurrentScene();
+			if (currentScene != nullptr)
+			{
+				currentScene->OnResize(w, h);
+			}
 		}
 		break;
 	case WM_ENTERSIZEMOVE:

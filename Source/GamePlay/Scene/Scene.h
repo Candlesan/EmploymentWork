@@ -28,6 +28,7 @@ public:
 	//€”õŠ®—¹İ’è
 	void SetReady() { ready = true; }
 
+	virtual void OnResize(float width, float height) {}
 private:
 	bool ready = false;
 };

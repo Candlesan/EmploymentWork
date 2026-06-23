@@ -54,6 +54,9 @@ public:
 
 	// “G‚Ì–‚–@‚ÆPlayer‚Ì“–‚½‚è”»’è
 	void CollisionEnemyMagicVsPlayer();
+
+	// ‰æ–Ê”ä—¦C³ŠÖ”
+	void OnResize(float width, float height);
 private:
 	// 3Dƒ‚ƒfƒ‹
 	std::unique_ptr<Stage> stage;

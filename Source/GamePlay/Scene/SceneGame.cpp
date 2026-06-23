@@ -296,13 +296,6 @@ void SceneGame::Render()
 	// シャドウマップ描画
 	RenderShadowMap();
 
-	// スカイマップ描画
-	Graphics::Instance().SetRenderTargets();
-	skyMap->Draw(rc);
-
-
-	Graphics::Instance().SetRenderTargets();
-
 	// 3Dモデル描画
 	{
 		// ステージ描画
@@ -320,6 +313,14 @@ void SceneGame::Render()
 		// 全モデル描画
 		modelRenderer->Render(rc);
 
+		// エフェクト描画 
+		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
+
+		//player.RenderTrail(rc);
+
+		// スカイマップ描画
+		skyMap->Draw(rc);
+
 		framebuffers[0]->deactivate(dc);
 
 		// ブルーム描画
@@ -331,13 +332,13 @@ void SceneGame::Render()
 			bloomer->shader_resource_view(),
 		};
 
+		Graphics::Instance().SetRenderTargets();
+
+		dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
+		dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+
 		bloomer->set_constant_buffer(dc);
 		bit_block_transfer->blit(dc, shader_resource_views, 0, 2, pixel_shaders[0].Get());
-
-		// エフェクト描画 
-		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
-
-		//player.RenderTrail(rc);
 
 		// プリミティブ描画
 		primitiveRenderer->Render(dc, camera.GetView(), camera.GetProjection(),
@@ -803,4 +804,23 @@ void SceneGame::CollisionEnemyMagicVsPlayer()
 			magic->OnTerminate();
 		}
 	}
+}
+
+// 画面比率修正関数
+void SceneGame::OnResize(float width, float height)
+{
+	// カメラの比率を直す
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45), width / height, 0.1f, 1000.0f);
+
+	ID3D11Device* device = Graphics::Instance().GetDevice();
+
+	framebuffers[0] = std::make_unique<framebuffer>(device, width, height, true);
+
+	// ブルームを新しいサイズで丸ごと生成し直す
+	bloomer = std::make_unique<bloom>(device, width, height);
+
+	// 初期化時に設定していたパラメータを再設定
+	bloomer->bloom_intensity = bloom_intensity;
+	bloomer->bloom_extraction_threshold = bloom_extraction;
 }
