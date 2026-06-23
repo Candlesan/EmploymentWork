@@ -40,6 +40,11 @@ public:
 	// GUI•`‰æ
 	void DrawGUI() override;
 
+	void DrawModelMaterialEditor(const char* label, Character* character);
+
+	void Save(const std::string& path, Character* character);
+	void Load(const std::string& path, Character* character);
+
 	// ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è
 	void CollisonPlayervsEnemy();
 

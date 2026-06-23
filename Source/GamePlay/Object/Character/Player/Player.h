@@ -58,7 +58,9 @@ public:
 
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
+
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
+
 	void SetLastDamage(float d) { lastDamage = d; }	// 計算したダメージ
 	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
 	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する

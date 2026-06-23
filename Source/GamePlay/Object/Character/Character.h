@@ -59,6 +59,9 @@ public:
 	const DirectX::XMFLOAT4X4& GetTransform() const { return transform; }
 	void Set_Transform(DirectX::XMFLOAT4X4 new_transform) { this->transform = new_transform; }
 
+	// ƒ‚ƒfƒ‹æ“¾
+	virtual std::shared_ptr<Model> GetModel() { return nullptr; }
+
 	// ‘¬“xæ“¾ / İ’è
 	const DirectX::XMFLOAT3& GetVelocity() const { return velocity; }
 	void SetVelocity(const DirectX::XMFLOAT3& v) { velocity = v; }

@@ -4,6 +4,7 @@
 #include "System/Audio/Audio.h"
 #include "System/Effect/EffectManager.h"
 #include "System/Core/Input/Input.h"
+#include "System/UI/Dialog.h"
 
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
@@ -612,11 +613,101 @@ void SceneGame::DrawGUI()
 				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
 			}
 		}
+
+		ImGui::Separator();
+		ImGui::Text("---- Material Realtime Editor ----");
+
+		DrawModelMaterialEditor("Player Clothes & Hair Material", &player);
+		DrawModelMaterialEditor("Enemy Body & Armor Material", enemy.get());
 	}
 	ImGui::End();
 
 	player.DrawGUI();
 	enemy->DrawGUI();
+}
+
+void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
+{
+	if (!character) return;
+
+	// 親クラスのポインタ経由で、相手が誰であれモデルを取得する
+	auto model = character->GetModel();
+	if (!model) return; // モデルを持っていないキャラなら何もしない
+
+	// 共通のマテリアル編集スライダー描画ロジック（1箇所にまとめられる！）
+	if (ImGui::CollapsingHeader(label))
+	{
+		auto& materials = model->GetMaterials();
+
+		// ここにボタンを追加
+		if (ImGui::Button("Save"))
+		{
+			char path[MAX_PATH] = "Data/Model/Json/Material/Player/player_material.json";
+			// Dialogを使ってもええし、パス固定でもOK
+			Save(path, character);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Load"))
+		{
+			char path[MAX_PATH] = "Data/Model/Json/Material/Player/player_material.json";
+			Load(path, character);
+		}
+
+		for (size_t i = 0; i < materials.size(); ++i)
+		{
+			ImGui::PushID(static_cast<int>(i));
+			ImGui::Text("Material: %s", materials[i].name.c_str());
+			ImGui::SliderFloat("Roughness", &materials[i].adjustRoughness, -1.0f, 1.0f);
+			ImGui::SliderFloat("Metalness", &materials[i].adjustMetalness, -1.0f, 1.0f);
+			ImGui::PopID();
+		}
+	}
+}
+
+void SceneGame::Save(const std::string& path, Character* character)
+{
+	auto model = character->GetModel();
+	if (!model) return;
+
+	nlohmann::json j;
+	auto& materials = model->GetMaterials();
+
+	for (auto& mat : materials)
+	{
+		nlohmann::json entry;
+		entry["name"] = mat.name;
+		entry["roughness"] = mat.adjustRoughness;
+		entry["metalness"] = mat.adjustMetalness;
+		j["materials"].push_back(entry);
+	}
+
+	std::ofstream file(path);
+	file << j.dump(4);
+}
+void SceneGame::Load(const std::string& path, Character* character)
+{
+	std::ifstream file(path);
+	if (!file.is_open()) return;
+
+	nlohmann::json j = nlohmann::json::parse(file);
+
+	auto model = character->GetModel();
+	auto& materials = model->GetMaterials();
+
+	for (auto& entry : j["materials"])
+	{
+		std::string name = entry["name"];
+		// マテリアル名でマッチングして値を上書き
+		for (auto& mat : materials)
+		{
+			if (mat.name == name)
+			{
+				mat.adjustRoughness = entry["roughness"];
+				mat.adjustMetalness = entry["metalness"];
+				break;
+			}
+		}
+	}
 }
 
 // プレイヤーと敵の当たり判定

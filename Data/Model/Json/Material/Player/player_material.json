@@ -1,0 +1,44 @@
+{
+    "materials": [
+        {
+            "metalness": 0.5550000071525574,
+            "name": "MI_HEAD_F_16_02",
+            "roughness": 0.23199999332427979
+        },
+        {
+            "metalness": 1.0,
+            "name": "MI_LASHES_05",
+            "roughness": 1.0
+        },
+        {
+            "metalness": 1.0,
+            "name": "MI_EYES_37_SK_SwordsmanGirl_02",
+            "roughness": 1.0
+        },
+        {
+            "metalness": 0.0,
+            "name": "MI_EYES_37_SK_SwordsmanGirl_02",
+            "roughness": 0.0
+        },
+        {
+            "metalness": 1.0,
+            "name": "MI_BODY_F_UPD_01",
+            "roughness": 1.0
+        },
+        {
+            "metalness": 1.0,
+            "name": "MI_HAIR_Straight_17_SK_SwordsmanGirl_02",
+            "roughness": 0.09000000357627869
+        },
+        {
+            "metalness": 1.0,
+            "name": "MI_SwordsmanGirl_CLOTHES_01",
+            "roughness": 0.1940000057220459
+        },
+        {
+            "metalness": 1.0,
+            "name": "MI_SwordsmanGirl_CAPE_01",
+            "roughness": 1.0
+        }
+    ]
+}

@@ -78,7 +78,7 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
         final_metalness *= sampled.r;
     }
 
-#if 0 // 確認用のコードなので本体は不要
+#if 1 // 確認用のコードなので本体は不要
     final_roughness = clamp(final_roughness + adjustroughness, 0.0001f, 1.0f);
     final_metalness = clamp(final_metalness + adjustmetalness, 0.0001f, 1.0f);
 #endif

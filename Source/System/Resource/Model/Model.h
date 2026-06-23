@@ -56,6 +56,10 @@ public:
 		float				alphaCutoff = 0.5f;
 		AlphaMode			alphaMode = AlphaMode::Opaque;
 
+		// マテリアルごとの調整
+		float				adjustMetalness = 0.0f;
+		float				adjustRoughness = 0.0f;
+
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	baseMap;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	normalMap;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	emissiveMap;
@@ -155,6 +159,9 @@ public:
 
 	// マテリアルデータ取得
 	const std::vector<Material>& GetMaterials() const { return materials; }
+
+	// マテリアル編集用
+	std::vector<Material>& GetMaterials() { return materials; }
 
 	// メッシュデータ取得
 	const std::vector<Mesh>& GetMeshes() const { return meshes; }
