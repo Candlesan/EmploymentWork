@@ -147,6 +147,7 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\PhysicsBone\PhysicsBone.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicBase.h" />
@@ -231,6 +232,7 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\PhysicsBone\PhysicsBone.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicBase.cpp" />

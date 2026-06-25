@@ -149,14 +149,14 @@ void SceneGame::Update(float elapsedTime)
 		debugCamera->SyncControllerToCamera(camera);
 	}
 
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
-	{
-		timeScale = 0.5f;
-	}
-	else
-	{
-		timeScale = 1.0f;
-	}
+	//if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
+	//{
+	//	timeScale = 0.5f;
+	//}
+	//else
+	//{
+	//	timeScale = 1.0f;
+	//}
 
 	float delta = elapsedTime * timeScale;
 
@@ -321,6 +321,29 @@ void SceneGame::Render()
 
 		//player.RenderTrail(rc);
 
+			// デバック描画
+		{
+			bool showPlayerWeapon = false;
+			for (auto& data : player.GetAnimSequence().GetAnimations()) {
+				if (data.name == player.GetCurrentState()) {
+					for (auto& r : data.ranges) {
+						if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
+							showPlayerWeapon = true;
+							break;
+						}
+					}
+					break;
+				}
+			}
+
+			player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
+			enemy->RenderDebugPrimitive(shapeRenderer, false);
+
+			// シェイプレンダラ描画
+			shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
+		}
+
+
 		// スカイマップ描画
 		skyMap->Draw(rc);
 
@@ -353,27 +376,6 @@ void SceneGame::Render()
 		particleManager->Render(rc);
 	}
 
-	// デバック描画
-	{
-		bool showPlayerWeapon = false;
-		for (auto& data : player.GetAnimSequence().GetAnimations()) {
-			if (data.name == player.GetCurrentState()) {
-				for (auto& r : data.ranges) {
-					if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
-						showPlayerWeapon = true;
-						break;
-					}
-				}
-				break;
-			}
-		}
-
-		player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
-		enemy->RenderDebugPrimitive(shapeRenderer, false);
-
-		// シェイプレンダラ描画
-		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
-	}
 }
 
 // シャドウマップ描画

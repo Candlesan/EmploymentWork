@@ -21,7 +21,8 @@ void Player::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// プレイヤーモデル読み込み
-	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
+	//player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
+	player = std::make_shared<Model>(device, "Data/Model/Player/unitychan/unitychan.glb");
 
 	// 武器モデル読み込み
 	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
@@ -121,7 +122,6 @@ void Player::Initialize()
 
 	rootMotionNodeName = "root";
 
-
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
@@ -162,6 +162,28 @@ void Player::Initialize()
 		}
 	}
 
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "J_L_HairTail_00");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "J_R_HairTail_00");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "dk_bun_front_01_l");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "dk_bun_front_01_mid");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "dk_bun_front_01_r");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "hair_back_01_r");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "hair_back_01_mid");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "hair_back_01_l");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "hair_front_01_r");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "hair_front_01_l");
+	//physicsBones.emplace_back();
+	//physicsBones.back().SetUp(player, "sg_belt_01");
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -283,6 +305,12 @@ void Player::Update(float elapsedTime)
 	// エリア移動制限
 	AreaRestriction();
 
+	// 揺れもの更新 
+	for (auto& bone : physicsBones)
+	{
+		bone.Update(elapsedTime, transform);
+	}
+
 	// モデル更新処理
 	UpdateTransform();
 	player->UpdateTransform(transform);
@@ -295,10 +323,10 @@ void Player::Update(float elapsedTime)
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, player);
-	renderer->Draw(ShaderId::PBR, weapon[0].model); // 杖
+	//renderer->Draw(ShaderId::PBR, weapon[0].model); // 杖
 
-	if (weapon[1].isVisible)
-		renderer->Draw(ShaderId::PBR, weapon[1].model); // 剣
+	//if (weapon[1].isVisible)
+	//	renderer->Draw(ShaderId::PBR, weapon[1].model); // 剣
 
 	// 魔法描画
 	magicManager.Render(rc);
@@ -368,7 +396,6 @@ void Player::DrawGUI()
 			}
 		}
 
-
 		// トランスフォーム情報
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -385,6 +412,14 @@ void Player::DrawGUI()
 			angle.z = DirectX::XMConvertToRadians(a.z);
 
 			ImGui::DragFloat3("Scale", &scale.x); // スケール
+		}
+
+		// 物理ボーン
+		for (size_t i = 0; i < physicsBones.size(); ++i) 
+		{
+			ImGui::PushID(static_cast<int>(i));
+			physicsBones[i].DrawGui();
+			ImGui::PopID();
 		}
 
 		// 当たり判定情報
@@ -509,6 +544,11 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 0, 1, 0, 1 });
+	}
+
+	for (auto& bone : physicsBones)
+	{
+		bone.RenderDebug(renderer);
 	}
 
 	// 武器の当たり判定

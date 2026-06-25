@@ -205,6 +205,9 @@
     <Filter Include="Shader\Bloom">
       <UniqueIdentifier>{f3542b1e-f6b8-46ee-a6d8-224807238f83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Character\PhysicsBone">
+      <UniqueIdentifier>{d55b3cd1-a9ff-44f6-8e71-f1c5e628c98d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -477,6 +480,7 @@
     <ClInclude Include="Source\System\Renderer\Shader\bloom\bloom.h">
       <Filter>Source\System\Renderer\Shader\bloom</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\PhysicsBone\PhysicsBone.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -709,6 +713,9 @@
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\bloom\bloom.cpp">
       <Filter>Source\System\Renderer\Shader\bloom</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\PhysicsBone\PhysicsBone.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

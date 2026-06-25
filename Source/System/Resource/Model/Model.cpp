@@ -697,3 +697,44 @@ void Model::BuildMeshes(ID3D11Device* device)
 		}
 	}
 }
+
+void Model::Node::UpdateWorldTransform(const DirectX::XMMATRIX& parentWorldTransform)
+{
+	// 1. ローカル行列算出 (今の UpdateTransform と全く同じ処理)
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rotation));
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	DirectX::XMMATRIX LocalTransform = S * R * T;
+
+	// 2. グローバル行列算出 (親の今フレームの最新 globalTransform を掛け合わせる)
+	DirectX::XMMATRIX ParentGlobalTransform;
+	if (parent != nullptr)
+	{
+		ParentGlobalTransform = DirectX::XMLoadFloat4x4(&parent->globalTransform);
+	}
+	else
+	{
+		ParentGlobalTransform = DirectX::XMMatrixIdentity();
+	}
+	DirectX::XMMATRIX GlobalTransform = LocalTransform * ParentGlobalTransform;
+
+	// 3. ワールド行列算出 (引数で受け取ったプレイヤーのワールド行列を掛ける)
+	DirectX::XMMATRIX WorldTransform = GlobalTransform * parentWorldTransform;
+
+	// 4. 計算結果を自分に格納
+	DirectX::XMStoreFloat4x4(&localTransform, LocalTransform);
+	DirectX::XMStoreFloat4x4(&globalTransform, GlobalTransform);
+	DirectX::XMStoreFloat4x4(&worldTransform, WorldTransform);
+}
+
+void Model::Node::UpdateWorldTransformsRecursive(const DirectX::XMMATRIX& parentWorldTransform)
+{
+	// まず自分を最新にする
+	UpdateWorldTransform(parentWorldTransform);
+
+	// 登録されている子供（枝分かれ対応）をループで全部同じように更新していく
+	for (Node* child : children)
+	{
+		child->UpdateWorldTransformsRecursive(parentWorldTransform);
+	}
+}

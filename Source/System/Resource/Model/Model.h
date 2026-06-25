@@ -29,6 +29,9 @@ public:
 		Node*				parent = nullptr; 
 		std::vector<Node*>	children;
 
+		void UpdateWorldTransform(const DirectX::XMMATRIX& parentWorldTransform);
+		void UpdateWorldTransformsRecursive(const DirectX::XMMATRIX& parentWorldTransform);
+
 		template<class Archive>
 		void serialize(Archive& archive);
 	};
@@ -184,6 +187,7 @@ public:
 
 	// トランスフォーム更新処理
 	void UpdateTransform(const DirectX::XMFLOAT4X4& worldTransform);
+
 
 	// アニメーション計算
 	void ComputeAnimation(int animationIndex, int nodeIndex, float time, NodePose& nodePose) const;

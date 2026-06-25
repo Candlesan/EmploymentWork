@@ -10,6 +10,7 @@
 // ゲームオブジェクト
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
+#include "GamePlay/Object/Character/PhysicsBone/PhysicsBone.h"
 #include "GamePlay/Object/Trail/Trail.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
 
@@ -237,4 +238,7 @@ private:
 
 	// 先行入力
 	int bufferedButton = 0;
+
+	// 物理ボーン
+	std::vector<PhysicsBone> physicsBones;
 };
