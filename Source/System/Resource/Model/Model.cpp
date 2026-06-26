@@ -696,6 +696,8 @@ void Model::BuildMeshes(ID3D11Device* device)
 			bone.node = &nodes.at(bone.nodeIndex);
 		}
 	}
+
+
 }
 
 void Model::Node::UpdateWorldTransform(const DirectX::XMMATRIX& parentWorldTransform)

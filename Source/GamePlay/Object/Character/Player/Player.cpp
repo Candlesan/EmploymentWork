@@ -14,6 +14,7 @@
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
+#include <format>
 
 // 初期化
 void Player::Initialize()
@@ -21,8 +22,7 @@ void Player::Initialize()
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// プレイヤーモデル読み込み
-	//player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
-	player = std::make_shared<Model>(device, "Data/Model/Player/unitychan/unitychan.glb");
+	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 
 	// 武器モデル読み込み
 	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
@@ -163,27 +163,23 @@ void Player::Initialize()
 	}
 
 	physicsBones.emplace_back();
-	physicsBones.back().SetUp(player, "J_L_HairTail_00");
+	physicsBones.back().SetUp(player, "dk_bun_front_01_l");
 	physicsBones.emplace_back();
-	physicsBones.back().SetUp(player, "J_R_HairTail_00");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "dk_bun_front_01_l");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "dk_bun_front_01_mid");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "dk_bun_front_01_r");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "hair_back_01_r");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "hair_back_01_mid");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "hair_back_01_l");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "hair_front_01_r");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "hair_front_01_l");
-	//physicsBones.emplace_back();
-	//physicsBones.back().SetUp(player, "sg_belt_01");
+	physicsBones.back().SetUp(player, "dk_bun_front_01_mid");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "dk_bun_front_01_r");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "hair_back_01_r");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "hair_back_01_mid");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "hair_back_01_l");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "hair_front_01_r");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "hair_front_01_l");
+	physicsBones.emplace_back();
+	physicsBones.back().SetUp(player, "sg_belt_01");
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -317,6 +313,23 @@ void Player::Update(float elapsedTime)
 
 	// 武器のアタッチメント処理
 	WeaponAttachment();
+
+	static bool checked = false;
+	if (!checked)
+	{
+		checked = true;
+		auto& mesh = player->GetMeshes()[6];
+		for (int i = 0; i < 10; i++)
+		{
+			auto& v = mesh.vertices[i];
+			char buf[256];
+			sprintf_s(buf, "v[%d] weight=(%.2f,%.2f,%.2f,%.2f) bone=(%d,%d,%d,%d)\n",
+				i,
+				v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w,
+				v.boneIndex.x, v.boneIndex.y, v.boneIndex.z, v.boneIndex.w);
+			OutputDebugStringA(buf);
+		}
+	}
 }
 
 // 描画処理
