@@ -116,9 +116,6 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		currentGraphIndex = tabSelectedIndex;
 	}
 
-	// 選択中のグラフを描画する
-	AnimationTransitionGraph& currentGraph = graphs[currentGraphIndex];
-
 	// ノードの追加
 	if (ImGui::Button("+ Add Node"))
 	{
@@ -144,7 +141,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	// Entryノードを出すボタン
 	if (ImGui::Button("+ Add Entry"))
 	{
-		currentGraph.AddNode("Entry", { 50, 200 });
+		graphs[currentGraphIndex].AddNode("Entry", { 50, 200 });
 	}
 
 	ImGui::SameLine();
@@ -152,7 +149,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	// Exitノードを出すボタン
 	if (ImGui::Button("+ Add Exit"))
 	{
-		currentGraph.AddNode("Exit", { 400, 200 });
+		graphs[currentGraphIndex].AddNode("Exit", { 400, 200 });
 	}
 
 	// 自動整列
@@ -176,7 +173,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 			{
 				// 既に追加済みのアニメーションかをチェックする
 				bool alreadyAnimation = false;
-				for (auto& node : currentGraph.nodes)
+				for (auto& node : graphs[currentGraphIndex].nodes)
 				{
 					// アニメーション名が一致するかをチェック
 					if (node.config.animationName == anim.name)
@@ -189,10 +186,10 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 				if (ImGui::Selectable(anim.name.c_str()))
 				{
-					currentGraph.AddNode(anim.name, { 100, 100 }); // 選んだらノード追加
+					graphs[currentGraphIndex].AddNode(anim.name, { 100, 100 }); // 選んだらノード追加
 
 					// 追加したノードにアニメーション名を設定する
-					currentGraph.nodes.back().config.animationName = anim.name;
+					graphs[currentGraphIndex].nodes.back().config.animationName = anim.name;
 
 					showSelectNodeWindow = false; // 選んだら閉じる
 				}
@@ -215,10 +212,10 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 			if (strlen(newSubGraphName) > 0)
 			{
 				// 新しいノードを追加
-				currentGraph.AddNode(newSubGraphName, { 100, 100 });
+				graphs[currentGraphIndex].AddNode(newSubGraphName, { 100, 100 });
 
 				// 作ったノードを取得して、最初から「階層タイプ」にする
-				AnimNode& newNode = currentGraph.nodes.back();
+				AnimNode& newNode = graphs[currentGraphIndex].nodes.back();
 				newNode.type = NodeType::SubGraph;
 
 				// パスを設定する
@@ -237,8 +234,18 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		ImGui::EndPopup();
 	}
 
+	AnimationTransitionGraph& currentGraph = graphs[currentGraphIndex];
+
 	ed::SetCurrentEditor(context);
 	ed::Begin("Animation Transition Editor");
+
+	if (currentGraph.justLoad > 0)
+	{
+		for (auto& node : currentGraph.nodes)
+		{
+			ed::SetNodePosition(node.nodeId, node.position);
+		}
+	}
 
 	// ノード描画
 	for (auto& node : currentGraph.nodes)
@@ -507,6 +514,12 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 				break;
 			}
 		}
+	}
+
+	if (currentGraph.justLoad > 0)
+	{
+		ed::NavigateToContent(0.0f);
+		currentGraph.justLoad--;  // 毎フレーム減らす
 	}
 
 	DrawSelectedLinkEditor(currentGraph);

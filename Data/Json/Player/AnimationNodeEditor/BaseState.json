@@ -159,6 +159,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                100.0,
+                100.0
+            ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
             "type": 1
         },
@@ -171,6 +175,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                300.0,
+                100.0
+            ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
             "type": 1
         },
@@ -183,6 +191,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                500.0,
+                100.0
+            ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Avoid.json",
             "type": 1
         },
@@ -195,6 +207,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                700.0,
+                100.0
+            ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Attack.json",
             "type": 1
         },
@@ -207,6 +223,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                100.0,
+                220.0
+            ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Magic.json",
             "type": 1
         }

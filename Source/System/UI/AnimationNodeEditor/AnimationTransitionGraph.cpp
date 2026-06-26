@@ -222,6 +222,8 @@ void AnimationTransitionGraph::Save(const std::string& path)
 			{"StateName", node.StateName},
 			{"type", (int)node.type},
 			{"subGraphPath", node.subGraphPath},
+			{"position", {node.position.x, node.position.y}},
+
 
 			{"config", {
 				{"animationName", node.config.animationName},
@@ -306,8 +308,16 @@ void AnimationTransitionGraph::Load(const std::string& path)
 				stateName = "Unknown";
 			}
 
+			float px = 0.0f, py = 0.0f;
+			if (node.count("position") > 0 && node["position"].is_array() && node["position"].size() == 2)
+			{
+				px = node["position"][0].get<float>();
+				py = node["position"][1].get<float>();
+			}
+
+
 			// ƒm[ƒh‚ğ’Ç‰Á
-			AddNode(stateName, { 0, 0 });
+			AddNode(stateName, { px, py });
 			AnimNode& newNode = nodes.back();
 
 			newNode.type = (NodeType)node.value("type", 0);
@@ -394,6 +404,8 @@ void AnimationTransitionGraph::Load(const std::string& path)
 			}
 		}
 	}
+
+	justLoad = 3;
 }
 
 // ©“®®—ñ

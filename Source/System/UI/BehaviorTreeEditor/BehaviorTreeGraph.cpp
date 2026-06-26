@@ -244,5 +244,5 @@ void BehaviorTreeGraph::Load(const std::string& path)
 		}
 	}
 
-	justLoad = true;
+	justLoad = 3;
 }

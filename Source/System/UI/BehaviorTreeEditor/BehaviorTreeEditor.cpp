@@ -10,6 +10,15 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 	ed::SetCurrentEditor(context);
 	ed::Begin("BehaviorTreeEditor",ImVec2(0,0));
 	{
+		// 描画を始める前にノードの位置を伝える
+		if (graph.justLoad > 0)
+		{
+			for (auto& node : graph.nodes)
+			{
+				ed::SetNodePosition(node.nodeId, node.position);
+			}
+		}
+
 		// ノードを描画
 		for (auto& node : graph.nodes)
 		{
@@ -77,15 +86,6 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 			{
 				node.position = ed::GetNodePosition(node.nodeId);
 			}
-		}
-
-		if (graph.justLoad)
-		{
-			for (auto& node : graph.nodes)
-			{
-				ed::SetNodePosition(node.nodeId, node.position);
-			}
-			graph.justLoad = false; // 用が済んだらフラグを戻す
 		}
 
 		// リンクを描画
@@ -182,8 +182,7 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 
 	// シングルクリックはノード選択
 	if (ImGui::IsMouseClicked(0) && hoveredNode != ed::NodeId::Invalid)
-	{
-		for (int i = 0; i < (int)graph.nodes.size(); i++)
+	{		for (int i = 0; i < (int)graph.nodes.size(); i++)
 		{
 			if (graph.nodes[i].nodeId == hoveredNode)
 			{
@@ -211,6 +210,15 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 	}
 
 	ed::End();
+
+	if (graph.justLoad > 0)
+	{
+		// カメラを自動調整する処理
+		ed::NavigateToContent(0.0f);
+
+		graph.justLoad--; // 用が済んだらフラグを戻す
+	}
+
 	ed::SetCurrentEditor(nullptr);
 
 	DrawInspector(graph);

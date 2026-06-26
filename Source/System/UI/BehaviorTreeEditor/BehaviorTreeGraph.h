@@ -74,7 +74,7 @@ struct BehaviorTreeGraph
 public:
 	std::vector<BTNode> nodes;
 	std::vector<BTLink> links;
-	bool justLoad = false;
+	int justLoad = 0;
 
 	void AddNode(const std::string& StateName, ImVec2 pos); // ƒm[ƒh‚Ì’Ç‰Á
 	void AddLink(ed::PinId from, ed::PinId to); // –îˆó‚Ì’Ç‰Á

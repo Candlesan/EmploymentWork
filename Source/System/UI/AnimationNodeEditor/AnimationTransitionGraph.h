@@ -40,6 +40,7 @@ public:
 	std::vector<AnimNode> nodes;
 	std::vector<AnimLink> links;
 	std::string graphName = "NewGraph"; // グラフの名前
+	int justLoad = 0;
 
 	// ===== 基本機能 ======
 	void AddNode(const std::string& StateName, ImVec2 pos); // ノードの追加
