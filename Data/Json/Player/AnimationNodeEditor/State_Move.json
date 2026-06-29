@@ -112,396 +112,6 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
-                    "threshold": 0.0,
-                    "type": 8
-                }
-            ],
-            "fromState": "Entry",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_R_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 11
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                }
-            ],
-            "fromState": "Entry",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_L_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 10
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                }
-            ],
-            "fromState": "Entry",
-            "priority": 0,
-            "toState": "AS_Run_Combat_B_180_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 8
-                }
-            ],
-            "fromState": "AS_Run_Combat_B_180_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_0_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 8
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_R_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_0_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 8
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_L_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_0_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 10
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_0_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_B_180_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 10
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_R_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_B_180_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 10
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_L_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_B_180_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 9
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_0_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_R_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 9
-                }
-            ],
-            "fromState": "AS_Run_Combat_B_180_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_R_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 9
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_L_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_R_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 11
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_0_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_L_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 11
-                }
-            ],
-            "fromState": "AS_Run_Combat_B_180_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_L_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 11
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_R_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_L_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.05000000074505806,
-                    "type": 7
-                }
-            ],
-            "fromState": "AS_Run_Combat_B_180_Loop_Seq_0",
-            "priority": 0,
-            "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.05000000074505806,
-                    "type": 7
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_R_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.05000000074505806,
-                    "type": 7
-                }
-            ],
-            "fromState": "AS_Run_Combat_F_L_90_Loop_Seq_0",
-            "priority": 0,
-            "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
                     "threshold": 0.6000000238418579,
                     "type": 6
                 },
@@ -515,78 +125,6 @@
             "fromState": "Entry",
             "priority": 0,
             "toState": "AS_Run_Combat_F_0_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 9
-                }
-            ],
-            "fromState": "AS_Run_Combat_Fast_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_R_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 11
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                }
-            ],
-            "fromState": "AS_Run_Combat_Fast_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_F_L_90_Loop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 14
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "threshold": 0.0,
-                    "type": 10
-                }
-            ],
-            "fromState": "AS_Run_Combat_Fast_Loop_Seq_0",
-            "priority": 0,
-            "toState": "AS_Run_Combat_B_180_Loop_Seq_0"
         }
     ],
     "nodes": [
@@ -599,6 +137,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                -127.0,
+                9.0
+            ],
             "subGraphPath": "",
             "type": 0
         },
@@ -611,6 +153,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "position": [
+                321.0,
+                9.0
+            ],
             "subGraphPath": "",
             "type": 0
         },
@@ -623,6 +169,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
+            "position": [
+                17.0,
+                41.0
+            ],
             "subGraphPath": "",
             "type": 0
         },
@@ -635,42 +185,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "AS_Run_Combat_F_R_90_Loop_Seq_0",
-            "config": {
-                "animationName": "AS_Run_Combat_F_R_90_Loop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": false,
-                "useRootMotionEx": true
-            },
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "AS_Run_Combat_F_L_90_Loop_Seq_0",
-            "config": {
-                "animationName": "AS_Run_Combat_F_L_90_Loop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": false,
-                "useRootMotionEx": true
-            },
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "AS_Run_Combat_B_180_Loop_Seq_0",
-            "config": {
-                "animationName": "AS_Run_Combat_B_180_Loop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": false,
-                "useRootMotionEx": true
-            },
+            "position": [
+                19.0,
+                -39.0
+            ],
             "subGraphPath": "",
             "type": 0
         }

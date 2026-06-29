@@ -126,20 +126,8 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = (ctx.moveLength < cond.threshold);
 			break;
 
-		case TransitionConditionType::InputIsForward:
-			result = (ctx.inputDir == RelativeInputDir::Forward);
-			break;
-
-		case TransitionConditionType::InputIsRight:
-			result = (ctx.inputDir == RelativeInputDir::Right);
-			break;
-
-		case TransitionConditionType::InputIsBackward:
-			result = (ctx.inputDir == RelativeInputDir::Backward);
-			break;
-
-		case TransitionConditionType::InputIsLeft:
-			result = (ctx.inputDir == RelativeInputDir::Left);
+		case TransitionConditionType::InputDir:
+			result = (ctx.inputDir == cond.targetDir);
 			break;
 
 		case TransitionConditionType::EnemyFromDistance:
@@ -192,6 +180,9 @@ bool AnimationTransitionGraph::EvaluateConditions(
 
 			result = (ctx.position.z > cond.threshold);
 			break;
+
+		case TransitionConditionType::IsCancelable:
+			result = ctx.IsCancelable;
 
 		case TransitionConditionType::Always:
 			result = true;
@@ -255,6 +246,7 @@ void AnimationTransitionGraph::Save(const std::string& path)
 				{"threshold", cond.threshold},
 				{"buttonMask", cond.buttonMask},
 				{"negate", cond.negate},
+				{"targetDir", (int)cond.targetDir},
 				});
 		}
 
@@ -388,6 +380,7 @@ void AnimationTransitionGraph::Load(const std::string& path)
 						c.threshold = cond.value("threshold", 0.0f);
 						c.buttonMask = cond.value("buttonMask", 0);
 						c.negate = cond.value("negate", false);
+						c.targetDir = (RelativeInputDir)cond.value("targetDir", 0);
 						newLink.transition.conditions.push_back(c);
 					}
 				}

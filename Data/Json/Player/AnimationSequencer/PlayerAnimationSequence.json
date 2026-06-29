@@ -140,6 +140,29 @@
                     "radius": 0.5,
                     "shapeType": 0,
                     "start": 0.0
+                },
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.8816004991531372,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "Cancelable",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.3285653293132782
                 }
             ],
             "speedKeys": []

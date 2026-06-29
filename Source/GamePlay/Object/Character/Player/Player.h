@@ -146,17 +146,6 @@ private:
 	float dropStartT = 0.0f;
 	float dropEndT = 0.0f;
 
-	float pushLT = 0.0f;
-
-	enum class MoveMode {
-		Walk,   // 通常時
-		Jog,	// 小走り
-		Run,	// 走り
-		Guarding_Walk, // ガード入力中(歩き)
-		Guarding_Jog,  // ガード入力中(小走り)
-	};
-	MoveMode mode = MoveMode::Walk;
-
 	// 当たり判定関係
 	float debugOffset = 0.5;
 
@@ -190,7 +179,6 @@ private:
 
 	// ロックオン関係
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
-	float lerpSpeed = 10.0f;
 	float debug_degree = 0.0f;   // 入力角度
 	int   debug_dirIndex = 0;    // 方向インデックス
 
@@ -237,4 +225,8 @@ private:
 
 	// 先行入力
 	int bufferedButton = 0;
+
+	// 入力閾値
+	float lerpSpeed = 10.0f;
+	float smoothdMoveLength = 0.0f;
 };

@@ -46,7 +46,6 @@ void Player::Initialize()
 	baseAttackPower = 860.0f;
 	invincibleTimer = 0.0f;
 
-
 	// 当たり判定パラメーター初期化(Player)
 	weight = 0.5f;
 	radius = 0.4f;
@@ -121,7 +120,6 @@ void Player::Initialize()
 
 	rootMotionNodeName = "root";
 
-
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
@@ -161,7 +159,6 @@ void Player::Initialize()
 			ChangeAnimationState("Idle");
 		}
 	}
-
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -208,9 +205,6 @@ void Player::Update(float elapsedTime)
 		magicCoolDownTimer -= elapsedTime;
 	}
 
-	pushLT = gamePad.GetTriggerL();
-
-
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());
@@ -219,17 +213,16 @@ void Player::Update(float elapsedTime)
 
 	if (gamePad.GetButtonDown() & GamePad::BTN_X || gamePad.GetButtonDown() & GamePad::BTN_Y)
 	{
-		MagicInput();
-		//if (currentState != "State_Attack")
-		//{
-		//	lockedEnemyDistance = EnemyfromDistance;
-		//}
+		if (currentState != "State_Attack")
+		{
+			lockedEnemyDistance = EnemyfromDistance;
+		}
 
-		//// 敵との距離が12.0f以上だったら魔法を撃つ
-		//if (lockedEnemyDistance > 12.0f)
-		//{
-		//	MagicInput();
-		//}
+		// 敵との距離が12.0f以上だったら魔法を撃つ
+		if (lockedEnemyDistance > 12.0f)
+		{
+			MagicInput();
+		}
 	}
 
 	// 無敵時間更新
@@ -342,10 +335,17 @@ void Player::DrawGUI()
 			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 			ImGui::Text("moveLength: %.3f", moveLength);
 			ImGui::Text("EnemyfromDistance: %.3f", EnemyfromDistance);
-			ImGui::Text("pushLT: %.3f", pushLT);
+			ImGui::Separator();
 
+			// 入力方向のデバッグ表示
+			const char* debugDirNames[] = { "None", "Forward", "ForwardRight", "ForwardLeft", "Right", "Backward", "BackwardRight", "BackwardLeft", "Left" };
+			ImGui::Text("Input Degree: %.2f", debug_degree);
+			ImGui::Text("Input Dir: %s", debugDirNames[debug_dirIndex]);
 
 			ImGui::Separator();
+
+			ImGui::DragFloat("lerpSpeed", &lerpSpeed, 0.1f);
+			ImGui::Text("smoothdMoveLength : %f.1", smoothdMoveLength);
 
 			if (ImGui::Button(u8"ポーション回復"))
 			{
@@ -934,6 +934,9 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
+	smoothdMoveLength += (moveLength - smoothdMoveLength) * lerpSpeed * elapsedTime;
+
+	// 先行入力処理
 	if (animSequence.GetRange("InputBuffer"))
 	{
 		// 既に記憶しているボタンに今フレームでおされたボタンを追加
@@ -942,20 +945,15 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 	IsGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
 
-	HaveStamina = (Stamina > 0.1f);
-
-	bool canRunTrigger = (runDisableTimer <= 0.0f); // 3秒ペナルティが終わっているか
-
 	UpdateStateBehavior();
 
 	TransitionContext ctx;
 	ctx.position = GetPosition();
 	ctx.animSeconds = GetCurrentAnimationSeconds();
 	ctx.animLength = GetCurrentAnimationLength();
-	ctx.moveLength = moveLength;
+	ctx.moveLength = smoothdMoveLength;
 	ctx.enemyFromdistance = EnemyfromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
-	ctx.inputDir = RelativeInputDir::None;
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.jumpPressed = jumpPressed;
@@ -963,6 +961,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.havePotion = (Potion > 0);
 	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
 	ctx.isGuarding = IsGuarding;
+	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 
 	if (moveLength > 0.01f) // ある程度入力がある場合のみ判定
 	{
@@ -979,23 +978,42 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		float degree = DirectX::XMConvertToDegrees(relativeAngle);
 		if (degree < 0) degree += 360.0; // 0 ～ 360度に補正
 
-		// 角度を4等分して前後左右を判定する
-		if (degree >= 315.0f || degree < 45.0f)
+		// 角度を8等分して前後左右を判定する
+		if (degree >= 337.5 || degree < 22.5f)
 		{
 			ctx.inputDir = RelativeInputDir::Forward;
 		}
-		else if (degree >= 45.0f && degree < 135.0f) 
+		else if (degree >= 22.5f && degree < 67.5f)
+		{
+			ctx.inputDir = RelativeInputDir::ForwardRight;
+		}
+		else if (degree >= 67.5f && degree < 112.5f)
 		{
 			ctx.inputDir = RelativeInputDir::Right;
 		}
-		else if (degree >= 135.0f && degree < 225.0f)
+		else if (degree > 112.5f && degree < 157.5f)
+		{
+			ctx.inputDir = RelativeInputDir::BackwardRight;
+		}
+		else if (degree >= 157.5f && degree < 202.5f)
 		{
 			ctx.inputDir = RelativeInputDir::Backward;
 		}
-		else if (degree >= 225.0f && degree < 315.0f)
+		else if (degree >= 202.5f && degree < 247.5f)
+		{
+			ctx.inputDir = RelativeInputDir::BackwardLeft;
+		}
+		else if (degree >= 247.5f && degree < 292.5f)
 		{
 			ctx.inputDir = RelativeInputDir::Left;
 		}
+		else if (degree >= 292.5f && degree < 337.5)
+		{
+			ctx.inputDir = RelativeInputDir::ForwardLeft;
+		}
+
+		debug_degree = degree;
+		debug_dirIndex = (int)ctx.inputDir;
 	}
 
 	if (activeGraphStack.empty()) return;
@@ -1003,13 +1021,11 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	int currentIndex = activeGraphStack.back();
 	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
 	int targetLevel = (int)activeGraphStack.size() - 1;
-
 	std::string evalStateForTrans = currentState;
-
-	std::string nextState = currentGraph->EvaluateTransitions(currentState, ctx);
+	std::string nextState = currentState;
 
 	// 親の割り込み処理
-	for (int i = (int)activeGraphStack.size() - 1; i >= 0; i--)
+	for (int i = 0; i < (int)activeGraphStack.size(); i++) 
 	{
 		int gIdx = activeGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
@@ -1032,7 +1048,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			nextState = result;
 			currentGraph = g;
 			targetLevel = i;
-
 			evalStateForTrans = evalState;
 			break;
 		}

@@ -47,6 +47,16 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		// 現在選択中のグラフを参照して取得する
 		auto& editGraph = graphs[currentGraphIndex];
 
+		ed::SetCurrentEditor(context);
+
+		for (auto& node : editGraph.nodes)
+		{
+			// エディターが側が持っている最新の座標を取得してデータの保存
+			node.position = ed::GetNodePosition(node.nodeId);
+		}
+
+		ed::SetCurrentEditor(nullptr); // 使い終わったらもとにもどす
+
 		char filepath[MAX_PATH] = { 0 };
 
 		HWND hwnd = Graphics::Instance().GetWindowHandle();
@@ -261,28 +271,48 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 			ed::PushStyleVar(ed::StyleVar_NodeBorderWidth, 4.0f);
 		}
 
+		// 線を直線にする設定
+		ed::PushStyleVar(ed::StyleVar_SourceDirection, ImVec2(0.0f, 1.0f));
+		ed::PushStyleVar(ed::StyleVar_TargetDirection, ImVec2(0.0f, -1.0f));
+		ed::PushStyleVar(ed::StyleVar_LinkStrength, 0.0f); // 0にすると曲線が直線になる
+
 		ed::BeginNode(node.nodeId);
 
 		ImGui::Text("State: %s", node.StateName.c_str());
 
+		// 矢印の設定は「INピンを描画する直前」に書く！
+		ed::PushStyleVar(ed::StyleVar_PinArrowSize, 10.0f);  // 矢印の大きさ
+		ed::PushStyleVar(ed::StyleVar_PinArrowWidth, 10.0f); // 矢印の太さ
+
 		ed::BeginPin(node.pinIn, ed::PinKind::Input);
 		ImGui::Text("IN");
 		ed::EndPin();
+
+		// INピンの描画が終わったら、忘れずに矢印の設定を戻す（2個）
+		ed::PopStyleVar(2);
+
 
 		ImGui::SameLine();
 
 		ed::BeginPin(node.pinOut, ed::PinKind::Output);
 		ImGui::Text("OUT");
 		ed::EndPin();
-		ed::EndNode();
 
+
+		ed::EndNode(); // ノードの描画終了
+
+		// ノードの描画が終わったら、直線用の設定を戻す（3個）
+		ed::PopStyleVar(3);
+
+
+		// isActiveの色や太さを戻す
 		if (isActive)
 		{
 			ed::PopStyleColor();
 			ed::PopStyleVar();
 		}
 
-		// 色をもとに戻す
+		// SubGraphノードの色をもとに戻す
 		if (node.type == NodeType::SubGraph)
 		{
 			ed::PopStyleColor();
@@ -621,10 +651,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"ButtonHeld",			// ボタンを長押ししているとき
 				"MoveLengthOver",		// 入力が一定以上の時
 				"MoveLengthUnder",		// 入力が一定以下の時
-				"InputIsForward",
-				"InputIsRight",
-				"InputIsBackward",
-				"InputIsLeft",
+				"InputDir",				// 入力方向
 				"EnemyFromDistance",	// 敵との距離が一定以上の時
 				"JumpPressed",			// ジャンプ可能かどうか
 				"IsLockOn",				// ロックオン中かどうか
@@ -634,6 +661,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"PoaitionX",			// X軸が～なら
 				"PoaitionY",			// Y軸が～なら
 				"PoaitionZ",			// Z軸が～なら
+				"IsCancelable",			// モーションキャンセル
 				"Always",				// 無条件
 			};
 			int typeIdx = (int)cond.type;
@@ -686,6 +714,24 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionConditionType::PositionZ:
 				ImGui::DragFloat("Thershold", &cond.threshold, 0.01f, 0.0f, 1000.0f);
 				break;
+
+			case TransitionConditionType::InputDir:
+				const char* dirNames[] = { 
+					"None",
+					"Forward",
+					"ForwardRight",
+					"ForwardLeft",
+					"Right",
+					"Backward",
+					"BackwardRight",
+					"BackwardLeft",
+					"Left" };
+				int currentDirIdx = (int)cond.targetDir;
+
+				if (ImGui::Combo("Direction", &currentDirIdx, dirNames, IM_ARRAYSIZE(dirNames)));
+				{
+					cond.targetDir = (RelativeInputDir)currentDirIdx;
+				}
 			}
 
 			// 条件の反転チェックボックス

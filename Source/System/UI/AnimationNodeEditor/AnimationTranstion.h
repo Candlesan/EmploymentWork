@@ -16,10 +16,7 @@ enum class TransitionConditionType
 	MoveLengthOver,		// スティックの入力値が一定以上だったら
 	MoveLengthUnder,	// スティックの入力値が一定以下だったら
 
-	InputIsForward, // 入力方向が「前」か
-	InputIsRight,   // 入力方向が「右」か
-	InputIsBackward,// 入力方向が「後」か
-	InputIsLeft,    // 入力方向が「左」か
+	InputDir,			// 入力方向
 
 	EnemyFromDistance,	// 敵との距離
 
@@ -33,6 +30,9 @@ enum class TransitionConditionType
 	PositionX,			// 位置:X座標
 	PositionY,			// 位置:Y座標
 	PositionZ,			// 位置:Z座標
+
+	IsCancelable,		// モーションキャンセル
+
 	Always,				// 無条件
 };
 
@@ -46,11 +46,15 @@ enum class TransitionActionType
 
 enum class RelativeInputDir
 {
-	None,     // 入力なし
-	Forward,  // 前
-	Right,    // 右
-	Backward, // 後ろ
-	Left      // 左
+	None,			// 入力なし
+	Forward,		// 前
+	ForwardRight,	// 右斜め前
+	ForwardLeft,	// 左斜め前
+	Right,			// 右
+	Backward,		// 後ろ
+	BackwardRight,	// 後ろ斜め後ろ
+	BackwardLeft,	// 後ろ斜め後ろ
+	Left			// 左
 };
 
 struct TransitionAction
@@ -65,6 +69,7 @@ struct TransitionCondition
 	float threshold = 0.0f;    // 時間・入力量などの閾値
 	int   buttonMask = 0;      // GamePad::BTN_XXX
 	bool  negate = false;      // 条件を反転（〜でない）
+	RelativeInputDir targetDir = RelativeInputDir::None;
 };
 
 struct AnimationTransition
@@ -91,5 +96,6 @@ struct TransitionContext
 	bool  havePotion;
 	bool  healCooldownReady;
 	bool  isGuarding;
+	bool IsCancelable;
 	RelativeInputDir inputDir;
 };

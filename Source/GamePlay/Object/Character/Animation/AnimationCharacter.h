@@ -82,6 +82,7 @@ protected:
 	float animationBlendSeconds = 0.0f;
 	float animationBlendSecondsLength = 0.2f;
 	bool isBlending = true;
+	bool justChangedAnimation = true;
 	bool animationLoop = false;
 	bool useRootMotion = false;
 	bool useRootMotionEx = false;

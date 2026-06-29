@@ -71,17 +71,6 @@
             "fromState": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
             "priority": 0,
             "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [],
-            "fromState": "Exit",
-            "priority": 0,
-            "toState": "-1"
         }
     ],
     "nodes": [
@@ -94,8 +83,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "position.x": 100.0,
-            "position.y": 100.0,
+            "position": [
+                -111.0,
+                89.0
+            ],
             "subGraphPath": "",
             "type": 0
         },
@@ -108,8 +99,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "position.x": 300.0,
-            "position.y": 100.0,
+            "position": [
+                419.0,
+                89.0
+            ],
             "subGraphPath": "",
             "type": 0
         },
@@ -122,8 +115,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
-            "position.x": 500.0,
-            "position.y": 100.0,
+            "position": [
+                19.0,
+                57.0
+            ],
             "subGraphPath": "",
             "type": 0
         },
@@ -136,8 +131,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
-            "position.x": 700.0,
-            "position.y": 100.0,
+            "position": [
+                17.0,
+                137.0
+            ],
             "subGraphPath": "",
             "type": 0
         }

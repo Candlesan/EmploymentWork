@@ -299,6 +299,27 @@ void SceneGame::Render()
 	// シャドウマップ描画
 	RenderShadowMap();
 
+	// デバック描画
+	{
+		bool showPlayerWeapon = false;
+		for (auto& data : player.GetAnimSequence().GetAnimations()) {
+			if (data.name == player.GetCurrentState()) {
+				for (auto& r : data.ranges) {
+					if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
+						showPlayerWeapon = true;
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
+		enemy->RenderDebugPrimitive(shapeRenderer, false);
+
+	}
+
+
 	// 3Dモデル描画
 	{
 		// ステージ描画
@@ -323,6 +344,9 @@ void SceneGame::Render()
 
 		// スカイマップ描画
 		skyMap->Draw(rc);
+
+		// シェイプレンダラ描画
+		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
 
 		framebuffers[0]->deactivate(dc);
 
@@ -351,28 +375,6 @@ void SceneGame::Render()
 	// 2Dスプライト描画
 	{
 		particleManager->Render(rc);
-	}
-
-	// デバック描画
-	{
-		bool showPlayerWeapon = false;
-		for (auto& data : player.GetAnimSequence().GetAnimations()) {
-			if (data.name == player.GetCurrentState()) {
-				for (auto& r : data.ranges) {
-					if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
-						showPlayerWeapon = true;
-						break;
-					}
-				}
-				break;
-			}
-		}
-
-		player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
-		enemy->RenderDebugPrimitive(shapeRenderer, false);
-
-		// シェイプレンダラ描画
-		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
 	}
 }
 

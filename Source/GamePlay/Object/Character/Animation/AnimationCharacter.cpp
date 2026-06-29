@@ -41,6 +41,7 @@ void AnimationCharacter::ChangeAnimationState(const std::string& newState, bool 
 		oldAnimationSeconds = 0.0f;
 		animationBlendSeconds = 0.0f;
 		isBlending = true;
+		justChangedAnimation = true;
 	}
 
 	//アニメーションのリソースが同じでも、ステートが変われば「ループ設定」などは更新
@@ -111,7 +112,12 @@ void AnimationCharacter::UpdateAnimation(float elapsedTime)
 		nodePoses = currentNodePoses;
 	}
 
-	if (useRootMotion)
+	if (justChangedAnimation)
+	{
+		justChangedAnimation = false;
+		// ルートモーション計算をこのフレームだけ飛ばす
+	}
+	else if (useRootMotion)
 	{
 		// ルートモーションノード番号取得
 		const int rootMotionNodeIndex = model->GetNodeIndex(rootMotionNodeName.c_str()); // モデルに合わせて変えてくれ
