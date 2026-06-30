@@ -41,7 +41,7 @@
         {
             "Actions": [
                 {
-                    "type": 4,
+                    "type": 3,
                     "value": 1.0
                 }
             ],
@@ -65,8 +65,8 @@
         {
             "Actions": [
                 {
-                    "type": 4,
-                    "value": 0.0
+                    "type": 3,
+                    "value": 1.0
                 }
             ],
             "colorA": 1.0,
@@ -532,6 +532,61 @@
             "fromState": "State_LockOn_Jump",
             "priority": 0,
             "toState": "State_LockOnMove"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 1.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                }
+            ],
+            "fromState": "State_LockOnMove",
+            "priority": 0,
+            "toState": "State_LockOn_Avoid"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_LockOn_Avoid",
+            "priority": 0,
+            "toState": "State_LockOnMove"
         }
     ],
     "nodes": [
@@ -661,6 +716,22 @@
                 -231.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_Jump.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_LockOn_Avoid",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                401.0,
+                25.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_Avoid.json",
             "type": 1
         }
     ]

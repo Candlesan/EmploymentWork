@@ -125,22 +125,15 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": true,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 11
-                },
-                {
-                    "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 6
+                    "threshold": 0.4000000059604645,
+                    "type": 1
                 }
             ],
-            "fromState": "Entry",
+            "fromState": "AS_Jump_Combat_Start_F_0_Seq_0",
             "priority": 0,
-            "toState": "AS_Jump_Combat_Start_F_0_Seq_0"
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
         },
         {
             "Actions": [],
@@ -153,13 +146,13 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 0.4000000059604645,
-                    "type": 1
+                    "threshold": 0.10000000149011612,
+                    "type": 6
                 }
             ],
-            "fromState": "AS_Jump_Combat_Start_F_0_Seq_0",
+            "fromState": "Entry",
             "priority": 0,
-            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+            "toState": "AS_Jump_Combat_Start_F_0_Seq_0"
         }
     ],
     "nodes": [
@@ -215,7 +208,7 @@
             "StateName": "AS_Jump_Combat_Loop_0_Seq_0",
             "config": {
                 "animationName": "AS_Jump_Combat_Loop_0_Seq_0",
-                "blendTime": 0.20000000298023224,
+                "blendTime": 0.3499999940395355,
                 "loop": true,
                 "useRootMotion": false,
                 "useRootMotionEx": false
@@ -247,7 +240,7 @@
             "StateName": "AS_Jump_Combat_Start_F_0_Seq_0",
             "config": {
                 "animationName": "AS_Jump_Combat_Start_F_0_Seq_0",
-                "blendTime": 0.20000000298023224,
+                "blendTime": 0.0,
                 "loop": false,
                 "useRootMotion": false,
                 "useRootMotionEx": false
