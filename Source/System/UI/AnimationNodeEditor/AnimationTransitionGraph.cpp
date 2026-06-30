@@ -146,8 +146,8 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = (ctx.buttonHeld & cond.buttonMask) != 0;
 			break;
 
-		case TransitionConditionType::JumpPressed:
-			result = ctx.jumpPressed;
+		case TransitionConditionType::IsGround:
+			result = ctx.IsGround;
 			break;
 
 		case TransitionConditionType::IsLockOn:

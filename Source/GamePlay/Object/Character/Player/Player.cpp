@@ -31,7 +31,7 @@ void Player::Initialize()
 	weapon[1].scale.x = weapon[1].scale.y = weapon[1].scale.z = 0.2;
 
 	// プレイヤーパラメーター初期化
-	moveSpeed = 2.0f; // 移動速度
+	moveSpeed = 7.0f; // 移動速度
 	maxMoveSpeed = 7.0f; // 最大移動速度
 
 	health = 1400.0f; // 体力
@@ -186,7 +186,7 @@ void Player::Update(float elapsedTime)
 
 	// ジャンプ入力を確定させる（文字入力中・プレビュー中は無効化）
 	if (!isTyping && !isPreviewMode) {
-		jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A)/* && CanJump()*/;
+		jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A);
 	}
 	else {
 		jumpPressed = false;
@@ -203,6 +203,21 @@ void Player::Update(float elapsedTime)
 	if (magicCoolDownTimer > 0.0f)
 	{
 		magicCoolDownTimer -= elapsedTime;
+	}
+
+	falling = (velocity.y < -0.1f);
+	// 滞空処理
+	if (falling && gamePad.GetButton() & GamePad::BTN_A)
+	{
+		SetGravity(-1.0f);
+	}
+	else if (falling)
+	{
+		SetGravity(-25.0f);
+	}
+	else
+	{
+		SetGravity(-9.8f);
 	}
 
 	// 敵との距離の計算
@@ -335,6 +350,14 @@ void Player::DrawGUI()
 			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 			ImGui::Text("moveLength: %.3f", moveLength);
 			ImGui::Text("EnemyfromDistance: %.3f", EnemyfromDistance);
+			if (IsGround())
+			{
+				ImGui::Text(u8"地面");
+			}
+			else
+			{
+				ImGui::Text(u8"空中");
+			}
 			ImGui::Separator();
 
 			// 入力方向のデバッグ表示
@@ -446,7 +469,7 @@ void Player::DrawGUI()
 	ImGui::End();
 
 	ImGui::Begin("Animation Transition Editor");
-	std::string clickedNode = transitionEditor.Draw(transitionGraphs, currentState);
+	std::string clickedNode = transitionEditor.Draw(transitionGraphs, currentState, activeGraphStack);
 	ImGui::End();
 
 	// ノードがダブルクリックされたらプレビューモードに切り替える
@@ -915,16 +938,6 @@ void Player::InputMove(float elapsedTime)
 			}
 		}
 	}
-
-	// ジャンプ
-	if (jumpPressed)
-	{
-		if (jumpCount < jumpLimit)
-		{
-			jumpCount++;
-			Jump(jumpSpeed);
-		}
-	}
 }
 
 // 状態遷移更新処理
@@ -956,7 +969,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
-	ctx.jumpPressed = jumpPressed;
+	ctx.IsGround = IsGround();
 	ctx.isLockOn = (lockOnTargetPos != nullptr);
 	ctx.havePotion = (Potion > 0);
 	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
@@ -1015,6 +1028,10 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		debug_degree = degree;
 		debug_dirIndex = (int)ctx.inputDir;
 	}
+	else
+	{
+		ctx.inputDir = RelativeInputDir::None; // 入力なし
+	}
 
 	if (activeGraphStack.empty()) return;
 
@@ -1065,6 +1082,31 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentState)
 	{
+		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
+		{
+			Jump(jumpSpeed);
+
+			// 空中に飛び出すときに勢いを載せる
+			if (moveLength > 0.1f)
+			{
+				float mvX = moveVec.x / moveLength;
+				float mvZ = moveVec.z / moveLength;
+
+				// 走ってるときの速度を掛けてVelocityに送る
+				float jumpForwardSpeed = maxMoveSpeed;
+				velocity.x = mvX * jumpForwardSpeed;
+				velocity.z = mvZ * jumpForwardSpeed;
+			}
+			else
+			{
+				velocity.x = 0.0f;
+				velocity.z = 0.0f;
+			}
+
+			jumpCount++;
+			bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+		}
+
 		// アクションを実行する
 		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
 		if (trans)

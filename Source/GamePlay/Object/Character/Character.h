@@ -75,6 +75,8 @@ public:
 	bool IsGround() const { return isGround; }
 	bool SetIsGround(bool flag) { return isGround = flag; }
 
+	void SetGravity(float g) { gravity = g; }
+
 	// ----- ダメージ / ステータス -----
 
 	// ダメージを与える（無敵時間・体幹ダメージを考慮）

@@ -7,7 +7,7 @@
 #include "System/UI/Dialog.h"
 
 // ノードエディタ描画
-std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs, const std::string& activeState)
+std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs, const std::string& activeState, const std::vector<int>& activeGraphStack)
 {
 	std::string doubleClickedState = "";
 
@@ -63,7 +63,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 		if (Dialog::SaveFileName(filepath, MAX_PATH,
 			"JSON File\0*.json\0\0",	// フィルター
-			u8"名前を付けて保存",	// タイトル
+			"名前を付けて保存",	// タイトル
 			"json",// 拡張子
 			hwnd)				
 			== DialogResult::OK)
@@ -83,7 +83,7 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 
 		if (Dialog::OpenFileName(filepath, MAX_PATH,
 			"JSON File\0*.json\0\0",	// フィルター
-			u8"ファイルを開く",
+			"ファイルを開く",
 			hwnd)	// タイトル
 			== DialogResult::OK)
 		{
@@ -264,7 +264,31 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		if (node.type == NodeType::SubGraph)
 			ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.2f, 0.4f, 0.6f, 1.0f));
 
-		bool isActive = (node.StateName == activeState);
+		bool isActive = false;
+		if (node.type == NodeType::SubGraph)
+		{
+			if (!node.subGraphPath.empty())
+			{
+				char filename[MAX_PATH];
+				_splitpath_s(node.subGraphPath.c_str(), nullptr, 0, nullptr, 0,
+					filename, MAX_PATH, nullptr, 0);
+				std::string childGraphName = filename;
+
+				for (int activeIdx : activeGraphStack)
+				{
+					if (graphs[activeIdx].graphName == childGraphName)
+					{
+						isActive = true;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			isActive = (node.StateName == activeState);
+		}
+
 		if (isActive)
 		{
 			ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
@@ -323,6 +347,26 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 	for (auto& link : currentGraph.links)
 	{
 		ed::Link(link.linkId, link.startPin, link.endPin, link.color);
+
+		// 今いるグラフのインデックスを取得
+		// activeGraphStackの中にcurrentGraphIndexがあるか探す
+		std::string evalState = activeState; // デフォルトは currentState
+
+		// 親グラフを見てるとき → evalStateを子グラフ名に差し替える
+		for (int i = 0; i < (int)activeGraphStack.size() - 1; i++)
+		{
+			if (activeGraphStack[i] == currentGraphIndex)
+			{
+				// 1個下の子グラフ名がこの階層でのevalState
+				evalState = graphs[activeGraphStack[i + 1]].graphName;
+				break;
+			}
+		}
+
+		if (link.transition.fromState == evalState)
+		{
+			ed::Flow(link.linkId);
+		}
 	}
 
 	// ドラックでリンクを作成
@@ -653,7 +697,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"MoveLengthUnder",		// 入力が一定以下の時
 				"InputDir",				// 入力方向
 				"EnemyFromDistance",	// 敵との距離が一定以上の時
-				"JumpPressed",			// ジャンプ可能かどうか
+				"IsGround",				// 地面にいる時
 				"IsLockOn",				// ロックオン中かどうか
 				"HavePotion",			// ポーションを持っているか
 				"HealCooldownReady",	// 回復のクールダウン中か
@@ -705,9 +749,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 					cond.buttonMask = buttonMasks[currentIndex];
 				break;
 			}
-			case TransitionConditionType::JumpPressed:
-				ImGui::TextDisabled(u8"（追加設定なし）");
-				break;
 
 			case TransitionConditionType::PositionX:
 			case TransitionConditionType::PositionY:

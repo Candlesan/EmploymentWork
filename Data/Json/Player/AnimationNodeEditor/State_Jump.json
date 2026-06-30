@@ -10,8 +10,16 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 21
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
                 }
             ],
             "fromState": "Entry",
@@ -28,8 +36,9 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
-                    "threshold": 0.0,
-                    "type": 0
+                    "targetDir": 0,
+                    "threshold": 0.17499999701976776,
+                    "type": 1
                 }
             ],
             "fromState": "AS_Jump_Combat_Start_0_Seq_0",
@@ -37,12 +46,78 @@
             "toState": "AS_Jump_Combat_Loop_0_Seq_0"
         },
         {
-            "Actions": [
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
                 {
-                    "type": 0,
-                    "value": 0.0
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 10
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
                 }
             ],
+            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 16
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Stop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Stop_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
@@ -51,13 +126,40 @@
                 {
                     "buttonMask": 0,
                     "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.10000000149011612,
-                    "type": 19
+                    "type": 6
                 }
             ],
-            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "fromState": "Entry",
             "priority": 0,
-            "toState": "Exit"
+            "toState": "AS_Jump_Combat_Start_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.4000000059604645,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Start_F_0_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
         }
     ],
     "nodes": [
@@ -71,8 +173,8 @@
                 "useRootMotionEx": false
             },
             "position": [
-                -15.0,
-                185.0
+                -191.0,
+                265.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -87,8 +189,8 @@
                 "useRootMotionEx": false
             },
             "position": [
-                435.0,
-                233.0
+                417.0,
+                249.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -99,11 +201,11 @@
                 "animationName": "AS_Jump_Combat_Start_0_Seq_0",
                 "blendTime": 0.0,
                 "loop": false,
-                "useRootMotion": true,
+                "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "position": [
-                113.0,
+                1.0,
                 185.0
             ],
             "subGraphPath": "",
@@ -119,8 +221,40 @@
                 "useRootMotionEx": false
             },
             "position": [
-                113.0,
-                281.0
+                3.0,
+                265.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Stop_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Stop_0_Seq_0",
+                "blendTime": 0.0,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                5.0,
+                345.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Start_F_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Start_F_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                1.0,
+                105.0
             ],
             "subGraphPath": "",
             "type": 0

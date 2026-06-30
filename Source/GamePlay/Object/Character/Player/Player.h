@@ -167,7 +167,8 @@ private:
 
 	// ƒWƒƒƒ“ƒvŠÖŒW
 	bool jumpPressed = false;
-	float jumpSpeed = 5.0f;
+	float jumpSpeed = 7.0f;
+	bool falling = false;
 
 	int jumpCount = 0;
 	int jumpLimit = 1;

@@ -72,7 +72,7 @@ void Character::Turn(float elapsedTime, float vx, float vz, float speed)
 //ジャンプ処理
 void Character::Jump(float speed)
 {
-	velocity.y += speed;
+	velocity.y = speed;
 }
 
 //速力処理更新
@@ -200,18 +200,21 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 	float length = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
 	if (length > 0.0f)
 	{
+		// 空中にいる時は摩擦をほぼ0にする
+		float currentFriction = isGround ? (this->friction * elapsedTime) : (this->friction * 0.02f * elapsedTime);
+
 		//摩擦力
-		float friction = this->friction * elapsedTime;
+		//float friction = this->friction * elapsedTime;
 
 		//摩擦による横方向の減速処理
-		if (length > friction)
+		if (length > currentFriction)
 		{
 			//単位ベクトル化
 			float vx = velocity.x / length;
 			float vz = velocity.z / length;
 			//速力を減らす
-			velocity.x -= vx * friction;
-			velocity.z -= vz * friction;
+			velocity.x -= vx * currentFriction;
+			velocity.z -= vz * currentFriction;
 		}
 		//横方向の速力が摩擦力以下になってたので速力を無効化
 		else
@@ -228,12 +231,15 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 		float moveVeclength = sqrtf(moveVecX * moveVecX + moveVecZ * moveVecZ);
 		if (moveVeclength > 0.0f)
 		{
+			// 空中でスティックを倒したときの空中制御力を下げる。自由にターンできるのを防ぐため
+			float currentAcceleration = isGround ? (this->acceleration * elapsedTime) : (this->acceleration * 0.3f * elapsedTime);
+
 			//加速力
-			float acceleration = this->acceleration * elapsedTime;
+			//float acceleration = this->acceleration * elapsedTime;
 
 			//移動ベクトルによる加速処理
-			velocity.x += acceleration * moveVecX;
-			velocity.z += acceleration * moveVecZ;
+			velocity.x += currentAcceleration * moveVecX;
+			velocity.z += currentAcceleration * moveVecZ;
 
 			//最大速度制限
 			float length = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);

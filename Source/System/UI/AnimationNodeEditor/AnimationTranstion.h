@@ -15,12 +15,11 @@ enum class TransitionConditionType
 
 	MoveLengthOver,		// スティックの入力値が一定以上だったら
 	MoveLengthUnder,	// スティックの入力値が一定以下だったら
-
 	InputDir,			// 入力方向
 
 	EnemyFromDistance,	// 敵との距離
 
-	JumpPressed,		// ジャンプ入力
+	IsGround,			//	地面にいるかどうか
 
 	IsLockOn,			// ロックオン中
 	HavePotion,			// ポーションがある
@@ -32,6 +31,7 @@ enum class TransitionConditionType
 	PositionZ,			// 位置:Z座標
 
 	IsCancelable,		// モーションキャンセル
+	//IsFalling,			// 落下中か
 
 	Always,				// 無条件
 };
@@ -91,7 +91,7 @@ struct TransitionContext
 	int   buttonDown;
 	int   buttonHeld;
 	int   buttonUp;
-	bool  jumpPressed;
+	bool  IsGround;
 	bool  isLockOn;
 	bool  havePotion;
 	bool  healCooldownReady;

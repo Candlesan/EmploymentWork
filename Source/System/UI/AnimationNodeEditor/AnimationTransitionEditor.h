@@ -15,10 +15,9 @@ public:
     }
 
 	// ノードエディタ描画
-	//void Draw(AnimationTransitionGraph& graph);
-	//void Draw(std::vector< AnimationTransitionGraph>& graph);
-	std::string Draw(std::vector< AnimationTransitionGraph>& graph, const std::string& activeState = "");
-
+    std::string Draw(std::vector<AnimationTransitionGraph>& graphs,
+        const std::string& activeState = "",
+        const std::vector<int>& activeGraphStack = {});
 private:
 	// リンク選択
 	void DrawSelectedLinkEditor(AnimationTransitionGraph& graph);

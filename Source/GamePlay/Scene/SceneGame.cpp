@@ -107,6 +107,9 @@ void SceneGame::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
+	float delta = elapsedTime * timeScale;
+	timeScale = baseTimeScale;
+
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
@@ -153,12 +156,6 @@ void SceneGame::Update(float elapsedTime)
 	{
 		timeScale = 0.5f;
 	}
-	else
-	{
-		timeScale = 1.0f;
-	}
-
-	float delta = elapsedTime * timeScale;
 
 
 	if (shouldUpdate)

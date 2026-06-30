@@ -89,6 +89,7 @@ private:
 	bool isPaused = false;      // 一時停止中か
 	bool stepNextFrame = false; // 1フレームだけ進めるか
 	float timeScale = 1.0f; // 1.0が通常、0.1が10倍スロー
+	float baseTimeScale = 1.0f;
 
 	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 

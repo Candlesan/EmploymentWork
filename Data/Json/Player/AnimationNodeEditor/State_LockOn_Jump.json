@@ -1,0 +1,411 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Start_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.17499999701976776,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Start_0_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 8
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 16
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Stop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Stop_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 5,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toState": "AS_Jump_Combat_Start_B_180_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 1,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toState": "AS_Jump_Combat_Start_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 8,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toState": "AS_Jump_Combat_Start_L_90_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 4,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toState": "AS_Jump_Combat_Start_R_90_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.4000000059604645,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Start_B_180_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.4000000059604645,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Start_F_0_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.4000000059604645,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Start_L_90_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.4000000059604645,
+                    "type": 1
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Start_R_90_Seq_0",
+            "priority": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.0,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -236.0,
+                9.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                657.0,
+                9.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Loop_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Loop_0_Seq_0",
+                "blendTime": 0.25,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                321.0,
+                9.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Start_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Start_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -33.0,
+                9.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Start_B_180_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Start_B_180_Seq_0",
+                "blendTime": 0.5,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -31.0,
+                89.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Start_F_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Start_F_0_Seq_0",
+                "blendTime": 0.5,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -33.0,
+                169.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Start_L_90_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Start_L_90_Seq_0",
+                "blendTime": 0.5,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -44.0,
+                249.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Start_R_90_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Start_R_90_Seq_0",
+                "blendTime": 0.5,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -31.0,
+                345.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Jump_Combat_Stop_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Stop_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                319.0,
+                89.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}
