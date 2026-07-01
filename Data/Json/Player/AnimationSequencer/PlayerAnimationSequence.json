@@ -3,8 +3,45 @@
         {
             "events": [],
             "name": "AS_Idle_Combat_Seq_0",
-            "ranges": [],
-            "speedKeys": []
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 10.0,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "IsGliding",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 1.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.0,
+                    "time": 0.2370000034570694
+                },
+                {
+                    "speed": 1.0,
+                    "time": 10.0
+                }
+            ]
         },
         {
             "events": [],
@@ -600,6 +637,49 @@
                 }
             ],
             "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Dodge_Combat_Air_F_0_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.5833333134651184,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "IsGliding",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 1.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.0,
+                    "time": 0.30300000309944153
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.5833333134651184
+                }
+            ]
         }
     ]
 }

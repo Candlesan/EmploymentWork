@@ -108,6 +108,9 @@ private:
 
 	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
+
+	// 滑空
+	void Gliding();
 private:
 	std::shared_ptr<Model> player;
 	Enemy* enemy = nullptr;

@@ -269,6 +269,9 @@ void Player::Update(float elapsedTime)
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
+	// 滑空
+	Gliding();
+
 	// 根本と剣先を求める関数
 	CalculationRootAndTip();
 
@@ -1488,5 +1491,18 @@ AudioSource* Player::GetOrLoadSound(const std::string& soundName)
 		// 見つからなかった場合、次は探さないようにnullptrを保持（または警告を出すようにする）
 		sounds[soundName] = nullptr;
 		return nullptr;
+	}
+}
+
+// 滑空
+void Player::Gliding()
+{
+	if (animSequence.GetRange("IsGliding"))
+	{
+		moveSpeed = 30.0f;
+	}
+	else
+	{
+		moveSpeed = 7.0f;
 	}
 }

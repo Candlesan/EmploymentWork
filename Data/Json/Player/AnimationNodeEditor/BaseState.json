@@ -587,6 +587,44 @@
             "fromState": "State_LockOn_Avoid",
             "priority": 0,
             "toState": "State_LockOnMove"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 5
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toState": "State_Gliding"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 4
+                }
+            ],
+            "fromState": "State_Gliding",
+            "priority": 0,
+            "toState": "State_Move"
         }
     ],
     "nodes": [
@@ -732,6 +770,22 @@
                 25.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_Avoid.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Gliding",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                211.0,
+                153.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Gliding.json",
             "type": 1
         }
     ]
