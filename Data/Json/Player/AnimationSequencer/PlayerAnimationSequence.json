@@ -600,6 +600,66 @@
                 }
             ],
             "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Attack_01_01_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.0,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "InputBuffer",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Attack_01_02_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.0110000371932983,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "InputBuffer",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": []
         }
     ]
 }

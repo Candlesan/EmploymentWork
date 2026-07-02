@@ -8,9 +8,6 @@
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
-#include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMagic.h"
-#include "GamePlay/Object/Magic/MagicMove/HommingMagic/HommingMagic.h"
-#include "GamePlay/Object/Magic/MagicType/Player/WindBladeMagic/WindBladeMagic.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -228,16 +225,18 @@ void Player::Update(float elapsedTime)
 
 	if (gamePad.GetButtonDown() & GamePad::BTN_X || gamePad.GetButtonDown() & GamePad::BTN_Y)
 	{
-		if (currentState != "State_Attack")
-		{
-			lockedEnemyDistance = EnemyfromDistance;
-		}
+
+		MagicInput();
+
+		//if (currentState != "State_Attack")
+		//{
+		//	lockedEnemyDistance = EnemyfromDistance;
+		//}
 
 		// 敵との距離が12.0f以上だったら魔法を撃つ
-		if (lockedEnemyDistance > 12.0f)
-		{
-			MagicInput();
-		}
+		//if (lockedEnemyDistance > 12.0f)
+		//{
+		//}
 	}
 
 	// 無敵時間更新
@@ -273,7 +272,7 @@ void Player::Update(float elapsedTime)
 	CalculationRootAndTip();
 
 	// 魔法剣の挙動を作る関数
-	UpdateMagicSwordTrasform(elapsedTime);
+	//UpdateMagicSwordTrasform(elapsedTime);
 
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
@@ -447,6 +446,11 @@ void Player::DrawGUI()
 		// 魔法関係
 		if (ImGui::CollapsingHeader("Magic", ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			ImGui::SliderFloat("Speed", &config.speed, 0.0f, 50.0f, "%.1f");
+			ImGui::SliderFloat("Damage", &config.damage, 0.0f, 500.0f, "%.0f");
+			ImGui::SliderFloat("Wait Time", &config.waitTimer, 0.0f, 2.0f, "%.2f");
+			ImGui::SliderFloat("Life Time", &config.lifeTimer, 0.5f, 10.0f, "%.1f");
+
 			ImGui::SliderInt("Level", &level, 1, 3);
 		}
 
@@ -628,7 +632,7 @@ void Player::MagicInput()
 	{
 		if (magicCoolDownTimer > 0.0f) return;
 
-		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level);
+		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level, this->config);
 
 		if (level == 3)
 		{
@@ -640,7 +644,7 @@ void Player::MagicInput()
 		}
 		else
 		{
-			magicCoolDownTimer = 0.2f;
+			magicCoolDownTimer = 0.5f;
 		}
 	}
 }

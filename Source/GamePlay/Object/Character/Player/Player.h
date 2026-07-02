@@ -12,6 +12,7 @@
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Trail/Trail.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
+#include "GamePlay/Object/Magic/MagicType/Player/WindBladeMagic/WindBladeMagic.h"
 
 // ‘O•ûéŒ¾
 #include <memory>
@@ -230,4 +231,6 @@ private:
 	// “ü—Íè‡’l
 	float lerpSpeed = 10.0f;
 	float smoothdMoveLength = 0.0f;
+
+	WindBladeMagic::WindBladeConfig config;
 };

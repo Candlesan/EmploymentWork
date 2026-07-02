@@ -149,10 +149,12 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicBase.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicManager.h" />
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HommingMagic.h" />
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMagic.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicProjectile.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Particle\compute_particle_system.h" />
@@ -235,8 +237,9 @@
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicBase.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicManager.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HommingMagic.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMagic.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicProjectile.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Particle\Compute_Particle.cpp" />

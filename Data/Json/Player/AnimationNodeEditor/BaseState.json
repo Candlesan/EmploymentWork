@@ -125,13 +125,6 @@
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 3
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 12.0,
-                    "type": 12
                 }
             ],
             "fromState": "State_Idle",
@@ -208,96 +201,6 @@
             "fromState": "State_Jump",
             "priority": 0,
             "toState": "State_Idle"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 64,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 3
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": true,
-                    "targetDir": 0,
-                    "threshold": 12.0,
-                    "type": 12
-                }
-            ],
-            "fromState": "State_Idle",
-            "priority": 0,
-            "toState": "State_Attack"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 0
-                }
-            ],
-            "fromState": "State_Attack",
-            "priority": 0,
-            "toState": "State_Idle"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 6
-                }
-            ],
-            "fromState": "State_Attack",
-            "priority": 0,
-            "toState": "State_Move"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 64,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 3
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": true,
-                    "targetDir": 0,
-                    "threshold": 12.0,
-                    "type": 12
-                }
-            ],
-            "fromState": "State_Move",
-            "priority": 0,
-            "toState": "State_Attack"
         },
         {
             "Actions": [],
@@ -639,22 +542,6 @@
             "type": 1
         },
         {
-            "StateName": "State_Attack",
-            "config": {
-                "animationName": "",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "position": [
-                -303.0,
-                297.0
-            ],
-            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Attack.json",
-            "type": 1
-        },
-        {
             "StateName": "State_Magic",
             "config": {
                 "animationName": "",
@@ -664,8 +551,8 @@
                 "useRootMotionEx": false
             },
             "position": [
-                35.0,
-                297.0
+                -380.0,
+                201.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Magic.json",
             "type": 1

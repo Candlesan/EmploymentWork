@@ -456,12 +456,6 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicManager.h">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HommingMagic.h">
-      <Filter>Source\GamepPlay\Object\Magic\MagicMove\HommingMangic</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMagic.h">
-      <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic</Filter>
     </ClInclude>
@@ -476,6 +470,18 @@
     </ClInclude>
     <ClInclude Include="Source\System\Renderer\Shader\bloom\bloom.h">
       <Filter>Source\System\Renderer\Shader\bloom</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h">
+      <Filter>Source\GamepPlay\Object\Magic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicMove\HommingMangic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicProjectile.h">
+      <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -689,12 +695,6 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicManager.cpp">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HommingMagic.cpp">
-      <Filter>Source\GamepPlay\Object\Magic\MagicMove\HommingMangic</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMagic.cpp">
-      <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic</Filter>
     </ClCompile>
@@ -709,6 +709,15 @@
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\bloom\bloom.cpp">
       <Filter>Source\System\Renderer\Shader\bloom</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicMove\HommingMangic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicProjectile.cpp">
+      <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
