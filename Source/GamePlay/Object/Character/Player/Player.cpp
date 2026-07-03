@@ -20,6 +20,10 @@ void Player::Initialize()
 	// プレイヤーモデル読み込み
 	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 
+	// アニメーター生成
+	animator = std::make_unique<Animator>();
+	animator->Initialize(player);
+
 	// 武器モデル読み込み
 	weapon[0].model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
 	weapon[0].scale.x = weapon[0].scale.y = weapon[0].scale.z = 0.01f;
@@ -116,6 +120,7 @@ void Player::Initialize()
 	}
 
 	rootMotionNodeName = "root";
+	upperBodyNodeName = "spine_01";
 
 	// アニメーション設定
 	player->GetNodePoses(nodePoses);
@@ -156,6 +161,18 @@ void Player::Initialize()
 			ChangeAnimationState("Idle");
 		}
 	}
+
+	int magicGraphIndex = -1;
+	for (int i = 0; i < (int)transitionGraphs.size(); i++) {
+		if (transitionGraphs[i].graphName == "State_Magic") { // 魔法のグラフを探す
+			magicGraphIndex = i;
+			break;
+		}
+	}
+	if (magicGraphIndex != -1) {
+		UpperGraphStack.push_back(magicGraphIndex); // 上半身用のスタックに積む！
+	}
+
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -225,18 +242,7 @@ void Player::Update(float elapsedTime)
 
 	if (gamePad.GetButtonDown() & GamePad::BTN_X || gamePad.GetButtonDown() & GamePad::BTN_Y)
 	{
-
 		MagicInput();
-
-		//if (currentState != "State_Attack")
-		//{
-		//	lockedEnemyDistance = EnemyfromDistance;
-		//}
-
-		// 敵との距離が12.0f以上だったら魔法を撃つ
-		//if (lockedEnemyDistance > 12.0f)
-		//{
-		//}
 	}
 
 	// 無敵時間更新
@@ -249,6 +255,8 @@ void Player::Update(float elapsedTime)
 		if (!IsGuarding) Heal(elapsedTime);
 
 		UpdateStateTransitions(elapsedTime);
+		UpdateUpperBodyTransitions(elapsedTime);
+
 	}
 	else if (isTyping && !isPreviewMode)
 	{
@@ -270,9 +278,6 @@ void Player::Update(float elapsedTime)
 
 	// 根本と剣先を求める関数
 	CalculationRootAndTip();
-
-	// 魔法剣の挙動を作る関数
-	//UpdateMagicSwordTrasform(elapsedTime);
 
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
@@ -1224,6 +1229,176 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			// 通常のアニメーション遷移
 			ChangeAnimationState(nextState);
 			bufferedButton = 0;
+		}
+	}
+}
+
+// 上半身の状態遷移更新処理
+void Player::UpdateUpperBodyTransitions(float elapsedTime)
+{
+	DirectX::XMFLOAT3 moveVec = GetMoveVec();
+	float moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	// 先行入力処理
+	if (animSequence.GetRange("InputBuffer")) {
+		bufferedButton |= gamePad.GetButtonDown();
+	}
+	IsGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
+
+	TransitionContext ctx;
+	ctx.position = GetPosition();
+
+	// ★工場の「上半身の再生時間」をエディターに提出する書類に書き込む！
+	if (animator) {
+		ctx.animSeconds = animator->GetUpperCurrentSeconds();
+	}
+	else {
+		ctx.animSeconds = 0.0f;
+	}
+	ctx.animLength = GetCurrentAnimationLength(); // ※魔法ごとの長さに応じて調整
+
+	ctx.moveLength = smoothdMoveLength;
+	ctx.enemyFromdistance = EnemyfromDistance;
+	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
+	ctx.buttonHeld = gamePad.GetButton();
+	ctx.buttonUp = gamePad.GetButtonUp();
+	ctx.IsGround = IsGround();
+	ctx.isLockOn = (lockOnTargetPos != nullptr);
+	ctx.havePotion = (Potion > 0);
+	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
+	ctx.isGuarding = IsGuarding;
+	ctx.IsCancelable = animSequence.GetRange("Cancelable");
+
+	if (moveLength > 0.01f) {
+		float ForwardX = sinf(angle.y), ForwardZ = cosf(angle.y);
+		float RightX = cosf(angle.y), RightZ = -sinf(angle.y);
+		float dotForward = moveVec.x * ForwardX + moveVec.z * ForwardZ;
+		float dotRight = moveVec.x * RightX + moveVec.z * RightZ;
+		float relativeAngle = atan2f(dotRight, dotForward);
+		float degree = DirectX::XMConvertToDegrees(relativeAngle);
+		if (degree < 0) degree += 360.0;
+		if (degree >= 337.5 || degree < 22.5f) ctx.inputDir = RelativeInputDir::Forward;
+		else if (degree >= 22.5f && degree < 67.5f) ctx.inputDir = RelativeInputDir::ForwardRight;
+		else if (degree >= 67.5f && degree < 112.5f) ctx.inputDir = RelativeInputDir::Right;
+		else if (degree > 112.5f && degree < 157.5f) ctx.inputDir = RelativeInputDir::BackwardRight;
+		else if (degree >= 157.5f && degree < 202.5f) ctx.inputDir = RelativeInputDir::Backward;
+		else if (degree >= 202.5f && degree < 247.5f) ctx.inputDir = RelativeInputDir::BackwardLeft;
+		else if (degree >= 247.5f && degree < 292.5f) ctx.inputDir = RelativeInputDir::Left;
+		else if (degree >= 292.5f && degree < 337.5) ctx.inputDir = RelativeInputDir::ForwardLeft;
+	}
+	else {
+		ctx.inputDir = RelativeInputDir::None;
+	}
+
+	if (UpperGraphStack.empty()) return;
+
+	int currentIndex = UpperGraphStack.back();
+	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
+	int targetLevel = (int)UpperGraphStack.size() - 1;
+
+	// ★上半身が何もしていないなら、"Entry" を現在地とする
+	std::string evalStateForTrans = currentOverlayState.empty() ? "Entry" : currentOverlayState;
+	std::string nextState = evalStateForTrans;
+
+	// 親の割り込み処理
+	for (int i = 0; i < (int)UpperGraphStack.size(); i++)
+	{
+		int gIdx = UpperGraphStack[i];
+		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
+
+		std::string evalState = evalStateForTrans;
+		if (i < (int)UpperGraphStack.size() - 1) {
+			evalState = transitionGraphs[UpperGraphStack[i + 1]].graphName;
+		}
+
+		std::string result = g->EvaluateTransitions(evalState, ctx);
+		if (result != evalState) {
+			nextState = result;
+			currentGraph = g;
+			targetLevel = i;
+			evalStateForTrans = evalState;
+			break;
+		}
+	}
+
+	if (currentGraph == nullptr) return;
+
+	while ((int)UpperGraphStack.size() - 1 > targetLevel) {
+		UpperGraphStack.pop_back();
+	}
+
+	if (nextState != (currentOverlayState.empty() ? "Entry" : currentOverlayState))
+	{
+		// 脱出（Exit）処理
+		if (nextState == "Exit")
+		{
+			currentOverlayState = "";
+			UpperGraphStack.pop_back();
+
+			if (UpperGraphStack.empty()) {
+				// ★空っぽになったら、もう一度 State_Magic をセットして待機！
+				int magicGraphIndex = -1;
+				for (int i = 0; i < (int)transitionGraphs.size(); i++) {
+					if (transitionGraphs[i].graphName == "State_Magic") {
+						magicGraphIndex = i;
+						break;
+					}
+				}
+				if (magicGraphIndex != -1) {
+					UpperGraphStack.push_back(magicGraphIndex);
+				}
+			}
+			return;
+		}
+
+		AnimNode* nextNode = nullptr;
+		for (auto& n : currentGraph->nodes) {
+			if (n.StateName == nextState) { nextNode = &n; break; }
+		}
+
+		// 潜り込み（SubGraph）処理
+		if (nextNode && nextNode->type == NodeType::SubGraph)
+		{
+			AnimationTransitionGraph* subGraph = nullptr;
+			int targetIndex = -1;
+			char filename[MAX_PATH];
+			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+			std::string targetName = filename;
+
+			for (int i = 0; i < (int)transitionGraphs.size(); i++) {
+				if (transitionGraphs[i].graphName == targetName) {
+					subGraph = &transitionGraphs[i];
+					targetIndex = i;
+					break;
+				}
+			}
+
+			if (subGraph && targetIndex != -1) {
+				UpperGraphStack.push_back(targetIndex);
+				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
+
+				if (firstState != "Entry" && firstState != "") {
+					StartOverlayAnimation(firstState); // ★司令塔へ発注！
+				}
+				else {
+					firstState = "";
+					for (auto& n : subGraph->nodes) {
+						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit") {
+							firstState = n.StateName;
+							break;
+						}
+					}
+					if (firstState != "") {
+						StartOverlayAnimation(firstState);
+					}
+				}
+			}
+		}
+		else
+		{
+			// 通常のアニメーション遷移
+			StartOverlayAnimation(nextState); // ★司令塔へ発注！
 		}
 	}
 }

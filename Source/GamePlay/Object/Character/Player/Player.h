@@ -95,6 +95,9 @@ private:
 	// 状態遷移更新処理
 	void UpdateStateTransitions(float elapsedTime);
 
+	// 上半身の状態遷移
+	void UpdateUpperBodyTransitions(float elapsedTime);
+
 	// 遷移以外の細かい条件
 	void UpdateStateBehavior();
 
@@ -155,7 +158,7 @@ private:
 	static constexpr float RUN_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
 
 	// 魔法レベル切り替えの条件
-	float rbButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
+	float rbButtonHoldTime = 0.0f;          // RBボタンを押し続けた時間
 	static constexpr float RB_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
 
 	// 攻撃用の条件
@@ -203,6 +206,7 @@ private:
 	// ノードエディター
 	std::vector<AnimationTransitionGraph>   transitionGraphs;
 	std::vector<int>   activeGraphStack;
+	std::vector<int> UpperGraphStack; // 上半身専用のグラフスタック
 	AnimationTransitionEditor  transitionEditor;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;

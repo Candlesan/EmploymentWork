@@ -483,6 +483,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicProjectile.h">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Animation\Animator.h">
+      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -718,6 +721,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicProjectile.cpp">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Animation\Animator.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

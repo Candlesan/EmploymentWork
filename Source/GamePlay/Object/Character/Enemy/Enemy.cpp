@@ -28,6 +28,10 @@ void Enemy::Initialize()
 
 	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss2/SevarogBloodred.gltf");
 
+	// アニメーター生成
+	animator = std::make_unique<Animator>();
+	animator->Initialize(enemy);
+
 	// 敵モデルの設定
 	position = { 0, 0, 10 };
 	angle = { 0, 3, 0 };

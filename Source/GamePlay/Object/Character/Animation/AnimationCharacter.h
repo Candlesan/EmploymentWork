@@ -1,6 +1,7 @@
 #pragma once
 #include "GamePlay/Object/Character/Character.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
+#include "GamePlay/Object/Character/Animation/Animator.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -67,6 +68,7 @@ protected:
 	// アニメーション関連データ
 	std::string currentState = "";
 	std::string previousState = "";
+	std::string currentOverlayState = "";
 
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
@@ -110,4 +112,6 @@ protected:
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	};
+
+	std::unique_ptr<Animator> animator;
 };
