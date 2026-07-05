@@ -9,4 +9,5 @@ struct AnimationConfig
 	bool useRootMotion = false;		// ルートモーションするか
 	bool useRootMotionEx = false;	// 腰骨に対応したルートモーション
 	float blendTime = 0.2f;			// 補間時間
+	std::string targetBoneName = "";
 };

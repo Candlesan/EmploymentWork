@@ -221,7 +221,8 @@ void AnimationTransitionGraph::Save(const std::string& path)
 				{"loop", node.config.loop},
 				{"useRootMotion", node.config.useRootMotion},
 				{"useRootMotionEx", node.config.useRootMotionEx},
-				{"blendTime", node.config.blendTime}
+				{"blendTime", node.config.blendTime},
+				{"targetBoneName", node.config.targetBoneName}
 			}}
 		});
 	}
@@ -323,6 +324,7 @@ void AnimationTransitionGraph::Load(const std::string& path)
 				newNode.config.useRootMotion = c.value("useRootMotion", false);
 				newNode.config.useRootMotionEx = c.value("useRootMotionEx", false);
 				newNode.config.blendTime = c.value("blendTime", 0.2f);
+				newNode.config.targetBoneName = c.value("targetBoneName", "");
 			}
 		}
 	}

@@ -74,7 +74,7 @@ void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 	if (animator)
 	{
 		// AnimatorHê‚Ìã”¼gƒ‰ƒCƒ“‚É”­’‚·‚é‚¾‚¯I
-		animator->PlayUpper(newAnimationIndex, config.loop, upperBodyNodeName, config.blendTime);
+		animator->PlayUpper(newAnimationIndex, config.loop, config.targetBoneName, config.blendTime);
 	}
 }
 
@@ -199,6 +199,8 @@ void AnimationCharacter::LoadAnimationData(const std::string& jsonPath)
 				config.useRootMotion	= c.value("useRootMotion", false);
 				config.useRootMotionEx	= c.value("useRootMotionEx", false);
 				config.blendTime		= c.value("blendTime", 0.2);
+
+				config.targetBoneName = c.value("targetBoneName", "");
 			}
 
 			// Map‚É“o˜^

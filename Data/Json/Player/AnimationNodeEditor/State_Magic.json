@@ -8,14 +8,78 @@
             "colorR": 1.0,
             "conditions": [
                 {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toState": "AS_Attack_01_01_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 19
+                    "type": 0
                 }
             ],
-            "fromState": "Entry",
+            "fromState": "AS_Attack_01_01_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Attack_01_02_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 1.0,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "AS_Attack_01_02_Seq_0",
             "priority": 0,
             "toState": "AS_Attack_01_01_Seq_0"
         },
@@ -34,65 +98,16 @@
                     "type": 1
                 },
                 {
-                    "buttonMask": 0,
+                    "buttonMask": 64,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 0
+                    "type": 3
                 }
             ],
             "fromState": "AS_Attack_01_01_Seq_0",
             "priority": 0,
             "toState": "AS_Attack_01_02_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 0
-                }
-            ],
-            "fromState": "AS_Attack_01_02_Seq_0",
-            "priority": 0,
-            "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [],
-            "fromState": "AS_Attack_01_02_Seq_0",
-            "priority": 0,
-            "toState": "AS_Attack_01_01_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 0
-                }
-            ],
-            "fromState": "AS_Attack_01_01_Seq_0",
-            "priority": 0,
-            "toState": "Exit"
         }
     ],
     "nodes": [
@@ -102,12 +117,13 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "position": [
-                -172.0,
-                -71.0
+                -127.0,
+                9.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -118,12 +134,13 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "position": [
-                243.0,
-                -55.0
+                321.0,
+                9.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -134,12 +151,13 @@
                 "animationName": "AS_Attack_01_01_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "spine_01",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "position": [
-                3.0,
-                -87.0
+                33.0,
+                -7.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -150,12 +168,13 @@
                 "animationName": "AS_Attack_01_02_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "spine_01",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "position": [
-                3.0,
-                9.0
+                34.0,
+                98.0
             ],
             "subGraphPath": "",
             "type": 0

@@ -257,3 +257,12 @@ bool Animator::IsUpperBodyNode(const Model::Node& node, const std::string& rootN
 	}
 	return false;
 }
+
+float Animator::GetUpperAnimationLength() const
+{
+	if (upperLayer.animationIndex < 0) return false;
+
+	const Model::Animation& animation = targetModel->GetAnimations().at(upperLayer.animationIndex);
+
+	return animation.secondsLength;
+}

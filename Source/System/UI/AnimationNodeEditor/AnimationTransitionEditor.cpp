@@ -920,6 +920,15 @@ void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph&
 
 			// ブレンド時間
 			ImGui::DragFloat(u8"ブレンド時間(秒)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);
+
+			// レイヤー分けする親ボーンを入力する欄
+			char BoneNameBuf[256] = "";
+			strncpy_s(BoneNameBuf, selectedNode->config.targetBoneName.c_str(), sizeof(BoneNameBuf));
+
+			if(ImGui::InputText(u8"ボーン名入力(レイヤー分け)", BoneNameBuf, sizeof(BoneNameBuf)))
+			{
+				selectedNode->config.targetBoneName = BoneNameBuf;
+			}
 		}
 	}
 	ImGui::End();

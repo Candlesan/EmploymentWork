@@ -41,6 +41,10 @@ public:
 
 	float GetBaseCurrentSeconds() const { return baseLayer.currentSeconds; }
 	float GetUpperCurrentSeconds() const { return upperLayer.currentSeconds; }
+	float GetUpperAnimationLength() const;
+
+	bool IsUpperPlaying() const { return upperLayer.animationIndex >= 0; }
+	void StopUpper() { upperLayer.animationIndex = -1; upperLayer.currentSeconds = 0.0f; }
 private:
 	std::shared_ptr<Model> targetModel; // “®‚©‚·‘ÎÛ‚Ìƒ‚ƒfƒ‹
 

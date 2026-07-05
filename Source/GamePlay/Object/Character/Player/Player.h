@@ -95,8 +95,13 @@ private:
 	// 状態遷移更新処理
 	void UpdateStateTransitions(float elapsedTime);
 
-	// 上半身の状態遷移
+	// 上半身の状態遷移更新処理
 	void UpdateUpperBodyTransitions(float elapsedTime);
+
+	// 条件設定
+	TransitionContext InputTransitionContext(float elapsedTime);
+
+	void PlayActionGraph(const std::string& graphName);
 
 	// 遷移以外の細かい条件
 	void UpdateStateBehavior();

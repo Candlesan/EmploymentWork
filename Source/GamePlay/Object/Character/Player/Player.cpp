@@ -161,18 +161,6 @@ void Player::Initialize()
 			ChangeAnimationState("Idle");
 		}
 	}
-
-	int magicGraphIndex = -1;
-	for (int i = 0; i < (int)transitionGraphs.size(); i++) {
-		if (transitionGraphs[i].graphName == "State_Magic") { // 魔法のグラフを探す
-			magicGraphIndex = i;
-			break;
-		}
-	}
-	if (magicGraphIndex != -1) {
-		UpperGraphStack.push_back(magicGraphIndex); // 上半身用のスタックに積む！
-	}
-
 }
 
 // 攻撃とかの情報を初期化(Jsonファイルの初期化)
@@ -321,6 +309,7 @@ void Player::DrawGUI()
 {
 	ImGui::Begin("Player");
 	{
+		ImGui::Text("currentOverlayState: %s", currentOverlayState.c_str());
 		// パラメーター
 		if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -639,6 +628,8 @@ void Player::MagicInput()
 
 		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level, this->config);
 
+		PlayActionGraph("State_Magic");
+
 		if (level == 3)
 		{
 			magicCoolDownTimer = 1.0f;
@@ -956,6 +947,459 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
+	// 条件設定
+	TransitionContext ctx = InputTransitionContext(elapsedTime);
+
+	if (activeGraphStack.empty()) return;
+
+	int currentIndex = activeGraphStack.back();
+	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
+	int targetLevel = (int)activeGraphStack.size() - 1;
+	std::string evalStateForTrans = currentState;
+	std::string nextState = currentState;
+
+	// 親の割り込み処理
+	for (int i = 0; i < (int)activeGraphStack.size(); i++) 
+	{
+		int gIdx = activeGraphStack[i];
+		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
+
+		// この階層における「現在のステート名」を決める
+		// 自分が一番上（子）なら実際の currentState。
+		// 親グラフを評価する時は、自分の1つ上に乗っている「子グラフの箱の名前」が現在位置になる。
+		std::string evalState = currentState;
+		if (i < (int)activeGraphStack.size() - 1)
+		{
+			evalState = transitionGraphs[activeGraphStack[i + 1]].graphName; // 現在地から１個上
+		}
+
+		// 遷移できるか評価する
+		std::string result = g->EvaluateTransitions(evalState, ctx);
+
+		// 遷移先が見つかったら即遷移
+		if (result != evalState)
+		{
+			nextState = result;
+			currentGraph = g;
+			targetLevel = i;
+			evalStateForTrans = evalState;
+			break;
+		}
+	}
+
+	// どの階層でも遷移が出来なかったら終了
+	if (currentGraph == nullptr) return;
+
+	// 遷移する時に指定された階層までスタックを下す
+	while ((int)activeGraphStack.size() - 1 > targetLevel)
+	{
+		activeGraphStack.pop_back();
+	}
+
+	// 今のステートから変化があった場合のみ処理
+	if (nextState != currentState)
+	{
+		// ジャンプ処理
+		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
+		{
+			Jump(jumpSpeed);
+
+			// 空中に飛び出すときに勢いを載せる
+			if (moveLength > 0.1f)
+			{
+				float mvX = moveVec.x / moveLength;
+				float mvZ = moveVec.z / moveLength;
+
+				// 走ってるときの速度を掛けてVelocityに送る
+				float jumpForwardSpeed = maxMoveSpeed;
+				velocity.x = mvX * jumpForwardSpeed;
+				velocity.z = mvZ * jumpForwardSpeed;
+			}
+			else
+			{
+				velocity.x = 0.0f;
+				velocity.z = 0.0f;
+			}
+
+			jumpCount++;
+			bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+		}
+
+		// アクションを実行する
+		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
+		if (trans)
+		{
+			// グラフで評価して遷移する
+			for (auto& action : trans->actions)
+			{
+				switch (action.type)
+				{
+				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
+				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+				}
+			}
+		}
+
+
+		//脱出（Exit）処理
+		// 階層ノードかどうかを調べる前に、まずはExitかどうか判定するのが正解
+		if (nextState == "Exit")
+		{
+			// 現在のステート名を子グラフの名前（=親グラフでの箱の名前）に上書きする
+			currentState = currentGraph->graphName;
+
+			// スタックから現在の子グラフを下ろして、親グラフに戻る
+			activeGraphStack.pop_back();
+
+			return;
+		}
+
+
+		// 遷移の結果、その行き先のノードが「階層ノード(SubGraph)」かどうかを調べる
+		AnimNode* nextNode = nullptr;
+		for (auto& n : currentGraph->nodes)
+		{
+			if (n.StateName == nextState) { nextNode = &n; break; }
+		}
+
+		// 潜り込み処理
+		if (nextNode && nextNode->type == NodeType::SubGraph)
+		{
+			AnimationTransitionGraph* subGraph = nullptr;
+			int targetIndex = -1;
+
+			// パスからファイル名(グラフ名)を取り出す
+			char filename[MAX_PATH];
+			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+			std::string targetName = filename;
+
+
+			// Initializeで既に全ロードされているグラフ群から探す
+			for (int i = 0; i < (int)transitionGraphs.size(); i++)
+			{
+				if (transitionGraphs[i].graphName == targetName)
+				{
+					subGraph = &transitionGraphs[i];
+					targetIndex = i;
+					break;
+				}
+			}
+
+			if (subGraph && targetIndex != -1)
+			{
+				// スタックに子グラフを積んで潜る！
+				activeGraphStack.push_back(targetIndex);
+
+				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
+				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
+				if (firstState != "Entry" && firstState != "")
+				{
+					const AnimationTransition* trans = subGraph->GetTransition("Entry", firstState);
+					if (trans)
+					{
+						for (auto& action : trans->actions)
+						{
+							switch (action.type)
+							{
+							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
+							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+							}
+						}
+					}
+					// 最初のステートへ切り替え！
+					if (firstState != "")
+					{
+						ChangeAnimationState(firstState);
+						bufferedButton = 0; // サブグラフへ潜り込んだ時のリセット
+					}
+				}
+				else
+				{
+					// 万が一 Entry からの条件がどれも満たされなかったら、適当なノードを最初にする（元のフォールバック）
+					firstState = "";
+					for (auto& n : subGraph->nodes)
+					{
+						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
+						{
+							firstState = n.StateName;
+							break;
+						}
+					}
+				}
+
+				// 最初のステートへ切り替え！
+				if (firstState != "") ChangeAnimationState(firstState);
+			}
+		}
+		else
+		{
+			// 次に遷移するノードの設定を持ってくる
+			auto it = stateConfigs.find(nextState);
+			if (it != stateConfigs.end())
+			{
+				const AnimationConfig& nextConfig = it->second;
+
+				// ノードに設定されたボーン名があるかどうかで、アニメーターのレイヤーを分ける
+				if (!nextConfig.targetBoneName.empty())
+				{
+					// ボーン名が空では無ければマスクをかける
+					StartOverlayAnimation(nextState);
+				}
+				else
+				{
+					// ボーン名が空だったら全身アニメーションにする
+					ChangeAnimationState(nextState);
+				}
+			}
+			bufferedButton = 0;
+		}
+	}
+}
+
+// 上半身の状態遷移更新処理
+void Player::UpdateUpperBodyTransitions(float elapsedTime)
+{
+	DirectX::XMFLOAT3 moveVec = GetMoveVec();
+	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	// 条件設定
+	TransitionContext ctx = InputTransitionContext(elapsedTime);
+	ctx.animSeconds = animator->GetUpperCurrentSeconds();
+	ctx.animLength = animator->GetUpperAnimationLength();
+
+	if (UpperGraphStack.empty()) return;
+
+	int currentIndex = UpperGraphStack.back();
+	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
+	int targetLevel = (int)UpperGraphStack.size() - 1;
+	std::string evalStateForTrans = currentOverlayState;
+	std::string nextState = currentOverlayState;
+
+	// 親の割り込み処理
+	for (int i = 0; i < (int)UpperGraphStack.size(); i++)
+	{
+		int gIdx = UpperGraphStack[i];
+		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
+
+		// この階層における「現在のステート名」を決める
+		// 自分が一番上（子）なら実際の currentOverlayState。
+		// 親グラフを評価する時は、自分の1つ上に乗っている「子グラフの箱の名前」が現在位置になる。
+		std::string evalState = currentOverlayState;
+		if (i < (int)UpperGraphStack.size() - 1)
+		{
+			evalState = transitionGraphs[UpperGraphStack[i + 1]].graphName; // 現在地から１個上
+		}
+
+		// 遷移できるか評価する
+		std::string result = g->EvaluateTransitions(evalState, ctx);
+
+		// 遷移先が見つかったら即遷移
+		if (result != evalState)
+		{
+			nextState = result;
+			currentGraph = g;
+			targetLevel = i;
+			evalStateForTrans = evalState;
+			break;
+		}
+	}
+
+	// どの階層でも遷移が出来なかったら終了
+	if (currentGraph == nullptr) return;
+
+	// 遷移する時に指定された階層までスタックを下す
+	while ((int)UpperGraphStack.size() - 1 > targetLevel)
+	{
+		UpperGraphStack.pop_back();
+	}
+
+	// 今のステートから変化があった場合のみ処理
+	if (nextState != currentOverlayState)
+	{
+		// ジャンプ処理
+		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
+		{
+			Jump(jumpSpeed);
+
+			// 空中に飛び出すときに勢いを載せる
+			if (moveLength > 0.1f)
+			{
+				float mvX = moveVec.x / moveLength;
+				float mvZ = moveVec.z / moveLength;
+
+				// 走ってるときの速度を掛けてVelocityに送る
+				float jumpForwardSpeed = maxMoveSpeed;
+				velocity.x = mvX * jumpForwardSpeed;
+				velocity.z = mvZ * jumpForwardSpeed;
+			}
+			else
+			{
+				velocity.x = 0.0f;
+				velocity.z = 0.0f;
+			}
+
+			jumpCount++;
+			bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+		}
+
+		// アクションを実行する
+		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
+		if (trans)
+		{
+			// グラフで評価して遷移する
+			for (auto& action : trans->actions)
+			{
+				switch (action.type)
+				{
+				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
+				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+				}
+			}
+		}
+
+
+		//脱出（Exit）処理
+		// 階層ノードかどうかを調べる前に、まずはExitかどうか判定するのが正解
+		if (nextState == "Exit")
+		{
+			// 上半身を止める
+			animator->StopUpper();
+
+			if (UpperGraphStack.size() > 1)
+			{
+				// 親グラフがいるなら、そこに戻る
+				currentOverlayState = currentGraph->graphName;
+				UpperGraphStack.pop_back();
+			}
+			else
+			{
+				// 親がいない（これが一番下）なら、popせず待機状態に戻すだけ
+				currentOverlayState = "Entry";
+			}
+
+			// 名前を空にする
+			currentOverlayState = "";
+
+			// スタックから現在の子グラフを下ろして、親グラフに戻る
+			UpperGraphStack.pop_back();
+
+			return;
+		}
+
+
+		// 遷移の結果、その行き先のノードが「階層ノード(SubGraph)」かどうかを調べる
+		AnimNode* nextNode = nullptr;
+		for (auto& n : currentGraph->nodes)
+		{
+			if (n.StateName == nextState) { nextNode = &n; break; }
+		}
+
+		// 潜り込み処理
+		if (nextNode && nextNode->type == NodeType::SubGraph)
+		{
+			AnimationTransitionGraph* subGraph = nullptr;
+			int targetIndex = -1;
+
+			// パスからファイル名(グラフ名)を取り出す
+			char filename[MAX_PATH];
+			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+			std::string targetName = filename;
+
+
+			// Initializeで既に全ロードされているグラフ群から探す
+			for (int i = 0; i < (int)transitionGraphs.size(); i++)
+			{
+				if (transitionGraphs[i].graphName == targetName)
+				{
+					subGraph = &transitionGraphs[i];
+					targetIndex = i;
+					break;
+				}
+			}
+
+			if (subGraph && targetIndex != -1)
+			{
+				// スタックに子グラフを積んで潜る！
+				UpperGraphStack.push_back(targetIndex);
+
+				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
+				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
+				if (firstState != "Entry" && firstState != "")
+				{
+					const AnimationTransition* trans = subGraph->GetTransition("Entry", firstState);
+					if (trans)
+					{
+						for (auto& action : trans->actions)
+						{
+							switch (action.type)
+							{
+							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
+							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+							}
+						}
+					}
+					// 最初のステートへ切り替え！
+					if (firstState != "")
+					{
+						ChangeAnimationState(firstState);
+						bufferedButton = 0; // サブグラフへ潜り込んだ時のリセット
+					}
+				}
+				else
+				{
+					// 万が一 Entry からの条件がどれも満たされなかったら、適当なノードを最初にする（元のフォールバック）
+					firstState = "";
+					for (auto& n : subGraph->nodes)
+					{
+						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
+						{
+							firstState = n.StateName;
+							break;
+						}
+					}
+				}
+
+				// 最初のステートへ切り替え！
+				if (firstState != "") ChangeAnimationState(firstState);
+			}
+		}
+		else
+		{
+			// 次に遷移するノードの設定を持ってくる
+			auto it = stateConfigs.find(nextState);
+			if (it != stateConfigs.end())
+			{
+				const AnimationConfig& nextConfig = it->second;
+
+				// ノードに設定されたボーン名があるかどうかで、アニメーターのレイヤーを分ける
+				if (!nextConfig.targetBoneName.empty())
+				{
+					// ボーン名が空では無ければマスクをかける
+					StartOverlayAnimation(nextState);
+				}
+				else
+				{
+					// ボーン名が空だったら全身アニメーションにする
+					ChangeAnimationState(nextState);
+				}
+			}
+			bufferedButton = 0;
+		}
+	}
+}
+
+// 条件設定
+TransitionContext Player::InputTransitionContext(float elapsedTime)
+{
+	DirectX::XMFLOAT3 moveVec = GetMoveVec();
+	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
 	smoothdMoveLength += (moveLength - smoothdMoveLength) * lerpSpeed * elapsedTime;
 
 	// 先行入力処理
@@ -1042,363 +1486,23 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		ctx.inputDir = RelativeInputDir::None; // 入力なし
 	}
 
-	if (activeGraphStack.empty()) return;
-
-	int currentIndex = activeGraphStack.back();
-	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
-	int targetLevel = (int)activeGraphStack.size() - 1;
-	std::string evalStateForTrans = currentState;
-	std::string nextState = currentState;
-
-	// 親の割り込み処理
-	for (int i = 0; i < (int)activeGraphStack.size(); i++) 
-	{
-		int gIdx = activeGraphStack[i];
-		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
-
-		// この階層における「現在のステート名」を決める
-		// 自分が一番上（子）なら実際の currentState。
-		// 親グラフを評価する時は、自分の1つ上に乗っている「子グラフの箱の名前」が現在位置になる。
-		std::string evalState = currentState;
-		if (i < (int)activeGraphStack.size() - 1)
-		{
-			evalState = transitionGraphs[activeGraphStack[i + 1]].graphName; // 現在地から１個上
-		}
-
-		// 遷移できるか評価する
-		std::string result = g->EvaluateTransitions(evalState, ctx);
-
-		// 遷移先が見つかったら即遷移
-		if (result != evalState)
-		{
-			nextState = result;
-			currentGraph = g;
-			targetLevel = i;
-			evalStateForTrans = evalState;
-			break;
-		}
-	}
-
-	// どの階層でも遷移が出来なかったら終了
-	if (currentGraph == nullptr) return;
-
-	// 遷移する時に指定された階層までスタックを下す
-	while ((int)activeGraphStack.size() - 1 > targetLevel)
-	{
-		activeGraphStack.pop_back();
-	}
-
-	// 今のステートから変化があった場合のみ処理
-	if (nextState != currentState)
-	{
-		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
-		{
-			Jump(jumpSpeed);
-
-			// 空中に飛び出すときに勢いを載せる
-			if (moveLength > 0.1f)
-			{
-				float mvX = moveVec.x / moveLength;
-				float mvZ = moveVec.z / moveLength;
-
-				// 走ってるときの速度を掛けてVelocityに送る
-				float jumpForwardSpeed = maxMoveSpeed;
-				velocity.x = mvX * jumpForwardSpeed;
-				velocity.z = mvZ * jumpForwardSpeed;
-			}
-			else
-			{
-				velocity.x = 0.0f;
-				velocity.z = 0.0f;
-			}
-
-			jumpCount++;
-			bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
-		}
-
-		// アクションを実行する
-		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
-		if (trans)
-		{
-			// グラフで評価して遷移する
-			for (auto& action : trans->actions)
-			{
-				switch (action.type)
-				{
-				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
-				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
-				}
-			}
-		}
-
-
-		//脱出（Exit）処理
-		// 階層ノードかどうかを調べる前に、まずはExitかどうか判定するのが正解
-		if (nextState == "Exit")
-		{
-			// 現在のステート名を子グラフの名前（=親グラフでの箱の名前）に上書きする
-			currentState = currentGraph->graphName;
-
-			// スタックから現在の子グラフを下ろして、親グラフに戻る
-			activeGraphStack.pop_back();
-
-			return;
-		}
-
-		// 遷移の結果、その行き先のノードが「階層ノード(SubGraph)」かどうかを調べる
-		AnimNode* nextNode = nullptr;
-		for (auto& n : currentGraph->nodes)
-		{
-			if (n.StateName == nextState) { nextNode = &n; break; }
-		}
-
-		// 潜り込み処理
-		if (nextNode && nextNode->type == NodeType::SubGraph)
-		{
-			AnimationTransitionGraph* subGraph = nullptr;
-			int targetIndex = -1;
-
-			// パスからファイル名(グラフ名)を取り出す
-			char filename[MAX_PATH];
-			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
-			std::string targetName = filename;
-
-
-			// Initializeで既に全ロードされているグラフ群から探す
-			for (int i = 0; i < (int)transitionGraphs.size(); i++)
-			{
-				if (transitionGraphs[i].graphName == targetName)
-				{
-					subGraph = &transitionGraphs[i];
-					targetIndex = i;
-					break;
-				}
-			}
-
-			if (subGraph && targetIndex != -1)
-			{
-				// スタックに子グラフを積んで潜る！
-				activeGraphStack.push_back(targetIndex);
-
-				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
-				//std::string firstState = "";
-				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
-				if (firstState != "Entry" && firstState != "")
-				{
-					const AnimationTransition* trans = subGraph->GetTransition("Entry", firstState);
-					if (trans)
-					{
-						for (auto& action : trans->actions)
-						{
-							switch (action.type)
-							{
-							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
-							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
-							}
-						}
-					}
-					// 最初のステートへ切り替え！
-					if (firstState != "")
-					{
-						ChangeAnimationState(firstState);
-						bufferedButton = 0; // ★追加：サブグラフへ潜り込んだ時のリセット
-					}
-				}
-				else
-				{
-					// 万が一 Entry からの条件がどれも満たされなかったら、適当なノードを最初にする（元のフォールバック）
-					firstState = "";
-					for (auto& n : subGraph->nodes)
-					{
-						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
-						{
-							firstState = n.StateName;
-							break;
-						}
-					}
-				}
-
-				// 最初のステートへ切り替え！
-				if (firstState != "") ChangeAnimationState(firstState);
-			}
-		}
-		else
-		{
-			// 通常のアニメーション遷移
-			ChangeAnimationState(nextState);
-			bufferedButton = 0;
-		}
-	}
+	return ctx;
 }
 
-// 上半身の状態遷移更新処理
-void Player::UpdateUpperBodyTransitions(float elapsedTime)
+// アクション（コンボ）のグラフを呼び出す関数
+void Player::PlayActionGraph(const std::string& graphName)
 {
-	DirectX::XMFLOAT3 moveVec = GetMoveVec();
-	float moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
-	GamePad& gamePad = Input::Instance().GetGamePad();
+	// 既に何かのコンボ中なら、新しくは上書きしない
+	if (!UpperGraphStack.empty()) return;
 
-	// 先行入力処理
-	if (animSequence.GetRange("InputBuffer")) {
-		bufferedButton |= gamePad.GetButtonDown();
-	}
-	IsGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
-
-	TransitionContext ctx;
-	ctx.position = GetPosition();
-
-	// ★工場の「上半身の再生時間」をエディターに提出する書類に書き込む！
-	if (animator) {
-		ctx.animSeconds = animator->GetUpperCurrentSeconds();
-	}
-	else {
-		ctx.animSeconds = 0.0f;
-	}
-	ctx.animLength = GetCurrentAnimationLength(); // ※魔法ごとの長さに応じて調整
-
-	ctx.moveLength = smoothdMoveLength;
-	ctx.enemyFromdistance = EnemyfromDistance;
-	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
-	ctx.buttonHeld = gamePad.GetButton();
-	ctx.buttonUp = gamePad.GetButtonUp();
-	ctx.IsGround = IsGround();
-	ctx.isLockOn = (lockOnTargetPos != nullptr);
-	ctx.havePotion = (Potion > 0);
-	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
-	ctx.isGuarding = IsGuarding;
-	ctx.IsCancelable = animSequence.GetRange("Cancelable");
-
-	if (moveLength > 0.01f) {
-		float ForwardX = sinf(angle.y), ForwardZ = cosf(angle.y);
-		float RightX = cosf(angle.y), RightZ = -sinf(angle.y);
-		float dotForward = moveVec.x * ForwardX + moveVec.z * ForwardZ;
-		float dotRight = moveVec.x * RightX + moveVec.z * RightZ;
-		float relativeAngle = atan2f(dotRight, dotForward);
-		float degree = DirectX::XMConvertToDegrees(relativeAngle);
-		if (degree < 0) degree += 360.0;
-		if (degree >= 337.5 || degree < 22.5f) ctx.inputDir = RelativeInputDir::Forward;
-		else if (degree >= 22.5f && degree < 67.5f) ctx.inputDir = RelativeInputDir::ForwardRight;
-		else if (degree >= 67.5f && degree < 112.5f) ctx.inputDir = RelativeInputDir::Right;
-		else if (degree > 112.5f && degree < 157.5f) ctx.inputDir = RelativeInputDir::BackwardRight;
-		else if (degree >= 157.5f && degree < 202.5f) ctx.inputDir = RelativeInputDir::Backward;
-		else if (degree >= 202.5f && degree < 247.5f) ctx.inputDir = RelativeInputDir::BackwardLeft;
-		else if (degree >= 247.5f && degree < 292.5f) ctx.inputDir = RelativeInputDir::Left;
-		else if (degree >= 292.5f && degree < 337.5) ctx.inputDir = RelativeInputDir::ForwardLeft;
-	}
-	else {
-		ctx.inputDir = RelativeInputDir::None;
-	}
-
-	if (UpperGraphStack.empty()) return;
-
-	int currentIndex = UpperGraphStack.back();
-	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
-	int targetLevel = (int)UpperGraphStack.size() - 1;
-
-	// ★上半身が何もしていないなら、"Entry" を現在地とする
-	std::string evalStateForTrans = currentOverlayState.empty() ? "Entry" : currentOverlayState;
-	std::string nextState = evalStateForTrans;
-
-	// 親の割り込み処理
-	for (int i = 0; i < (int)UpperGraphStack.size(); i++)
+	// 指定されたグラフ（State_Magicなど）を探して、上半身スタックに積む！
+	for (int i = 0; i < (int)transitionGraphs.size(); i++)
 	{
-		int gIdx = UpperGraphStack[i];
-		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
-
-		std::string evalState = evalStateForTrans;
-		if (i < (int)UpperGraphStack.size() - 1) {
-			evalState = transitionGraphs[UpperGraphStack[i + 1]].graphName;
-		}
-
-		std::string result = g->EvaluateTransitions(evalState, ctx);
-		if (result != evalState) {
-			nextState = result;
-			currentGraph = g;
-			targetLevel = i;
-			evalStateForTrans = evalState;
-			break;
-		}
-	}
-
-	if (currentGraph == nullptr) return;
-
-	while ((int)UpperGraphStack.size() - 1 > targetLevel) {
-		UpperGraphStack.pop_back();
-	}
-
-	if (nextState != (currentOverlayState.empty() ? "Entry" : currentOverlayState))
-	{
-		// 脱出（Exit）処理
-		if (nextState == "Exit")
+		if (transitionGraphs[i].graphName == graphName)
 		{
-			currentOverlayState = "";
-			UpperGraphStack.pop_back();
-
-			if (UpperGraphStack.empty()) {
-				// ★空っぽになったら、もう一度 State_Magic をセットして待機！
-				int magicGraphIndex = -1;
-				for (int i = 0; i < (int)transitionGraphs.size(); i++) {
-					if (transitionGraphs[i].graphName == "State_Magic") {
-						magicGraphIndex = i;
-						break;
-					}
-				}
-				if (magicGraphIndex != -1) {
-					UpperGraphStack.push_back(magicGraphIndex);
-				}
-			}
+			UpperGraphStack.push_back(i);
+			currentOverlayState = "Entry"; // スタート地点にセット
 			return;
-		}
-
-		AnimNode* nextNode = nullptr;
-		for (auto& n : currentGraph->nodes) {
-			if (n.StateName == nextState) { nextNode = &n; break; }
-		}
-
-		// 潜り込み（SubGraph）処理
-		if (nextNode && nextNode->type == NodeType::SubGraph)
-		{
-			AnimationTransitionGraph* subGraph = nullptr;
-			int targetIndex = -1;
-			char filename[MAX_PATH];
-			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
-			std::string targetName = filename;
-
-			for (int i = 0; i < (int)transitionGraphs.size(); i++) {
-				if (transitionGraphs[i].graphName == targetName) {
-					subGraph = &transitionGraphs[i];
-					targetIndex = i;
-					break;
-				}
-			}
-
-			if (subGraph && targetIndex != -1) {
-				UpperGraphStack.push_back(targetIndex);
-				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
-
-				if (firstState != "Entry" && firstState != "") {
-					StartOverlayAnimation(firstState); // ★司令塔へ発注！
-				}
-				else {
-					firstState = "";
-					for (auto& n : subGraph->nodes) {
-						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit") {
-							firstState = n.StateName;
-							break;
-						}
-					}
-					if (firstState != "") {
-						StartOverlayAnimation(firstState);
-					}
-				}
-			}
-		}
-		else
-		{
-			// 通常のアニメーション遷移
-			StartOverlayAnimation(nextState); // ★司令塔へ発注！
 		}
 	}
 }

@@ -94,70 +94,6 @@
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 64,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 3
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 12.0,
-                    "type": 12
-                }
-            ],
-            "fromState": "State_Move",
-            "priority": 1,
-            "toState": "State_Magic"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 64,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 3
-                }
-            ],
-            "fromState": "State_Idle",
-            "priority": 1,
-            "toState": "State_Magic"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 1.0,
-                    "type": 1
-                }
-            ],
-            "fromState": "State_Magic",
-            "priority": 0,
-            "toState": "State_Idle"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
                     "buttonMask": 16,
                     "negate": false,
                     "targetDir": 0,
@@ -499,6 +435,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
@@ -515,11 +452,12 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "position": [
-                4.0,
+                3.0,
                 -87.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
@@ -531,6 +469,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
@@ -547,6 +486,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
@@ -563,6 +503,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
@@ -579,6 +520,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
@@ -595,6 +537,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
@@ -611,6 +554,7 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
