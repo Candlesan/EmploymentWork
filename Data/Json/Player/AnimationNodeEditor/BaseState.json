@@ -66,7 +66,7 @@
             "Actions": [
                 {
                     "type": 3,
-                    "value": 1.0
+                    "value": 0.0
                 }
             ],
             "colorA": 1.0,
@@ -426,6 +426,165 @@
             "fromState": "State_LockOn_Avoid",
             "priority": 0,
             "toState": "State_LockOnMove"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 1.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                },
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_Jump",
+            "priority": 0,
+            "toState": "State_AirAvoid"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_AirAvoid",
+            "priority": 0,
+            "toState": "State_Jump"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "State_AirAvoid",
+            "priority": 0,
+            "toState": "State_Move"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 1.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                },
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_LockOn_Jump",
+            "priority": 0,
+            "toState": "State_LockOn_AirAvoid"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_LockOn_AirAvoid",
+            "priority": 0,
+            "toState": "State_LockOnMove"
         }
     ],
     "nodes": [
@@ -440,8 +599,8 @@
                 "useRootMotionEx": false
             },
             "position": [
-                -524.0,
-                105.0
+                -303.0,
+                73.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
             "type": 1
@@ -508,7 +667,7 @@
                 "useRootMotionEx": false
             },
             "position": [
-                -303.0,
+                -300.0,
                 -87.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Jump.json",
@@ -526,7 +685,7 @@
             },
             "position": [
                 1.0,
-                -215.0
+                -279.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOnMove.json",
             "type": 1
@@ -542,8 +701,8 @@
                 "useRootMotionEx": false
             },
             "position": [
-                -303.0,
-                -231.0
+                -316.0,
+                -279.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_Jump.json",
             "type": 1
@@ -563,6 +722,40 @@
                 25.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_Avoid.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_AirAvoid",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -303.0,
+                -199.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_AirAvoid.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_LockOn_AirAvoid",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -319.0,
+                -391.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_AirAvoid.json",
             "type": 1
         }
     ]
