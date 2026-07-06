@@ -7,7 +7,10 @@
 #include "System/UI/Dialog.h"
 
 // ノードエディタ描画
-std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph>& graphs, const std::string& activeState, const std::vector<int>& activeGraphStack)
+std::string AnimationTransitionEditor::Draw(
+	std::vector<AnimationTransitionGraph>& graphs,
+	const std::string& activeState, const std::vector<int>& activeGraphStack,
+	const std::string& upperState, const std::vector<int>& upperGraphStack)
 {
 	std::string doubleClickedState = "";
 
@@ -265,6 +268,11 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 			ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.2f, 0.4f, 0.6f, 1.0f));
 
 		bool isActive = false;
+		bool isUpperGraph = false;
+		for (int upperIdx : upperGraphStack) {
+			if (upperIdx == currentGraphIndex) { isUpperGraph = true; break; }
+		}
+
 		if (node.type == NodeType::SubGraph)
 		{
 			if (!node.subGraphPath.empty())
@@ -274,7 +282,8 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 					filename, MAX_PATH, nullptr, 0);
 				std::string childGraphName = filename;
 
-				for (int activeIdx : activeGraphStack)
+				const auto& targetStack = isUpperGraph ? upperGraphStack : activeGraphStack;
+				for (int activeIdx : targetStack)
 				{
 					if (graphs[activeIdx].graphName == childGraphName)
 					{
@@ -286,7 +295,8 @@ std::string AnimationTransitionEditor::Draw(std::vector<AnimationTransitionGraph
 		}
 		else
 		{
-			isActive = (node.StateName == activeState);
+			std::string targetActiveState = isUpperGraph ? upperState : activeState;
+			isActive = (node.StateName == targetActiveState);
 		}
 
 		if (isActive)

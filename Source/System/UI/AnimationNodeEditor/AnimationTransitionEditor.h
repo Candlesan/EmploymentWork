@@ -17,7 +17,8 @@ public:
 	// ノードエディタ描画
     std::string Draw(std::vector<AnimationTransitionGraph>& graphs,
         const std::string& activeState = "",
-        const std::vector<int>& activeGraphStack = {});
+        const std::vector<int>& activeGraphStack = {},
+        const std::string& upperState = "", const std::vector<int>& upperGraphStack = {});
 private:
 	// リンク選択
 	void DrawSelectedLinkEditor(AnimationTransitionGraph& graph);

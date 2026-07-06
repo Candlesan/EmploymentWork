@@ -467,7 +467,11 @@ void Player::DrawGUI()
 	ImGui::End();
 
 	ImGui::Begin("Animation Transition Editor");
-	std::string clickedNode = transitionEditor.Draw(transitionGraphs, currentState, activeGraphStack);
+	std::string clickedNode = transitionEditor.Draw(
+		transitionGraphs,
+		currentState, activeGraphStack,
+		currentOverlayState, UpperGraphStack
+	);
 	ImGui::End();
 
 	// ノードがダブルクリックされたらプレビューモードに切り替える
