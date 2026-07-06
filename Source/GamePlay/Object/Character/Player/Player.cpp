@@ -963,7 +963,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	std::string nextState = currentState;
 
 	// 親の割り込み処理
-	for (int i = 0; i < (int)activeGraphStack.size(); i++) 
+	for (int i = 0; i < (int)activeGraphStack.size(); i++)
 	{
 		int gIdx = activeGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
@@ -1137,6 +1137,24 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				if (firstState != "") ChangeAnimationState(firstState);
 			}
 		}
+		else if (nextNode && nextNode->type == NodeType::Mix)
+		{
+			// 逆探知関数でAとBのアニメーション名を取ってくる
+			std::string stateA = currentGraph->GetInputNodeName(nextState, InputSlot::A);
+			std::string stateB = currentGraph->GetInputNodeName(nextState, InputSlot::B);
+
+			// 名前からアニメーション番号に変換する
+			int animIndexA = GetModel()->GetAnimationIndex(stateConfigs[stateA].animationName.c_str());
+			int animIndexB= GetModel()->GetAnimationIndex(stateConfigs[stateB].animationName.c_str());
+
+			// Animatorに加算ブレンドを依頼する
+			animator->PlayBaseMix(animIndexA, animIndexB, nextNode->mixRate, false, 0.2f, false, false);
+
+			// ステート名をMixノードに変える
+			previousState = currentState;
+			currentState = nextState;
+			bufferedButton = 0;
+		}
 		else
 		{
 			// 次に遷移するノードの設定を持ってくる
@@ -1161,6 +1179,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		}
 	}
 }
+
 
 // 上半身の状態遷移更新処理
 void Player::UpdateUpperBodyTransitions(float elapsedTime)
@@ -1371,6 +1390,23 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 				// 最初のステートへ切り替え！
 				if (firstState != "") ChangeAnimationState(firstState);
 			}
+		}
+		else if (nextNode && nextNode->type == NodeType::Mix)
+		{
+			// 逆探知してAとBの名前を取得！
+			std::string stateA = currentGraph->GetInputNodeName(nextState, InputSlot::A);
+			std::string stateB = currentGraph->GetInputNodeName(nextState, InputSlot::B);
+
+			// 名前からアニメーション番号に変換する
+			int animIndexA = GetModel()->GetAnimationIndex(stateConfigs[stateA].animationName.c_str());
+			int animIndexB = GetModel()->GetAnimationIndex(stateConfigs[stateB].animationName.c_str());
+
+			// Animator工場に上半身用のMix発注！
+			animator->PlayUpperMix(animIndexA, animIndexB, nextNode->mixRate, false, stateConfigs[stateA].targetBoneName, 0.2f);
+
+			// ステート名を更新
+			currentOverlayState = nextState;
+			bufferedButton = 0;
 		}
 		else
 		{

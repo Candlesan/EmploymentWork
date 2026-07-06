@@ -38,6 +38,49 @@ void Animator::PlayUpper(int animIndex, bool loop, const std::string& boneName, 
 	upperLayer.rootBoneName = boneName;
 }
 
+// 加算ブレンド
+void Animator::PlayBaseMix(
+	int animIndexA, int animIndexB,
+	float mixRate,
+	bool loop, float blendTime, bool rootMotion, bool rootMotionEx)
+{
+	// アニメが違うものに切り替わる瞬間なら、今の全身ポーズを退避してブレンド開始
+	if (baseLayer.animationIndex != animIndexA && !finalPoses.empty())
+	{
+		baseLayer.oldPoses = finalPoses;
+		baseLayer.isBlending = true;
+		baseLayer.blendSeconds = 0.0f;
+	}
+
+	baseLayer.animationIndex = animIndexA;		// ベースのアニメーション
+	baseLayer.mixAnimationindex = animIndexB;	// 混ぜるアニメーション
+	baseLayer.mixRate = mixRate;				// 混ぜる割合
+
+	baseLayer.isLoop = loop;
+	baseLayer.blendSecondsLength = blendTime;
+	baseLayer.useRootMotion = rootMotion;
+	baseLayer.useRootMotionEx = rootMotionEx;
+
+	baseLayer.currentSeconds = 0.0f;
+	baseLayer.mixcurrentSeconds = 0.0f; // Bの時間も0から始める
+	baseLayer.oldSeconds = 0.0f;
+}
+
+void Animator::PlayUpperMix(int animIndexA, int animIndexB, float mixRate, bool loop, const std::string& boneName, float blendTime) {
+	if (upperLayer.animationIndex != animIndexA && !finalPoses.empty())
+	{
+		upperLayer.oldPoses = finalPoses;
+		upperLayer.isBlending = true;
+		upperLayer.blendSeconds = 0.0f;
+	}
+
+	upperLayer.animationIndex = animIndexA;
+	upperLayer.isLoop = loop;
+	upperLayer.blendSecondsLength = blendTime;
+	upperLayer.currentSeconds = 0.0f;
+	upperLayer.rootBoneName = boneName;
+}
+
 // 更新処理
 DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4& worldTransform)
 {
@@ -45,6 +88,7 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 
 	DirectX::XMFLOAT3 rootMotionDelta = { 0.0f, 0.0f, 0.0f };
 
+	// ベースとなるアニメーションを計算する
 	if (baseLayer.animationIndex >= 0)
 	{
 		const Model::Animation& animation = targetModel->GetAnimations().at(baseLayer.animationIndex);
@@ -59,9 +103,23 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		}
 
 		std::vector<Model::NodePose> currentNodePoses;
-		targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, currentNodePoses);
+		// Mix用のアニメーションがあったら
+		if (baseLayer.mixAnimationindex >= 0)
+		{
+			std::vector<Model::NodePose> poseA;
+			std::vector<Model::NodePose> poseB;
 
-		// 
+			// 両方のポーズを計算する
+			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, poseA);
+			targetModel->ComputeAnimation(baseLayer.mixcurrentSeconds, baseLayer.mixcurrentSeconds, poseB);
+
+			targetModel->AccumulateAnimation(poseA, poseB, baseLayer.mixRate, currentNodePoses);
+		}
+		else
+		{
+			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, currentNodePoses);
+		}
+
 		if (baseLayer.isBlending && baseLayer.blendSeconds < baseLayer.blendSecondsLength)
 		{
 			float rate = baseLayer.blendSeconds / baseLayer.blendSecondsLength;
@@ -73,6 +131,7 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		}
 
 		baseLayer.oldSeconds = baseLayer.currentSeconds;
+		baseLayer.mixcurrentSeconds += elapsedTime;
 		baseLayer.currentSeconds += elapsedTime;
 		if (baseLayer.currentSeconds >= animation.secondsLength)
 		{
@@ -183,7 +242,7 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 	// 上半身のポーズを計算する
 	if (upperLayer.animationIndex >= 0)
 	{
-		// ⭕️修正ポイント：upperLayer から情報を取得するように完全修正
+		// upperLayer から情報を取得するように完全修正
 		const Model::Animation& upperAnim = targetModel->GetAnimations().at(upperLayer.animationIndex);
 		std::vector<Model::NodePose> upperPoses;
 
@@ -196,7 +255,22 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 			}
 		}
 
-		targetModel->ComputeAnimation(upperLayer.animationIndex, upperLayer.currentSeconds, upperPoses);
+		// Mix用のアニメーションがあったら
+		if (baseLayer.mixAnimationindex >= 0)
+		{
+			std::vector<Model::NodePose> poseA;
+			std::vector<Model::NodePose> poseB;
+
+			// 両方のポーズを計算する
+			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, poseA);
+			targetModel->ComputeAnimation(baseLayer.mixcurrentSeconds, baseLayer.mixcurrentSeconds, poseB);
+
+			targetModel->AccumulateAnimation(poseA, poseB, baseLayer.mixRate, upperPoses);
+		}
+		else
+		{
+			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, upperPoses);
+		}
 
 		const auto& nodes = targetModel->GetNodes();
 		std::vector<Model::NodePose> finalUpperPoses; // 上半身専用の一時的な箱
@@ -223,6 +297,8 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 
 		upperLayer.oldSeconds = upperLayer.currentSeconds;
 		upperLayer.currentSeconds += elapsedTime;
+		upperLayer.mixcurrentSeconds += elapsedTime;
+
 		if (upperLayer.currentSeconds >= upperAnim.secondsLength)
 		{
 			if (upperLayer.isLoop)
@@ -258,6 +334,7 @@ bool Animator::IsUpperBodyNode(const Model::Node& node, const std::string& rootN
 	return false;
 }
 
+// 上半身のアニメーション再生時間を取得
 float Animator::GetUpperAnimationLength() const
 {
 	if (upperLayer.animationIndex < 0) return false;

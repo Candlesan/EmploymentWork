@@ -81,6 +81,8 @@ struct AnimationTransition
 	std::vector<TransitionAction> actions;
 };
 
+enum class InputSlot { A, B };
+
 struct TransitionContext
 {
 	DirectX::XMFLOAT3 position;

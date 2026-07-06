@@ -438,6 +438,57 @@ void Model::BlendAnimations(
 	}
 }
 
+// アニメーションの加算ブレンド
+void Model::AccumulateAnimation(
+	const std::vector<NodePose>& animation0,
+	const std::vector<NodePose>& animation1,
+	float blendRate,
+	std::vector<NodePose>& result)
+{
+	size_t nodeCount = animation0.size();
+	result.resize(nodeCount);
+
+	for (size_t i = 0; i < nodeCount; ++i)
+	{
+		const Model::NodePose& pose0 = animation0[i];
+		const Model::NodePose& pose1 = animation1[i];
+		Model::NodePose& blendedPose = result[i];
+
+		// ※ 
+		// XMVectorScale : ベクトルのすべての成分に同じ数字を掛け算する関数
+
+		// 位置の線形補間
+		DirectX::XMVECTOR pos0 = DirectX::XMLoadFloat3(&pose0.position);
+		DirectX::XMVECTOR pos1 = DirectX::XMLoadFloat3(&pose1.position);
+
+		// 基準位置(0, 0, 0)からpos1に向けてblendRate分だけ移動値を取り出す
+		DirectX::XMVECTOR zeroPos = DirectX::XMVectorSet(0, 0, 0, 0);
+		DirectX::XMVECTOR weightedDeltaPos = DirectX::XMVectorLerp(zeroPos, pos1, blendRate);
+
+		DirectX::XMVECTOR blendedPos = DirectX::XMVectorAdd(pos0, weightedDeltaPos);
+		DirectX::XMStoreFloat3(&blendedPose.position, blendedPos);
+
+		// 回転のスフィア線形補間
+		DirectX::XMVECTOR rot0 = DirectX::XMLoadFloat4(&pose0.rotation);
+		DirectX::XMVECTOR rot1 = DirectX::XMLoadFloat4(&pose1.rotation);
+
+		// 影響度
+		DirectX::XMVECTOR identity = DirectX::XMVectorSet(0, 0, 0, 1);
+		DirectX::XMVECTOR weightedDeltaRot = DirectX::XMQuaternionSlerp(identity, rot1, blendRate);
+
+		// 差分の回転値を掛け算する
+		DirectX::XMVECTOR finalRot = DirectX::XMQuaternionMultiply(rot0, weightedDeltaRot);
+		DirectX::XMStoreFloat4(&blendedPose.rotation, finalRot);
+
+		// スケールの線形補間
+		DirectX::XMVECTOR scale0 = DirectX::XMLoadFloat3(&pose0.scale);
+		DirectX::XMVECTOR scale1 = DirectX::XMLoadFloat3(&pose1.scale);
+		DirectX::XMVECTOR blendedScale = DirectX::XMVectorLerp(scale0, scale1, blendRate);
+		DirectX::XMStoreFloat3(&blendedPose.scale, blendedScale);
+	}
+
+}
+
 // ノードポーズ設定
 void Model::SetNodePoses(const std::vector<NodePose>& nodePoses)
 {

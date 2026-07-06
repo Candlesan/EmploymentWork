@@ -9,6 +9,7 @@ void AnimationTransitionGraph::AddNode(const std::string& StateName, ImVec2 pos)
 	AnimNode node;
 	node.nodeId = NextId();
 	node.pinIn = NextId();
+	node.pinInB = NextId();
 	node.pinOut = NextId();
 	node.StateName = StateName;
 	node.position = pos;
@@ -20,10 +21,20 @@ void AnimationTransitionGraph::AddLink(ed::PinId from, ed::PinId to)
 {
 	// fromがどのノードか、toがどのノードかを探す
 	std::string fromState = "", toState = "-1";
+	InputSlot targetSlot = InputSlot::A;
 	for (auto& n : nodes)
 	{
 		if (n.pinOut == from) fromState = n.StateName;
-		if (n.pinIn == to) toState = n.StateName;
+		if (n.pinIn == to)
+		{
+			toState = n.StateName;
+			targetSlot = InputSlot::A;
+		}
+		if (n.pinInB == to)
+		{
+			toState = n.StateName;
+			targetSlot = InputSlot::B;
+		}
 	}
 	if (fromState.empty()|| toState.empty()) return; // 見つからなければ何もしない
 
@@ -33,6 +44,8 @@ void AnimationTransitionGraph::AddLink(ed::PinId from, ed::PinId to)
 	link.endPin = to;
 	link.transition.fromState = fromState;
 	link.transition.toState = toState;
+	link.targetSlot = targetSlot;
+
 	links.push_back(link);
 }
 
@@ -46,7 +59,7 @@ void AnimationTransitionGraph::RemoveNode(ed::NodeId id)
 		{
 			// このノードのpinInとpinOutを使ってるリンクを全部消す
 			links.erase(std::remove_if(links.begin(), links.end(),
-				[&](const AnimLink& l) {return l.startPin == node.pinOut || l.endPin == node.pinIn; }),
+				[&](const AnimLink& l) {return l.startPin == node.pinOut || l.endPin == node.pinIn || l.endPin == node.pinInB; }),
 				links.end());
 			break;
 		}
@@ -214,6 +227,7 @@ void AnimationTransitionGraph::Save(const std::string& path)
 			{"type", (int)node.type},
 			{"subGraphPath", node.subGraphPath},
 			{"position", {node.position.x, node.position.y}},
+			{"mixRate", node.mixRate},
 
 
 			{"config", {
@@ -233,6 +247,7 @@ void AnimationTransitionGraph::Save(const std::string& path)
 		// リンクのつながりも fromState(文字列) で保存する
 		linkJson["fromState"] = link.transition.fromState;
 		linkJson["toState"] = link.transition.toState;
+		linkJson["toSlot"] = link.targetSlot;
 		linkJson["priority"] = link.transition.priority;
 		linkJson["colorR"] = link.color.x;
 		linkJson["colorG"] = link.color.y;
@@ -315,6 +330,7 @@ void AnimationTransitionGraph::Load(const std::string& path)
 
 			newNode.type = (NodeType)node.value("type", 0);
 			newNode.subGraphPath = node.value("subGraphPath", "");
+			newNode.mixRate = node.value("mixRate", 0.0f);
 
 			// configデータが存在すれば読み込む
 			if (node.count("config") > 0) {
@@ -335,6 +351,8 @@ void AnimationTransitionGraph::Load(const std::string& path)
 		{
 			std::string fromState = "";
 			std::string toState = "";
+
+			InputSlot toSlot = (InputSlot)link.value("toSlot", 0);
 
 			if (link.count("fromState") > 0) {
 				if (link["fromState"].is_string()) fromState = link["fromState"];
@@ -357,7 +375,7 @@ void AnimationTransitionGraph::Load(const std::string& path)
 					foundFrom = true;
 				}
 				if (node.StateName == toState) {
-					toPin = node.pinIn;
+					toPin = (toSlot == InputSlot::B) ? node.pinInB : node.pinIn;
 					foundTo = true;
 				}
 			}
@@ -435,6 +453,20 @@ void AnimationTransitionGraph::InitializeAsNew(const std::string& name)
 
 	// 名前をセットする
 	graphName = name;
+}
+
+// Mixノードから合わせるアニメーションを逆探知する関数
+std::string AnimationTransitionGraph::GetInputNodeName(const std::string& animName, InputSlot slot)
+{
+	for (auto& link : links)
+	{
+		if (link.transition.toState == animName && slot == link.targetSlot)
+		{
+			return link.transition.fromState; // 同じだったら出発地点を返す
+		}
+	}
+
+	return "";
 }
 
 // リンクの取得

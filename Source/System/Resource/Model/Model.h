@@ -196,6 +196,13 @@ public:
 		float blendRate,
 		std::vector<NodePose>& result);
 
+	// アニメーションの加算ブレンド
+	static void AccumulateAnimation(
+		const std::vector<NodePose>& animation0,
+		const std::vector<NodePose>& animation1,
+		float blendRate,
+		std::vector<NodePose>& result);
+
 	// ノードポーズ設定
 	void SetNodePoses(const std::vector<NodePose>& nodePoses);
 

@@ -13,17 +13,22 @@ struct AnimLayer {
 	bool isLoop = false;
 	std::string rootBoneName = "";
 
-	// ブレンド用の記憶
+	// ブレンド用の変数
 	bool isBlending = false;
 	float blendSeconds = 0.0f;
 	float blendSecondsLength = 0.2f;
 	std::vector<Model::NodePose> oldPoses; // 1つ前のアニメーションの姿勢
 
-	// ルートモーション用の記憶
+	// ルートモーション用の変数
 	float oldSeconds = 0.0f;
 	bool useRootMotion = false;
 	bool useRootMotionEx = false;
 	bool bakeTranslationY = false;
+
+	// 加算ブレンド用の変数
+	int mixAnimationindex = -1;
+	float mixcurrentSeconds = 0.0f;
+	float mixRate = 0.0f; // 混ぜる割合
 };
 
 // アニメーション専門のクラス
@@ -32,9 +37,14 @@ class Animator
 public:
 	void Initialize(std::shared_ptr<Model> model) { targetModel = model; }
 
+	// レイヤー各種設定
 	void PlayBase(int animIndex, bool loop, float blendTime, bool rootMotion, bool rootMotionEx);
 	void PlayUpper(int animIndex, bool loop, const std::string& boneName, float blendTime);
 	
+	// 加算ブレンド各レイヤー設定
+	void PlayBaseMix(int animIndexA, int animIndexB, float mixRate,
+		bool loop, float blendTime, bool rootMotion, bool rootMotionEx);
+	void PlayUpperMix(int animIndexA, int animIndexB, float mixRate, bool loop, const std::string& boneName, float blendTime);
 	DirectX::XMFLOAT3 Update(float elapsedTime, const DirectX::XMFLOAT4X4& worldTransform);
 
 	bool IsUpperBodyNode(const Model::Node& node, const std::string& rootNodeName);

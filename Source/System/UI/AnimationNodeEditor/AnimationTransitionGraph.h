@@ -10,6 +10,7 @@ namespace ed = ax::NodeEditor;
 enum class NodeType {
 	Animation, // アニメーションを再生するためのノード
 	SubGraph, // ダブルクリックしたときに階層に潜るための箱
+	Mix, // 加算ブレンドをするノード
 };
 
 struct AnimNode {
@@ -19,11 +20,14 @@ struct AnimNode {
 	NodeType type = NodeType::Animation;
 	std::string subGraphPath = "";
 
+	float mixRate = 0.0f;
+
 	AnimationConfig config; // アニメーション自体の設定
 
 	ImVec2 position; // ノードの位置
 	ed::PinId pinOut; // 遷移の出口
 	ed::PinId pinIn; // 遷移の入口
+	ed::PinId pinInB; // 加算ブレンド用のピン
 };
 
 struct AnimLink {
@@ -32,6 +36,7 @@ struct AnimLink {
 	ed::PinId endPin; // toノードのpinIn
 	AnimationTransition transition; // この矢印の遷移条件
 	ImVec4 color = ImVec4(1, 1, 1, 1);
+	InputSlot targetSlot = InputSlot::A;
 };
 
 class AnimationTransitionGraph
@@ -60,6 +65,9 @@ public:
 
 	// 新しいグラフのセットアップ
 	void InitializeAsNew(const std::string& name);
+
+	// Mixノードから合わせるアニメーションを逆探知する関数
+	std::string GetInputNodeName(const std::string& animName, InputSlot slot);
 
 	int NextId() { return nextId++; }
 

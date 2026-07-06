@@ -154,7 +154,7 @@ std::string AnimationTransitionEditor::Draw(
 	// Entryノードを出すボタン
 	if (ImGui::Button("+ Add Entry"))
 	{
-		graphs[currentGraphIndex].AddNode("Entry", { 50, 200 });
+		graphs[currentGraphIndex].AddNode("Entry", { 0, 0 });
 	}
 
 	ImGui::SameLine();
@@ -162,7 +162,16 @@ std::string AnimationTransitionEditor::Draw(
 	// Exitノードを出すボタン
 	if (ImGui::Button("+ Add Exit"))
 	{
-		graphs[currentGraphIndex].AddNode("Exit", { 400, 200 });
+		graphs[currentGraphIndex].AddNode("Exit", { 0, 0 });
+	}
+
+	ImGui::SameLine();
+
+	// ミックスノードを出すボタン
+	if (ImGui::Button("+ Add Mix Node"))
+	{
+		graphs[currentGraphIndex].AddNode("MixNode", { 0, 0 });
+		graphs[currentGraphIndex].nodes.back().type = NodeType::Mix;
 	}
 
 	// 自動整列
@@ -318,9 +327,29 @@ std::string AnimationTransitionEditor::Draw(
 		ed::PushStyleVar(ed::StyleVar_PinArrowSize, 10.0f);  // 矢印の大きさ
 		ed::PushStyleVar(ed::StyleVar_PinArrowWidth, 10.0f); // 矢印の太さ
 
-		ed::BeginPin(node.pinIn, ed::PinKind::Input);
-		ImGui::Text("IN");
-		ed::EndPin();
+		if (node.type == NodeType::Mix)
+		{
+			ed::BeginPin(node.pinIn, ed::PinKind::Input);
+			ImGui::Text("A");
+			ed::EndPin();
+
+			ImGui::Spacing();
+
+			ed::BeginPin(node.pinInB, ed::PinKind::Input);
+			ImGui::Text("B");
+			ed::EndPin();
+
+			ImGui::PushItemWidth(100.0f);
+			ImGui::SliderFloat("##mixRate", &node.mixRate, 0.0f, 1.0f);
+			ImGui::PopItemWidth();
+		}
+		else // 普通のノードならいつも通りにInを描画する
+		{
+			ed::BeginPin(node.pinIn, ed::PinKind::Input);
+			ImGui::Text("IN");
+			ed::EndPin();
+		}
+
 
 		// INピンの描画が終わったら、忘れずに矢印の設定を戻す（2個）
 		ed::PopStyleVar(2);
