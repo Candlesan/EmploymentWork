@@ -680,6 +680,19 @@ void Player::Heal(float elapsedTime)
 	}
 }
 
+// 滑空
+void Player::Gliding()
+{
+	if (animSequence.GetRange("IsGliding"))
+	{
+		moveSpeed = 30.0f;
+	}
+	else
+	{
+		moveSpeed = 7.0f;
+	}
+}
+
 // ロックオン対象の位置を取得
 void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
 {

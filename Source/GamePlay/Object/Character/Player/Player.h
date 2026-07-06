@@ -54,6 +54,8 @@ public:
 	// 回復
 	void Heal(float elapsedTime);
 
+	void Gliding();
+
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
 

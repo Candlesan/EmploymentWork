@@ -1,0 +1,92 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 19
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toState": "AS_Dodge_Combat_Air_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 4
+                }
+            ],
+            "fromState": "AS_Dodge_Combat_Air_F_0_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -31.0,
+                -7.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                483.0,
+                -7.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Dodge_Combat_Air_F_0_Seq_0",
+            "config": {
+                "animationName": "AS_Dodge_Combat_Air_F_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                145.0,
+                -7.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}
