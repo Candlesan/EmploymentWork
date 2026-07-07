@@ -31,7 +31,7 @@ enum class TransitionConditionType
 	PositionZ,			// 位置:Z座標
 
 	IsCancelable,		// モーションキャンセル
-	//IsFalling,			// 落下中か
+	IsFalling,			// 落下中か
 
 	Always,				// 無条件
 };
@@ -99,5 +99,6 @@ struct TransitionContext
 	bool  healCooldownReady;
 	bool  isGuarding;
 	bool IsCancelable;
+	bool IsFalling;
 	RelativeInputDir inputDir;
 };

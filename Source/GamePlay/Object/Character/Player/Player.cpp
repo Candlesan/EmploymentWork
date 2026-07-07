@@ -223,7 +223,7 @@ void Player::Update(float elapsedTime)
 	}
 
 	// 滑空
-	Gliding();
+	//Gliding();
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
@@ -364,7 +364,7 @@ void Player::DrawGUI()
 			ImGui::Separator();
 
 			ImGui::DragFloat("lerpSpeed", &lerpSpeed, 0.1f);
-			ImGui::Text("smoothdMoveLength : %f.1", smoothdMoveLength);
+			ImGui::Text("smoothdMoveLength : %f.1", smoothMoveLength);
 
 			if (ImGui::Button(u8"ポーション回復"))
 			{
@@ -897,8 +897,11 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	// 移動処理
-	Move(moveVec.x, moveVec.z, moveSpeed);
+	if (useRootMotion)
+	{
+		// 移動処理
+		Move(moveVec.x, moveVec.z, moveSpeed);
+	}
 
 	// 回転処理
 
@@ -1019,30 +1022,44 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentState)
 	{
+		// ルートモーション中はMove関数を使わないようにする
+		if (stateConfigs[nextState].useRootMotion || stateConfigs[nextState].useRootMotionEx)
+		{
+			useRootMotion = true;
+		}
+		else
+		{
+			useRootMotion = false;
+		}
+
+
 		// ジャンプ処理
 		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
 		{
-			Jump(jumpSpeed);
-
-			// 空中に飛び出すときに勢いを載せる
-			if (moveLength > 0.1f)
+			if (IsGround())
 			{
-				float mvX = moveVec.x / moveLength;
-				float mvZ = moveVec.z / moveLength;
+				Jump(jumpSpeed);
 
-				// 走ってるときの速度を掛けてVelocityに送る
-				float jumpForwardSpeed = maxMoveSpeed;
-				velocity.x = mvX * jumpForwardSpeed;
-				velocity.z = mvZ * jumpForwardSpeed;
-			}
-			else
-			{
-				velocity.x = 0.0f;
-				velocity.z = 0.0f;
-			}
+				// 空中に飛び出すときに勢いを載せる
+				if (moveLength > 0.1f)
+				{
+					float mvX = moveVec.x / moveLength;
+					float mvZ = moveVec.z / moveLength;
 
-			jumpCount++;
-			bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+					// 走ってるときの速度を掛けてVelocityに送る
+					float jumpForwardSpeed = maxMoveSpeed;
+					velocity.x = mvX * jumpForwardSpeed;
+					velocity.z = mvZ * jumpForwardSpeed;
+				}
+				else
+				{
+					velocity.x = 0.0f;
+					velocity.z = 0.0f;
+				}
+
+				jumpCount++;
+				bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+			}
 		}
 
 		// アクションを実行する
@@ -1196,7 +1213,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	}
 }
 
-
 // 上半身の状態遷移更新処理
 void Player::UpdateUpperBodyTransitions(float elapsedTime)
 {
@@ -1258,6 +1274,16 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentOverlayState)
 	{
+		// ルートモーション中はMove関数を使わないようにする
+		if (stateConfigs[nextState].useRootMotion || stateConfigs[nextState].useRootMotionEx)
+		{
+			useRootMotion = true;
+		}
+		else
+		{
+			useRootMotion = false;
+		}
+
 		// ジャンプ処理
 		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
 		{
@@ -1456,7 +1482,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	smoothdMoveLength += (moveLength - smoothdMoveLength) * lerpSpeed * elapsedTime;
+	smoothMoveLength += (moveLength - smoothMoveLength) * lerpSpeed * elapsedTime;
 
 	// 先行入力処理
 	if (animSequence.GetRange("InputBuffer"))
@@ -1473,7 +1499,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.position = GetPosition();
 	ctx.animSeconds = GetCurrentAnimationSeconds();
 	ctx.animLength = GetCurrentAnimationLength();
-	ctx.moveLength = smoothdMoveLength;
+	ctx.moveLength = smoothMoveLength;
 	ctx.enemyFromdistance = EnemyfromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
 	ctx.buttonHeld = gamePad.GetButton();
@@ -1484,6 +1510,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
 	ctx.isGuarding = IsGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
+	ctx.IsFalling = falling;
 
 	if (moveLength > 0.01f) // ある程度入力がある場合のみ判定
 	{

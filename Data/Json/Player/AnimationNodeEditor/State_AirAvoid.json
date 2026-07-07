@@ -10,17 +10,23 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
-                    "targetDir": 1,
+                    "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 8
+                    "type": 19
                 }
             ],
             "fromState": "Entry",
             "priority": 0,
+            "toSlot": 0,
             "toState": "AS_Dodge_Combat_Air_F_0_Seq_0"
         },
         {
-            "Actions": [],
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 0.0
+                }
+            ],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
@@ -36,6 +42,7 @@
             ],
             "fromState": "AS_Dodge_Combat_Air_F_0_Seq_0",
             "priority": 0,
+            "toSlot": 0,
             "toState": "Exit"
         }
     ],
@@ -50,6 +57,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 -124.0,
                 201.0
@@ -67,6 +75,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 371.0,
                 201.0
@@ -84,6 +93,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
+            "mixRate": 0.0,
             "position": [
                 35.0,
                 201.0

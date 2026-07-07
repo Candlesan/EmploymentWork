@@ -745,6 +745,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				"PoaitionY",			// Y軸が～なら
 				"PoaitionZ",			// Z軸が～なら
 				"IsCancelable",			// モーションキャンセル
+				"IsFalling",			// 落下中か
 				"Always",				// 無条件
 			};
 			int typeIdx = (int)cond.type;

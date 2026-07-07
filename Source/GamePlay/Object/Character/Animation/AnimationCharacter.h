@@ -105,6 +105,8 @@ protected:
 	bool overlayAnimationLoop = false;
 	bool isOverlayPlaying = false;        // ã”¼gƒAƒjƒÄ¶’†‚©
 
+	float smoothMoveLength = 0.0f;
+
 
 	DirectX::XMFLOAT4X4 worldTransform = {
 		1, 0, 0, 0,

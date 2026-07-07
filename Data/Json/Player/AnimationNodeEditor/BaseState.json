@@ -477,31 +477,6 @@
             "toState": "State_AirAvoid"
         },
         {
-            "Actions": [
-                {
-                    "type": 3,
-                    "value": 0.0
-                }
-            ],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 0
-                }
-            ],
-            "fromState": "State_AirAvoid",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "State_Jump"
-        },
-        {
             "Actions": [],
             "colorA": 1.0,
             "colorB": 1.0,
@@ -609,44 +584,36 @@
             "toState": "State_LockOnMove"
         },
         {
-            "Actions": [],
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 0.0
+                }
+            ],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 32,
+                    "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 5
-                }
-            ],
-            "fromState": "State_Move",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "State_Gliding"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
+                    "type": 0
+                },
                 {
-                    "buttonMask": 32,
-                    "negate": false,
+                    "buttonMask": 0,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 4
+                    "type": 10
                 }
             ],
-            "fromState": "State_Gliding",
+            "fromState": "State_AirAvoid",
             "priority": 0,
             "toSlot": 0,
-            "toState": "State_Move"
+            "toState": "State_Jump"
         }
     ],
     "nodes": [
@@ -662,7 +629,7 @@
             },
             "mixRate": 0.0,
             "position": [
-                -303.0,
+                -460.0,
                 73.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
@@ -828,24 +795,6 @@
                 -391.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_AirAvoid.json",
-            "type": 1
-        },
-        {
-            "StateName": "State_Gliding",
-            "config": {
-                "animationName": "",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "targetBoneName": "",
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "mixRate": 0.0,
-            "position": [
-                0.0,
-                0.0
-            ],
-            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Gliding.json",
             "type": 1
         }
     ]

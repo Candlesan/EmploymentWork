@@ -218,6 +218,7 @@ private:
 	AnimationTransitionEditor  transitionEditor;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;
+	bool useRootMotion = false;
 
 	// --- プレビューモード用 ---
 	bool isPreviewMode = false;
@@ -241,8 +242,8 @@ private:
 	int bufferedButton = 0;
 
 	// 入力閾値
-	float lerpSpeed = 10.0f;
-	float smoothdMoveLength = 0.0f;
+	float lerpSpeed = 3.0f;
+	//float smoothMoveLength = 0.0f;
 
 	WindBladeMagic::WindBladeConfig config;
 };

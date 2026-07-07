@@ -196,6 +196,11 @@ bool AnimationTransitionGraph::EvaluateConditions(
 
 		case TransitionConditionType::IsCancelable:
 			result = ctx.IsCancelable;
+			break;
+
+		case TransitionConditionType::IsFalling:
+			result = ctx.IsCancelable;
+			break;
 
 		case TransitionConditionType::Always:
 			result = true;
