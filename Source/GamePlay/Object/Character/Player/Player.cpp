@@ -286,6 +286,9 @@ void Player::Update(float elapsedTime)
 	// エリア移動制限
 	AreaRestriction();
 
+	// 移動時の背骨の回転角度を求める関数
+	CalculateSpineRotation(elapsedTime);
+
 	// モデル更新処理
 	UpdateTransform();
 	player->UpdateTransform(transform);
@@ -387,7 +390,6 @@ void Player::DrawGUI()
 			}
 		}
 
-
 		// トランスフォーム情報
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -465,6 +467,13 @@ void Player::DrawGUI()
 			{
 				ImGui::Text("currentState: None (or Unknown)");
 			}
+		}
+
+		// 移動時の背骨の傾き
+		if (ImGui::CollapsingHeader(u8"背骨の傾き量", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat(u8"回転の強さ", &TargetSpineAngle, 0.1f);
+			ImGui::DragFloat(u8"回転速度", &SpineAngleSpeed, 0.1f);
 		}
 	}
 	ImGui::End();
@@ -897,7 +906,7 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (useRootMotion)
+	if (!useRootMotion && !useRootMotionEx)
 	{
 		// 移動処理
 		Move(moveVec.x, moveVec.z, moveSpeed);
@@ -1022,17 +1031,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentState)
 	{
-		// ルートモーション中はMove関数を使わないようにする
-		if (stateConfigs[nextState].useRootMotion || stateConfigs[nextState].useRootMotionEx)
-		{
-			useRootMotion = true;
-		}
-		else
-		{
-			useRootMotion = false;
-		}
-
-
 		// ジャンプ処理
 		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
 		{
@@ -1274,16 +1272,6 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentOverlayState)
 	{
-		// ルートモーション中はMove関数を使わないようにする
-		if (stateConfigs[nextState].useRootMotion || stateConfigs[nextState].useRootMotionEx)
-		{
-			useRootMotion = true;
-		}
-		else
-		{
-			useRootMotion = false;
-		}
-
 		// ジャンプ処理
 		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
 		{
@@ -1854,5 +1842,37 @@ AudioSource* Player::GetOrLoadSound(const std::string& soundName)
 		// 見つからなかった場合、次は探さないようにnullptrを保持（または警告を出すようにする）
 		sounds[soundName] = nullptr;
 		return nullptr;
+	}
+}
+
+// 移動時の背骨の回転角度を求める関数
+void Player::CalculateSpineRotation(float elapsedTime)
+{
+	// 今回の背骨の回転角度と前回の背骨の回転角度の差分を求める
+	float deltaAngleY = angle.y - previousAngleY;
+
+	// XMScalarModAngle : 角度を -π ～ +π の範囲に正規化する関数
+	deltaAngleY = DirectX::XMScalarModAngle(deltaAngleY);
+
+	// 目標角度を求める
+	float targetBankAngle = deltaAngleY * TargetSpineAngle;
+
+	// 曲がる最大値を設定する
+	float maxLimit = DirectX::XMConvertToRadians(30.0f);
+
+	//targetBankAngle を - maxLimit ～ + maxLimit の範囲にする
+	targetBankAngle = std::clamp(targetBankAngle, -maxLimit, maxLimit);
+
+	if (moveLength < 0.1f || !IsGround()) {
+		targetBankAngle = 0.0f;
+	}
+
+	// 傾きを滑らかにする
+	currentBankAngle += (targetBankAngle - currentBankAngle) * SpineAngleSpeed * elapsedTime;
+	previousAngleY = angle.y;
+
+	if (animator)
+	{
+		animator->SetBankAngle(currentBankAngle);
 	}
 }

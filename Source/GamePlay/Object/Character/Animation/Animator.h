@@ -56,6 +56,7 @@ public:
 	bool IsUpperPlaying() const { return upperLayer.animationIndex >= 0; }
 	void StopUpper();
 
+	void SetBankAngle(float angle) { bankAngle = angle; }
 private:
 	std::shared_ptr<Model> targetModel; // 動かす対象のモデル
 
@@ -64,4 +65,6 @@ private:
 	AnimLayer upperLayer; // 上半身
 
 	std::vector<Model::NodePose> finalPoses; // 最終的に完成したポーズ
+
+	float bankAngle = 0.0f; // 目標の傾きを入れる変数
 };

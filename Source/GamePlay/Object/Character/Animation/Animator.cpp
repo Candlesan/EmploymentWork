@@ -317,9 +317,40 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		}
 	}
 
+	float totalBankAngle = this->bankAngle;
+
 	// 姿勢更新
 	if (!finalPoses.empty())
 	{
+		// 背骨のリスト
+		std::vector<std::string> spineNames = {
+			"spine_01","spine_02","spine_03","spine_04","spine_05"
+		};
+
+		// 段々角度をつけていく
+		float divideAngle = totalBankAngle / spineNames.size();
+
+		// 傾き用のクォータニオンを作成する
+
+		DirectX::XMVECTOR bankRot = DirectX::XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, divideAngle);
+
+		for (const std::string& boneName : spineNames)
+		{
+			int nodeIndex = targetModel->GetNodeIndex(boneName.c_str());
+			if(nodeIndex >= 0)
+			{
+				// 現在のローカル回転を合成する
+				DirectX::XMVECTOR currentRot = DirectX::XMLoadFloat4(&finalPoses[nodeIndex].rotation);
+
+				// 傾き用の行列を合成する
+				DirectX::XMVECTOR newRot = DirectX::XMQuaternionMultiply(currentRot, bankRot);
+
+				// 上書きする
+				DirectX::XMStoreFloat4(&finalPoses[nodeIndex].rotation, newRot);
+			}
+		}
+
+		// 最終的な姿勢をモデルにセットする
 		targetModel->SetNodePoses(finalPoses);
 	}
 

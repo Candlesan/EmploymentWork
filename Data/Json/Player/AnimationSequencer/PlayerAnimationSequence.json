@@ -10,7 +10,20 @@
             "events": [],
             "name": "AS_Run_Combat_Fast_Loop_Seq_0",
             "ranges": [],
-            "speedKeys": []
+            "speedKeys": [
+                {
+                    "speed": 1.100000023841858,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.100000023841858,
+                    "time": 0.23333333432674408
+                },
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.46666666865348816
+                }
+            ]
         },
         {
             "events": [],

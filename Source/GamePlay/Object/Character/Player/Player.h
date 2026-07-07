@@ -120,6 +120,9 @@ private:
 
 	// ‰¹‚ğæ“¾i–³‚¯‚ê‚Î©“®ƒ[ƒhj‚·‚éŠÖ”
 	AudioSource* GetOrLoadSound(const std::string& soundName);
+
+	// ˆÚ“®‚Ì”wœ‚Ì‰ñ“]Šp“x‚ğ‹‚ß‚éŠÖ”
+	void CalculateSpineRotation(float elapsedTime);
 private:
 	std::shared_ptr<Model> player;
 	Enemy* enemy = nullptr;
@@ -244,6 +247,12 @@ private:
 	// “ü—Íè‡’l
 	float lerpSpeed = 3.0f;
 	//float smoothMoveLength = 0.0f;
+
+	// ”wœ‚ÌŒX‚«
+	float previousAngleY = 0.0f; // ‘O‚Ì”wœ‚Ì‰ñ“]’l
+	float currentBankAngle = 0.0f; // Œ»İ‚Ì”wœ‚Ì‰ñ“]’l
+	float TargetSpineAngle = -10.0f; // –Ú•W‚Ì‰ñ“]Šp“x
+	float SpineAngleSpeed = 10.0f; // ”wœ‚Ì‰ñ“]‚·‚é‘¬“x
 
 	WindBladeMagic::WindBladeConfig config;
 };
