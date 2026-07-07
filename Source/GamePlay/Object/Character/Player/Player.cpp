@@ -222,6 +222,9 @@ void Player::Update(float elapsedTime)
 		SetGravity(-9.8f);
 	}
 
+	// 滑空
+	Gliding();
+
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());

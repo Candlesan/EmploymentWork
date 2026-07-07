@@ -84,7 +84,7 @@ void AnimationCharacter::UpdateAnimation(float elapsedTime)
 	if (animator)
 	{
 		// このフレームの移動量を受け取って、キャラクターの座標に足す
-		DirectX::XMFLOAT3 delta = animator->Update(elapsedTime, GetTransform());
+		DirectX::XMFLOAT3 delta = animator->Update(elapsedTime * baseSpeed, GetTransform());
 
 		this->position.x += delta.x;
 		this->position.y += delta.y;

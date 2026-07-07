@@ -8,16 +8,17 @@
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 0,
+                    "buttonMask": 32,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 19
+                    "type": 4
                 }
             ],
-            "fromState": "Entry",
+            "fromState": "MixNode",
             "priority": 0,
-            "toState": "AS_Dodge_Combat_Air_F_0_Seq_0"
+            "toSlot": 0,
+            "toState": "Exit"
         },
         {
             "Actions": [],
@@ -27,16 +28,57 @@
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 32,
+                    "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 4
+                    "type": 19
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "MixNode"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 19
                 }
             ],
             "fromState": "AS_Dodge_Combat_Air_F_0_Seq_0",
             "priority": 0,
-            "toState": "Exit"
+            "toSlot": 1,
+            "toState": "MixNode"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 19
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
         }
     ],
     "nodes": [
@@ -46,12 +88,14 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
-                -31.0,
-                -7.0
+                -188.0,
+                -23.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -62,11 +106,13 @@
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
-                483.0,
+                625.0,
                 -7.0
             ],
             "subGraphPath": "",
@@ -78,12 +124,50 @@
                 "animationName": "AS_Dodge_Combat_Air_F_0_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
-                145.0,
-                -7.0
+                -12.0,
+                41.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "MixNode",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.48500001430511475,
+            "position": [
+                365.0,
+                -23.0
+            ],
+            "subGraphPath": "",
+            "type": 2
+        },
+        {
+            "StateName": "AS_Jump_Combat_Loop_0_Seq_0",
+            "config": {
+                "animationName": "AS_Jump_Combat_Loop_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -12.0,
+                -23.0
             ],
             "subGraphPath": "",
             "type": 0

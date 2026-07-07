@@ -19,6 +19,8 @@ void Animator::PlayBase(int animIndex, bool loop, float blendTime, bool rootMoti
 	baseLayer.useRootMotionEx = rootMotionEx;
 	baseLayer.currentSeconds = 0.0f;
 	baseLayer.oldSeconds = 0.0f;
+
+	baseLayer.mixAnimationIndex = -1;
 }
 
 // 上半身のレイヤー
@@ -36,6 +38,8 @@ void Animator::PlayUpper(int animIndex, bool loop, const std::string& boneName, 
 	upperLayer.blendSecondsLength = blendTime;
 	upperLayer.currentSeconds = 0.0f;
 	upperLayer.rootBoneName = boneName;
+
+	upperLayer.mixAnimationIndex = -1;
 }
 
 // 加算ブレンド
@@ -53,7 +57,7 @@ void Animator::PlayBaseMix(
 	}
 
 	baseLayer.animationIndex = animIndexA;		// ベースのアニメーション
-	baseLayer.mixAnimationindex = animIndexB;	// 混ぜるアニメーション
+	baseLayer.mixAnimationIndex = animIndexB;	// 混ぜるアニメーション
 	baseLayer.mixRate = mixRate;				// 混ぜる割合
 
 	baseLayer.isLoop = loop;
@@ -104,14 +108,14 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 
 		std::vector<Model::NodePose> currentNodePoses;
 		// Mix用のアニメーションがあったら
-		if (baseLayer.mixAnimationindex >= 0)
+		if (baseLayer.mixAnimationIndex >= 0)
 		{
 			std::vector<Model::NodePose> poseA;
 			std::vector<Model::NodePose> poseB;
 
 			// 両方のポーズを計算する
 			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, poseA);
-			targetModel->ComputeAnimation(baseLayer.mixcurrentSeconds, baseLayer.mixcurrentSeconds, poseB);
+			targetModel->ComputeAnimation(baseLayer.mixAnimationIndex, baseLayer.mixcurrentSeconds, poseB);
 
 			targetModel->AccumulateAnimation(poseA, poseB, baseLayer.mixRate, currentNodePoses);
 		}
@@ -256,20 +260,20 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		}
 
 		// Mix用のアニメーションがあったら
-		if (baseLayer.mixAnimationindex >= 0)
+		if (baseLayer.mixAnimationIndex >= 0)
 		{
 			std::vector<Model::NodePose> poseA;
 			std::vector<Model::NodePose> poseB;
 
 			// 両方のポーズを計算する
-			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, poseA);
-			targetModel->ComputeAnimation(baseLayer.mixcurrentSeconds, baseLayer.mixcurrentSeconds, poseB);
+			targetModel->ComputeAnimation(upperLayer.animationIndex, upperLayer.currentSeconds, poseA);
+			targetModel->ComputeAnimation(upperLayer.mixAnimationIndex, upperLayer.mixcurrentSeconds, poseB);
 
-			targetModel->AccumulateAnimation(poseA, poseB, baseLayer.mixRate, upperPoses);
+			targetModel->AccumulateAnimation(poseA, poseB, upperLayer.mixRate, upperPoses);
 		}
 		else
 		{
-			targetModel->ComputeAnimation(baseLayer.animationIndex, baseLayer.currentSeconds, upperPoses);
+			targetModel->ComputeAnimation(upperLayer.animationIndex, upperLayer.currentSeconds, upperPoses);
 		}
 
 		const auto& nodes = targetModel->GetNodes();
@@ -342,4 +346,12 @@ float Animator::GetUpperAnimationLength() const
 	const Model::Animation& animation = targetModel->GetAnimations().at(upperLayer.animationIndex);
 
 	return animation.secondsLength;
+}
+
+// 
+void Animator::StopUpper()
+{
+	upperLayer.animationIndex = -1;
+	upperLayer.currentSeconds = 0.0f;
+	upperLayer.mixAnimationIndex = -1;
 }

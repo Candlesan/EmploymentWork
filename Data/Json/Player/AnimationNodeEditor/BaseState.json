@@ -607,6 +607,46 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "State_LockOnMove"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 5
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Gliding"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 4
+                }
+            ],
+            "fromState": "State_Gliding",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
         }
     ],
     "nodes": [
@@ -788,6 +828,24 @@
                 -391.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_AirAvoid.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Gliding",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Gliding.json",
             "type": 1
         }
     ]

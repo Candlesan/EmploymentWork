@@ -26,7 +26,7 @@ struct AnimLayer {
 	bool bakeTranslationY = false;
 
 	// 加算ブレンド用の変数
-	int mixAnimationindex = -1;
+	int mixAnimationIndex = -1;
 	float mixcurrentSeconds = 0.0f;
 	float mixRate = 0.0f; // 混ぜる割合
 };
@@ -54,7 +54,8 @@ public:
 	float GetUpperAnimationLength() const;
 
 	bool IsUpperPlaying() const { return upperLayer.animationIndex >= 0; }
-	void StopUpper() { upperLayer.animationIndex = -1; upperLayer.currentSeconds = 0.0f; }
+	void StopUpper();
+
 private:
 	std::shared_ptr<Model> targetModel; // 動かす対象のモデル
 

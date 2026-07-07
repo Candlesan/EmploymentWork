@@ -478,6 +478,10 @@ void Model::AccumulateAnimation(
 
 		// 差分の回転値を掛け算する
 		DirectX::XMVECTOR finalRot = DirectX::XMQuaternionMultiply(rot0, weightedDeltaRot);
+
+		// 長さを1にする
+		finalRot = DirectX::XMQuaternionNormalize(finalRot);
+
 		DirectX::XMStoreFloat4(&blendedPose.rotation, finalRot);
 
 		// スケールの線形補間

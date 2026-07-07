@@ -54,6 +54,7 @@ public:
 	// 回復
 	void Heal(float elapsedTime);
 
+	// 滑空
 	void Gliding();
 
 	// ロックオン対象の位置を取得
