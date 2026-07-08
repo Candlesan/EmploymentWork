@@ -34,11 +34,16 @@ private:
 	CameraMode cameraMode = CameraMode::Normal;
 
 
-	Enemy* lockOnTarget = nullptr; // © ’Ç‰Á
+	Enemy* lockOnTarget = nullptr;
 	DirectX::XMFLOAT3 target = { 0, 0, 0 }; // ’‹“_
 	DirectX::XMFLOAT3 currentTarget = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 }; // ‰ñ“]Šp“x
 	float rollSpeed = DirectX::XMConvertToRadians(90); // ‰ñ“]‘¬“x
 	float range = 10.0f; // ‹——£
+
+	float currentFov = 45.0f; // ¡‚ÌÀÛ‚ÌFOV
+	float defaultFov = 45.0f; // ’Êí‚ÌFOV
+	float maxFov = 65.0f; // Å‘åFOV
+	float targetFov = 0.0f;
 };
 

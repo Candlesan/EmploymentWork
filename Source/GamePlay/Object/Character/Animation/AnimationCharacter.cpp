@@ -86,17 +86,6 @@ void AnimationCharacter::UpdateAnimation(float elapsedTime)
 		// このフレームの移動量を受け取って、キャラクターの座標に足す
 		DirectX::XMFLOAT3 delta = animator->Update(elapsedTime * baseSpeed, GetTransform());
 
-		// もしルートモーションを使ってて、かつ「移動ステート」の時だけ慣性を掛ける
-		if (useRootMotion && (currentState == "State_Move" || currentState == "State_LockOnMove"))
-		{
-			delta.x *= smoothMoveLength;
-			delta.z *= smoothMoveLength;
-
-			// 足滑り対策
-			float moveAnimSpeed = smoothMoveLength;
-			if (moveAnimSpeed < 0.1f) moveAnimSpeed = 0.1f;
-		}
-
 		this->position.x += delta.x;
 		this->position.y += delta.y;
 		this->position.z += delta.z;

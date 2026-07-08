@@ -208,6 +208,7 @@ void Player::Update(float elapsedTime)
 	}
 
 	falling = (velocity.y < -0.1f);
+
 	// 滞空処理
 	if (falling && gamePad.GetButton() & GamePad::BTN_A)
 	{
@@ -913,7 +914,6 @@ void Player::InputMove(float elapsedTime)
 	}
 
 	// 回転処理
-
 	if (lockOnTargetPos != nullptr)
 	{
 		float dx = lockOnTargetPos->x - position.x;

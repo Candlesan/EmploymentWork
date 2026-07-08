@@ -2,6 +2,7 @@
 #include "System/Core/Input/Input.h"
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
+#include "GamePlay/Object/Character/Player/Player.h"
 
 // 更新処理
 void GameCamera::Update(float elapsedTime)
@@ -71,7 +72,41 @@ void GameCamera::Update(float elapsedTime)
 	eye.y = currentTarget.y - front.y * range;
 	eye.z = currentTarget.z - front.z * range;
 
+
+	targetFov = defaultFov;
+
+	std::string playerState = Player::Instance().GetCurrentState();
+	bool isAvoiding = (playerState.find("Avoid") != std::string::npos ||
+		playerState.find("Dodge") != std::string::npos);
+
+	// 回避中なら、目標FOVを広くする
+	if (isAvoiding)
+	{
+		targetFov = 65.0f;
+	}
+
+	float fovLerpSpeed = 5.0f;
+	if (targetFov > currentFov)
+	{
+		fovLerpSpeed = 20.0f;
+	}
+	else
+	{
+		fovLerpSpeed = 5.0f;
+	}
+
+	float lerpFactor = fovLerpSpeed * elapsedTime;
+	if (lerpFactor > 1.0f) lerpFactor = 1.0f;
+
+	currentFov += (targetFov - currentFov) * lerpFactor;
+
 	// カメラの視点と注視点を設定
 	Camera& camera = CameraManager::Instance().GetMainCamera();
+	camera.SetPerspectiveFov(
+		DirectX::XMConvertToRadians(currentFov),
+		camera.GetAspect(),
+		camera.GetNear(),
+		camera.GetFar()
+	);
 	camera.SetLookAt(eye, currentTarget, DirectX::XMFLOAT3(0, 1, 0));
 }
