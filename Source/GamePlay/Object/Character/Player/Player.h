@@ -14,239 +14,208 @@
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/Player/WindBladeMagic/WindBladeMagic.h"
 
-// 前方宣言
 #include <memory>
 
+// 前方宣言
 class Enemy;
 
 class Player : public AnimationCharacter
 {
-private:
-	Player() {};
-	~Player() override {};
-
 public:
-	// 唯一のインスタンス
-	static Player& Instance()
-	{
+	// =========================================================================
+	//  インスタンス管理（シングルトン）
+	// =========================================================================
+	static Player& Instance() {
 		static Player instance;
 		return instance;
 	}
 
+	// =========================================================================
+	//  ライフサイクル（ゲームの根幹の流れ）
+	// =========================================================================
 	void Initialize();
+	void InitializeSequencer();
+	void InitializeAnimationNodeEditor();
+	void SetupInitialAnimationState();
 	void Finalize();
-	void InitializeAttackData();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void RenderTrail(const RenderContext& rc) { trail.Render(rc); }
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox = false);
 
-	// 武器の当たり判定情報
+	// =========================================================================
+	//  外部からのアクション命令（プレイヤーを動かす外からのトリガー）
+	// =========================================================================
+	void MagicInput();
+	void Heal(float elapsedTime);
+	void AddGraph(std::string name);              
+	void UpdateSounds(const std::string& state);  
+
+	// =========================================================================
+	//  セッター（外部からデータをセットする窓口）
+	// =========================================================================
+	void SetEnemy(Enemy* e) { enemy = e; }
+	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos);
+	void SetLastDamage(float d) { lastDamage = d; }
+	void SetIsHit(bool hit) { isHit = hit; }
+
+	// =========================================================================
+	//  ゲッター（外部からデータを取得する窓口）
+	// =========================================================================
+	// ── プレイヤーの状態 ──
+	bool GetIsGuarding() const { return isGuarding; }
+	bool GetIsAvoid() const { return isAvoid; }
+
+	// ── 武器・戦闘関係 ──
 	DirectX::XMFLOAT3 GetWeaponPosition() const;
 	DirectX::XMFLOAT3 GetWeaponDirection() const;
 	float GetWeaponRadius() const { return weapon.weaponRadius; }
 	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
-	// 魔法発動処理
-	void MagicInput();
-
-	// 回復
-	void Heal(float elapsedTime);
-
-	// ロックオン対象の位置を取得
-	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
-
+	// ── マネージャー・システム系へのアクセス ──
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
-
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
-
-	void SetLastDamage(float d) { lastDamage = d; }	// 計算したダメージ
-	bool GetIsGuarding() const { return IsGuarding; } // 防御中かどうか
-	void SetIsHit(bool hit) { IsHit = hit; } // 攻撃を食らったかどうか設定する
-	bool GetIsAvoid() const { return IsAvoid; } // 回避中かを取得
-
-	void SetEnemy(Enemy* e) { enemy = e; }
 	MagicManager& GetMagicManager() { return magicManager; }
-
-	// 今使ってるHitBoxを計算して返す関数
 	std::vector<HitBoxInfo> GetActiveHitBoxes() const override;
-public:
-	// グラフを追加する
-	void AddGraph(std::string name);
 
-	// サウンドを流す
-	void UpdateSounds(const std::string& state);
 protected:
-
-	//着地したときに呼ばれる
+	// =========================================================================
+	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
+	// =========================================================================
 	void OnLanding() override;
-
-	// アニメーションのコールバック関数
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
+
 private:
-	// スティック入力値から移動ベクトルを取得
+	// コンストラクタ群（シングルトンなので隠す）
+	Player() {};
+	~Player() override {};
+
+	// =========================================================================
+	//  内部ヘルパー関数（UpdateやInputから小分けにされたお仕事）
+	// =========================================================================
+	// ── 移動・入力の計算 ──
 	DirectX::XMFLOAT3 GetMoveVec() const;
-
-	// 入力処理
 	void InputMove(float elapsedTime);
+	RelativeInputDir CalculateRelativeInputDir();
 
-	// 状態遷移更新処理
+	// ── ステートマシン・先行入力 ──
 	void UpdateStateTransitions(float elapsedTime);
-
-	// 上半身の状態遷移更新処理
 	void UpdateUpperBodyTransitions(float elapsedTime);
-
-	// 条件設定
 	TransitionContext InputTransitionContext(float elapsedTime);
-
 	void PlayActionGraph(const std::string& graphName);
-
-	// 遷移以外の細かい条件
 	void UpdateStateBehavior();
 
-	// 武器のアタッチメント処理
-	void WeaponAttachment();
-
-	// 剣先と根本を求める関数
+	// ── 物理・タイマー・その他 ──
+	void UpdateTimers(float elapsedTime);
+	void CalculateStatusParameters();
 	void CalculationRootAndTip();
-
-	// 音を取得（無ければ自動ロード）する関数
+	void CalculateSpineRotation(float elapsedTime);
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
-	// 移動時の背骨の回転角度を求める関数
-	void CalculateSpineRotation(float elapsedTime);
 private:
+	// =========================================================================
+	//  メンバ変数（大量にあるので、ジャンルごとに綺麗にグループ化！）
+	// =========================================================================
+	// ── 3Dモデルと装備 ──
 	std::shared_ptr<Model> player;
 	Enemy* enemy = nullptr;
 
+	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;
+	float maxMoveSpeed = 7.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
+	float moveLength = 0.0f;
 
-	// 武器のアタッチメメント関係
-	struct Weapon
-	{
-		std::shared_ptr<Model> model;
-		DirectX::XMFLOAT3 position = { 0,0,0 };
-		DirectX::XMFLOAT3 angle = { 0,0,0 };
-		DirectX::XMFLOAT3 scale = { 1,1,1 };
-		DirectX::XMFLOAT4X4 transform = {
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
-		DirectX::XMFLOAT3 weaponHitOffset = { 0, 0, 0 };
-		DirectX::XMFLOAT3 weaponAngleOffset = { 0, 0, 0 };
-		float weaponRadius = 0.5f;
-		float weaponHeight = 1.0f;
-		bool isVisible = false;
-	};
-	Weapon weapon;
+	// ── 戦闘・ステータス（HP・スタミナ・無敵） ──
+	float health = 1400.0f;
+	float maxHealth = 1400.0f;
+	float stamina = 150.0f;
+	float maxStamina = 150.0f;
+	float currentPoise = 100.0f;
+	float maxPoise = 100.0f;
+	float baseAttackPower = 860.0f;
 	float lastDamage = 0.0f;
+	float invincibleTimer = 0.0f;
+	float runDisableTimer = 0.0f;
+	float staminaCooldownTimer = 0.0f;
+	bool haveStamina = false;
+	bool isStaminaEmpty = false;
 
-	DirectX::XMFLOAT3 SwingAngle = { 0, 0, 1.6 };
-	DirectX::XMFLOAT3 SwingPosition = { 0, 2.0f, 0 };
-	DirectX::XMFLOAT3 SwingOriginOffset = { 0, 0, 0 };
-	float RotationSpeed = 25.0f;
-	float Rotation = 0.0f;
-	float DropSpeed = 5.0f;
-	float dropStartT = 0.0f;
-	float dropEndT = 0.0f;
+	// ── アクション状態のフラグ ──
+	bool isGuarding = false;
+	bool isHit = false;
+	bool isAvoid = false;
 
-	// 当たり判定関係
-	float debugOffset = 0.5;
-
-	// 回避用の条件
-	float bButtonHoldTime = 0.0f;          // Bボタンを押し続けた時間
-	static constexpr float RUN_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
-
-	// 魔法レベル切り替えの条件
-	float rbButtonHoldTime = 0.0f;          // RBボタンを押し続けた時間
-	static constexpr float RB_THRESHOLD = 0.5f; // 何秒以上で走りと判定するか
-
-	// 攻撃用の条件
-	float rtButtonHoldTime = 0.0f;          // RTボタンを押し続けた時間
-	static constexpr float ATTACK_THRESHOLD = 0.25f; // 何秒以上で溜め攻撃と判定するか
-
-	bool IsGuarding = false; // ガード中か
-	bool IsHit = false; // 攻撃を食らったか
-	bool IsAvoid = false; // 回避が有効か
-
-	// ジャンプ関係
+	// ── ジャンプ関係 ──
 	bool jumpPressed = false;
 	float jumpSpeed = 7.0f;
 	bool falling = false;
-
 	int jumpCount = 0;
 	int jumpLimit = 1;
 
-	float moveLength = 0.0f;
-	float EnemyfromDistance = 0.0f;
+	// ── ロックオン・敵との距離 ──
+	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
+	float enemyFromDistance = 0.0f;
 	float lockedEnemyDistance = 0.0f;
+
+	// ── 回復（ポーション） ──
+	int potion = 14;
+	float healValue = 810;
+	float healCoolDownTimer = 0.0f;
+	float regeneTimer = 0.0f;
+
+	// ── 魔法 ──
+	MagicManager magicManager;
+	WindBladeMagic::WindBladeConfig config;
+	int level = 1;
+	float magicCoolDownTimer = 0.0f;
 	bool isMagicAttack = true;
 
-	// ロックオン関係
-	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
-	float debug_degree = 0.0f;   // 入力角度
-	int   debug_dirIndex = 0;    // 方向インデックス
+	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
+	float previousAngleY = 0.0f;
+	float currentBankAngle = 0.0f;
+	float targetSpineAngle = -10.0f;
+	float spineAngleSpeed = 10.0f;
+	Trail trail;
+	DirectX::XMFLOAT3 rootOffset = { 0.42f, -5.93f, -0.37f };
+	DirectX::XMFLOAT3 tipOffset = { 0.770f, 6.22f, -0.5f };
+	DirectX::XMFLOAT3 swingAngle = { 0, 0, 1.6f };
+	DirectX::XMFLOAT3 swingPosition = { 0, 2.0f, 0 };
+	DirectX::XMFLOAT3 swingOriginOffset = { 0, 0, 0 };
+	float rotationSpeed = 25.0f;
+	float rotation = 0.0f;
+	float dropSpeed = 5.0f;
+	float dropStartT = 0.0f;
+	float dropEndT = 0.0f;
 
-	// 回復関係
-	int Potion = 14; // ポーション数
-	float HealValue = 810; // 回復量
-	float HealCoolDownTimer = 0.0f; // クールダウン
-	float RegeneTimer = 0.0f; // 回復中
+	// ── 入力バッファ・閾値・デバッグ ──
+	int bufferedButton = 0;
+	float lerpSpeed = 3.0f;
+	float bButtonHoldTime = 0.0f;
+	float rbButtonHoldTime = 0.0f;
+	float rtButtonHoldTime = 0.0f;
+	float debug_degree = 0.0f;
+	int debug_dirIndex = 0;
+	float debugOffset = 0.5f;
 
-	// スタミナ関係
-	float staminaCooldownTimer = 0.0f;
-	bool HaveStamina = false;
-	bool IsStaminaEmpty = false;
-	float runDisableTimer = 0.0f;
+	const float RB_THRESHOLD = 0.5f;
 
-	// シーケンサー関係
+	// ── シーケンサー・ノードエディタ ──
 	AnimationSequencer animSequence;
 	AnimationSequencerEditor sequencerEditor;
-
-	// ノードエディター
-	std::vector<AnimationTransitionGraph>   transitionGraphs;
-	std::vector<int>   activeGraphStack;
-	std::vector<int> UpperGraphStack; // 上半身専用のグラフスタック
-	AnimationTransitionEditor  transitionEditor;
+	AnimationTransitionEditor transitionEditor;
+	std::vector<AnimationTransitionGraph> transitionGraphs;
+	std::vector<int> activeGraphStack;
+	std::vector<int> upperGraphStack;
 	int currentGraphIndex = 0;
 	int debugNextState = 0;
-	bool useRootMotion = false;
 
-	// --- プレビューモード用 ---
+	// ── プレビューモード用 ──
 	bool isPreviewMode = false;
 	std::string editingState = "";
 
-	// SE関係
-	// 音の名前と実体を紐づけるマップ
+	// ── サウンド ──
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
-
-	// トレイル
-	Trail trail;
-	DirectX::XMFLOAT3 rootOffset = { 0.42, -5.93, -0.37 };
-	DirectX::XMFLOAT3 tipOffset = { 0.770, 6.22, -0.5 };
-
-	// 魔法関係
-	MagicManager magicManager;
-	int level = 1;
-	float magicCoolDownTimer = 0.0f;
-
-	// 先行入力
-	int bufferedButton = 0;
-
-	// 入力閾値
-	float lerpSpeed = 3.0f;
-	//float smoothMoveLength = 0.0f;
-
-	// 背骨の傾き
-	float previousAngleY = 0.0f; // 前の背骨の回転値
-	float currentBankAngle = 0.0f; // 現在の背骨の回転値
-	float TargetSpineAngle = -10.0f; // 目標の回転角度
-	float SpineAngleSpeed = 10.0f; // 背骨の回転する速度
-
-	WindBladeMagic::WindBladeConfig config;
 };

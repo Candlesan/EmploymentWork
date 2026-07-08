@@ -149,10 +149,6 @@ void Enemy::Update(float elapsedTime)
 void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, enemy);
-
-	//renderer->Draw(ShaderId::PBR, weapon[0].model);
-
-	//if(!weapon->LeftHandInvincible) renderer->Draw(ShaderId::PBR, weapon[1].model);
 }
 
 // GUI描画

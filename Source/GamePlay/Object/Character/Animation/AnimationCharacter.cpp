@@ -94,6 +94,42 @@ void AnimationCharacter::UpdateAnimation(float elapsedTime)
 	}
 }
 
+// 武器のアタッチメント
+void AnimationCharacter::UpdateWeaponAttachment(const std::string& attachBoneName)
+{
+	// 武器モデルがないなら何もしない
+	if (!weapon.model) return;
+
+	// ボーン名を入れる
+	const char* AttachName = attachBoneName.c_str();
+
+	// モデルを取得
+	std::shared_ptr<Model> myModel = GetModel();
+	if (!myModel) return;
+
+	// 武器のローカル行列を計算する
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon.scale.x, weapon.scale.y, weapon.scale.z);
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon.position.x, weapon.position.y, weapon.position.z);
+	DirectX::XMMATRIX weaponLocal = S * R * T;
+
+	// キャラクターモデルから右手ノードを検索する
+	for (const Model::Node& node : myModel->GetNodes())
+	{
+		if (strcmp(node.name.c_str(), AttachName) == 0)
+		{
+			// 右手ノードと武器のローカル行列から武器のワールド行列を求める
+			DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
+			DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
+			DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
+			DirectX::XMStoreFloat4x4(&weapon.transform, weaponWorld);
+			weapon.model->UpdateTransform(weapon.transform);
+			break;
+		}
+	}
+
+}
+
 // アニメーション終了判定
 bool AnimationCharacter::IsAnimationFinished() const
 {

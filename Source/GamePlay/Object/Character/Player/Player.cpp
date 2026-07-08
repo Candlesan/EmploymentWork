@@ -12,56 +12,72 @@
 #include "imgui_node_editor.h"
 #include <imgui.h>
 
+
+// =========================================================================
+//  ライフサイクル・初期化
+// =========================================================================
+
 // 初期化
 void Player::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	// プレイヤーモデル読み込み
+	// モデルの読み込み
 	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
-
-	// アニメーター生成
-	animator = std::make_unique<Animator>();
-	animator->Initialize(player);
-
-	// 杖モデル読み込み
 	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
 	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.01f;
 
-	// プレイヤーパラメーター初期化
-	moveSpeed = 7.0f; // 移動速度
-	maxMoveSpeed = 7.0f; // 最大移動速度
+	// アニメーターを生成
+	animator = std::make_unique<Animator>();
+	animator->Initialize(player);
 
-	health = 1400.0f; // 体力
-	MaxHealth = 1400.0f; // 最大体力
-
-	Stamina = 150; // 持久力
-	MaxStamina = 150; // 最大持久力
-
+	// パラメータ初期化
+	moveSpeed = 7.0f;
+	maxMoveSpeed = 7.0f;
+	health = 1400.0f;
+	MaxHealth = 1400.0f;
+	Stamina = 150;
+	MaxStamina = 150;
 	currentPoise = 100.0f;
 	maxPoise = 100.0f;
-
 	baseAttackPower = 860.0f;
 	invincibleTimer = 0.0f;
 
-	// 当たり判定パラメーター初期化(Player)
 	weight = 0.5f;
 	radius = 0.4f;
 	height = 1.6f;
 	debugOffset = 0.8;
 
-	// 武器のパラメーター初期化(杖)
 	weapon.position = { 0.07f, 0.0f, 0.03f };
 	weapon.angle = { -0.06, 0.23f, -1.13f };
 
-	// 武器のパラメーター初期化(剣)
+	rootMotionNodeName = "root";
+	upperBodyNodeName = "spine_01";
 
-	// Jsonファイルの初期化
-	InitializeAttackData();
+	// 各種システムの初期化（
+	InitializeSequencer();          // シーケンサーの初期化
+	InitializeAnimationNodeEditor(); // ノードエディターの初期化
+	trail.Initialize();              // トレイルの初期化
 
-	trail.Initialize();
+	// アニメーションポーズと初期ステートの設定
+	player->GetNodePoses(nodePoses);
+	player->GetNodePoses(oldNodePoses);
+	SetupInitialAnimationState();    // 初期アニメーションの設定
+}
 
-	// アニメーションノードエディターの初期化
+// シーケンサーの初期化
+void Player::InitializeSequencer()
+{
+	// シーケンサーの初期化
+	std::string path = "Data/Json/Player/AnimationSequencer/PlayerAnimationSequence.json";
+	sequencerEditor.SetJsonPath(path);
+	sequencerEditor.SetWindowName("Player Sequencer");
+	animSequence.Load(path);
+}
+
+// ノードエディタの初期化
+void Player::InitializeAnimationNodeEditor()
+{
 	{
 		namespace fs = std::filesystem;
 		std::string folderPath = "Data/Json/Player/AnimationNodeEditor/";
@@ -111,14 +127,11 @@ void Player::Initialize()
 			LoadAnimationData("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 		}
 	}
+}
 
-	rootMotionNodeName = "root";
-	upperBodyNodeName = "spine_01";
-
-	// アニメーション設定
-	player->GetNodePoses(nodePoses);
-	player->GetNodePoses(oldNodePoses);
-
+// アニメーションのセットアップ処理
+void Player::SetupInitialAnimationState()
+{
 	// ゲーム開始時は、1つ目のグラフをスタックの１番上に詰む！
 	if (!transitionGraphs.empty())
 	{
@@ -156,20 +169,16 @@ void Player::Initialize()
 	}
 }
 
-// 攻撃とかの情報を初期化(Jsonファイルの初期化)
-void Player::InitializeAttackData()
-{
-	// シーケンサーの初期化
-	std::string path = "Data/Json/Player/AnimationSequencer/PlayerAnimationSequence.json";
-	sequencerEditor.SetJsonPath(path);
-	sequencerEditor.SetWindowName("Player Sequencer");
-	animSequence.Load(path);
-}
-
+// 終了化
 void Player::Finalize()
 {
 	sounds.clear();
 }
+
+
+// =========================================================================
+//  毎フレームのメイン処理・描画
+// =========================================================================
 
 // 更新処理
 void Player::Update(float elapsedTime)
@@ -187,54 +196,22 @@ void Player::Update(float elapsedTime)
 		jumpPressed = false;
 	}
 
-	if (runDisableTimer > 0.0f) {
-		runDisableTimer -= elapsedTime;
-		if (runDisableTimer < 0.0f)
-		{
-			runDisableTimer = 0.0f;
-		}
-	}
+	// タイマーを更新する関数
+	UpdateTimers(elapsedTime);
 
-	if (magicCoolDownTimer > 0.0f)
-	{
-		magicCoolDownTimer -= elapsedTime;
-	}
-
-	falling = (velocity.y < -0.1f);
-
-	// 滞空処理
-	if (falling && gamePad.GetButton() & GamePad::BTN_A)
-	{
-		SetGravity(-1.0f);
-	}
-	else if (falling)
-	{
-		SetGravity(-25.0f);
-	}
-	else
-	{
-		SetGravity(-9.8f);
-	}
-
-	// 敵との距離の計算
-	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
-	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());
-	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Epos, Ppos);
-	EnemyfromDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
+	// プレイヤーの状態を計算する関数
+	CalculateStatusParameters();
 
 	if (gamePad.GetButtonDown() & GamePad::BTN_X || gamePad.GetButtonDown() & GamePad::BTN_Y)
 	{
 		MagicInput();
 	}
 
-	// 無敵時間更新
-	UpdateInvincibleTimer(elapsedTime);
-
 	if (!isTyping && !isPreviewMode)
 	{
 		InputMove(elapsedTime);
 
-		if (!IsGuarding) Heal(elapsedTime);
+		if (!isGuarding) Heal(elapsedTime);
 
 		UpdateStateTransitions(elapsedTime);
 		UpdateUpperBodyTransitions(elapsedTime);
@@ -285,7 +262,7 @@ void Player::Update(float elapsedTime)
 	player->UpdateTransform(transform);
 
 	// 武器のアタッチメント処理
-	WeaponAttachment();
+	UpdateWeaponAttachment("hand_r");
 }
 
 // 描画処理
@@ -314,18 +291,6 @@ void Player::DrawGUI()
 			}
 			ImGui::Text("Health: %f.0", health);
 			ImGui::Separator();
-			if (IsStaminaEmpty)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-				ImGui::Text("Stamina: %f.0", Stamina);
-			}
-			else
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-				ImGui::Text("Stamina: %f.0", Stamina);
-			}
-			ImGui::PopStyleColor();
-			ImGui::Separator();
 			ImGui::Text("Damage: %f.0", lastDamage);
 			ImGui::Separator();
 			ImGui::Text("currentPoise: %f.0", currentPoise);
@@ -336,7 +301,7 @@ void Player::DrawGUI()
 			ImGui::Text("Move Speed: %f.0", moveSpeed); // 移動速度
 			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
 			ImGui::Text("moveLength: %.3f", moveLength);
-			ImGui::Text("EnemyfromDistance: %.3f", EnemyfromDistance);
+			ImGui::Text("EnemyfromDistance: %.3f", enemyFromDistance);
 			if (IsGround())
 			{
 				ImGui::Text(u8"地面");
@@ -359,18 +324,18 @@ void Player::DrawGUI()
 
 			if (ImGui::Button(u8"ポーション回復"))
 			{
-				Potion = 14;
+				potion = 14;
 			}
-			ImGui::Text("Potion: %d", Potion);
+			ImGui::Text("Potion: %d", potion);
 			ImGui::Separator();
-			if (IsGuarding) {
+			if (isGuarding) {
 				ImGui::Text(u8"ガード中");
 			}
 			else {
 				ImGui::Text(u8"ガードしてない");
 			}
 
-			if (IsAvoid) {
+			if (isAvoid) {
 				ImGui::Text(u8"回避中");
 			}
 			else {
@@ -416,11 +381,11 @@ void Player::DrawGUI()
 			ImGui::DragFloat("Weapon Collision Radius##1", &weapon.weaponRadius, 0.1f);
 			ImGui::DragFloat("Weapon Collision Height##1", &weapon.weaponHeight, 0.1f);
 
-			ImGui::DragFloat(u8"武器の回転速度", &RotationSpeed, 0.1, 0.0f, 100.0f);
-			ImGui::DragFloat(u8"剣の落下速度", &DropSpeed, 0.1, 0.0f, 100.0f);
-			ImGui::DragFloat3(u8"回転中の杖の位置", &SwingPosition.x, 0.1f);
-			ImGui::DragFloat3(u8"回転中の杖の向き", &SwingAngle.x, 0.1f, -360.0f, 360.0f);
-			ImGui::DragFloat3(u8"回転軸", &SwingOriginOffset.x, 0.1f);
+			ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
+			ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
+			ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
+			ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
+			ImGui::DragFloat3(u8"回転軸", &swingOriginOffset.x, 0.1f);
 		}
 
 		// トレイル
@@ -460,8 +425,8 @@ void Player::DrawGUI()
 		// 移動時の背骨の傾き
 		if (ImGui::CollapsingHeader(u8"背骨の傾き量", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat(u8"回転の強さ", &TargetSpineAngle, 0.1f);
-			ImGui::DragFloat(u8"回転速度", &SpineAngleSpeed, 0.1f);
+			ImGui::DragFloat(u8"回転の強さ", &targetSpineAngle, 0.1f);
+			ImGui::DragFloat(u8"回転速度", &spineAngleSpeed, 0.1f);
 		}
 	}
 	ImGui::End();
@@ -470,7 +435,7 @@ void Player::DrawGUI()
 	std::string clickedNode = transitionEditor.Draw(
 		transitionGraphs,
 		currentState, activeGraphStack,
-		currentOverlayState, UpperGraphStack
+		currentOverlayState, upperGraphStack
 	);
 	ImGui::End();
 
@@ -526,7 +491,7 @@ void Player::DrawGUI()
 void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 {
 	// プレイヤーの当たり判定
-	if (!IsAvoid)
+	if (!isAvoid)
 	{
 		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
@@ -557,6 +522,124 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 	// 魔法の当たり判定描画
 	magicManager.RenderDebugPrimitive(renderer);
 }
+
+
+// =========================================================================
+//  外部アクション命令
+// =========================================================================
+
+// 魔法射出
+void Player::MagicInput()
+{
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	if (gamePad.GetButtonDown() & GamePad::BTN_X)
+	{
+		if (magicCoolDownTimer > 0.0f) return;
+
+		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level, this->config);
+
+		PlayActionGraph("State_Magic");
+
+		if (level == 3)
+		{
+			magicCoolDownTimer = 1.0f;
+		}
+		else if (level == 2)
+		{
+			magicCoolDownTimer = 0.75f;
+		}
+		else
+		{
+			magicCoolDownTimer = 0.5f;
+		}
+	}
+}
+
+// 回復
+void Player::Heal(float elapsedTime)
+{
+	GamePad gamePad = Input::Instance().GetGamePad();
+
+	if ((gamePad.GetButtonDown() & GamePad::BTN_X) && healCoolDownTimer < 0.1f && potion > 0) {
+		potion--; // 一つ使う
+		healCoolDownTimer = 0.5f;
+		regeneTimer = 1.0f;
+	}
+
+
+	if (healCoolDownTimer > 0.0f)
+	{
+		healCoolDownTimer -= elapsedTime;
+	}
+
+	if (regeneTimer > 0.0f)
+	{
+		float healStep = healValue * elapsedTime;
+
+		health += healStep;
+
+		regeneTimer -= elapsedTime;
+
+		if (health > MaxHealth) health = MaxHealth;
+
+		if (regeneTimer < 0.0f) regeneTimer = 0.0f;
+	}
+}
+
+// グラフを追加する
+void Player::AddGraph(std::string name)
+{
+	AnimationTransitionGraph newGraph;
+
+	// デフォルトのタブ名をセットする
+	newGraph.InitializeAsNew(name);
+
+	// 初期ノードをセット
+	newGraph.AddNode("Idle", { 100, 100 });
+
+	// リストに追加する
+	transitionGraphs.push_back(newGraph);
+
+	// Jsonファイルとして保存する
+	std::string path = "Data/Json/Player/AnimationNodeEditor/" + name + ".json";
+	transitionGraphs.back().Save(path);
+}
+
+// サウンドを流す
+void Player::UpdateSounds(const std::string& state)
+{
+	auto& animations = animSequence.GetAnimations();
+	for (auto& data : animations)
+	{
+		if (data.name != state) continue;
+
+		for (auto& e : data.events)
+		{
+			AudioSource* se = GetOrLoadSound(e.soundName);
+			if (se)
+			{
+				se->Play(false);
+			}
+		}
+	}
+}
+
+
+// =========================================================================
+//  セッター（インライン以外）
+// =========================================================================
+
+// ロックオン対象の位置を取得
+void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
+{
+	lockOnTargetPos = pos;
+}
+
+
+// =========================================================================
+//  ゲッター（インライン以外）
+// =========================================================================
 
 //　武器の位置を取得
 DirectX::XMFLOAT3 Player::GetWeaponPosition() const
@@ -619,71 +702,6 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 	DirectX::XMFLOAT3 Direction;
 	DirectX::XMStoreFloat3(&Direction, dir);
 	return Direction;
-}
-
-// 魔法射出
-void Player::MagicInput()
-{
-	GamePad& gamePad = Input::Instance().GetGamePad();
-
-	if (gamePad.GetButtonDown() & GamePad::BTN_X)
-	{
-		if (magicCoolDownTimer > 0.0f) return;
-
-		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level, this->config);
-
-		PlayActionGraph("State_Magic");
-
-		if (level == 3)
-		{
-			magicCoolDownTimer = 1.0f;
-		}
-		else if (level == 2)
-		{
-			magicCoolDownTimer = 0.75f;
-		}
-		else
-		{
-			magicCoolDownTimer = 0.5f;
-		}
-	}
-}
-
-// 回復
-void Player::Heal(float elapsedTime)
-{
-	GamePad gamePad = Input::Instance().GetGamePad();
-
-	if ((gamePad.GetButtonDown() & GamePad::BTN_X) && HealCoolDownTimer < 0.1f && Potion > 0) {
-		Potion--; // 一つ使う
-		HealCoolDownTimer = 0.5f;
-		RegeneTimer = 1.0f;
-	}
-
-
-	if (HealCoolDownTimer > 0.0f)
-	{
-		HealCoolDownTimer -= elapsedTime;
-	}
-
-	if (RegeneTimer > 0.0f)
-	{
-		float healStep = HealValue * elapsedTime;
-
-		health += healStep;
-
-		RegeneTimer -= elapsedTime;
-
-		if (health > MaxHealth) health = MaxHealth;
-
-		if (RegeneTimer < 0.0f) RegeneTimer = 0.0f;
-	}
-}
-
-// ロックオン対象の位置を取得
-void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
-{
-	lockOnTargetPos = pos;
 }
 
 // 今使ってるHitBoxを計算して返す関数
@@ -774,43 +792,10 @@ std::vector<Character::HitBoxInfo> Player::GetActiveHitBoxes() const
 	return result;
 }
 
-// グラフを追加する
-void Player::AddGraph(std::string name)
-{
-	AnimationTransitionGraph newGraph;
 
-	// デフォルトのタブ名をセットする
-	newGraph.InitializeAsNew(name);
-
-	// 初期ノードをセット
-	newGraph.AddNode("Idle", { 100, 100 });
-
-	// リストに追加する
-	transitionGraphs.push_back(newGraph);
-
-	// Jsonファイルとして保存する
-	std::string path = "Data/Json/Player/AnimationNodeEditor/" + name + ".json";
-	transitionGraphs.back().Save(path);
-}
-
-// サウンドを流す
-void Player::UpdateSounds(const std::string& state)
-{
-	auto& animations = animSequence.GetAnimations();
-	for (auto& data : animations)
-	{
-		if (data.name != state) continue;
-
-		for (auto& e : data.events)
-		{
-			AudioSource* se = GetOrLoadSound(e.soundName);
-			if (se)
-			{
-				se->Play(false);
-			}
-		}
-	}
-}
+// =========================================================================
+//  親子関係のオーバーライド
+// =========================================================================
 
 //着地したときに呼ばれる
 void Player::OnLanding()
@@ -822,6 +807,11 @@ void Player::OnLanding()
 void Player::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
 }
+
+
+// =========================================================================
+//  内部ヘルパー（移動・入力）
+// =========================================================================
 
 // スティック入力値から移動ベクトルを取得
 DirectX::XMFLOAT3 Player::GetMoveVec() const
@@ -943,6 +933,74 @@ void Player::InputMove(float elapsedTime)
 	}
 }
 
+// 入力されたスティックから相対的な移動方向を計算する関数
+RelativeInputDir Player::CalculateRelativeInputDir()
+{
+	DirectX::XMFLOAT3 moveVec = GetMoveVec();
+	moveLength = sqrtf(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
+
+	if (moveLength > 0.01f) // ある程度入力がある場合のみ判定
+	{
+		// キャラクターの前・右ベクトル
+		float ForwardX = sinf(angle.y), ForwardZ = cosf(angle.y);
+		float RightX = cosf(angle.y), RightZ = -sinf(angle.y);
+
+		// 入力ベクトルとの内積
+		float dotForward = moveVec.x * ForwardX + moveVec.z * ForwardZ;
+		float dotRight = moveVec.x * RightX + moveVec.z * RightZ;
+
+		// 相対角度を求める
+		float relativeAngle = atan2f(dotRight, dotForward);
+		float degree = DirectX::XMConvertToDegrees(relativeAngle);
+		if (degree < 0) degree += 360.0; // 0 ～ 360度に補正
+
+		// 角度を8等分して前後左右を判定する
+		if (degree >= 337.5 || degree < 22.5f)
+		{
+			return RelativeInputDir::Forward;
+		}
+		else if (degree >= 22.5f && degree < 67.5f)
+		{
+			return RelativeInputDir::ForwardRight;
+		}
+		else if (degree >= 67.5f && degree < 112.5f)
+		{
+			return RelativeInputDir::Right;
+		}
+		else if (degree > 112.5f && degree < 157.5f)
+		{
+			return RelativeInputDir::BackwardRight;
+		}
+		else if (degree >= 157.5f && degree < 202.5f)
+		{
+			return RelativeInputDir::Backward;
+		}
+		else if (degree >= 202.5f && degree < 247.5f)
+		{
+			return RelativeInputDir::BackwardLeft;
+		}
+		else if (degree >= 247.5f && degree < 292.5f)
+		{
+			return RelativeInputDir::Left;
+		}
+		else if (degree >= 292.5f && degree < 337.5)
+		{
+			return RelativeInputDir::ForwardLeft;
+		}
+
+		debug_degree = degree;
+	}
+	else
+	{
+		return RelativeInputDir::None;
+	}
+}
+
+
+// =========================================================================
+//  内部ヘルパー（ステートマシン）
+// =========================================================================
+
 // 状態遷移更新処理
 void Player::UpdateStateTransitions(float elapsedTime)
 {
@@ -1042,7 +1100,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				{
 				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+				case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
 				}
 			}
 		}
@@ -1110,7 +1168,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 							{
 							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+							case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
 							}
 						}
 					}
@@ -1194,27 +1252,27 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	ctx.animSeconds = animator->GetUpperCurrentSeconds();
 	ctx.animLength = animator->GetUpperAnimationLength();
 
-	if (UpperGraphStack.empty()) return;
+	if (upperGraphStack.empty()) return;
 
-	int currentIndex = UpperGraphStack.back();
+	int currentIndex = upperGraphStack.back();
 	AnimationTransitionGraph* currentGraph = &transitionGraphs[currentIndex];
-	int targetLevel = (int)UpperGraphStack.size() - 1;
+	int targetLevel = (int)upperGraphStack.size() - 1;
 	std::string evalStateForTrans = currentOverlayState;
 	std::string nextState = currentOverlayState;
 
 	// 親の割り込み処理
-	for (int i = 0; i < (int)UpperGraphStack.size(); i++)
+	for (int i = 0; i < (int)upperGraphStack.size(); i++)
 	{
-		int gIdx = UpperGraphStack[i];
+		int gIdx = upperGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
 
 		// この階層における「現在のステート名」を決める
 		// 自分が一番上（子）なら実際の currentOverlayState。
 		// 親グラフを評価する時は、自分の1つ上に乗っている「子グラフの箱の名前」が現在位置になる。
 		std::string evalState = currentOverlayState;
-		if (i < (int)UpperGraphStack.size() - 1)
+		if (i < (int)upperGraphStack.size() - 1)
 		{
-			evalState = transitionGraphs[UpperGraphStack[i + 1]].graphName; // 現在地から１個上
+			evalState = transitionGraphs[upperGraphStack[i + 1]].graphName; // 現在地から１個上
 		}
 
 		// 遷移できるか評価する
@@ -1235,9 +1293,9 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	if (currentGraph == nullptr) return;
 
 	// 遷移する時に指定された階層までスタックを下す
-	while ((int)UpperGraphStack.size() - 1 > targetLevel)
+	while ((int)upperGraphStack.size() - 1 > targetLevel)
 	{
-		UpperGraphStack.pop_back();
+		upperGraphStack.pop_back();
 	}
 
 	// 今のステートから変化があった場合のみ処理
@@ -1280,7 +1338,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 				{
 				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-				case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+				case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
 				}
 			}
 		}
@@ -1293,11 +1351,11 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 			// 上半身を止める
 			animator->StopUpper();
 
-			if (UpperGraphStack.size() > 1)
+			if (upperGraphStack.size() > 1)
 			{
 				// 親グラフがいるなら、そこに戻る
 				currentOverlayState = currentGraph->graphName;
-				UpperGraphStack.pop_back();
+				upperGraphStack.pop_back();
 			}
 			else
 			{
@@ -1309,7 +1367,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 			currentOverlayState = "";
 
 			// スタックから現在の子グラフを下ろして、親グラフに戻る
-			UpperGraphStack.pop_back();
+			upperGraphStack.pop_back();
 
 			return;
 		}
@@ -1348,7 +1406,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 			if (subGraph && targetIndex != -1)
 			{
 				// スタックに子グラフを積んで潜る！
-				UpperGraphStack.push_back(targetIndex);
+				upperGraphStack.push_back(targetIndex);
 
 				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
 				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
@@ -1363,7 +1421,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 							{
 							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-							case TransitionActionType::SetIsAvoid: IsAvoid = (action.value != 0.0f); break;
+							case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
 							}
 						}
 					}
@@ -1450,7 +1508,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 		bufferedButton |= gamePad.GetButtonDown();
 	}
 
-	IsGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
+	isGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
 
 	UpdateStateBehavior();
 
@@ -1459,74 +1517,18 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.animSeconds = GetCurrentAnimationSeconds();
 	ctx.animLength = GetCurrentAnimationLength();
 	ctx.moveLength = smoothMoveLength;
-	ctx.enemyFromdistance = EnemyfromDistance;
+	ctx.enemyFromdistance = enemyFromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
 	ctx.buttonHeld = gamePad.GetButton();
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.IsGround = IsGround();
 	ctx.isLockOn = (lockOnTargetPos != nullptr);
-	ctx.havePotion = (Potion > 0);
-	ctx.healCooldownReady = (HealCoolDownTimer < 0.1f);
-	ctx.isGuarding = IsGuarding;
+	ctx.havePotion = (potion > 0);
+	ctx.healCooldownReady = (healCoolDownTimer < 0.1f);
+	ctx.isGuarding = isGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
-
-	if (moveLength > 0.01f) // ある程度入力がある場合のみ判定
-	{
-		// キャラクターの前・右ベクトル
-		float ForwardX = sinf(angle.y), ForwardZ = cosf(angle.y);
-		float RightX = cosf(angle.y), RightZ = -sinf(angle.y);
-
-		// 入力ベクトルとの内積
-		float dotForward = moveVec.x * ForwardX + moveVec.z * ForwardZ;
-		float dotRight = moveVec.x * RightX + moveVec.z * RightZ;
-
-		// 相対角度を求める
-		float relativeAngle = atan2f(dotRight, dotForward);
-		float degree = DirectX::XMConvertToDegrees(relativeAngle);
-		if (degree < 0) degree += 360.0; // 0 ～ 360度に補正
-
-		// 角度を8等分して前後左右を判定する
-		if (degree >= 337.5 || degree < 22.5f)
-		{
-			ctx.inputDir = RelativeInputDir::Forward;
-		}
-		else if (degree >= 22.5f && degree < 67.5f)
-		{
-			ctx.inputDir = RelativeInputDir::ForwardRight;
-		}
-		else if (degree >= 67.5f && degree < 112.5f)
-		{
-			ctx.inputDir = RelativeInputDir::Right;
-		}
-		else if (degree > 112.5f && degree < 157.5f)
-		{
-			ctx.inputDir = RelativeInputDir::BackwardRight;
-		}
-		else if (degree >= 157.5f && degree < 202.5f)
-		{
-			ctx.inputDir = RelativeInputDir::Backward;
-		}
-		else if (degree >= 202.5f && degree < 247.5f)
-		{
-			ctx.inputDir = RelativeInputDir::BackwardLeft;
-		}
-		else if (degree >= 247.5f && degree < 292.5f)
-		{
-			ctx.inputDir = RelativeInputDir::Left;
-		}
-		else if (degree >= 292.5f && degree < 337.5)
-		{
-			ctx.inputDir = RelativeInputDir::ForwardLeft;
-		}
-
-		debug_degree = degree;
-		debug_dirIndex = (int)ctx.inputDir;
-	}
-	else
-	{
-		ctx.inputDir = RelativeInputDir::None; // 入力なし
-	}
+	ctx.inputDir = CalculateRelativeInputDir(); 
 
 	return ctx;
 }
@@ -1535,14 +1537,14 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 void Player::PlayActionGraph(const std::string& graphName)
 {
 	// 既に何かのコンボ中なら、新しくは上書きしない
-	if (!UpperGraphStack.empty()) return;
+	if (!upperGraphStack.empty()) return;
 
 	// 指定されたグラフ（State_Magicなど）を探して、上半身スタックに積む！
 	for (int i = 0; i < (int)transitionGraphs.size(); i++)
 	{
 		if (transitionGraphs[i].graphName == graphName)
 		{
-			UpperGraphStack.push_back(i);
+			upperGraphStack.push_back(i);
 			currentOverlayState = "Entry"; // スタート地点にセット
 			return;
 		}
@@ -1554,33 +1556,50 @@ void Player::UpdateStateBehavior()
 {
 }
 
-// 武器のアタッチメント処理
-void Player::WeaponAttachment()
+
+// =========================================================================
+//  内部ヘルパー（物理・タイマー・その他）
+// =========================================================================
+
+// タイマー処理を更新する関数
+void Player::UpdateTimers(float elapsedTime)
 {
-	const char* AttachName = "hand_r";
-
+	// 魔法のクールダウン
+	if (magicCoolDownTimer > 0.0f)
 	{
-		// 武器のローカル行列を計算する
-		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(weapon.scale.x, weapon.scale.y, weapon.scale.z);
-		DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(weapon.angle.x, weapon.angle.y, weapon.angle.z);
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(weapon.position.x, weapon.position.y, weapon.position.z);
-		DirectX::XMMATRIX weaponLocal = S * R * T;
-
-		// キャラクターモデルから右手ノードを検索する
-		for (const Model::Node& node : player->GetNodes())
-		{
-			if (strcmp(node.name.c_str(), AttachName) == 0)
-			{
-				// 右手ノードと武器のローカル行列から武器のワールド行列を求める
-				DirectX::XMMATRIX rightHandGlobal = DirectX::XMLoadFloat4x4(&node.globalTransform);
-				DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
-				DirectX::XMMATRIX weaponWorld = weaponLocal * rightHandGlobal * playerWorld;
-				DirectX::XMStoreFloat4x4(&weapon.transform, weaponWorld);
-				weapon.model->UpdateTransform(weapon.transform);
-				break;
-			}
-		}
+		magicCoolDownTimer -= elapsedTime;
 	}
+
+	// 無敵時間更新
+	UpdateInvincibleTimer(elapsedTime);
+}
+
+// プレイヤーの状態を計算する関数
+void Player::CalculateStatusParameters()
+{
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	falling = (velocity.y < -0.1f);
+
+	// 滞空処理
+	if (falling && gamePad.GetButton() & GamePad::BTN_A)
+	{
+		SetGravity(-1.0f);
+	}
+	else if (falling)
+	{
+		SetGravity(-25.0f);
+	}
+	else
+	{
+		SetGravity(-9.8f);
+	}
+
+	// 敵との距離の計算
+	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());
+	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Epos, Ppos);
+	enemyFromDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
 }
 
 // 剣先と根本を求める関数
@@ -1602,6 +1621,38 @@ void Player::CalculationRootAndTip()
 		DirectX::XMStoreFloat3(&tipF3, Tip);
 
 		trail.Update(rootF3, tipF3);
+	}
+}
+
+// 移動時の背骨の回転角度を求める関数
+void Player::CalculateSpineRotation(float elapsedTime)
+{
+	// 今回の背骨の回転角度と前回の背骨の回転角度の差分を求める
+	float deltaAngleY = angle.y - previousAngleY;
+
+	// XMScalarModAngle : 角度を -π ～ +π の範囲に正規化する関数
+	deltaAngleY = DirectX::XMScalarModAngle(deltaAngleY);
+
+	// 目標角度を求める
+	float targetBankAngle = deltaAngleY * targetSpineAngle;
+
+	// 曲がる最大値を設定する
+	float maxLimit = DirectX::XMConvertToRadians(30.0f);
+
+	//targetBankAngle を - maxLimit ～ + maxLimit の範囲にする
+	targetBankAngle = std::clamp(targetBankAngle, -maxLimit, maxLimit);
+
+	if (moveLength < 0.1f || !IsGround()) {
+		targetBankAngle = 0.0f;
+	}
+
+	// 傾きを滑らかにする
+	currentBankAngle += (targetBankAngle - currentBankAngle) * spineAngleSpeed * elapsedTime;
+	previousAngleY = angle.y;
+
+	if (animator)
+	{
+		animator->SetBankAngle(currentBankAngle);
 	}
 }
 
@@ -1635,37 +1686,5 @@ AudioSource* Player::GetOrLoadSound(const std::string& soundName)
 		// 見つからなかった場合、次は探さないようにnullptrを保持（または警告を出すようにする）
 		sounds[soundName] = nullptr;
 		return nullptr;
-	}
-}
-
-// 移動時の背骨の回転角度を求める関数
-void Player::CalculateSpineRotation(float elapsedTime)
-{
-	// 今回の背骨の回転角度と前回の背骨の回転角度の差分を求める
-	float deltaAngleY = angle.y - previousAngleY;
-
-	// XMScalarModAngle : 角度を -π ～ +π の範囲に正規化する関数
-	deltaAngleY = DirectX::XMScalarModAngle(deltaAngleY);
-
-	// 目標角度を求める
-	float targetBankAngle = deltaAngleY * TargetSpineAngle;
-
-	// 曲がる最大値を設定する
-	float maxLimit = DirectX::XMConvertToRadians(30.0f);
-
-	//targetBankAngle を - maxLimit ～ + maxLimit の範囲にする
-	targetBankAngle = std::clamp(targetBankAngle, -maxLimit, maxLimit);
-
-	if (moveLength < 0.1f || !IsGround()) {
-		targetBankAngle = 0.0f;
-	}
-
-	// 傾きを滑らかにする
-	currentBankAngle += (targetBankAngle - currentBankAngle) * SpineAngleSpeed * elapsedTime;
-	previousAngleY = angle.y;
-
-	if (animator)
-	{
-		animator->SetBankAngle(currentBankAngle);
 	}
 }
