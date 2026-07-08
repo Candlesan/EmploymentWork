@@ -58,6 +58,16 @@ Framework::~Framework()
 // 更新処理
 void Framework::Update(float elapsedTime)
 {
+	bool isF1DownNow = (GetAsyncKeyState(VK_F1) & 0x8000);
+
+	// GUIの表示/非表示切り替え
+	if (isF1DownNow && !isF1PressedLastFrame) 
+	{
+		GUIDrawSwitch = !GUIDrawSwitch;
+	}
+
+	isF1PressedLastFrame = isF1DownNow;
+
 	// IMGUIフレーム開始処理	
 	ImGuiRenderer::NewFrame();
 
@@ -87,6 +97,7 @@ void Framework::Render(float elapsedTime)
 	SceneManager::Instance().Render();
 
 	// シーンGUI描画処理
+	if(GUIDrawSwitch)
 	SceneManager::Instance().DrawGUI();
 
 #if 0

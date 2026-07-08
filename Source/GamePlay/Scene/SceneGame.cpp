@@ -152,12 +152,6 @@ void SceneGame::Update(float elapsedTime)
 		debugCamera->SyncControllerToCamera(camera);
 	}
 
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
-	{
-		timeScale = 0.5f;
-	}
-
-
 	if (shouldUpdate)
 	{
 		// ステージ更新

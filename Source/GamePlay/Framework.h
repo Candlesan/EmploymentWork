@@ -26,4 +26,6 @@ private:
 	std::unique_ptr<Scene>	scene;
 	bool isFullscreen = false;
 	RECT windowedRect = {};
+	bool GUIDrawSwitch = true;
+	bool isF1PressedLastFrame = false;
 };
