@@ -278,160 +278,162 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 // GUI描画
 void Player::DrawGUI()
 {
-	ImGui::Begin("Player");
+	ImGui::Begin(u8"プレイヤーデバッグ");
 	{
-		ImGui::Text("currentOverlayState: %s", currentOverlayState.c_str());
+		ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
+
 		// パラメーター
-		if (ImGui::CollapsingHeader("Parameter", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::Text("MagicCoolDown:%f", magicCoolDownTimer);
-			if (ImGui::Button(u8"HP前回"))
+			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
+			if (ImGui::Button(u8"HP全回復"))
 			{
-				health = MaxHealth;
+				health = maxHealth; // 前回の残党退治で maxHealth（小文字）にしてる場合はこれでOK！
 			}
-			ImGui::Text("Health: %f.0", health);
+			ImGui::Text(u8"体力 (HP): %f.0", health);
 			ImGui::Separator();
-			ImGui::Text("Damage: %f.0", lastDamage);
+			ImGui::Text(u8"直前の被ダメージ: %f.0", lastDamage);
 			ImGui::Separator();
-			ImGui::Text("currentPoise: %f.0", currentPoise);
+			ImGui::Text(u8"現在の体幹値 (ポイズ): %f.0", currentPoise);
 			ImGui::Separator();
-			ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
+			ImGui::Text(u8"無敵残り時間: %f.0", invincibleTimer);
 			ImGui::Separator();
 
-			ImGui::Text("Move Speed: %f.0", moveSpeed); // 移動速度
-			ImGui::Text("Velocity: %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
-			ImGui::Text("moveLength: %.3f", moveLength);
-			ImGui::Text("EnemyfromDistance: %.3f", enemyFromDistance);
+			ImGui::Text(u8"基本移動速度: %f.0", moveSpeed);
+			ImGui::Text(u8"物理速力 (Velocity): %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
+			ImGui::Text(u8"スティック入力強度: %.3f", moveLength);
+			ImGui::Text(u8"ターゲットとの距離: %.3f", enemyFromDistance);
 			if (IsGround())
 			{
-				ImGui::Text(u8"地面");
+				ImGui::Text(u8"接地状態: 地面");
 			}
 			else
 			{
-				ImGui::Text(u8"空中");
+				ImGui::Text(u8"接地状態: 空中");
 			}
 			ImGui::Separator();
 
 			// 入力方向のデバッグ表示
-			const char* debugDirNames[] = { "None", "Forward", "ForwardRight", "ForwardLeft", "Right", "Backward", "BackwardRight", "BackwardLeft", "Left" };
-			ImGui::Text("Input Degree: %.2f", debug_degree);
-			ImGui::Text("Input Dir: %s", debugDirNames[debug_dirIndex]);
+			const char* debugDirNames[] = {
+				u8"入力なし", u8"前", u8"右前", u8"左前", u8"右", u8"後", u8"右後", u8"左後", u8"左"
+			};
+			ImGui::Text(u8"入力角度: %.2f", debug_degree);
+			ImGui::Text(u8"判定された入力方向: %s", debugDirNames[debug_dirIndex]);
 
 			ImGui::Separator();
 
-			ImGui::DragFloat("lerpSpeed", &lerpSpeed, 0.1f);
-			ImGui::Text("smoothdMoveLength : %f.1", smoothMoveLength);
+			ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
+			ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
 
-			if (ImGui::Button(u8"ポーション回復"))
+			if (ImGui::Button(u8"ポーション残量リセット"))
 			{
 				potion = 14;
 			}
-			ImGui::Text("Potion: %d", potion);
+			ImGui::Text(u8"所持ポーション数: %d", potion);
 			ImGui::Separator();
+
 			if (isGuarding) {
-				ImGui::Text(u8"ガード中");
+				ImGui::Text(u8"防衛状態: ガード中");
 			}
 			else {
-				ImGui::Text(u8"ガードしてない");
+				ImGui::Text(u8"防衛状態: ガードなし");
 			}
 
 			if (isAvoid) {
-				ImGui::Text(u8"回避中");
+				ImGui::Text(u8"アクション状態: 回避中");
 			}
 			else {
-				ImGui::Text(u8"回避してない");
+				ImGui::Text(u8"アクション状態: 通常時");
 			}
 		}
 
 		// トランスフォーム情報
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"トランスフォーム (位置・回転・拡縮)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat3("Position", &position.x); // 位置
+			ImGui::DragFloat3(u8"座標 (Position)", &position.x);
 
 			DirectX::XMFLOAT3 a;
 			a.x = DirectX::XMConvertToDegrees(angle.x);
 			a.y = DirectX::XMConvertToDegrees(angle.y);
 			a.z = DirectX::XMConvertToDegrees(angle.z);
-			ImGui::DragFloat3("Angle", &a.x); // 回転
-			// 表示用に度数法に変換した後、再度ラジアンで戻す処理
+			ImGui::DragFloat3(u8"回転角度 (Angle)", &a.x);
 			angle.x = DirectX::XMConvertToRadians(a.x);
 			angle.y = DirectX::XMConvertToRadians(a.y);
 			angle.z = DirectX::XMConvertToRadians(a.z);
 
-			ImGui::DragFloat3("Scale", &scale.x); // スケール
+			ImGui::DragFloat3(u8"拡縮比 (Scale)", &scale.x);
 		}
 
 		// 当たり判定情報
-		if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
-			ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
-			ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
+			ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
+			ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
+			ImGui::DragFloat(u8"デバッグ用描画オフセット", &debugOffset, 0.1f);
 		}
 
 		// 武器のアタッチメント情報
-		if (ImGui::CollapsingHeader("Weapon Attachment", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"武器アタッチメント (手元・位置調整)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat3("Position##1", &weapon.position.x, 0.01f);
-			ImGui::DragFloat3("Angle##1", &weapon.angle.x, 0.01f);
-			ImGui::DragFloat3("Scale##1", &weapon.scale.x, 0.01f);
+			ImGui::DragFloat3(u8"武器のローカル位置##1", &weapon.position.x, 0.01f);
+			ImGui::DragFloat3(u8"武器のローカル角度##1", &weapon.angle.x, 0.01f);
+			ImGui::DragFloat3(u8"武器のローカルスケール##1", &weapon.scale.x, 0.01f);
 
-			ImGui::DragFloat3("Weapon HitOffset##1", &weapon.weaponHitOffset.x, 0.1f);
-			ImGui::DragFloat3("Weapon AngleOffset##1", &weapon.weaponAngleOffset.x, 0.1f);
-			ImGui::DragFloat("Weapon Collision Radius##1", &weapon.weaponRadius, 0.1f);
-			ImGui::DragFloat("Weapon Collision Height##1", &weapon.weaponHeight, 0.1f);
+			ImGui::DragFloat3(u8"攻撃判定の位置ズレ##1", &weapon.weaponHitOffset.x, 0.1f);
+			ImGui::DragFloat3(u8"攻撃判定の角度ズレ##1", &weapon.weaponAngleOffset.x, 0.1f);
+			ImGui::DragFloat(u8"攻撃判定の半径##1", &weapon.weaponRadius, 0.1f);
+			ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
 
 			ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
 			ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
 			ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
 			ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
-			ImGui::DragFloat3(u8"回転軸", &swingOriginOffset.x, 0.1f);
+			ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
 		}
 
 		// トレイル
-		if (ImGui::CollapsingHeader("Weapon Trail", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"武器軌跡エフェクト (トレイル)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat3("Root Offset", &rootOffset.x, 0.01f);
-			ImGui::DragFloat3("Tip Offset", &tipOffset.x, 0.01f);
+			ImGui::DragFloat3(u8"エフェクト根本位置", &rootOffset.x, 0.01f);
+			ImGui::DragFloat3(u8"エフェクト先端位置", &tipOffset.x, 0.01f);
 		}
 
 		// 魔法関係
-		if (ImGui::CollapsingHeader("Magic", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"魔法パラメータ設定 (ウィンドブレード)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::SliderFloat("Speed", &config.speed, 0.0f, 50.0f, "%.1f");
-			ImGui::SliderFloat("Damage", &config.damage, 0.0f, 500.0f, "%.0f");
-			ImGui::SliderFloat("Wait Time", &config.waitTimer, 0.0f, 2.0f, "%.2f");
-			ImGui::SliderFloat("Life Time", &config.lifeTimer, 0.5f, 10.0f, "%.1f");
+			ImGui::SliderFloat(u8"弾速 (Speed)", &config.speed, 0.0f, 50.0f, "%.1f");
+			ImGui::SliderFloat(u8"威力 (Damage)", &config.damage, 0.0f, 500.0f, "%.0f");
+			ImGui::SliderFloat(u8"射出前の溜め時間", &config.waitTimer, 0.0f, 2.0f, "%.2f");
+			ImGui::SliderFloat(u8"消滅までの寿命", &config.lifeTimer, 0.5f, 10.0f, "%.1f");
 
-			ImGui::SliderInt("Level", &level, 1, 3);
+			ImGui::SliderInt(u8"暫定魔法レベル", &level, 1, 3);
 		}
 
 		// アニメーション遷移状態
-		if (ImGui::CollapsingHeader("Animation/State", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"アニメーションステート状況", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			auto it = stateConfigs.find(currentState);
 
-			// 見つかった場合のみ名前を表示する
 			if (it != stateConfigs.end())
 			{
-				ImGui::Text("currentState: %s", it->second.animationName.c_str());
+				ImGui::Text(u8"現在の全身ステート: %s", it->second.animationName.c_str());
 			}
 			else
 			{
-				ImGui::Text("currentState: None (or Unknown)");
+				ImGui::Text(u8"現在の全身ステート: なし(または不明)");
 			}
 		}
 
 		// 移動時の背骨の傾き
-		if (ImGui::CollapsingHeader(u8"背骨の傾き量", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat(u8"回転の強さ", &targetSpineAngle, 0.1f);
-			ImGui::DragFloat(u8"回転速度", &spineAngleSpeed, 0.1f);
+			ImGui::DragFloat(u8"しなりの強さ", &targetSpineAngle, 0.1f);
+			ImGui::DragFloat(u8"しなりの戻り速度", &spineAngleSpeed, 0.1f);
 		}
 	}
 	ImGui::End();
 
-	ImGui::Begin("Animation Transition Editor");
+	ImGui::Begin(u8"ステート遷移グラフエディタ");
 	std::string clickedNode = transitionEditor.Draw(
 		transitionGraphs,
 		currentState, activeGraphStack,
@@ -450,34 +452,30 @@ void Player::DrawGUI()
 
 	if (isPreviewMode)
 	{
-		ImGui::Begin("Preview Timeline");
+		ImGui::Begin(u8"プレビュー再生タイムライン");
 
-		if (ImGui::Button(u8"▶ ゲームに戻る"))
+		if (ImGui::Button(u8"▶ ゲーム画面に戻る"))
 		{
 			isPreviewMode = false;
-			ChangeAnimationState("Idle"); // プレビューを終えてIdleに戻す
+			ChangeAnimationState("Idle");
 		}
 		ImGui::SameLine();
 
-		// 現在の時間を取得
 		float length = GetCurrentAnimationLength();
 
 		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
 		ImGui::SameLine();
-		ImGui::Text("  Time: %.2f / %.2f s", animationSeconds, length);
+		ImGui::Text(u8"  時間: %.2f / %.2f 秒", animationSeconds, length);
 
-		// スライダーでアニメーションの時間を操作
 		ImGui::SetNextItemWidth(-1);
 		if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
 		{
-			// スライダーを操作した瞬間は、補間を切らないとキャラがガタガタする
 			isBlending = false;
 		}
 
 		ImGui::End();
 	}
 
-	// プレビュー中なら editingState を、そうじゃなければ今のステートをシーケンサーに渡す
 	std::string displayState = isPreviewMode ? editingState : currentState;
 	sequencerEditor.DrawEditor(
 		animSequence,
