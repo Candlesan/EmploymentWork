@@ -486,6 +486,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\Animator.h">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Collision\CollisionManager.h">
+      <Filter>Source\GamepPlay\Object\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -724,6 +727,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\Animator.cpp">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Collision\CollisionManager.cpp">
+      <Filter>Source\GamepPlay\Object\Collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -108,7 +108,6 @@ void SceneGame::Update(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	float delta = elapsedTime * timeScale;
-	timeScale = baseTimeScale;
 
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
@@ -163,20 +162,8 @@ void SceneGame::Update(float elapsedTime)
 		// エネミー更新
 		enemy->Update(delta);
 
-		// プレイヤーと敵の当たり判定
-		CollisonPlayervsEnemy();
-
-		// プレイヤーの武器と敵の当たり判定
-		CollisionPlayerWeaponVsEnemy();
-
-		// 敵の攻撃とプレイヤーの当たり判定
-		CollisionEnemyWeaponVsPlayer();
-
-		// 魔法と敵の当たり判定
-		CollisionMagicVsEnemy();
-
-		// 敵の魔法とプレイヤーの当たり判定
-		CollisionEnemyMagicVsPlayer();
+		// 当たり判定更新
+		collisonManager.Update(player, *enemy);
 
 		// Xキーを押した瞬間に降雪エフェクトを発生させる
 		if (GetAsyncKeyState('P') & 0x8000)
@@ -720,192 +707,6 @@ void SceneGame::Load(const std::string& path, Character* character)
 	}
 }
 
-// プレイヤーと敵の当たり判定
-void SceneGame::CollisonPlayervsEnemy()
-{
-	// プレイヤーを取得
-	Player& player = Player::Instance();
-	DirectX::XMFLOAT3 outPositionA, outPositionB;
-	if (Collision::IntersectCapsuleVsCapsule(
-		player.GetPosition(),
-		player.GetCapsuleDirection(),
-		player.GetHeight(),
-		player.GetRadius(),
-		player.GetWeight(),
-		enemy->GetPosition(),
-		enemy->GetCapsuleDirection(),
-		enemy->GetHeight(),
-		enemy->GetRadius(),
-		enemy->GetWeight(),
-		outPositionA,
-		outPositionB
-	))
-	{
-		// 押し出し処理
-		player.SetPosition(outPositionA);
-		enemy->SetPosition(outPositionB);
-	}
-}
-
-// 武器と敵の当たり判定
-void SceneGame::CollisionPlayerWeaponVsEnemy()
-{
-	Player& player = Player::Instance();
-
-	// プレイヤーの現在有効な攻撃判定をすべて取得！
-	std::vector<Character::HitBoxInfo> playerHits = player.GetActiveHitBoxes();
-
-	for (const auto& hit : playerHits)
-	{
-		bool isHit = false;
-		DirectX::XMFLOAT3 outPosA, outPosB, outPos;
-
-		if (hit.shape == HitBoxShape::Capsule) {
-			isHit = Collision::IntersectCapsuleVsCapsule(
-				hit.position, hit.direction, hit.height, hit.radius, 1.0f,
-				enemy->GetPosition(), enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(), enemy->GetWeight(),
-				outPosA, outPosB
-			);
-		}
-		else if (hit.shape == HitBoxShape::Sphere) {
-			isHit = Collision::IntersectSphereVsCapsule(
-				hit.position, hit.radius,
-				enemy->GetPosition(), enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(),
-				outPos
-			);
-		}
-
-		if (isHit) {
-			// ダメージ処理
-			if (hit.damageRate > 0.0f) {
-				AttackResult res = player.CalculateAttackResult(hit.damageRate, hit.poiseRate);
-				enemy->SetLastDamage(res.damage);
-				enemy->ApplyDamage(res.damage, hit.invincibleTime, res.poiseDamage);
-			}
-		}
-	}
-}
-
-// 敵の攻撃とプレイヤーの当たり判定
-void SceneGame::CollisionEnemyWeaponVsPlayer()
-{
-	Player& player = Player::Instance();
-
-	// 敵の現在有効な攻撃判定をすべて取得！
-	std::vector<Character::HitBoxInfo> enemyHits = enemy->GetActiveHitBoxes();
-
-	for (const auto& hit : enemyHits)
-	{
-		bool isHit = false;
-		DirectX::XMFLOAT3 outPos, outPosA, outPosB;
-
-		// 形状に合わせて判定関数を変える
-		if (hit.shape == HitBoxShape::Capsule) {
-			isHit = Collision::IntersectCapsuleVsCapsule(
-				hit.position, hit.direction, hit.height, hit.radius, 1.0f,
-				player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(), 1.0f,
-				outPosA, outPosB);
-		}
-		else if (hit.shape == HitBoxShape::Sphere) {
-			isHit = Collision::IntersectSphereVsCapsule(
-				hit.position, hit.radius,
-				player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(),
-				outPos);
-		}
-
-		// 当たっていたらダメージ処理
-		if (isHit) {
-			player.SetIsHit(true);
-			bool isGuarding = player.GetIsGuarding();
-			bool isAvoid = player.GetIsAvoid();
-
-			if (isGuarding) player.SetIsHit(true);
-
-			if (!isGuarding && !isAvoid) {
-				// hitの中にダメージ情報が入っているのでそのまま使える！
-				AttackResult res = enemy->CalculateAttackResult(hit.damageRate, hit.poiseRate);
-				player.SetLastDamage(res.damage);
-				player.ApplyDamage(res.damage, hit.invincibleTime, res.poiseDamage);
-			}
-		}
-	}
-}
-
-// 敵と魔法の当たり判定
-void SceneGame::CollisionMagicVsEnemy()
-{
-	// プレイヤーを取得
-	Player& player = Player::Instance();
-	MagicManager& magicManager = player.GetMagicManager();
-
-	// 存在する魔法の数だけループ
-	for (int i = 0; i < magicManager.GetMagicCount(); ++i)
-	{
-		MagicBase* magic = magicManager.getMagic(i);
-
-		DirectX::XMFLOAT3 outPos;
-
-		// 魔法と敵の当たり判定
-		if (Collision::IntersectSphereVsCapsule(
-			magic->GetPosition(), magic->GetRadius(),
-			enemy->GetPosition(), enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(),
-			outPos))
-		{
-			// ダメージを与える
-			enemy->ApplyDamage(magic->GetDamage(), 0.3, 10.0f);
-
-			// 魔法自体を消滅させる
-			magic->OnTerminate();
-		}
-	}
-}
-
-// 敵の魔法とPlayerの当たり判定
-void SceneGame::CollisionEnemyMagicVsPlayer()
-{
-	Player& player = Player::Instance();
-	if (!enemy) return;
-
-	MagicManager& enemyMagicManger = enemy->GetMagicManager();
-
-	for (int i = 0; i < enemyMagicManger.GetMagicCount(); ++i)
-	{
-		// 槍のデータを取り出す
-		MagicBase* magic = enemyMagicManger.getMagic(i);
-		if (!magic) continue;
-
-		bool isHit = false;
-
-		DirectX::XMFLOAT3 outPosA, outPosB;
-		isHit = Collision::IntersectCapsuleVsCapsule(
-			magic->GetPosition(),
-			magic->GetDirection(),
-			magic->GetHeight(),
-			magic->GetRadius(),
-			0.0f,
-			player.GetPosition(),
-			player.GetCapsuleDirection(),
-			player.GetHeight(),
-			player.GetRadius(),
-			0.0f,
-			outPosA,
-			outPosB);
-
-		if (isHit)
-		{
-			bool isGuarding = player.GetIsGuarding();
-			bool isAvoid = player.GetIsAvoid();
-
-			if (!isGuarding && !isAvoid)
-			{
-				player.ApplyDamage(magic->GetDamage(), 0.5f, 10.0f);
-			}
-
-			// 当たった槍は消滅させる
-			magic->OnTerminate();
-		}
-	}
-}
 
 // 画面比率修正関数
 void SceneGame::OnResize(float width, float height)

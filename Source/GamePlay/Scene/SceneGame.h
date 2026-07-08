@@ -8,6 +8,7 @@
 // モデル
 #include "Gameplay/Object/Stage/Stage.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
+#include "GamePlay/Object/Collision/CollisionManager.h"
 
 #include "System/Renderer/Shader/FrameBuffer/FrameBuffer.h"
 #include "System/Renderer/Shader/fullscreen_quad/fullscreen_quad.h"
@@ -44,21 +45,6 @@ public:
 
 	void Save(const std::string& path, Character* character);
 	void Load(const std::string& path, Character* character);
-
-	// プレイヤーと敵の当たり判定
-	void CollisonPlayervsEnemy();
-
-	// 武器と敵の当たり判定
-	void CollisionPlayerWeaponVsEnemy();
-
-	// 敵の武器とプレイヤーの当たり判定
-	void CollisionEnemyWeaponVsPlayer();
-
-	// 敵と魔法の当たり判定
-	void CollisionMagicVsEnemy();
-
-	// 敵の魔法とPlayerの当たり判定
-	void CollisionEnemyMagicVsPlayer();
 
 	// 画面比率修正関数
 	void OnResize(float width, float height);
@@ -113,4 +99,6 @@ private:
 	// パーティクル
 	std::unique_ptr<Compute_Particle> particleManager;
 
+	// コリジョンマネージャー
+	CollisionManager collisonManager;
 };
