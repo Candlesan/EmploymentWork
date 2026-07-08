@@ -43,19 +43,16 @@ public:
 	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox = false);
 
 	// 武器の当たり判定情報
-	DirectX::XMFLOAT3 GetWeaponPosition(int index) const;
-	DirectX::XMFLOAT3 GetWeaponDirection(int index) const;
-	float GetWeaponRadius(int index) const { return weapon[index].weaponRadius; }
-	float GetWeaponHeight(int index) const { return weapon[index].weaponHeight; }
+	DirectX::XMFLOAT3 GetWeaponPosition() const;
+	DirectX::XMFLOAT3 GetWeaponDirection() const;
+	float GetWeaponRadius() const { return weapon.weaponRadius; }
+	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
 	// 魔法発動処理
 	void MagicInput();
 
 	// 回復
 	void Heal(float elapsedTime);
-
-	// 滑空
-	void Gliding();
 
 	// ロックオン対象の位置を取得
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos); // nullptrかどうかでロックオンしてるか判定出来るらしい
@@ -115,9 +112,6 @@ private:
 	// 剣先と根本を求める関数
 	void CalculationRootAndTip();
 
-	// 魔法剣の挙動を作る関数
-	void UpdateMagicSwordTrasform(float elapsedTime);
-
 	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
@@ -149,7 +143,7 @@ private:
 		float weaponHeight = 1.0f;
 		bool isVisible = false;
 	};
-	Weapon weapon[2];
+	Weapon weapon;
 	float lastDamage = 0.0f;
 
 	DirectX::XMFLOAT3 SwingAngle = { 0, 0, 1.6 };
