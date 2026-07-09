@@ -331,7 +331,6 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		float divideAngle = totalBankAngle / spineNames.size();
 
 		// 傾き用のクォータニオンを作成する
-
 		DirectX::XMVECTOR bankRot = DirectX::XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, divideAngle);
 
 		for (const std::string& boneName : spineNames)

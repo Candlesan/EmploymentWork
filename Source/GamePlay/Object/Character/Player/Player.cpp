@@ -539,9 +539,19 @@ void Player::MagicInput()
 	{
 		if (magicCoolDownTimer > 0.0f) return;
 
-		WindBladeMagic::Emit(&magicManager, position, angle.y, enemy, level, this->config);
+		// カメラの前方向を取得する
+		Camera& camera = CameraManager::Instance().GetMainCamera();
+		const DirectX::XMFLOAT3 cameraFront = camera.GetFront();
+
+		// カメラが向いてる水平な角度を求める
+		float cameraAngleY = atan2f(cameraFront.x, cameraFront.z);
+
+		angle.y = cameraAngleY;
+
+		WindBladeMagic::Emit(&magicManager, position, cameraAngleY, enemy, level, this->config);
 
 		PlayActionGraph("State_Magic");
+
 
 		if (level == 3)
 		{
