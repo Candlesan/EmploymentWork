@@ -22,4 +22,6 @@ private:
 	// 敵の魔法とPlayerの当たり判定
 	void CollisionEnemyMagicVsPlayer(Player& player, Enemy& enemy);
 
+	// デバック用の当たり判定
+	void CollisionDebugSphereVsPlayer(Player& player);
 };

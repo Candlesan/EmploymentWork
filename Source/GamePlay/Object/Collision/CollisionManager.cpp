@@ -7,6 +7,7 @@ void CollisionManager::Update(Player& player, Enemy& enemy)
 	CollisionEnemyWeaponVsPlayer(player, enemy);
 	CollisionMagicVsEnemy(player, enemy);
 	CollisionEnemyMagicVsPlayer(player, enemy);
+	CollisionDebugSphereVsPlayer(player);
 }
 
 // プレイヤーと敵の当たり判定
@@ -111,7 +112,7 @@ void CollisionManager::CollisionEnemyWeaponVsPlayer(Player& player, Enemy& enemy
 				// hitの中にダメージ情報が入っているのでそのまま使える！
 				AttackResult res = enemy.CalculateAttackResult(hit.damageRate, hit.poiseRate);
 				player.SetLastDamage(res.damage);
-				player.ApplyDamage(res.damage, hit.invincibleTime, res.poiseDamage);
+				player.OnHitEnemyAttack(res.damage, hit.invincibleTime, res.poiseDamage);
 			}
 		}
 	}
@@ -185,6 +186,27 @@ void CollisionManager::CollisionEnemyMagicVsPlayer(Player& player, Enemy& enemy)
 
 			// 当たった槍は消滅させる
 			magic->OnTerminate();
+		}
+	}
+}
+
+// デバック用の当たり判定
+void CollisionManager::CollisionDebugSphereVsPlayer(Player& player)
+{
+	DirectX::XMFLOAT3 debugSpherePos = { 5.0f, 1.0f, 0.0f };
+	float debugSphereRadius = 1.0f;
+
+	DirectX::XMFLOAT3 outPos;
+
+	//プレイヤーのカプセルと、この固定の球が触れているかチェック
+	if (Collision::IntersectSphereVsCapsule(
+		debugSpherePos, debugSphereRadius,
+		player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(),
+		outPos))
+	{
+		if (!player.GetIsGuarding())
+		{
+			player.OnHitEnemyAttack(10.0f, 5.0f, 0.5f);
 		}
 	}
 }

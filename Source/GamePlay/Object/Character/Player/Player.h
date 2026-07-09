@@ -51,6 +51,7 @@ public:
 	void Heal(float elapsedTime);
 	void AddGraph(std::string name);              
 	void UpdateSounds(const std::string& state);  
+	void OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime);
 
 	// =========================================================================
 	//  セッター（外部からデータをセットする窓口）
@@ -79,6 +80,7 @@ public:
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
 	MagicManager& GetMagicManager() { return magicManager; }
 	std::vector<HitBoxInfo> GetActiveHitBoxes() const override;
+	float GetJustAvoidSlowTimer() const { return justAvoidSlowTimer; }
 
 protected:
 	// =========================================================================
@@ -138,6 +140,7 @@ private:
 	float baseAttackPower = 860.0f;
 	float lastDamage = 0.0f;
 	float invincibleTimer = 0.0f;
+	float windDashAvailTimer = 0.3f;
 	float runDisableTimer = 0.0f;
 	float staminaCooldownTimer = 0.0f;
 	bool haveStamina = false;
@@ -189,6 +192,7 @@ private:
 	float dropSpeed = 5.0f;
 	float dropStartT = 0.0f;
 	float dropEndT = 0.0f;
+	float justAvoidSlowTimer = 0.0f;
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;

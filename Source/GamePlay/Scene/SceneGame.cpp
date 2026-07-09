@@ -107,7 +107,17 @@ void SceneGame::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	float delta = elapsedTime * timeScale;
+	// 演出用の倍率
+	float gameplayEffectScale = 1.0f;
+
+	// ジャスト回避したときのスロータイマーが動いてるなら
+	if (Player::Instance().GetJustAvoidSlowTimer() > 0.0f)
+	{
+		// スロー中なら、演出用の倍率を落とす
+		gameplayEffectScale = 0.3f;
+	}
+
+	float delta = elapsedTime * timeScale * gameplayEffectScale;
 
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
@@ -323,6 +333,8 @@ void SceneGame::Render()
 		// スカイマップ描画
 		skyMap->Draw(rc);
 
+		shapeRenderer->DrawSphere({ 5.0f, 1.0f, 0.0f }, 1.0f, { 1.0f, 0.0f, 1.0f, 1.0f });
+
 		// シェイプレンダラ描画
 		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
 
@@ -453,14 +465,14 @@ void SceneGame::DrawGUI()
 	// プレイヤーを取得
 	Player& player = Player::Instance();
 
-	ImGui::Begin("Game Debug Control");
+	ImGui::Begin(u8"デバック");
 	{
 		// 一時停止ボタン
 		if (isPaused) {
-			if (ImGui::Button("Resume (F5)")) isPaused = false;
+			if (ImGui::Button(u8"再開 (F5)")) isPaused = false;
 		}
 		else {
-			if (ImGui::Button("Pause (F5)")) isPaused = true;
+			if (ImGui::Button(u8"一時停止 (F5)")) isPaused = true;
 		}
 		ImGui::SameLine();
 
@@ -473,7 +485,7 @@ void SceneGame::DrawGUI()
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
 		}
 
-		if (ImGui::Button("Step Frame (F6)")) {
+		if (ImGui::Button(u8"1フレーム進める (F6)")) {
 			// ポーズ中のみ処理を受け付ける
 			if (isPaused) {
 				stepNextFrame = true;
@@ -487,48 +499,46 @@ void SceneGame::DrawGUI()
 		}
 
 		ImGui::Separator();
-		ImGui::Text("Time Control");
+		ImGui::Text(u8"再生速度");
 
 		// 0.01 (ほぼ停止) から 1.0 (通常) までのスライダー
-		ImGui::SliderFloat("Time Scale", &timeScale, 0.01f, 1.0f, "%.2f");
+		ImGui::SliderFloat(u8"再生スケール", &timeScale, 0.01f, 1.0f, "%.2f");
 
-		if (ImGui::Button("Reset Speed")) {
+		if (ImGui::Button(u8"再生時間を元に戻す")) {
 			timeScale = 1.0f;
 		}
-
-		ImGui::Text("Status: %s", isPaused ? "PAUSED" : "RUNNING");
 	}
 	ImGui::End();
 
-	ImGui::Begin("Camera System");
+	ImGui::Begin(u8"カメラ");
 	{
 		// モード切り替え用のラジオボタン
 		int mode = static_cast<int>(cameraMode);
-		if (ImGui::RadioButton("Game (3rd Person)", &mode, 0)) {
+		if (ImGui::RadioButton(u8"ゲームカメラ (サードパーソン)", &mode, 0)) {
 			cameraMode = CameraMode::Game;
 		}
 		ImGui::SameLine();
 
-		if (ImGui::RadioButton("Debug (Free)", &mode, 1)) {
+		if (ImGui::RadioButton(u8"デバックカメラ (フリーカメラ)", &mode, 1)) {
 			cameraMode = CameraMode::Debug;
 			// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
 			debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
 		}
 		ImGui::Separator();
 
-		ImGui::DragFloat("Distance", &cameraRange, 0.1f);
+		ImGui::DragFloat(u8"距離", &cameraRange, 0.1f);
 		gameCamera->SetRange(cameraRange);
 	}
 	ImGui::End();
 
-	ImGui::Begin("Shader");
+	ImGui::Begin(u8"シェーダー");
 	{
-		if (ImGui::CollapsingHeader("light", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"ライト", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			DirectionalLight& light = lightManager.GetDirectionalLight();
 
 			// 1. GUIで値を操作
-			if (ImGui::DragFloat3("light direction", &light.direction.x, 0.01f, -1.0f, 1.0f))
+			if (ImGui::DragFloat3(u8"ライトの向き", &light.direction.x, 0.01f, -1.0f, 1.0f))
 			{
 				// 2. 値が変更されたら、ベクトルを数学的に正しい状態（長さ1）に直す
 				DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
@@ -546,36 +556,36 @@ void SceneGame::DrawGUI()
 				}
 			}
 
-			ImGui::ColorEdit3("light color", &light.color.x);
+			ImGui::ColorEdit3(u8"ライトの色", &light.color.x);
 
 			// 3. 補正した値をマネージャーにセット
 			lightManager.SetDirectionalLight(light);
 		}
 
-		if (ImGui::CollapsingHeader("PBR", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat("Adjust Metalness", &pbrMetalness, 0.01f, -1.0f, 1.0f);
-			ImGui::DragFloat("Adjust Roughness", &pbrRoughness, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat(u8"金属度", &pbrMetalness, 0.01f, -1.0f, 1.0f);
+			ImGui::DragFloat(u8"粗さ", &pbrRoughness, 0.01f, -1.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("ShadowMap", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"シャドウマップ", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			Graphics& graphics = Graphics::Instance();
 			ShadowMap* shadowMap = graphics.GetShadowMap();
 			RenderContext rc;
 
-			ImGui::SliderFloat("Shadow Attenuation", &shadowAttenuation, 0.0f, 1.0f);
-			ImGui::SliderFloat("Shadow Bias", &shadowBias, 0.0f, 0.01f);
+			ImGui::SliderFloat(u8"影の減衰", &shadowAttenuation, 0.0f, 1.0f);
+			ImGui::SliderFloat(u8"シャドウバイアス", &shadowBias, 0.0f, 0.01f);
 
-			ImGui::Text("texture");
+			ImGui::Text(u8"テクスチャ");
 			ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 		}
 
-		if (ImGui::CollapsingHeader("Bloom", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat("bloom_extraction_threshold", &bloom_extraction, 0.01f, +0.0f, +5.0f);
-			ImGui::DragFloat("bloom_intensity", &bloom_intensity, 0.01f, +0.0f, +5.0f);
-			ImGui::DragFloat("exposure", &bloomer->exposure, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat(u8"ブローム抽出閾値", &bloom_extraction, 0.01f, +0.0f, +5.0f);
+			ImGui::DragFloat(u8"ブローム強度", &bloom_intensity, 0.01f, +0.0f, +5.0f);
+			ImGui::DragFloat(u8"露出", &bloomer->exposure, 0.01f, 0.0f, 1.0f);
 
 			bloomer->bloom_extraction_threshold = bloom_extraction;
 			bloomer->bloom_intensity = bloom_intensity;
@@ -583,24 +593,32 @@ void SceneGame::DrawGUI()
 			ImGui::Separator();
 
 			// グロー抽出
-			ImGui::Text("Glow Extraction");
+			ImGui::Text(u8"グロー抽出");
 			ImGui::Image((ImTextureID)bloomer->get_glkow_extraction(), ImVec2(256, 256));
 
 			// ガウシアンブラー各段階
 			for (size_t i = 0; i < bloom::downsampled_count; ++i)
 			{
-				ImGui::Text("Gaussian Blur [%zu][0]", i);
+				ImGui::Text(u8"ガウシアンブラー [%zu][0]", i);
 				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 0), ImVec2(256, 256));
-				ImGui::Text("Gaussian Blur [%zu][1]", i);
+				ImGui::Text(u8"ガウシアンブラー [%zu][1]", i);
 				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
 			}
 		}
 
 		ImGui::Separator();
-		ImGui::Text("---- Material Realtime Editor ----");
+		ImGui::Text(u8"---- マテリアル リアルタイム編集 ----");
 
-		DrawModelMaterialEditor("Player Clothes & Hair Material", &player);
-		DrawModelMaterialEditor("Enemy Body & Armor Material", enemy.get());
+		// 日本語ラベルでモデルごとのマテリアルエディタを呼び出す
+		DrawModelMaterialEditor(u8"プレイヤー：服・髪のマテリアル", &player);
+		DrawModelMaterialEditor(u8"敵：体・鎧のマテリアル", enemy.get());
+	}
+	ImGui::End();
+
+	ImGui::Begin(u8"当たり判定");
+	{
+		// SceneGame.cpp の DrawGUI() の中
+		ImGui::Checkbox(u8"ジャスト回避テスト用の球を配置", &showDebugSphere);
 	}
 	ImGui::End();
 
@@ -616,46 +634,46 @@ void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
 	auto model = character->GetModel();
 	if (!model) return; // モデルを持っていないキャラなら何もしない
 
-	// 共通のマテリアル編集スライダー描画ロジック（1箇所にまとめられる！）
+	// 共通のマテリアル編集スライダー描画ロジック
 	if (ImGui::CollapsingHeader(label))
 	{
 		auto& materials = model->GetMaterials();
 
-		// ここにボタンを追加
-		if (ImGui::Button("Save"))
+		// 保存・読み込みボタン
+		if (ImGui::Button(u8"保存"))
 		{
 			char path[MAX_PATH] = "";
 			if (Dialog::SaveFileName(
 				path,
 				MAX_PATH,
 				"JSON Files\0*.json\0\0",
-				"マテリアルを保存",
+				u8"マテリアルを保存",
 				"json") == DialogResult::OK)
 			{
 				Save(path, character);
 			}
-			// Dialogを使ってもええし、パス固定でもOK
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Load"))
+		if (ImGui::Button(u8"読み込み"))
 		{
 			char path[MAX_PATH] = "";
 			if (Dialog::OpenFileName(
 				path,
 				MAX_PATH,
 				"JSON Files\0*.json\0\0",
-				"マテリアルを保存") == DialogResult::OK)
+				u8"マテリアルを読み込む") == DialogResult::OK)
 			{
 				Load(path, character);
 			}
 		}
 
+		// 各マテリアルごとの編集スライダー
 		for (size_t i = 0; i < materials.size(); ++i)
 		{
 			ImGui::PushID(static_cast<int>(i));
-			ImGui::Text("Material: %s", materials[i].name.c_str());
-			ImGui::SliderFloat("Roughness", &materials[i].adjustRoughness, -1.0f, 1.0f);
-			ImGui::SliderFloat("Metalness", &materials[i].adjustMetalness, -1.0f, 1.0f);
+			ImGui::Text(u8"マテリアル: %s", materials[i].name.c_str());
+			ImGui::SliderFloat(u8"粗さ", &materials[i].adjustRoughness, -1.0f, 1.0f);
+			ImGui::SliderFloat(u8"金属度", &materials[i].adjustMetalness, -1.0f, 1.0f);
 			ImGui::PopID();
 		}
 	}
@@ -706,7 +724,6 @@ void SceneGame::Load(const std::string& path, Character* character)
 		}
 	}
 }
-
 
 // 画面比率修正関数
 void SceneGame::OnResize(float width, float height)

@@ -101,4 +101,5 @@ private:
 
 	// コリジョンマネージャー
 	CollisionManager collisonManager;
+	bool showDebugSphere = false;
 };
