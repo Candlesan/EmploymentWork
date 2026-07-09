@@ -1630,6 +1630,13 @@ void Player::CalculateStatusParameters()
 	if (falling && gamePad.GetButton() & GamePad::BTN_A)
 	{
 		SetGravity(-1.0f);
+
+		DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
+		float glideSpeed = 4.0f;
+
+		velocity.x = moveVec.x * glideSpeed;
+		velocity.z = moveVec.z * glideSpeed;
 	}
 	else if (falling)
 	{
