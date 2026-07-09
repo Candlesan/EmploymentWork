@@ -866,10 +866,17 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (!useRootMotion && !useRootMotionEx)
+	std::string state = GetCurrentState();
+	bool isHybridState = (state.find("Avoid") != std::string::npos ||
+		state.find("Dash") != std::string::npos ||
+		state.find("AS_Run_Combat_Fast_Loop_Seq_0") != std::string::npos);
+
+	if ((!useRootMotion && !useRootMotionEx) || isHybridState) 
 	{
+		float finalSpeed = isHybridState ? moveSpeed : 3.0f;
+
 		// 移動処理
-		Move(moveVec.x, moveVec.z, moveSpeed);
+		Move(moveVec.x, moveVec.z, finalSpeed);
 	}
 
 	// 回転処理
