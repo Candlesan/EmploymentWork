@@ -1828,7 +1828,7 @@ void Player::CalculateSpineRotation(float elapsedTime)
 	deltaAngleY = DirectX::XMScalarModAngle(deltaAngleY);
 
 	// 目標角度を求める
-	float targetBankAngle = deltaAngleY * targetSpineAngle;
+	float targetBankAngle = deltaAngleY * targetSpineAngle * smoothMoveLength;
 
 	// 曲がる最大値を設定する
 	float maxLimit = DirectX::XMConvertToRadians(30.0f);
