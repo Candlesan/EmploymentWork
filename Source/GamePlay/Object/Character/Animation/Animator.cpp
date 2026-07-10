@@ -319,6 +319,24 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 
 	float totalBankAngle = this->bankAngle;
 
+	// もしフェイドアウトがオンになってたら
+	if (upperLayer.isFadeingOut)
+	{
+		// タイマーを進める
+		upperLayer.fadeOutSeconds += elapsedTime;
+		float rate = upperLayer.fadeOutSeconds / upperLayer.fadeOutLength;
+
+		if (rate >= 1.0f)
+		{
+			upperLayer.isFadeingOut = false;
+			upperLayer.animationIndex = -1;
+		}
+		else
+		{
+			targetModel->BlendAnimations(upperLayer.fadeOutOldPose, finalPoses, rate, finalPoses);
+		}
+	}
+
 	// 姿勢更新
 	if (!finalPoses.empty())
 	{
@@ -378,10 +396,11 @@ float Animator::GetUpperAnimationLength() const
 	return animation.secondsLength;
 }
 
-// 
 void Animator::StopUpper()
 {
-	upperLayer.animationIndex = -1;
+	upperLayer.isFadeingOut = true;
+	upperLayer.fadeOutSeconds = 0.0f;
+	upperLayer.fadeOutOldPose = finalPoses;
 	upperLayer.currentSeconds = 0.0f;
 	upperLayer.mixAnimationIndex = -1;
 }

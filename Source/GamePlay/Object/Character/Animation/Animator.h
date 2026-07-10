@@ -29,6 +29,11 @@ struct AnimLayer {
 	int mixAnimationIndex = -1;
 	float mixcurrentSeconds = 0.0f;
 	float mixRate = 0.0f; // 混ぜる割合
+
+	bool isFadeingOut = false;
+	float fadeOutSeconds = 0.0f;
+	float fadeOutLength = 0.2;
+	std::vector<Model::NodePose> fadeOutOldPose;
 };
 
 // アニメーション専門のクラス

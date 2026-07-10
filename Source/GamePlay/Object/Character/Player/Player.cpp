@@ -1658,7 +1658,7 @@ void Player::UpdateTimers(float elapsedTime)
 void Player::UpdateLockAt(float elapsedTime)
 {
 
-	if (enemyFromDistance > 10.0f && currentState != "State_Magic") return;
+	if (enemyFromDistance > 10.0f && currentOverlayState != "State_Magic") return;
 
 	// ターゲット位置を計算する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
@@ -1677,9 +1677,21 @@ void Player::UpdateLockAt(float elapsedTime)
 	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(playerFront, camFront));
 
 	float targetWeight = 0.0f;
+	bool isMagicEndingSoon = false;
+
+	if (currentOverlayState == "State_Magic")
+	{
+		float currentSec = animator->GetUpperCurrentSeconds();
+		float lengthSec = animator->GetUpperAnimationLength();
+
+		if (lengthSec - currentSec <= 0.15f)
+		{
+			isMagicEndingSoon = true;
+		}
+	}
 
 	// 範囲内かつ、内積が前方を向いているとき
-	if (enemyFromDistance <= 10.0f && dot >= 0.0f)
+	if (((enemyFromDistance <= 10.0f && dot >= 0.0f) || currentOverlayState == "State_Magic") && !isMagicEndingSoon)
 	{
 		targetWeight = 1.0f;
 	}
