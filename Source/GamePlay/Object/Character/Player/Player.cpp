@@ -63,6 +63,8 @@ void Player::Initialize()
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
 	SetupInitialAnimationState();    // 初期アニメーションの設定
+
+	InitializeHeadDirection(); // 頭の向きを初期化
 }
 
 // シーケンサーの初期化
@@ -127,6 +129,24 @@ void Player::InitializeAnimationNodeEditor()
 			LoadAnimationData("Data/Json/Player/AnimationNodeEditor/BaseState.json");
 		}
 	}
+}
+
+// 頭の向きを初期化
+void Player::InitializeHeadDirection()
+{
+	// 頭ノード取得
+	int headNodeIndex = player->GetNodeIndex("neck_01");
+	Model::Node& headNode = player->GetNodes().at(headNodeIndex);
+
+	// 初期姿勢時の頭のノードのローカル空間前方向を求める
+	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&headNode.worldTransform);
+	DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
+	DirectX::XMVECTOR HeadWorldForward = DirectX::XMVectorSet(0.0f, 0.0f, 10.0f, 0.0f);
+	DirectX::XMVECTOR HeadLocalForward = DirectX::XMVector3TransformNormal(HeadWorldForward, InverseWorldTransform);
+
+	HeadLocalForward = DirectX::XMVector3Normalize(HeadLocalForward);
+	DirectX::XMStoreFloat3(&headLocalForward, HeadLocalForward);
+
 }
 
 // アニメーションのセットアップ処理
@@ -247,6 +267,8 @@ void Player::Update(float elapsedTime)
 
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
+	UpdateTransform();
+	player->UpdateTransform(transform);
 
 	// サウンド再生
 	UpdateSounds(this->currentState);
@@ -256,6 +278,9 @@ void Player::Update(float elapsedTime)
 
 	// 移動時の背骨の回転角度を求める関数
 	CalculateSpineRotation(elapsedTime);
+
+	// ルックアット処理更新
+	UpdateLockAt(elapsedTime);
 
 	// モデル更新処理
 	UpdateTransform();
@@ -301,6 +326,8 @@ void Player::DrawGUI()
 			ImGui::Text(u8"風状態残り時間: %f.0", windDashAvailTimer);
 			ImGui::Separator();
 			ImGui::Text(u8"スロー演出残り時間: %f.0", justAvoidSlowTimer);
+			ImGui::Separator();
+			ImGui::Text(u8"首の回転: %f.0", debugAngle);
 			ImGui::Separator();
 
 			ImGui::Text(u8"基本移動速度: %f.0", moveSpeed);
@@ -545,8 +572,6 @@ void Player::MagicInput()
 
 		// カメラが向いてる水平な角度を求める
 		float cameraAngleY = atan2f(cameraFront.x, cameraFront.z);
-
-		angle.y = cameraAngleY;
 
 		WindBladeMagic::Emit(&magicManager, position, cameraAngleY, enemy, level, this->config);
 
@@ -1627,6 +1652,113 @@ void Player::UpdateTimers(float elapsedTime)
 
 	// 無敵時間更新
 	UpdateInvincibleTimer(elapsedTime);
+}
+
+// ルックアット処理更新
+void Player::UpdateLockAt(float elapsedTime)
+{
+
+	if (enemyFromDistance > 10.0f && currentState != "State_Magic") return;
+
+	// ターゲット位置を計算する
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	DirectX::XMVECTOR camFront = DirectX::XMLoadFloat3(&camera.GetFront());
+	DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR targetVec = DirectX::XMVectorAdd(playerPos, DirectX::XMVectorScale(camFront, 70.0f));
+	DirectX::XMFLOAT3 targetPosition;
+	DirectX::XMStoreFloat3(&targetPosition, targetVec);
+
+	// ターゲットがキャラクターの後ろに来た時に制限を掛ける
+	float s = sinf(angle.y);
+	float c = cosf(angle.y);
+	DirectX::XMVECTOR playerFront = DirectX::XMVectorSet(s, 0.0f, c, 0.0f);
+
+	// プレイヤーの前方向とカメラの前方向の内積を取る
+	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(playerFront, camFront));
+
+	float targetWeight = 0.0f;
+
+	// 範囲内かつ、内積が前方を向いているとき
+	if (enemyFromDistance <= 10.0f && dot >= 0.0f)
+	{
+		targetWeight = 1.0f;
+	}
+	else
+	{
+		targetWeight = 0.0f;
+	}
+
+	// 線形補間をする
+	lookAtWeight += (targetWeight - lookAtWeight) * 5.0f * elapsedTime;
+
+	// もしウェイトが0になったら処理をスキップする
+	if (lookAtWeight <= 0.001f && targetWeight == 0.0f)
+	{
+		lookAtWeight = 0.0f;
+		return;
+	}
+
+	// 頭のノードを取得する
+	int spineNodeIndex = player->GetNodeIndex("spine_02");
+	int headNodeIndex = player->GetNodeIndex("neck_01");
+	if (headNodeIndex < 0 || spineNodeIndex < 0) return;
+	Model::Node& spineNode = player->GetNodes().at(spineNodeIndex);
+	Model::Node& headNode = player->GetNodes().at(headNodeIndex);
+
+	// 頭から見たターゲットへの方向ベクトルを求める
+	DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&headNode.worldTransform);
+	DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
+
+	// ターゲットまでのベクトルをローカル空間に変換
+	DirectX::XMVECTOR HeadPos = DirectX::XMLoadFloat3(&position);
+	HeadPos = DirectX::XMVectorSetY(HeadPos, position.y + 1.6f);
+	DirectX::XMVECTOR TragetPos = DirectX::XMLoadFloat3(&targetPosition);
+	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(TragetPos, HeadPos);
+	Vec = DirectX::XMVector3Normalize(Vec);
+
+	// 2つのローカルベクトル
+	DirectX::XMVECTOR LocalDirection = DirectX::XMVector3TransformNormal(Vec, InverseWorldTransform);
+	DirectX::XMVECTOR LocalForward = DirectX::XMLoadFloat3(&headLocalForward);
+
+	// ローカル空間で回転処理
+	// 回転軸を求める
+	DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(LocalForward, LocalDirection);
+
+	// 回転角を求める
+	float angle = acosf(DirectX::XMVectorGetX(DirectX::XMVector3Dot(LocalForward, LocalDirection)));
+	debugAngle = angle;
+
+	float maxLookAngle = DirectX::XMConvertToRadians(120.0f);
+	if (angle > maxLookAngle)
+	{
+		angle = maxLookAngle; 
+	}
+
+	DirectX::XMVECTOR currentSpineRotation = DirectX::XMLoadFloat4(&spineNode.rotation);
+	DirectX::XMVECTOR SpineNewRot = DirectX::XMQuaternionMultiply(DirectX::XMQuaternionRotationAxis(Axis, angle * 0.3f), currentSpineRotation);
+
+	// 今のウェイトの割合にで滑らかにブレンドする
+	DirectX::XMVECTOR FinalSpineRot = DirectX::XMQuaternionSlerp(
+		currentSpineRotation,
+		SpineNewRot,
+		lookAtWeight);
+
+	DirectX::XMStoreFloat4(&spineNode.rotation, FinalSpineRot);
+
+
+
+	// クォータニオンを使ってボーンに掛ける
+	DirectX::XMVECTOR CurrentHeadRotation = DirectX::XMLoadFloat4(&headNode.rotation);
+	DirectX::XMVECTOR NewHeadRotation = DirectX::XMQuaternionMultiply(DirectX::XMQuaternionRotationAxis(Axis, angle * 0.7f), CurrentHeadRotation);
+
+	// 今のウェイトの割合にで滑らかにブレンドする
+	DirectX::XMVECTOR FinalHeadRot = DirectX::XMQuaternionSlerp(
+		CurrentHeadRotation,
+		NewHeadRotation,
+		lookAtWeight);
+
+
+	DirectX::XMStoreFloat4(&headNode.rotation, FinalHeadRot);
 }
 
 // プレイヤーの状態を計算する関数

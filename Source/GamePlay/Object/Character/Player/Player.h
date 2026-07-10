@@ -36,6 +36,7 @@ public:
 	void Initialize();
 	void InitializeSequencer();
 	void InitializeAnimationNodeEditor();
+	void InitializeHeadDirection();
 	void SetupInitialAnimationState();
 	void Finalize();
 	void Update(float elapsedTime);
@@ -111,6 +112,7 @@ private:
 
 	// ── 物理・タイマー・その他 ──
 	void UpdateTimers(float elapsedTime);
+	void UpdateLockAt(float elapsedTime);
 	void CalculateStatusParameters();
 	void CalculationRootAndTip();
 	void CalculateSpineRotation(float elapsedTime);
@@ -184,15 +186,17 @@ private:
 	Trail trail;
 	DirectX::XMFLOAT3 rootOffset = { 0.42f, -5.93f, -0.37f };
 	DirectX::XMFLOAT3 tipOffset = { 0.770f, 6.22f, -0.5f };
-	DirectX::XMFLOAT3 swingAngle = { 0, 0, 1.6f };
-	DirectX::XMFLOAT3 swingPosition = { 0, 2.0f, 0 };
-	DirectX::XMFLOAT3 swingOriginOffset = { 0, 0, 0 };
+	DirectX::XMFLOAT3 swingAngle = { 0.0f, 0.0f, 1.6f };
+	DirectX::XMFLOAT3 swingPosition = { 0.0f, 2.0f, 0.0f };
+	DirectX::XMFLOAT3 swingOriginOffset = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 headLocalForward = { 0.0f, 0.0f, 1.0f };
 	float rotationSpeed = 25.0f;
 	float rotation = 0.0f;
 	float dropSpeed = 5.0f;
 	float dropStartT = 0.0f;
 	float dropEndT = 0.0f;
 	float justAvoidSlowTimer = 0.0f;
+	float lookAtWeight = 0.0f;
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;
@@ -205,6 +209,7 @@ private:
 	float debugOffset = 0.5f;
 
 	const float RB_THRESHOLD = 0.5f;
+	float debugAngle = 0.0f;
 
 	// ── シーケンサー・ノードエディタ ──
 	AnimationSequencer animSequence;
