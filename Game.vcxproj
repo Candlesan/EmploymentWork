@@ -223,6 +223,7 @@
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
     <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
+    <ClCompile Include="External\SphereCast\Include\SphereCast.cpp" />
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 #include "System/Renderer/ModelRenderer.h"
 #include "GamePlay/Object/Character/Character.h"
+
 #include <memory>
 
 
@@ -16,6 +17,9 @@ public:
 	// •`‰æˆ—
 	void Render(const RenderContext& rc, ModelRenderer* renderer);
 
+	const std::vector<Collision::Triangle>& GetTriangles() const { return triangles; }
+
 private:
 	std::shared_ptr<Model> stage;
+	std::vector<Collision::Triangle> triangles;
 };

@@ -1,4 +1,5 @@
 #include "Collision.h"
+#include <SphereCast.h>
 
 //球と球の交差判定
 bool Collision::IntersectSphereVsSpere(
@@ -185,6 +186,50 @@ bool Collision::IntersectCapsuleVsCapsule(
     outPositionA = positionA;
     outPositionB = positionB;
     return false;
+}
+
+bool Collision::SphereCast(
+    const DirectX::XMFLOAT3& origin,
+    const DirectX::XMFLOAT3& direction,
+    float radius,
+    float& distance,
+    const std::vector<Triangle>& triangles,
+    DirectX::XMFLOAT3& hitPosition,
+    DirectX::XMFLOAT3& hitNormal)
+{
+    bool hit = false;
+    DirectX::XMVECTOR Start = DirectX::XMLoadFloat3(&origin);
+    DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
+
+    // 終点 = 始点 ＋ (方向 × 距離)
+    DirectX::XMVECTOR End = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Direction, distance));
+
+    // 三角形のリストと接触部分を総当たりで調べる
+    for (const auto& triangle : triangles)
+    {
+        // 接触部分の位置を読み込む
+        DirectX::XMVECTOR Positions[3] =
+        {
+            DirectX::XMLoadFloat3(&triangle.positions[0]),
+            DirectX::XMLoadFloat3(&triangle.positions[1]),
+            DirectX::XMLoadFloat3(&triangle.positions[2])
+        };
+
+        // 結果を取得する
+        SphereCastResult result;
+        if (IntersectSphereCastVsTriangle(Start, End, radius, Positions, &result))
+        {
+            if (distance < result.distance) continue;
+            distance = result.distance;
+            DirectX::XMVECTOR HitPosition = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Direction, distance));
+            DirectX::XMStoreFloat3(&hitPosition, HitPosition);
+            DirectX::XMStoreFloat3(&hitNormal, result.normal);
+            hit = true;
+        }
+    }
+
+    // 結果を返す
+    return hit;
 }
 
 // ヘルパー関数：線分と線分の最短距離を求める計算

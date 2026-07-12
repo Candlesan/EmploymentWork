@@ -49,6 +49,23 @@ public:
 		DirectX::XMFLOAT3& outPositionA,
 		DirectX::XMFLOAT3& outPositionB
 	);
+
+	// 三角形の定義
+	struct Triangle
+	{
+		DirectX::XMFLOAT3 positions[3];
+		DirectX::XMFLOAT3 normal;
+	};
+
+	// スフィアキャスト
+	static bool SphereCast(
+		const DirectX::XMFLOAT3& origin,
+		const DirectX::XMFLOAT3& direction,
+		float radius,
+		float& distance,
+		const std::vector<Triangle>& triangles,
+		DirectX::XMFLOAT3& hitPosition,
+		DirectX::XMFLOAT3& hitNormal);
 private:
 	// ヘルパー関数：線分と線分の最短距離を求める計算
 	static void ClosetPointSegmentSegment(

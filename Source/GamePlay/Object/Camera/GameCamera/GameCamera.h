@@ -1,4 +1,5 @@
 #pragma once
+#include "GamePlay/Object/Collision/Collision.h"
 #include <DirectXMath.h>
 
 // 前方宣言
@@ -9,7 +10,7 @@ class GameCamera
 {
 public:
 	// 更新処理
-	void Update(float elapsedTime);
+	void Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles);
 
 	// ターゲット位置設定
 	void SetTarget(const DirectX::XMFLOAT3& target) { this->target = target; }

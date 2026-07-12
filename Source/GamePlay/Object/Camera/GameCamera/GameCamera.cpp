@@ -5,7 +5,7 @@
 #include "GamePlay/Object/Character/Player/Player.h"
 
 // 更新処理
-void GameCamera::Update(float elapsedTime)
+void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -66,12 +66,51 @@ void GameCamera::Update(float elapsedTime)
 	DirectX::XMFLOAT3 front;
 	DirectX::XMStoreFloat3(&front, Front);
 
-	// 注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
 	DirectX::XMFLOAT3 eye;
-	eye.x = currentTarget.x - front.x * range;
-	eye.y = currentTarget.y - front.y * range;
-	eye.z = currentTarget.z - front.z * range;
 
+	// スタート地点を設定
+	DirectX::XMFLOAT3 origin = currentTarget;
+
+	// 飛ばす方向を設定(カメラと反対向き)
+	DirectX::XMFLOAT3 direction = { -front.x, -front.y, -front.z };
+
+	// 飛ばす距離
+	float distance = range;
+
+	// カメラの当たり判定の大きさ
+	float radius = 0.2f;
+
+	DirectX::XMFLOAT3 hitPosition, hitNormal;
+
+	// ステージとの当たり判定
+	if (Collision::SphereCast(origin, direction, radius, distance, stageTriangles, hitPosition, hitNormal)) 
+	{
+		// カメラとターゲットの距離を測る
+		float dx = hitPosition.x - currentTarget.x;
+		float dy = hitPosition.y - currentTarget.y;
+		float dz = hitPosition.z - currentTarget.z;
+
+		float distSq = sqrtf(dx * dx + dy * dy + dz * dz);
+
+		// 距離が近すぎる場合
+		if (distSq < 0.01f)
+		{
+			eye.x = currentTarget.x + direction.x * 0.1f;
+			eye.y = currentTarget.y + direction.y * 0.1f;
+			eye.z = currentTarget.z + direction.z * 0.1f;
+		}
+		else
+		{
+			eye = hitPosition;
+		}
+	}
+	else
+	{
+		// 注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
+		eye.x = currentTarget.x - front.x * range;
+		eye.y = currentTarget.y - front.y * range;
+		eye.z = currentTarget.z - front.z * range;
+	}
 
 	targetFov = defaultFov;
 

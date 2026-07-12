@@ -152,7 +152,7 @@ void SceneGame::Update(float elapsedTime)
 			player.SetLockOnTargetPosition(nullptr);
 		}
 
-		gameCamera->Update(elapsedTime);
+		gameCamera->Update(elapsedTime, stage->GetTriangles());
 	}
 	else
 	{
