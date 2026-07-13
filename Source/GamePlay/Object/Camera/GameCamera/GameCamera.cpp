@@ -49,6 +49,18 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 		// スティックの入力値に合わせてX軸とY軸を回転
 		angle.x += ay * speed;
 		angle.y += ax * speed;
+
+		// カメラの上下の制限をかける
+		const float MAX_ANGLE = DirectX::XMConvertToRadians(80.0f);
+
+		if (angle.x > MAX_ANGLE)
+		{
+			angle.x = MAX_ANGLE;
+		}
+		else if (angle.x < -MAX_ANGLE)
+		{
+			angle.x = -MAX_ANGLE;
+		}
 	}
 
 	// 線形補間でターゲットをジワジワ追跡させる
