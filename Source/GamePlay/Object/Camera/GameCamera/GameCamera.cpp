@@ -5,7 +5,7 @@
 #include "GamePlay/Object/Character/Player/Player.h"
 
 // 更新処理
-void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles)
+void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles, const std::vector<Collision::Area>& stageAreas)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -83,7 +83,7 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	DirectX::XMFLOAT3 hitPosition, hitNormal;
 
 	// ステージとの当たり判定
-	if (Collision::SphereCast(origin, direction, radius, distance, stageTriangles, hitPosition, hitNormal)) 
+	if (Collision::SphereCast(origin, direction, radius, distance, stageTriangles, stageAreas, hitPosition, hitNormal, true)) 
 	{
 		// カメラとターゲットの距離を測る
 		float dx = hitPosition.x - currentTarget.x;

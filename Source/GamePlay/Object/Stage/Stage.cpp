@@ -13,6 +13,9 @@ Stage::Stage()
 
 	scale.x = scale.y = scale.z = 0.025f;
 
+	DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
+	DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
+
 	// 	// 頂点データをワールド空間変換し、三角形データを作成
 	for (const Model::Mesh& mesh : stage->GetMeshes())
 	{
@@ -52,6 +55,65 @@ Stage::Stage()
 			DirectX::XMStoreFloat3(&triangle.positions[1], B);
 			DirectX::XMStoreFloat3(&triangle.positions[2], C);
 			DirectX::XMStoreFloat3(&triangle.normal, N);
+
+			// モデル全体のAABBを計測
+			VolumeMin = DirectX::XMVectorMin(VolumeMin, A);
+			VolumeMin = DirectX::XMVectorMin(VolumeMin, B);
+			VolumeMin = DirectX::XMVectorMin(VolumeMin, C);
+			VolumeMax = DirectX::XMVectorMax(VolumeMax, A);
+			VolumeMax = DirectX::XMVectorMax(VolumeMax, B);
+			VolumeMax = DirectX::XMVectorMax(VolumeMax, C);
+		}
+	}
+
+	// モデル全体のAABB
+	DirectX::XMFLOAT3 volumeMin, volumeMax;
+	DirectX::XMStoreFloat3(&volumeMin, VolumeMin);
+	DirectX::XMStoreFloat3(&volumeMax, VolumeMax);
+
+	// モデル全体のAABBからXZ平面に指定のサイズで分割されたコリジョンエリアを作成する
+	{
+		const int cellSize = 32;
+		for (float x = volumeMin.x; x < volumeMax.x; x += cellSize)
+		{
+			for (float z = volumeMin.z; z < volumeMax.z; z += cellSize)
+			{
+				//AABBを算出
+				Collision::Area& area = areas.emplace_back();
+				//エリアの最大値と最小値を出す
+				DirectX::XMFLOAT3 min = { x, volumeMin.y, z };
+				DirectX::XMFLOAT3 max = { x + cellSize, volumeMax.y, z + cellSize };
+
+				//バウンディングボックスの中心を出す
+				area.boundingBox.Center.x = (min.x + max.x) * 0.5f;
+				area.boundingBox.Center.y = (min.y + max.y) * 0.5f;
+				area.boundingBox.Center.z = (min.z + max.z) * 0.5f;
+
+				//中心からの各方向の大きさを出す
+				area.boundingBox.Extents.x = (max.x - min.x) * 0.5f;
+				area.boundingBox.Extents.y = (max.y - min.y) * 0.5f;
+				area.boundingBox.Extents.z = (max.z - min.z) * 0.5f;
+
+				//AABBに所属する三角形を抽出
+				for (int i = 0; i < static_cast<int>(triangles.size()); ++i)
+				{
+					Collision::Triangle& tri = triangles[i];
+					DirectX::XMFLOAT3& P0 = tri.positions[0];
+					DirectX::XMFLOAT3& P1 = tri.positions[1];
+					DirectX::XMFLOAT3& P2 = tri.positions[2];
+
+					//三角形の３点を使ってバウンディングボックスを作る
+					DirectX::XMFLOAT3 points[3] = { P0, P1, P2 };
+					DirectX::BoundingBox triangleBB;
+					DirectX::BoundingBox::CreateFromPoints(triangleBB, 3, points, sizeof(DirectX::XMFLOAT3));
+
+					//エリアのAABBと三角形のAABBが交差してたら追加
+					if (area.boundingBox.Intersects(triangleBB))
+					{
+						area.triangleIndices.push_back(i);
+					}
+				}
+			}
 		}
 	}
 }

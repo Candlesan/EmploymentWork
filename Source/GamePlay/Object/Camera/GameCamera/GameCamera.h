@@ -10,7 +10,7 @@ class GameCamera
 {
 public:
 	// 更新処理
-	void Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles);
+	void Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles, const std::vector<Collision::Area>& stageAreas);
 
 	// ターゲット位置設定
 	void SetTarget(const DirectX::XMFLOAT3& target) { this->target = target; }

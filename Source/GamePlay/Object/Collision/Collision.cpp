@@ -1,5 +1,9 @@
 #include "Collision.h"
 #include <SphereCast.h>
+#include <unordered_set>
+#include <Windows.h> 
+#include <string>
+
 
 //球と球の交差判定
 bool Collision::IntersectSphereVsSpere(
@@ -194,9 +198,14 @@ bool Collision::SphereCast(
     float radius,
     float& distance,
     const std::vector<Triangle>& triangles,
+    const std::vector<Area>& areas,
     DirectX::XMFLOAT3& hitPosition,
-    DirectX::XMFLOAT3& hitNormal)
+    DirectX::XMFLOAT3& hitNormal,
+    bool spaceDivisionFlag)
 {
+    static int callCount = 0;
+    callCount++;
+
     bool hit = false;
     DirectX::XMVECTOR Start = DirectX::XMLoadFloat3(&origin);
     DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
@@ -204,27 +213,74 @@ bool Collision::SphereCast(
     // 終点 = 始点 ＋ (方向 × 距離)
     DirectX::XMVECTOR End = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Direction, distance));
 
-    // 三角形のリストと接触部分を総当たりで調べる
-    for (const auto& triangle : triangles)
+    // 空間分割せずに、普通にレイキャストする
+    if (!spaceDivisionFlag)
     {
-        // 接触部分の位置を読み込む
-        DirectX::XMVECTOR Positions[3] =
+        // 三角形のリストと接触部分を総当たりで調べる
+        for (const auto& triangle : triangles)
         {
-            DirectX::XMLoadFloat3(&triangle.positions[0]),
-            DirectX::XMLoadFloat3(&triangle.positions[1]),
-            DirectX::XMLoadFloat3(&triangle.positions[2])
-        };
+            // 接触部分の位置を読み込む
+            DirectX::XMVECTOR Positions[3] =
+            {
+                DirectX::XMLoadFloat3(&triangle.positions[0]),
+                DirectX::XMLoadFloat3(&triangle.positions[1]),
+                DirectX::XMLoadFloat3(&triangle.positions[2])
+            };
 
-        // 結果を取得する
-        SphereCastResult result;
-        if (IntersectSphereCastVsTriangle(Start, End, radius, Positions, &result))
+            // 結果を取得する
+            SphereCastResult result;
+            if (IntersectSphereCastVsTriangle(Start, End, radius, Positions, &result))
+            {
+                if (distance < result.distance) continue;
+                distance = result.distance;
+                DirectX::XMVECTOR HitPosition = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Direction, distance));
+                DirectX::XMStoreFloat3(&hitPosition, HitPosition);
+                DirectX::XMStoreFloat3(&hitNormal, result.normal);
+                hit = true;
+            }
+        }
+    }
+    else // 空間分割したデータを使い、スフィアレイキャストを高速処理する
+    {
+        // レイのAABBを作る
+        DirectX::BoundingBox rayAABB;
+        DirectX::BoundingBox::CreateFromPoints(rayAABB, Start, End);
+
+        rayAABB.Extents.x += radius;
+        rayAABB.Extents.y += radius;
+        rayAABB.Extents.z += radius;
+
+        // エリアごとにチェック
+        for (const Area& area : areas)
         {
-            if (distance < result.distance) continue;
-            distance = result.distance;
-            DirectX::XMVECTOR HitPosition = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Direction, distance));
-            DirectX::XMStoreFloat3(&hitPosition, HitPosition);
-            DirectX::XMStoreFloat3(&hitNormal, result.normal);
-            hit = true;
+            // レイをAABBと交差してるエリアだけを見る
+            if (!area.boundingBox.Intersects(rayAABB)) continue;
+
+            // エリア内の三角形にレイキャスト
+            for (int triIndex : area.triangleIndices)
+            {
+                const Triangle& triangle = triangles[triIndex];
+
+                // 接触部分の位置を読み込む
+                DirectX::XMVECTOR Positions[3] =
+                {
+                    DirectX::XMLoadFloat3(&triangle.positions[0]),
+                    DirectX::XMLoadFloat3(&triangle.positions[1]),
+                    DirectX::XMLoadFloat3(&triangle.positions[2])
+                };
+
+                // 結果を取得する
+                SphereCastResult result;
+                if (IntersectSphereCastVsTriangle(Start, End, radius, Positions, &result))
+                {
+                    if (distance < result.distance) continue;
+                    distance = result.distance;
+                    DirectX::XMVECTOR HitPosition = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Direction, distance));
+                    DirectX::XMStoreFloat3(&hitPosition, HitPosition);
+                    DirectX::XMStoreFloat3(&hitNormal, result.normal);
+                    hit = true;
+                }
+            }
         }
     }
 

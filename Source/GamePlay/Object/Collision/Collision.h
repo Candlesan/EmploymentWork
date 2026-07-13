@@ -56,6 +56,12 @@ public:
 		DirectX::XMFLOAT3 positions[3];
 		DirectX::XMFLOAT3 normal;
 	};
+	// エリアの定義
+	struct Area
+	{
+		DirectX::BoundingBox	boundingBox;
+		std::vector<int>		triangleIndices;
+	};
 
 	// スフィアキャスト
 	static bool SphereCast(
@@ -64,8 +70,10 @@ public:
 		float radius,
 		float& distance,
 		const std::vector<Triangle>& triangles,
+		const std::vector<Area>& areas,
 		DirectX::XMFLOAT3& hitPosition,
-		DirectX::XMFLOAT3& hitNormal);
+		DirectX::XMFLOAT3& hitNormal,
+		bool spaceDivisionFlag = false);
 private:
 	// ヘルパー関数：線分と線分の最短距離を求める計算
 	static void ClosetPointSegmentSegment(
