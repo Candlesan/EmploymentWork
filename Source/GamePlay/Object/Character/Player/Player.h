@@ -176,6 +176,7 @@ private:
 	WindBladeMagic::WindBladeConfig config;
 	int level = 1;
 	float magicCoolDownTimer = 0.0f;
+	float coolDownValue = 0.0f;
 	bool isMagicAttack = true;
 
 	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──

@@ -385,8 +385,6 @@ std::string AnimationTransitionEditor::Draw(
 	// リンク描画
 	for (auto& link : currentGraph.links)
 	{
-		ed::Link(link.linkId, link.startPin, link.endPin, link.color);
-
 		// 今いるグラフのインデックスを取得
 		// activeGraphStackの中にcurrentGraphIndexがあるか探す
 		std::string evalState = activeState; // デフォルトは currentState
@@ -402,10 +400,18 @@ std::string AnimationTransitionEditor::Draw(
 			}
 		}
 
-		if (link.transition.fromState == evalState)
+		// このリンクが現在の状態からの遷移かを判定する
+		bool isActiveLink = (link.transition.fromState == evalState);
+
+		// 描画色を決める
+		ImVec4 drawColor = link.color;
+		if (isActiveLink)
 		{
-			ed::Flow(link.linkId);
+			drawColor = ImVec4(1.0f, 0.6f, 0.0f, 1.0f); // ノードのハイライト色と合わせる例
 		}
+
+		// リンクを描画（色を渡す）
+		ed::Link(link.linkId, link.startPin, link.endPin, drawColor);
 	}
 
 	// ドラックでリンクを作成

@@ -303,27 +303,28 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 // GUI描画
 void Player::DrawGUI()
 {
-	ImGui::Begin(u8"プレイヤーデバッグ");
+	ImGui::Begin(u8"プレイヤー");
 	{
 		ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
 
 		// パラメーター
 		if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 			if (ImGui::Button(u8"HP全回復"))
 			{
-				health = maxHealth; // 前回の残党退治で maxHealth（小文字）にしてる場合はこれでOK！
+				health = maxHealth;
 			}
 			ImGui::Text(u8"体力 (HP): %f.0", health);
 			ImGui::Separator();
 			ImGui::Text(u8"直前の被ダメージ: %f.0", lastDamage);
 			ImGui::Separator();
-			ImGui::Text(u8"現在の体幹値 (ポイズ): %f.0", currentPoise);
+			ImGui::Text(u8"現在の体幹値: %f.0", currentPoise);
 			ImGui::Separator();
 			ImGui::Text(u8"無敵残り時間: %f.0", invincibleTimer);
 			ImGui::Separator();
 			ImGui::Text(u8"風状態残り時間: %f.0", windDashAvailTimer);
+			ImGui::Separator();
+			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 			ImGui::Separator();
 			ImGui::Text(u8"スロー演出残り時間: %f.0", justAvoidSlowTimer);
 			ImGui::Separator();
@@ -436,8 +437,7 @@ void Player::DrawGUI()
 			ImGui::SliderFloat(u8"威力 (Damage)", &config.damage, 0.0f, 500.0f, "%.0f");
 			ImGui::SliderFloat(u8"射出前の溜め時間", &config.waitTimer, 0.0f, 2.0f, "%.2f");
 			ImGui::SliderFloat(u8"消滅までの寿命", &config.lifeTimer, 0.5f, 10.0f, "%.1f");
-
-			ImGui::SliderInt(u8"暫定魔法レベル", &level, 1, 3);
+			ImGui::SliderFloat(u8"魔法のクールダウン", &coolDownValue, 0.5f, 10.0f, "%.1f");
 		}
 
 		// アニメーション遷移状態
@@ -573,23 +573,11 @@ void Player::MagicInput()
 		// カメラが向いてる水平な角度を求める
 		float cameraAngleY = atan2f(cameraFront.x, cameraFront.z);
 
+		// 魔法を生成する
 		WindBladeMagic::Emit(&magicManager, position, cameraAngleY, enemy, level, this->config);
 
-		PlayActionGraph("State_Magic");
-
-
-		if (level == 3)
-		{
-			magicCoolDownTimer = 1.0f;
-		}
-		else if (level == 2)
-		{
-			magicCoolDownTimer = 0.75f;
-		}
-		else
-		{
-			magicCoolDownTimer = 0.5f;
-		}
+		// 魔法を撃った後にクールダウンをセットする
+		magicCoolDownTimer = coolDownValue;
 	}
 }
 
