@@ -1,0 +1,12 @@
+{
+    "damage": 100.0,
+    "hitHeight": 1.0,
+    "hitRadius": 1.0,
+    "lifeTimer": 3.0,
+    "scale": 1.0,
+    "spawnOffsetX": 0.0,
+    "spawnOffsetY": 1.0,
+    "spawnOffsetZ": 0.0,
+    "speed": 20.0,
+    "waitTimer": 0.1599999964237213
+}

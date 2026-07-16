@@ -11,7 +11,7 @@
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "SceneManager.h"
 
-// シェーダー
+ // シェーダー
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
 
 #include <imgui.h>
@@ -114,11 +114,32 @@ void SceneGame::Update(float elapsedTime)
 	if (Player::Instance().GetJustAvoidSlowTimer() > 0.0f)
 	{
 		// スロー中なら、演出用の倍率を落とす
-		gameplayEffectScale = 0.3f;
+		gameplayEffectScale = 1.0f * 0.3f; // 元のコードの意図を維持
 	}
 
 	float delta = elapsedTime * timeScale * gameplayEffectScale;
 
+	// --- キー入力：F5/F6 のエッジ検出（押下の立ち上がり） ---
+	{
+		// F5: 一時停止トグル
+		bool f5Down = (GetAsyncKeyState(VK_F5) & 0x8000) != 0;
+		if (f5Down && !wasF5DownLastFrame)
+		{
+			isPaused = !isPaused;
+		}
+		wasF5DownLastFrame = f5Down;
+
+		// F6: ポーズ中に1フレーム進める
+		bool f6Down = (GetAsyncKeyState(VK_F6) & 0x8000) != 0;
+		if (f6Down && !wasF6DownLastFrame)
+		{
+			if (isPaused)
+			{
+				stepNextFrame = true;
+			}
+		}
+		wasF6DownLastFrame = f6Down;
+	}
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
@@ -236,7 +257,7 @@ void SceneGame::Update(float elapsedTime)
 		}
 
 		// エフェクト更新処理 
-		EffectManager::Instance().Update(elapsedTime);
+		EffectManager::Instance().Update(delta);
 	}
 }
 

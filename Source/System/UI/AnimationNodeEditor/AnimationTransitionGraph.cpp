@@ -199,7 +199,7 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			break;
 
 		case TransitionConditionType::IsFalling:
-			result = ctx.IsCancelable;
+			result = ctx.IsFalling;
 			break;
 
 		case TransitionConditionType::Always:

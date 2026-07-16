@@ -2,6 +2,7 @@
 #include "GamePlay/Object/Magic/MagicBase.h"
 #include "System/Effect/Effect.h"
 #include "GamePlay/Object/Magic/IMagicMove.h"
+#include "GamePlay/Object/Magic/MagicInfor.h"
 #include <memory>
 
 class MagicProjectile : public MagicBase
@@ -39,4 +40,6 @@ private:
 	bool isAlive = false; // Ç‹Çæë∂ç›ÇµÇƒÇ¢ÇÈÇ©
 
 	std::unique_ptr<IMagicMove> moveComponent;
+
+	MagicInfo config;
 };

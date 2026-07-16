@@ -130,55 +130,17 @@
             ]
         },
         {
-            "events": [],
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "MagicInput",
+                    "soundName": "",
+                    "time": 0.20000000298023224,
+                    "type": 0
+                }
+            ],
             "name": "AS_Combo_Attack_03_01_Seq_0",
             "ranges": [
-                {
-                    "angleOffset": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "boneName": "",
-                    "damageRate": 1.0,
-                    "end": 0.6097044348716736,
-                    "height": 1.0,
-                    "invincible": 0.30000001192092896,
-                    "isHitBox": false,
-                    "name": "ShowSword",
-                    "offset": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "poiseRate": 1.0,
-                    "radius": 0.5,
-                    "shapeType": 0,
-                    "start": 0.12684692442417145
-                },
-                {
-                    "angleOffset": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "boneName": "Sword",
-                    "damageRate": 1.0,
-                    "end": 0.44999998807907104,
-                    "height": 2.7799999713897705,
-                    "invincible": 0.30000001192092896,
-                    "isHitBox": true,
-                    "name": "HitBox",
-                    "offset": [
-                        0.0,
-                        -2.890000104904175,
-                        0.0
-                    ],
-                    "poiseRate": 1.0,
-                    "radius": 0.7799999713897705,
-                    "shapeType": 1,
-                    "start": 0.12700000405311584
-                },
                 {
                     "angleOffset": [
                         0.0,
@@ -210,7 +172,7 @@
                     ],
                     "boneName": "",
                     "damageRate": 1.0,
-                    "end": 0.8816004991531372,
+                    "end": 1.4166666269302368,
                     "height": 1.0,
                     "invincible": 0.30000001192092896,
                     "isHitBox": false,
@@ -223,7 +185,7 @@
                     "poiseRate": 1.0,
                     "radius": 0.5,
                     "shapeType": 0,
-                    "start": 0.3285653293132782
+                    "start": 0.6463222503662109
                 }
             ],
             "speedKeys": []
@@ -235,55 +197,17 @@
             "speedKeys": []
         },
         {
-            "events": [],
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "MagicInput",
+                    "soundName": "",
+                    "time": 0.16099999845027924,
+                    "type": 0
+                }
+            ],
             "name": "AS_Combo_Attack_01_03_Seq_0",
             "ranges": [
-                {
-                    "angleOffset": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "boneName": "",
-                    "damageRate": 1.0,
-                    "end": 0.6065124273300171,
-                    "height": 1.0,
-                    "invincible": 0.30000001192092896,
-                    "isHitBox": false,
-                    "name": "ShowSword",
-                    "offset": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "poiseRate": 1.0,
-                    "radius": 0.5,
-                    "shapeType": 0,
-                    "start": 0.15967676043510437
-                },
-                {
-                    "angleOffset": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "boneName": "Sword",
-                    "damageRate": 1.0,
-                    "end": 0.38166964054107666,
-                    "height": 2.1700000762939453,
-                    "invincible": 0.30000001192092896,
-                    "isHitBox": true,
-                    "name": "HitBox",
-                    "offset": [
-                        0.0,
-                        -2.7799999713897705,
-                        0.0
-                    ],
-                    "poiseRate": 1.0,
-                    "radius": 1.0,
-                    "shapeType": 1,
-                    "start": 0.1599999964237213
-                },
                 {
                     "angleOffset": [
                         0.0,
@@ -306,6 +230,29 @@
                     "radius": 0.5,
                     "shapeType": 0,
                     "start": 0.0
+                },
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.5,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "Cancelable",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.45500001311302185
                 }
             ],
             "speedKeys": []
@@ -740,6 +687,109 @@
                     "time": 0.5833333134651184
                 }
             ]
+        },
+        {
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "MagicInput",
+                    "soundName": "",
+                    "time": 0.06599999964237213,
+                    "type": 0
+                }
+            ],
+            "name": "AS_Combo_Attack_01_04_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.25,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "InputBuffer",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                },
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.6333333253860474,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "Cancelable",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.8100000023841858
+                }
+            ],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Run_Combat_B_180_Loop_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Run_Combat_B_R_45_Loop_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_R_90_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_B_180_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_B_R_45_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Run_Combat_F_R_45_Loop_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "events": [],
+            "name": "AS_Run_Combat_F_L_45_Loop_Seq_0",
+            "ranges": [],
+            "speedKeys": []
         }
     ]
 }

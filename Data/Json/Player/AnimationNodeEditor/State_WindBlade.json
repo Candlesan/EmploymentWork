@@ -8,7 +8,7 @@
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 64,
+                    "buttonMask": 32768,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
@@ -17,7 +17,8 @@
             ],
             "fromState": "Entry",
             "priority": 0,
-            "toState": "AS_Attack_01_01_Seq_0"
+            "toSlot": 0,
+            "toState": "AS_Combo_Attack_03_01_Seq_0"
         },
         {
             "Actions": [],
@@ -34,8 +35,9 @@
                     "type": 0
                 }
             ],
-            "fromState": "AS_Attack_01_01_Seq_0",
+            "fromState": "AS_Combo_Attack_01_04_Seq_0",
             "priority": 0,
+            "toSlot": 0,
             "toState": "Exit"
         },
         {
@@ -53,8 +55,9 @@
                     "type": 0
                 }
             ],
-            "fromState": "AS_Attack_01_02_Seq_0",
+            "fromState": "AS_Combo_Attack_01_03_Seq_0",
             "priority": 0,
+            "toSlot": 0,
             "toState": "Exit"
         },
         {
@@ -68,20 +71,14 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 1.0,
-                    "type": 1
-                },
-                {
-                    "buttonMask": 64,
-                    "negate": false,
-                    "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 3
+                    "type": 0
                 }
             ],
-            "fromState": "AS_Attack_01_02_Seq_0",
+            "fromState": "AS_Combo_Attack_03_01_Seq_0",
             "priority": 0,
-            "toState": "AS_Attack_01_01_Seq_0"
+            "toSlot": 0,
+            "toState": "Exit"
         },
         {
             "Actions": [],
@@ -91,23 +88,44 @@
             "colorR": 1.0,
             "conditions": [
                 {
+                    "buttonMask": 32768,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                },
+                {
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 1.0,
+                    "threshold": 0.5630000233650208,
                     "type": 1
-                },
+                }
+            ],
+            "fromState": "AS_Combo_Attack_03_01_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Combo_Attack_01_03_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
                 {
-                    "buttonMask": 64,
+                    "buttonMask": 32768,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 3
                 }
             ],
-            "fromState": "AS_Attack_01_01_Seq_0",
+            "fromState": "AS_Combo_Attack_01_03_Seq_0",
             "priority": 0,
-            "toState": "AS_Attack_01_02_Seq_0"
+            "toSlot": 0,
+            "toState": "AS_Combo_Attack_01_04_Seq_0"
         }
     ],
     "nodes": [
@@ -121,9 +139,10 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
-                -127.0,
-                9.0
+                -140.0,
+                -39.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -138,43 +157,64 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
-                321.0,
-                9.0
+                449.0,
+                73.0
             ],
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "AS_Attack_01_01_Seq_0",
+            "StateName": "AS_Combo_Attack_01_03_Seq_0",
             "config": {
-                "animationName": "AS_Attack_01_01_Seq_0",
+                "animationName": "AS_Combo_Attack_01_03_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
-                "targetBoneName": "spine_01",
+                "targetBoneName": "",
                 "useRootMotion": false,
-                "useRootMotionEx": false
+                "useRootMotionEx": true
             },
+            "mixRate": 0.0,
             "position": [
-                33.0,
-                -7.0
+                83.0,
+                73.0
             ],
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "AS_Attack_01_02_Seq_0",
+            "StateName": "AS_Combo_Attack_03_01_Seq_0",
             "config": {
-                "animationName": "AS_Attack_01_02_Seq_0",
+                "animationName": "AS_Combo_Attack_03_01_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
-                "targetBoneName": "spine_01",
+                "targetBoneName": "",
                 "useRootMotion": false,
-                "useRootMotionEx": false
+                "useRootMotionEx": true
             },
+            "mixRate": 0.0,
             "position": [
-                34.0,
-                98.0
+                81.0,
+                -39.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Combo_Attack_01_04_Seq_0",
+            "config": {
+                "animationName": "AS_Combo_Attack_01_04_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                83.0,
+                185.0
             ],
             "subGraphPath": "",
             "type": 0

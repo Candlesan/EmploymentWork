@@ -153,6 +153,7 @@
     <ClInclude Include="Source\GamePlay\Object\Collision\CollisionManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicBase.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicInfor.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.h" />

@@ -489,6 +489,9 @@
     <ClInclude Include="Source\GamePlay\Object\Collision\CollisionManager.h">
       <Filter>Source\GamepPlay\Object\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicInfor.h">
+      <Filter>Source\GamepPlay\Object\Magic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
