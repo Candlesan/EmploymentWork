@@ -1,0 +1,183 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toState": "AS_Attack_01_01_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Attack_01_01_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Attack_01_02_Seq_0",
+            "priority": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 1.0,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "AS_Attack_01_02_Seq_0",
+            "priority": 0,
+            "toState": "AS_Attack_01_01_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 1.0,
+                    "type": 1
+                },
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "AS_Attack_01_01_Seq_0",
+            "priority": 0,
+            "toState": "AS_Attack_01_02_Seq_0"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                -127.0,
+                9.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                321.0,
+                9.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Attack_01_01_Seq_0",
+            "config": {
+                "animationName": "AS_Attack_01_01_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "spine_01",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                33.0,
+                -7.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Attack_01_02_Seq_0",
+            "config": {
+                "animationName": "AS_Attack_01_02_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "spine_01",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "position": [
+                34.0,
+                98.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}

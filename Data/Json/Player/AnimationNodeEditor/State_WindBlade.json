@@ -120,6 +120,13 @@
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.7300000190734863,
+                    "type": 1
                 }
             ],
             "fromState": "AS_Combo_Attack_01_03_Seq_0",

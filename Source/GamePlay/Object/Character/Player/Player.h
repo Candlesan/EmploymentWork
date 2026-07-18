@@ -107,6 +107,7 @@ private:
 	void UpdateStateTransitions(float elapsedTime);
 	void UpdateUpperBodyTransitions(float elapsedTime);
 	TransitionContext InputTransitionContext(float elapsedTime);
+	void Player::EnterSubGraph(const std::string& subGraphPath, const TransitionContext& ctx);
 	void PlayActionGraph(const std::string& graphName);
 	void UpdateStateBehavior();
 

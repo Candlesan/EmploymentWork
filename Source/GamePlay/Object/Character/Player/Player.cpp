@@ -1184,6 +1184,8 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			// スタックから現在の子グラフを下ろして、親グラフに戻る
 			activeGraphStack.pop_back();
 
+			bufferedButton = 0;
+
 			return;
 		}
 
@@ -1198,72 +1200,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 		// 潜り込み処理
 		if (nextNode && nextNode->type == NodeType::SubGraph)
 		{
-			AnimationTransitionGraph* subGraph = nullptr;
-			int targetIndex = -1;
-
-			// パスからファイル名(グラフ名)を取り出す
-			char filename[MAX_PATH];
-			_splitpath_s(nextNode->subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
-			std::string targetName = filename;
-
-
-			// Initializeで既に全ロードされているグラフ群から探す
-			for (int i = 0; i < (int)transitionGraphs.size(); i++)
-			{
-				if (transitionGraphs[i].graphName == targetName)
-				{
-					subGraph = &transitionGraphs[i];
-					targetIndex = i;
-					break;
-				}
-			}
-
-			if (subGraph && targetIndex != -1)
-			{
-				// スタックに子グラフを積んで潜る！
-				activeGraphStack.push_back(targetIndex);
-
-				// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
-				std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
-				if (firstState != "Entry" && firstState != "")
-				{
-					const AnimationTransition* trans = subGraph->GetTransition("Entry", firstState);
-					if (trans)
-					{
-						for (auto& action : trans->actions)
-						{
-							switch (action.type)
-							{
-							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
-							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-							case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
-							}
-						}
-					}
-					// 最初のステートへ切り替え！
-					if (firstState != "")
-					{
-						ChangeAnimationState(firstState);
-						bufferedButton = 0; // サブグラフへ潜り込んだ時のリセット
-					}
-				}
-				else
-				{
-					// 万が一 Entry からの条件がどれも満たされなかったら、適当なノードを最初にする（元のフォールバック）
-					firstState = "";
-					for (auto& n : subGraph->nodes)
-					{
-						if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
-						{
-							firstState = n.StateName;
-							break;
-						}
-					}
-				}
-
-				// 最初のステートへ切り替え！
-				if (firstState != "") ChangeAnimationState(firstState);
-			}
+			EnterSubGraph(nextNode->subGraphPath, ctx);
 		}
 		else if (nextNode && nextNode->type == NodeType::Mix)
 		{
@@ -1599,6 +1536,97 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.inputDir = CalculateRelativeInputDir(); 
 
 	return ctx;
+}
+
+// 潜り込み処理
+void Player::EnterSubGraph(const std::string& subGraphPath, const TransitionContext& ctx) {
+	// パスからファイル名(グラフ名)を取り出す
+	char filename[MAX_PATH];
+	_splitpath_s(subGraphPath.c_str(), nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+	std::string targetName = filename;
+
+
+	// Initializeで既に全ロードされているグラフ群から探す
+	AnimationTransitionGraph* subGraph = nullptr;
+	int targetIndex = -1;
+	for (int i = 0; i < (int)transitionGraphs.size(); i++)
+	{
+		if (transitionGraphs[i].graphName == targetName)
+		{
+			subGraph = &transitionGraphs[i];
+			targetIndex = i;
+			break;
+		}
+	}
+
+	if (subGraph && targetIndex != -1)
+	{
+		activeGraphStack.push_back(targetIndex);
+
+		// 「Entry」ノードからの矢印を探して、最初のアニメーションを決める
+		std::string firstState = subGraph->EvaluateTransitions("Entry", ctx);
+
+		if (firstState != "Entry" && !firstState.empty())
+		{
+			const AnimationTransition* trans = subGraph->GetTransition("Entry", firstState);
+			if (trans)
+			{
+				for (auto& action : trans->actions)
+				{
+					switch (action.type)
+					{
+					case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
+					case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
+					case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
+					}
+				}
+			}
+
+			// 最初のステートへ切り替え！
+			if (!firstState.empty()) 
+			{
+				// そのステート（ノード）の情報を取得する
+				AnimNode* firstNode = nullptr;
+				for (auto& n : subGraph->nodes)
+				{
+					if (n.StateName == firstState)
+					{
+						firstNode = &n;
+						break;
+					}
+				}
+
+				// もし見つかったノードが「さらにサブグラフ」だったら、もう一回この関数を呼んで深く潜る！
+				if (firstNode && firstNode->type == NodeType::SubGraph)
+				{
+					EnterSubGraph(firstNode->subGraphPath, ctx);
+				}
+				else
+				{
+					// サブグラフじゃない（＝本物のアニメーションノードだ！）なら、ついに遷移を実行！
+					ChangeAnimationState(firstState);
+					bufferedButton = 0;
+				}
+			}
+		}
+		else
+		{
+			// 万が一 Entry からの条件がどれも満たされなかったら、適当なノードを最初にする（元のフォールバック）
+			firstState = "";
+			for (auto& n : subGraph->nodes)
+			{
+				if (n.type == NodeType::Animation && n.StateName != "Entry" && n.StateName != "Exit")
+				{
+					firstState = n.StateName;
+					break;
+				}
+			}
+		}
+
+		// 最初のステートへ切り替え！
+		if (firstState != "") ChangeAnimationState(firstState);
+	}
+
 }
 
 // アクション（コンボ）のグラフを呼び出す関数

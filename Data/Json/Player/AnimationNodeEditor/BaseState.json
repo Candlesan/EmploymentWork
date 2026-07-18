@@ -614,6 +614,120 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "State_Jump"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32768,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Attack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32768,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Attack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 18
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                }
+            ],
+            "fromState": "State_Attack",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_Attack",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Idle"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 18
+                }
+            ],
+            "fromState": "State_Attack",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
         }
     ],
     "nodes": [
@@ -777,6 +891,24 @@
                 -391.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_LockOn_AirAvoid.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_Attack",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -156.0,
+                89.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Attack.json",
             "type": 1
         }
     ]
