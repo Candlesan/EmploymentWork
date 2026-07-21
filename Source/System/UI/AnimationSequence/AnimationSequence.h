@@ -76,6 +76,7 @@ public:
     struct AnimationData
     {
         std::string           name;      // アニメーション名
+        std::string           assetName; // データ自体の名前
         std::vector<Event>    events;    // イベント一覧
         std::vector<Range>    ranges;    // レンジ一覧
         std::vector<SpeedKey> speedKeys; // スピードキー一覧
@@ -91,6 +92,9 @@ public:
 
     // 再読み込み
     void Reload() { Load(jsonPath); }
+
+    // 現在のアニメーションデータを検索
+    AnimationData* FindAnimationData(const std::string& animName);
 
 private:
     std::vector<AnimationData> animations;
@@ -109,9 +113,6 @@ private:
     std::unordered_map<std::string, bool> firedEvents;
     // 現在有効なフラグ
     std::unordered_map<std::string, bool> activeFlags;
-
-    // 現在のアニメーションデータを検索
-    AnimationData* FindAnimationData(const std::string& animName);
 
     // 自動リロード用
     std::string jsonPath;

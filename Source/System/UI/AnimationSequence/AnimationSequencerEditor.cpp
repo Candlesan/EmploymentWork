@@ -26,6 +26,7 @@ void AnimationSequencerEditor::DrawEditor(
 	{
 		AnimationSequencer::AnimationData newData;
 		newData.name = animName;
+		newData.assetName = animName;
 		animations.push_back(newData);
 	}
 
@@ -480,11 +481,22 @@ void AnimationSequencerEditor::DrawSpeedCurveTrack(AnimationSequencer::Animation
 	ImGui::SetCursorScreenPos({ cursor.x, areaMax.y + 4 });
 	ImGui::Dummy({ width + labelWidth, 0 });
 }
-
 // 詳細パネル描画
 void AnimationSequencerEditor::DrawDetailPanel(AnimationSequencer::AnimationData& data)
 {
 	ImGui::TextDisabled(u8"詳細");
+	ImGui::Separator();
+
+	ImGui::Separator();
+	char assetBuf[128];
+	strncpy_s(assetBuf, data.assetName.c_str(), sizeof(assetBuf));
+
+	ImGui::Text(u8"再生アセット名：");
+	ImGui::SameLine();
+	if (ImGui::InputText(u8"##再生アセット名入力欄", assetBuf, sizeof(assetBuf)))
+	{
+		data.assetName = assetBuf;
+	}
 	ImGui::Separator();
 
 	// イベント

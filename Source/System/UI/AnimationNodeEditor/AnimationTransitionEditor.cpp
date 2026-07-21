@@ -730,33 +730,60 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			TransitionCondition& cond = trans.conditions[i];
 			ImGui::PushID(i);
 
-			// 条件タイプのドロップダウン
-			const char* condTypes[] = {
-				"AnimationFinished",	// アニメーションが終了したら
-				"AnimationTimeOver",	// 指定の再生時間オを過ぎたら
-				"AnimationTimeIn",		// 指定の再生時間内だったら
-				"ButtonPressed",		// ボタンを押した瞬間
-				"ButtonReleased",		// ボタンを離した瞬間
-				"ButtonHeld",			// ボタンを長押ししているとき
-				"MoveLengthOver",		// 入力が一定以上の時
-				"MoveLengthUnder",		// 入力が一定以下の時
-				"InputDir",				// 入力方向
-				"EnemyFromDistance",	// 敵との距離が一定以上の時
-				"IsGround",				// 地面にいる時
-				"IsLockOn",				// ロックオン中かどうか
-				"HavePotion",			// ポーションを持っているか
-				"HealCooldownReady",	// 回復のクールダウン中か
-				"IsGuarding",			// ガード中か
-				"PoaitionX",			// X軸が～なら
-				"PoaitionY",			// Y軸が～なら
-				"PoaitionZ",			// Z軸が～なら
-				"IsCancelable",			// モーションキャンセル
-				"IsFalling",			// 落下中か
-				"Always",				// 無条件
+			const ComboItem condItems[] = {
+				{ "AnimationFinished",	TransitionConditionType::AnimationFinished },         
+				{ "AnimationTimeOver",	TransitionConditionType::AnimationTimeOver },
+				{ "AnimationTimeIn",	TransitionConditionType::AnimationTimeIn },
+
+				{ "ButtonPressed",		TransitionConditionType::ButtonPressed },
+				{ "ButtonReleased",		TransitionConditionType::ButtonReleased },
+				{ "ButtonHeld",			TransitionConditionType::ButtonHeld },
+
+				{ "MoveLengthOver",		TransitionConditionType::MoveLengthOver },
+				{ "MoveLengthUnder",	TransitionConditionType::MoveLengthUnder },   
+				{ "EnemyFromDistance",	TransitionConditionType::EnemyFromDistance },
+
+				{ "IsGround",			TransitionConditionType::IsGround },
+				{ "IsLockOn",			TransitionConditionType::IsLockOn },
+				{ "IsGuarding",			TransitionConditionType::IsGuarding },
+				{ "IsCancelable",		TransitionConditionType::IsCancelable },
+				{ "IsFalling",			TransitionConditionType::IsFalling },
+
+				{ "HavePotion",			TransitionConditionType::HavePotion },
+				{ "HealCooldownReady",	TransitionConditionType::HealCooldownReady },
+
+				{ "WindDashAttack",	TransitionConditionType::WindDashAttack },
+
+				{ "InputDir",			TransitionConditionType::InputDir },          
+				{ "PositionX",			TransitionConditionType::PositionX },    
+				{ "PositionY",			TransitionConditionType::PositionY },           
+				{ "PositionZ",			TransitionConditionType::PositionZ },
+
+				{ "Always",				TransitionConditionType::Always },
 			};
-			int typeIdx = (int)cond.type;
-			if (ImGui::Combo("Type", &typeIdx, condTypes, IM_ARRAYSIZE(condTypes)))
-				cond.type = (TransitionConditionType)typeIdx;
+
+			int currentIndex = 0;
+			for (int i = 0; i < IM_ARRAYSIZE(condItems); i++)
+			{
+				if (condItems[i].type == cond.type)
+				{
+					currentIndex = i;
+					break;
+				}
+			}
+
+			// ドロップダウンのラベル一覧を作成
+			const char* comboLabels[IM_ARRAYSIZE(condItems)];
+			for (int i = 0; i < IM_ARRAYSIZE(condItems); i++)
+			{
+				comboLabels[i] = condItems[i].label;
+			}
+
+			// ImGui描画
+			if (ImGui::Combo("Type", &currentIndex, comboLabels, IM_ARRAYSIZE(condItems))) {
+				// 選択された項目の Enum 値をセットする！
+				cond.type = condItems[currentIndex].type;
+			}
 
 			// タイプによって追加入力欄を出す
 			switch (cond.type)
@@ -771,7 +798,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 
 			case TransitionConditionType::ButtonPressed:
 			case TransitionConditionType::ButtonReleased:
-			case TransitionConditionType::ButtonHeld:
 			{
 				// ボタン選択Comboを表示
 				const char* buttonNames[] = { "A","B","X","Y","LB","RB","LT","RT" };
@@ -795,6 +821,34 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 					cond.buttonMask = buttonMasks[currentIndex];
 				break;
 			}
+			case TransitionConditionType::ButtonHeld:
+			{
+				// ボタン選択Comboを表示
+				const char* buttonNames[] = { "A","B","X","Y","LB","RB","LT","RT" };
+				const int   buttonMasks[] = {
+					GamePad::BTN_A, GamePad::BTN_B,
+					GamePad::BTN_X, GamePad::BTN_Y,
+					GamePad::BTN_LEFT_SHOULDER,  GamePad::BTN_RIGHT_SHOULDER,
+					GamePad::BTN_LEFT_TRIGGER,   GamePad::BTN_RIGHT_TRIGGER,
+				};
+
+				if (cond.buttonMask == 0) {
+					cond.buttonMask = buttonMasks[0];
+				}
+
+				int currentIndex = 0;
+				for (int i = 0; i < IM_ARRAYSIZE(buttonMasks); i++)
+				{
+					if (cond.buttonMask == buttonMasks[i]) { currentIndex = i; break; }
+				}
+				if (ImGui::Combo("Button", &currentIndex, buttonNames, IM_ARRAYSIZE(buttonNames)))
+					cond.buttonMask = buttonMasks[currentIndex];
+
+				ImGui::Separator();
+
+				ImGui::DragFloat(u8"長押し時間(秒)", &cond.threshold, 0.05f, 0.0f, 3.0f, "%.2f秒");
+				break;
+			}
 
 			case TransitionConditionType::PositionX:
 			case TransitionConditionType::PositionY:
@@ -803,7 +857,8 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				break;
 
 			case TransitionConditionType::InputDir:
-				const char* dirNames[] = { 
+			{
+				const char* dirNames[] = {
 					"None",
 					"Forward",
 					"ForwardRight",
@@ -819,6 +874,14 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{
 					cond.targetDir = (RelativeInputDir)currentDirIdx;
 				}
+
+				break;
+			}
+			case TransitionConditionType::WindDashAttack:
+			{
+				ImGui::DragFloat("Thershold", &cond.threshold, 0.01f, 0.0f, 1000.0f);
+				break;
+			}
 			}
 
 			// 条件の反転チェックボックス
@@ -875,6 +938,17 @@ void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph&
 	ImGui::Begin("Node Properties (Animation Config)");
 	{
 		ImGui::Text(u8"ステート名: %s", selectedNode->StateName.c_str());
+		ImGui::Separator();
+
+		char assetBuf[128];
+		strncpy_s(assetBuf, selectedNode->assetName.c_str(), sizeof(assetBuf));
+
+		ImGui::Text(u8"再生アセット名（GLTF）：");
+		ImGui::SameLine();
+		if (ImGui::InputText(u8"##再生アセット名入力欄", assetBuf, sizeof(assetBuf)))
+		{
+			selectedNode->assetName = assetBuf;
+		}
 		ImGui::Separator();
 
 		// ノードの種類を切り替えるボタン

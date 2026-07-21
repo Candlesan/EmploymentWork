@@ -728,6 +728,46 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "State_Move"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 8192,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Attack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 8192,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Attack"
         }
     ],
     "nodes": [
@@ -761,7 +801,7 @@
             },
             "mixRate": 0.0,
             "position": [
-                3.0,
+                1.0,
                 -87.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",

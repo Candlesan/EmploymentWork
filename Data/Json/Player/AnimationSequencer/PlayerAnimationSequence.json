@@ -1,12 +1,14 @@
 {
     "animations": [
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Idle_Combat_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_Fast_Loop_Seq_0",
             "ranges": [],
@@ -26,18 +28,21 @@
             ]
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_F_0_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "State_Move",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
             "ranges": [
@@ -81,12 +86,14 @@
             ]
         },
         {
+            "assetName": "",
             "events": [],
             "name": "State_Avoid",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
             "ranges": [
@@ -130,6 +137,7 @@
             ]
         },
         {
+            "assetName": "",
             "events": [
                 {
                     "effectName": "",
@@ -191,12 +199,14 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "State_Attack",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [
                 {
                     "effectName": "",
@@ -258,12 +268,14 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Combo_Attack_05_03_Start_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Combo_Attack_05_03_Loop_Seq_0",
             "ranges": [
@@ -317,6 +329,7 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Combo_Attack_05_04_Seq_0",
             "ranges": [
@@ -410,18 +423,21 @@
             ]
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Skill_03_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "State_Magic",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [
                 {
                     "effectName": "",
@@ -460,18 +476,21 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_F_R_90_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_F_L_90_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Jump_Combat_Start_R_90_Seq_0",
             "ranges": [
@@ -502,6 +521,7 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Jump_Combat_Start_L_90_Seq_0",
             "ranges": [
@@ -532,24 +552,28 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_B_L_45_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Jump_Combat_Loop_0_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Jump_Combat_Stop_0_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Jump_Combat_Start_B_180_Seq_0",
             "ranges": [
@@ -580,6 +604,7 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Jump_Combat_Start_F_0_Seq_0",
             "ranges": [
@@ -610,6 +635,7 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Attack_01_01_Seq_0",
             "ranges": [
@@ -640,6 +666,7 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Attack_01_02_Seq_0",
             "ranges": [
@@ -670,6 +697,7 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_Air_F_0_Seq_0",
             "ranges": [],
@@ -689,6 +717,7 @@
             ]
         },
         {
+            "assetName": "",
             "events": [
                 {
                     "effectName": "",
@@ -750,45 +779,180 @@
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_B_180_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_B_R_45_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_R_90_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_B_180_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_B_R_45_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_F_R_45_Loop_Seq_0",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "AS_Run_Combat_F_L_45_Loop_Seq_0",
             "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "WindSpear_B",
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "DashAttack",
+                    "soundName": "",
+                    "time": 1.2833333015441895,
+                    "type": 0
+                }
+            ],
+            "name": "AS_Skill_02_01_Start_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Skill_02_01_Loop_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Skill_02_01_End_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 1.2833333015441895,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "Cancelable",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.6000000238418579
+                },
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.5587073564529419,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "InputBuffer",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": []
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "State_WindSpear",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "WindSpear_A",
+            "events": [],
+            "name": "WindSpear_A",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "Tap",
+            "events": [],
+            "name": "Tap",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+            "events": [],
+            "name": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.3333333432674408,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "DashAttack",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
             "speedKeys": []
         }
     ]

@@ -103,6 +103,9 @@ private:
 	void InputMove(float elapsedTime);
 	RelativeInputDir CalculateRelativeInputDir();
 
+	// ── 専用技 ──
+	void WindChargeAttack(float elapsedTime);
+
 	// ── ステートマシン・先行入力 ──
 	void UpdateStateTransitions(float elapsedTime);
 	void UpdateUpperBodyTransitions(float elapsedTime);
@@ -118,6 +121,8 @@ private:
 	void CalculationRootAndTip();
 	void CalculateSpineRotation(float elapsedTime);
 	AudioSource* GetOrLoadSound(const std::string& soundName);
+
+	AnimNode* FindNodeByName(const std::string& stateName);
 
 private:
 	// =========================================================================
@@ -175,10 +180,11 @@ private:
 	// ── 魔法 ──
 	MagicManager magicManager;
 	WindBladeMagic::WindBladeConfig config;
-	int level = 1;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 0.0f;
 	bool isMagicAttack = true;
+
+	float DashSpeed = 20.0f;
 
 	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
 	float previousAngleY = 0.0f;
@@ -199,6 +205,7 @@ private:
 	float dropEndT = 0.0f;
 	float justAvoidSlowTimer = 0.0f;
 	float lookAtWeight = 0.0f;
+	float WindDashAttackDistance = 0.0f;
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;

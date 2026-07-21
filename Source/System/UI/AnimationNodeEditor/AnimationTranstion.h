@@ -34,6 +34,8 @@ enum class TransitionConditionType
 	IsFalling,			// 落下中か
 
 	Always,				// 無条件
+
+	WindDashAttack,
 };
 
 enum class TransitionActionType
@@ -90,6 +92,8 @@ struct TransitionContext
 	float animLength;
 	float moveLength;
 	float enemyFromdistance;
+	float HoldTime;
+	float WindDashAttack;
 	int   buttonDown;
 	int   buttonHeld;
 	int   buttonUp;

@@ -1,0 +1,142 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 50.0,
+                    "type": 21
+                }
+            ],
+            "fromState": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Skill_02_01_End_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Skill_02_01_End_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 20
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Attack_Air_to_Floor_02_Loop_Seq_0"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -44.0,
+                73.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -44.0,
+                361.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -44.0,
+                169.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Skill_02_01_End_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Skill_02_01_End_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -44.0,
+                265.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}

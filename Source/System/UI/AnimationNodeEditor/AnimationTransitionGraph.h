@@ -16,6 +16,7 @@ enum class NodeType {
 struct AnimNode {
 	ed::NodeId nodeId;
 	std::string StateName; // 文字列に変える
+	std::string assetName; // シーケンサー用の文字列
 
 	NodeType type = NodeType::Animation;
 	std::string subGraphPath = "";

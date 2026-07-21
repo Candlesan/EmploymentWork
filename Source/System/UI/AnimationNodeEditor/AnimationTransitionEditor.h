@@ -36,4 +36,10 @@ private:
 
     // 今どのグラフの階層にいるかを記憶するスタック
     std::vector<int> graphStack;
+
+    // ImGuiの表示順を決める
+    struct ComboItem {
+        const char* label;
+        TransitionConditionType type;
+    };
 };

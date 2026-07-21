@@ -23,22 +23,25 @@ void AnimationSequencer::Update(const std::string& animName, float animTime)
 #if _DEBUG
     CheckAndReload();
 #endif
-    // アニメーションが切り替わったらリセット
-    if (animName != currentAnimName)
-    {
-        currentAnimName = animName;
-        prevAnimTime = 0.0f;
-        firedEvents.clear();
-        activeFlags.clear();
-        currentSpeed = 1.0f;
-    }
-
     // アニメーションデータを検索
     AnimationData* data = FindAnimationData(animName);
     if (!data)
     {
         prevAnimTime = animTime;
         return;
+    }
+
+    // データが空だったらanimNameを使うようにする
+    std::string realAnimName = data->assetName.empty() ? animName : data->assetName;
+
+    // アニメーションが切り替わったらリセット
+    if (animName != currentAnimName)
+    {
+        currentAnimName = realAnimName;
+        prevAnimTime = 0.0f;
+        firedEvents.clear();
+        activeFlags.clear();
+        currentSpeed = 1.0f;
     }
 
     // イベント判定（前フレームと今フレームの間を通過したか）
@@ -181,6 +184,7 @@ void AnimationSequencer::Save(const std::string& filepath)
     {
         nlohmann::json jAnim;
         jAnim["name"] = anim.name;
+        jAnim["assetName"] = anim.assetName;
 
         // Events
         jAnim["events"] = nlohmann::json::array();
@@ -253,6 +257,7 @@ void AnimationSequencer::Load(const std::string& filepath)
             {
                 AnimationData data;
                 data.name = jAnim.value("name", "");
+                data.assetName = jAnim.value("assetName", "");
 
                 // Events
                 if (jAnim.count("events") > 0)

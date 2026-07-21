@@ -156,7 +156,7 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			break;
 
 		case TransitionConditionType::ButtonHeld:
-			result = (ctx.buttonHeld & cond.buttonMask) != 0;
+			result = (ctx.HoldTime >= cond.threshold);
 			break;
 
 		case TransitionConditionType::IsGround:
@@ -202,6 +202,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.IsFalling;
 			break;
 
+		case TransitionConditionType::WindDashAttack:
+			result = (ctx.WindDashAttack >= cond.threshold);
+			break;
+
 		case TransitionConditionType::Always:
 			result = true;
 			break;
@@ -229,6 +233,7 @@ void AnimationTransitionGraph::Save(const std::string& path)
 	{
 		j["nodes"].push_back({
 			{"StateName", node.StateName},
+			{"assetName", node.assetName},
 			{"type", (int)node.type},
 			{"subGraphPath", node.subGraphPath},
 			{"position", {node.position.x, node.position.y}},
@@ -333,6 +338,7 @@ void AnimationTransitionGraph::Load(const std::string& path)
 			AddNode(stateName, { px, py });
 			AnimNode& newNode = nodes.back();
 
+			newNode.assetName = node.value("assetName", "");
 			newNode.type = (NodeType)node.value("type", 0);
 			newNode.subGraphPath = node.value("subGraphPath", "");
 			newNode.mixRate = node.value("mixRate", 0.0f);

@@ -8,11 +8,11 @@
             "colorR": 1.0,
             "conditions": [
                 {
-                    "buttonMask": 0,
+                    "buttonMask": 32768,
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 20
+                    "type": 3
                 }
             ],
             "fromState": "Entry",
@@ -66,11 +66,52 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 8192,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 1.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_WindSpear"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_WindSpear",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
         }
     ],
     "nodes": [
         {
             "StateName": "Entry",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
@@ -89,6 +130,7 @@
         },
         {
             "StateName": "Exit",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
@@ -107,6 +149,7 @@
         },
         {
             "StateName": "State_WindBlade",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
@@ -121,6 +164,25 @@
                 57.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_WindBlade.json",
+            "type": 1
+        },
+        {
+            "StateName": "State_WindSpear",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                33.0,
+                169.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_WindSpear.json",
             "type": 1
         }
     ]

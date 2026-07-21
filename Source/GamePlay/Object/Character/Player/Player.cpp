@@ -260,7 +260,8 @@ void Player::Update(float elapsedTime)
 	magicManager.Update(elapsedTime);
 
 	// シーケンサーとアニメーションの再生を同期させる
-	animSequence.Update(currentState, GetCurrentAnimationSeconds());
+	std::string targetSequenceName = isPreviewMode ? editingState : currentState;
+	animSequence.Update(targetSequenceName, GetCurrentAnimationSeconds());
 	SetBaseSpeed(animSequence.GetSpeed());
 
 	// アニメーション更新
@@ -288,12 +289,11 @@ void Player::Update(float elapsedTime)
 	UpdateWeaponAttachment("hand_r");
 }
 
-
 // 描画処理
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
 	renderer->Draw(ShaderId::PBR, player);
-	renderer->Draw(ShaderId::PBR, weapon.model); // 杖
+	renderer->Draw(ShaderId::PBR, weapon.model);
 
 	// 魔法描画
 	magicManager.Render(rc);
@@ -304,7 +304,6 @@ void Player::DrawGUI()
 {
 	ImGui::Begin(u8"プレイヤー");
 	{
-		ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
 
 		// パラメーター
 		if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
@@ -444,15 +443,26 @@ void Player::DrawGUI()
 				config.Load();
 			}
 
-			ImGui::Text(u8"(風の刃)");
-			ImGui::DragFloat(u8"威力 (Damage)", &config.damage, 0.1f);
-			ImGui::DragFloat(u8"弾速 (Speed)", &config.speed, 0.1f);
-			ImGui::DragFloat(u8"消滅までの寿命", &config.lifeTimer, 0.1f);
-			ImGui::DragFloat(u8"当たり判定の大きさ", &config.hitRadius, 0.1f);
-			ImGui::DragFloat(u8"エフェクトの大きさ", &config.scale, 0.1f);
-			ImGui::DragFloat3(u8"球が出る位置", &config.spawnOffset.x, 0.1f);
-			ImGui::DragFloat(u8"射出前の溜め時間", &config.waitTimer, 0.1f);
-			ImGui::DragFloat(u8"魔法のクールダウン", &coolDownValue, 0.1f);
+			{
+				ImGui::Text(u8"(風の刃)");
+				ImGui::DragFloat(u8"威力 (Damage)", &config.damage, 0.1f);
+				ImGui::DragFloat(u8"弾速 (Speed)", &config.speed, 0.1f);
+				ImGui::DragFloat(u8"消滅までの寿命", &config.lifeTimer, 0.1f);
+				ImGui::DragFloat(u8"当たり判定の大きさ", &config.hitRadius, 0.1f);
+				ImGui::DragFloat(u8"エフェクトの大きさ", &config.scale, 0.1f);
+				ImGui::DragFloat3(u8"球が出る位置", &config.spawnOffset.x, 0.1f);
+				ImGui::DragFloat(u8"射出前の溜め時間", &config.waitTimer, 0.1f);
+				ImGui::DragFloat(u8"魔法のクールダウン", &coolDownValue, 0.1f);
+			}
+
+			{
+				ImGui::Text(u8"(風の槍)");
+				{
+					ImGui::DragFloat(u8"突進した速度", &DashSpeed, 0.1f);
+					ImGui::Separator();
+					ImGui::Text(u8"突進した距離: %f.0", WindDashAttackDistance);
+				}
+			}
 		}
 
 		// アニメーション遷移状態
@@ -468,6 +478,8 @@ void Player::DrawGUI()
 			{
 				ImGui::Text(u8"現在の全身ステート: なし(または不明)");
 			}
+
+			ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
 		}
 
 		// 移動時の背骨の傾き
@@ -491,7 +503,13 @@ void Player::DrawGUI()
 	if (clickedNode != "")
 	{
 		editingState = clickedNode;
-		ChangeAnimationState(editingState);
+		AnimNode* node = FindNodeByName(editingState);
+		if (node)
+		{
+			// 本当のアニメーション名（WindSpear_B）を使ってモデルのアニメーションを再生！
+			std::string realAnimName = node->assetName.empty() ? node->config.animationName : node->assetName;
+			ChangeAnimationState(realAnimName);
+		}
 		isPreviewMode = true;
 		ImGui::SetWindowFocus("Player Sequencer");
 	}
@@ -523,9 +541,20 @@ void Player::DrawGUI()
 	}
 
 	std::string displayState = isPreviewMode ? editingState : currentState;
+
+	auto* animData = animSequence.FindAnimationData(displayState);
+	if (animData)
+	{
+		AnimNode* currentNode = FindNodeByName(displayState);
+		if (currentNode && !currentNode->assetName.empty())
+		{
+			animData->assetName = currentNode->assetName;
+		}
+	}
+
 	sequencerEditor.DrawEditor(
 		animSequence,
-		currentState,
+		displayState,
 		GetCurrentAnimationSeconds(),
 		GetCurrentAnimationLength()
 	);
@@ -928,6 +957,17 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
+	// 風の槍のチャージアタック時は通常移動をスキップする
+	if (animSequence.GetRange("DashAttack"))
+	{
+		WindChargeAttack(elapsedTime);
+		return;
+	}
+	else
+	{
+		WindDashAttackDistance = 0.0f;
+	}
+
 	std::string state = GetCurrentState();
 	bool isHybridState = (state.find("Avoid") != std::string::npos ||
 		state.find("Dash") != std::string::npos);
@@ -956,48 +996,6 @@ void Player::InputMove(float elapsedTime)
 	else
 	{
 		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-	}
-
-	// 魔法レベル切り替え
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
-	{
-		rbButtonHoldTime += elapsedTime;
-		bool rbHold = rbButtonHoldTime >= RB_THRESHOLD; // 長押し判定
-
-		if (rbHold)
-		{
-			// スティック入力値
-			float rx = gamePad.GetAxisRX();
-			float ry = gamePad.GetAxisRY();
-
-			// 0.5以上なら入力受付(デットゾーン)
-			float power = sqrt(rx * rx + ry * ry);
-			if (power > 0.5)
-			{
-				// 入力角度を決める
-				// アークタンジェントでラジアンを求める
-				float radians = atan2f(rx, ry);
-
-				// 度数法（0〜360度）に変換・補正する
-				float StickAngle = DirectX::XMConvertToDegrees(radians);
-				if (StickAngle < 0.0f) StickAngle += 360.0f;
-
-				// 補正された角度（0〜360）に合わせて3等分する
-
-				if (StickAngle >= 300.0f || StickAngle <= 60.0f)
-				{
-					level = 1; // 上
-				}
-				else if (StickAngle > 60.0f && StickAngle <= 180.0f)
-				{
-					level = 2; // 右下
-				}
-				else if (StickAngle > 180.0f && StickAngle < 300.0f)
-				{
-					level = 3; // 左下
-				}
-			}
-		}
 	}
 }
 
@@ -1066,6 +1064,24 @@ RelativeInputDir Player::CalculateRelativeInputDir()
 
 
 // =========================================================================
+//  専用技
+// =========================================================================
+
+// RBを長押ししたときの技変化（突進）
+void Player::WindChargeAttack(float elapsedTime)
+{
+	// プレイヤーの前方向を計算する
+	float s = sinf(angle.y);
+	float c = cosf(angle.y);
+
+	Move(s, c, DashSpeed);
+
+	float stepDistance = DashSpeed * elapsedTime;
+	WindDashAttackDistance += stepDistance;
+}
+
+
+// =========================================================================
 //  内部ヘルパー（ステートマシン）
 // =========================================================================
 
@@ -1088,7 +1104,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	std::string nextState = currentState;
 
 	// 親の割り込み処理
-	for (int i = 0; i < (int)activeGraphStack.size(); i++)
+	for (int i = (int)activeGraphStack.size() - 1; i >= 0; i--)
 	{
 		int gIdx = activeGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
@@ -1266,7 +1282,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	std::string nextState = currentOverlayState;
 
 	// 親の割り込み処理
-	for (int i = 0; i < (int)upperGraphStack.size(); i++)
+	for (int i = (int)upperGraphStack.size() - 1; i >= 0; i--)
 	{
 		int gIdx = upperGraphStack[i];
 		AnimationTransitionGraph* g = &transitionGraphs[gIdx];
@@ -1433,7 +1449,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 					// 最初のステートへ切り替え！
 					if (firstState != "")
 					{
-						ChangeAnimationState(firstState);
+						StartOverlayAnimation(firstState);
 						bufferedButton = 0; // サブグラフへ潜り込んだ時のリセット
 					}
 				}
@@ -1452,7 +1468,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 				}
 
 				// 最初のステートへ切り替え！
-				if (firstState != "") ChangeAnimationState(firstState);
+				if (firstState != "") StartOverlayAnimation(firstState);
 			}
 		}
 		else if (nextNode && nextNode->type == NodeType::Mix)
@@ -1515,6 +1531,15 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 
 	isGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
 
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
+	{
+		rbButtonHoldTime += elapsedTime; 
+	}
+	else
+	{
+		rbButtonHoldTime = 0.0f;
+	}
+
 	UpdateStateBehavior();
 
 	TransitionContext ctx;
@@ -1525,6 +1550,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.enemyFromdistance = enemyFromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
 	ctx.buttonHeld = gamePad.GetButton();
+	ctx.HoldTime = rbButtonHoldTime;
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.IsGround = IsGround();
 	ctx.isLockOn = (lockOnTargetPos != nullptr);
@@ -1534,6 +1560,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
 	ctx.inputDir = CalculateRelativeInputDir(); 
+	ctx.WindDashAttack = WindDashAttackDistance;
 
 	return ctx;
 }
@@ -1927,4 +1954,21 @@ AudioSource* Player::GetOrLoadSound(const std::string& soundName)
 		sounds[soundName] = nullptr;
 		return nullptr;
 	}
+}
+
+AnimNode* Player::FindNodeByName(const std::string& stateName)
+{
+	// Playerが持っているすべての遷移グラフ（transitionGraphs）から探す
+	for (auto& graph : transitionGraphs)
+	{
+		for (auto& node : graph.nodes)
+		{
+			// 名前（StateName）が一致するノードが見つかったらそのポインタを返す
+			if (node.StateName == stateName)
+			{
+				return &node;
+			}
+		}
+	}
+	return nullptr; // 見つからなかったら nullptr
 }
