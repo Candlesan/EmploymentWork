@@ -1,7 +1,7 @@
 #include "Compute_Particle.h"
 #include "System/Graphic/Graphics.h"
 
-Compute_Particle::Compute_Particle(ID3D11Device* device) 
+Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
 {
     //	総パーティクル数
     int num_particle = 100000;
@@ -9,6 +9,7 @@ Compute_Particle::Compute_Particle(ID3D11Device* device)
     D3D11_TEXTURE2D_DESC texture2d_desc;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view;
 
+    // デフォルトテクスチャの読み込み
     GpuResourceUtils::LoadTexture(device,
         "Data/Sprite/Particle/particle256x256.png",
         shader_resource_view.GetAddressOf(),
@@ -39,9 +40,9 @@ void Compute_Particle::Render(const RenderContext& rc)
     // サンプラーをセット
     ID3D11SamplerState* samplers[] =
     {
-        rc.renderState->GetSamplerState(SamplerState::PointClamp),
-        rc.renderState->GetSamplerState(SamplerState::LinearClamp),
-        rc.renderState->GetSamplerState(SamplerState::AnisotropicClamp)
+        rc.renderState->GetSamplerState(SamplerState::PointWrap),
+        rc.renderState->GetSamplerState(SamplerState::LinearWrap),
+        rc.renderState->GetSamplerState(SamplerState::AnisotropicWrap)
     };
     dc->PSSetSamplers(0, 3, samplers);
 
@@ -62,6 +63,9 @@ void Compute_Particle::Render(const RenderContext& rc)
     dc->OMSetDepthStencilState(
         rc.renderState->GetDepthStencilState(DepthState::TestOnly),
         0);
+    //dc->OMSetDepthStencilState(
+    //    nullptr,
+    //    0);
 
     dc->OMSetBlendState(
         rc.renderState->GetBlendState(BlendState::Additive), // 加算ブレンド
@@ -79,4 +83,32 @@ void Compute_Particle::Render(const RenderContext& rc)
         rc.renderState->GetBlendState(BlendState::Opaque),
         nullptr, 0xFFFFFFFF);
 
+}
+
+bool Compute_Particle::SetTexture(const std::string& texturePath, DirectX::XMUINT2 splitCount)
+{
+    if (!device || texturePath.empty()) return false;
+
+    D3D11_TEXTURE2D_DESC texture2d_desc;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+
+    try
+    {
+        // 画像を読み込む
+        HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+        if (FAILED(hr)) return false;
+    }
+    catch (...)
+    {
+        return false; // パスがおかしいときにクラッシュしないようにする
+    }
+
+
+    // システム側のSRVを上書き
+    if (system)
+    {
+        system->set_texture(srv, splitCount);
+    }
+
+    return true;
 }

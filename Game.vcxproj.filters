@@ -205,6 +205,9 @@
     <Filter Include="Shader\Bloom">
       <UniqueIdentifier>{f3542b1e-f6b8-46ee-a6d8-224807238f83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\UI\EffectEditor">
+      <UniqueIdentifier>{5d591b14-53ae-43e3-8430-5f74daa3a54e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -492,6 +495,12 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicInfor.h">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\UI\EffectEditor\EffectConfig.h">
+      <Filter>Source\System\UI\EffectEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\EffectEditor\EffectEditor.h">
+      <Filter>Source\System\UI\EffectEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -736,6 +745,12 @@
     </ClCompile>
     <ClCompile Include="External\SphereCast\Include\SphereCast.cpp">
       <Filter>External\SphereCast</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\EffectEditor\EffectEditor.cpp">
+      <Filter>Source\System\UI\EffectEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\EffectEditor\EffectConfig.cpp">
+      <Filter>Source\System\UI\EffectEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

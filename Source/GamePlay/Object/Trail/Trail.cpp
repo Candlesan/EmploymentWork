@@ -8,7 +8,7 @@
 void Trail::Initialize()
 {
 	// デバイス取得
-	ID3D11Device* device = Graphics::Instance().GetDevice();
+	device = Graphics::Instance().GetDevice();
 
 	HRESULT hr = S_OK;
 	// 頂点バッファの生成
@@ -193,4 +193,29 @@ void Trail::Render(const RenderContext& rc)
 	dc->OMSetBlendState(
 		rc.renderState->GetBlendState(BlendState::Opaque),
 		nullptr, 0xFFFFFFFF);
+}
+
+bool Trail::SetTexture(const std::string& texturePath)
+{
+	if (!device || texturePath.empty()) return false;
+
+	D3D11_TEXTURE2D_DESC texture2d_desc;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+
+	try
+	{
+		// 画像を読み込む
+		HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+		if (FAILED(hr)) return false;
+	}
+	catch (...)
+	{
+		return false; // パスがおかしいときにクラッシュしないようにする
+	}
+
+
+	// SRVを上書き
+	shaderResourceView = srv;
+
+	return true;
 }

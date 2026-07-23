@@ -72,19 +72,37 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         return;
     }
 
-    //  速度更新
-    data.velocity.xyz += data.acceleration.xyz * elapsed_time;
+    // --- 位置 ---
+    // 速度更新
+    data.posVelocity.xyz += data.posAcceleration.xyz * elapsed_time;
 
-    //  位置更新
-    data.position.xyz += data.velocity.xyz * elapsed_time;
+    // 位置更新
+    data.position.xyz += data.posVelocity.xyz * elapsed_time;
+    
+    // --- 回転 ---
+    // 角速度更新
+    data.rotVelocity.xyz += data.rotAcceleration.xyz * elapsed_time;
 
-    //  切り取り座標を算出
-    uint type = (uint) (data.parameter.x + 0.5f);
-    float w = 1.0 / texture_split_count.x;
-    float h = 1.0 / texture_split_count.y;
-    float2 uv = float2((type % texture_split_count.x) * w, (type / texture_split_count.x) * h);
-    data.texcoord.xy = uv;
-    data.texcoord.zw = float2(w, h);
+    // 回転更新
+    data.rotation.xyz += data.rotVelocity.xyz * elapsed_time;
+
+    // 拡大
+    // 拡大速度更新
+    data.scaleVelocity.xyz += data.scaleAcceleration.xyz * elapsed_time;
+
+    // 拡大更新
+    data.scale.xyz += data.scaleVelocity.xyz * elapsed_time;
+
+
+    ////  切り取り座標を算出
+    //uint type = (uint) (data.parameter.x + 0.5f);
+    //float w = 1.0 / texture_split_count.x;
+    //float h = 1.0 / texture_split_count.y;
+    //float2 uv = float2((type % texture_split_count.x) * w, (type / texture_split_count.x) * h);
+    //data.texcoord.xy = uv;
+    //data.texcoord.zw = float2(w, h);
+    
+    data.texcoord.xy += data.parameter.zw * elapsed_time;
         
     //  徐々に透明にしていく
     data.color.a = saturate(data.parameter.y);

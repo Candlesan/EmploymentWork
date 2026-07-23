@@ -102,15 +102,30 @@ void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
 
     //  生存していない場合はスケールを0にしておく
     float3 scale = !is_alive ? float3(0, 0, 0) : particle_data_buffer[vertex_id].scale.xyz;
-
-    //  ビルボード行列生成(ビュー行列の逆行列で良い。ただし移動値はいらない)
-    float4x4 billboard_matrix = inverseView;
-    billboard_matrix._41_42_43 = float3(0, 0, 0);
-    billboard_matrix._44 = 1.0f;
+    
+    float4x4 base_matrix;
+    
+    // wにいれたフラグが0.5f以上ならビルボードする
+    if (particle_data_buffer[vertex_id].rotation.w > 0.5f)
+    {
+        //  ビルボード行列生成(ビュー行列の逆行列で良い。ただし移動値はいらない)
+        base_matrix = inverseView;
+        base_matrix._41_42_43 = float3(0, 0, 0);
+        base_matrix._44 = 1.0f;
+    }
+    else
+    {
+        // ビルボードをしないのであれば単位行列
+        base_matrix = float4x4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+    }
 
 	//  ワールド行列生成
     float4x4 scale_matrix = matrix_scaling(scale);
-    float4x4 rotation_matrix = mul(billboard_matrix, matrix_rotation_roll_pitch_yaw(particle_data_buffer[vertex_id].rotation.xyz));
+    float4x4 rotation_matrix = mul(base_matrix, matrix_rotation_roll_pitch_yaw(particle_data_buffer[vertex_id].rotation.xyz));
     float4x4 translation_matrix = matrix_translation(particle_data_buffer[vertex_id].position.xyz);
     float4x4 world_matrix = mul(mul(scale_matrix, rotation_matrix), translation_matrix);
     float4x4 world_view_projection_matrix = mul(world_matrix, viewProjection);

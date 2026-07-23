@@ -14,6 +14,7 @@
 #include "System/Renderer/Shader/fullscreen_quad/fullscreen_quad.h"
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
 #include "System/Renderer/Shader/bloom/bloom.h"
+#include "System/UI/EffectEditor/EffectEditor.h"
 
 
 // ゲームシーン
@@ -106,4 +107,7 @@ private:
 	// コリジョンマネージャー
 	CollisionManager collisonManager;
 	bool showDebugSphere = false;
+
+	std::unique_ptr<EffectEditor> effectEditor;
+	bool showVfxEditor = false;
 };

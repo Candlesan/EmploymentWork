@@ -8,12 +8,18 @@ struct emit_particle_data
 {
     float4 parameter; // x : パーティクル処理タイプ, y : 生存時間, zw : 空き
 
-    float4 position; // 生成座標
-    float4 rotation; // 拡縮情報
-    float4 scale; // 回転情報
+    float4 position;          // 生成座標
+    float4 rotation;          // 拡縮情報
+    float4 scale;             // 回転情報
 
-    float4 velocity; // 初速
-    float4 acceleration; // 加速度
+    float4 posVelocity;       // 位置の初速
+    float4 posAcceleration;   // 位置の加速度
+    
+    float4 rotVelocity;       // 回転の初速
+    float4 rotAcceleration;   // 回転の加速度
+    
+    float4 scaleVelocity;     // 拡大の初速
+    float4 scaleAcceleration; // 拡大の加速度
     
     float4 color; // 色情報
 };
@@ -27,10 +33,16 @@ struct particle_data
     float4 rotation; // 回転情報
     float4 scale; // 拡縮情報
 
-    float4 velocity; // 初速
-    float4 acceleration; // 加速度
+    float4 posVelocity; // 位置の初速
+    float4 posAcceleration; // 位置の加速度
 
-    float4 texcoord; //  UV座標
+    float4 rotVelocity; // 回転の初速
+    float4 rotAcceleration; // 回転の加速度
+
+    float4 scaleVelocity; // 拡大の初速
+    float4 scaleAcceleration; // 拡大の加速度
+
+    float4 texcoord; // UV座標
     float4 color; // 色情報
 };
 

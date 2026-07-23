@@ -21,12 +21,17 @@ public:
         DirectX::XMFLOAT4 parameter; // x : パーティクル処理タイプ,y：生存時間,zw：空き
 
         DirectX::XMFLOAT4 position = { 0, 0, 0, 0 }; // 生成座標
-        DirectX::XMFLOAT4 rotation = { 0, 0, 0, 0 }; // 拡縮情報
-        DirectX::XMFLOAT4 scale = { 1, 1, 1, 0 }; // 回転情報
+        DirectX::XMFLOAT4 rotation = { 0, 0, 0, 0 };// 回転情報
+        DirectX::XMFLOAT4 scale = { 1, 1, 1, 0 }; // 拡縮情報 
 
+        DirectX::XMFLOAT4 posVelocity = { 0, 0, 0, 0 };     // 位置の初速
+        DirectX::XMFLOAT4 posAcceleration = { 0, 0, 0, 0 }; // 位置の加速度
 
-        DirectX::XMFLOAT4 velocity = { 0, 0, 0, 0 }; // 初速
-        DirectX::XMFLOAT4 acceleration = { 0, 0, 0, 0 }; // 加速度
+        DirectX::XMFLOAT4 rotVelocity = { 0, 0, 0, 0 };     // 回転初速
+        DirectX::XMFLOAT4 rotAcceleration = { 0, 0, 0, 0 }; // 回転加速度
+
+        DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // 拡大の初速
+        DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
 
         DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // 色情報
 
@@ -42,8 +47,14 @@ public:
         DirectX::XMFLOAT4 rotation; // 拡縮情報
         DirectX::XMFLOAT4 scale; // 回転情報
 
-        DirectX::XMFLOAT4 velocity; // 初速
-        DirectX::XMFLOAT4 acceleration; // 加速度
+        DirectX::XMFLOAT4 posVelocity = { 0, 0, 0, 0 };     // 位置の初速
+        DirectX::XMFLOAT4 posAcceleration = { 0, 0, 0, 0 }; // 位置の加速度
+
+        DirectX::XMFLOAT4 rotVelocity = { 0, 0, 0, 0 };     // 回転初速
+        DirectX::XMFLOAT4 rotAcceleration = { 0, 0, 0, 0 }; // 回転加速度
+
+        DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // 拡大の初速
+        DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
 
         DirectX::XMFLOAT4 texcoord; // UV座標
         DirectX::XMFLOAT4 color; // 色情報
@@ -135,6 +146,12 @@ public:
     void update(ID3D11DeviceContext* immdiate_context, float elapsedtime);
     void render(ID3D11DeviceContext* immdiate_context);
 
+    // ゲッターセッター
+    void set_texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, DirectX::XMUINT2 split_count = { 1, 1 })
+    {
+        shader_resource_view = srv;
+        texture_split_count = split_count;
+    }
 private:
     UINT num_particles;
     UINT num_emit_particles;

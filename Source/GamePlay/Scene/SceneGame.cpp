@@ -90,10 +90,14 @@ void SceneGame::Initialize()
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
 
-	// パーティクル生成
-	particleManager = std::make_unique<Compute_Particle>(device);
+	//// パーティクル生成
+	//particleManager = std::make_unique<Compute_Particle>(device);
 
 	Load("Data/Model/Json/Material/Player/player_material.json", &player);
+
+	// エフェクトエディター初期化
+	effectEditor = std::make_unique<EffectEditor>();
+	effectEditor->Initialize(device);
 }
 
 // 終了化
@@ -150,7 +154,6 @@ void SceneGame::Update(float elapsedTime)
 	// プレイヤーを取得
 	Player& player = Player::Instance();
 
-
 	// GUIの操作でゲーム用とデバック用のカメラを切り替え
 	if (cameraMode == CameraMode::Game)
 	{
@@ -196,65 +199,39 @@ void SceneGame::Update(float elapsedTime)
 		// 当たり判定更新
 		collisonManager.Update(player, *enemy);
 
-		// Xキーを押した瞬間に降雪エフェクトを発生させる
-		if (GetAsyncKeyState('P') & 0x8000)
-		{
-			DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3((rand() % 30 - 15) * 0.1f, (rand() % 30 * 0.1f + 1) + 10.0f, (rand() % 30 - 15) * 0.1f + 3);
-			int max = 100;
-			for (int i = 0; i < max; i++)
-			{
-				//	発生位置
-				DirectX::XMFLOAT3 p = { 0,0,0 };
-				p.x = pos.x + (rand() % 10001 - 5000) * 0.01f;
-				p.y = pos.y;
-				p.z = pos.z + (rand() % 10001 - 5000) * 0.01f;
-				//	発生方向
-				DirectX::XMFLOAT3 v = { 0,0,0 };
-				v.y = -(rand() % 10001) * 0.0002f - 0.002f;
-				//	力
-				DirectX::XMFLOAT3 f = { 0,0,0 };
-				f.x = (rand() % 10001) * 0.00001f + 0.1f;
-				f.z = (rand() % 10001 - 5000) * 0.00001f;
-				//	大きさ
-				DirectX::XMFLOAT2 s = { .2f,.2f };
-
-				// 発生させるパーティクルのパラメータを設定
-				compute_particle_system::emit_particle_data data;
-
-				//	更新タイプ
-				data.parameter.x = 12;
-				data.parameter.y = 5.0f;
-				//	発生位置
-				data.position.x = p.x;
-				data.position.y = p.y;
-				data.position.z = p.z;
-				//	発生方向
-				data.velocity.x = v.x;
-				data.velocity.y = v.y;
-				data.velocity.z = v.z;
-				//	加速力
-				data.acceleration.x = f.x;
-				data.acceleration.y = f.y;
-				data.acceleration.z = f.z;
-				//	大きさ
-				data.scale.x = s.x;
-				data.scale.y = s.y;
-				data.scale.z = 0.0f;
-
-				if (particleManager)
-				{
-					particleManager->Emit(data);
-				}
-			}
+		// F2でエディターの表示をON/OFF
+		static bool wasF2DownLastFrame = false;
+		bool f2Down = (GetAsyncKeyState(VK_F2) & 0x8000) != 0;
+		if (f2Down && !wasF2DownLastFrame) {
+			showVfxEditor = !showVfxEditor;
 		}
+		wasF2DownLastFrame = f2Down;
 
-		// パーティクルシステム自体の更新（これは毎フレーム必ず呼ぶ）
-		if (particleManager)
-		{
-			// デバイスコンテキストを取得して渡す（プロジェクトの仕様に合わせてな）
-			ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
-			particleManager->Update(dc, elapsedTime);
-		}
+		// エフェクトエディターの更新
+		effectEditor->Update(Graphics::Instance().GetDeviceContext(), elapsedTime);
+
+		//// Xキーを押した瞬間に降雪エフェクトを発生させる
+		//if (GetAsyncKeyState('P') & 0x8000)
+		//{
+		//	DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3((rand() % 30 - 15) * 0.1f, (rand() % 30 * 0.1f + 1) + 10.0f, (rand() % 30 - 15) * 0.1f + 3);
+		//	int max = 100;
+		//	for (int i = 0; i < max; i++)
+		//	{
+		//		//	発生位置
+		//		DirectX::XMFLOAT3 p = { 0,0,0 };
+		//		p.x = pos.x + (rand() % 10001 - 5000) * 0.01f;
+		//		p.y = pos.y;
+		//		p.z = pos.z + (rand() % 10001 - 5000) * 0.01f;
+		//		//	発生方向
+		//		DirectX::XMFLOAT3 v = { 0,0,0 };
+		//		v.y = -(rand() % 10001) * 0.0002f - 0.002f;
+		//		//	力
+		//		DirectX::XMFLOAT3 f = { 0,0,0 };
+		//		f.x = (rand() % 10001) * 0.00001f + 0.1f;
+		//		f.z = (rand() % 10001 - 5000) * 0.00001f;
+		//		//	大きさ
+		//		DirectX::XMFLOAT2 s = { .2f,.2f };
+
 
 		// エフェクト更新処理 
 		EffectManager::Instance().Update(delta);
@@ -311,15 +288,21 @@ void SceneGame::Render()
 	// デバック描画
 	{
 		bool showPlayerWeapon = false;
-		for (auto& data : player.GetAnimSequence().GetAnimations()) {
-			if (data.name == player.GetCurrentState()) {
-				for (auto& r : data.ranges) {
-					if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
-						showPlayerWeapon = true;
-						break;
+
+		// アニメーションリストを取得し、空でなければ処理する！
+		const auto& animations = player.GetAnimSequence().GetAnimations();
+		if (!animations.empty())
+		{
+			for (const auto& data : animations) {
+				if (data.name == player.GetCurrentState()) {
+					for (const auto& r : data.ranges) {
+						if (r.isHitBox && player.GetAnimSequence().GetRange(r.name)) {
+							showPlayerWeapon = true;
+							break;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 
@@ -340,6 +323,7 @@ void SceneGame::Render()
 		// エネミー描画
 		enemy->Render(rc, modelRenderer);
 
+
 		framebuffers[0]->clear(dc);
 		framebuffers[0]->activate(dc);
 
@@ -358,6 +342,8 @@ void SceneGame::Render()
 
 		// シェイプレンダラ描画
 		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
+
+		effectEditor->Render(rc, modelRenderer);
 
 		framebuffers[0]->deactivate(dc);
 
@@ -385,7 +371,7 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
-		particleManager->Render(rc);
+		//particleManager->Render(rc);
 	}
 }
 
@@ -642,6 +628,11 @@ void SceneGame::DrawGUI()
 		ImGui::Checkbox(u8"ジャスト回避テスト用の球を配置", &showDebugSphere);
 	}
 	ImGui::End();
+
+	if (showVfxEditor)
+	{
+		effectEditor->DrawGUI();
+	}
 
 	player.DrawGUI();
 	enemy->DrawGUI();

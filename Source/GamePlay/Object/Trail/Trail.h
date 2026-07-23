@@ -3,6 +3,7 @@
 
 #include <DirectXMath.h>
 #include <wrl.h>
+#include <string>
 
 class Trail
 {
@@ -15,6 +16,10 @@ public:
 
 	// 描画処理
 	void Render(const RenderContext& rc);
+
+	// ゲッターセッター
+	bool SetTexture(const std::string& texturePath);
+	void SetColor(DirectX::XMFLOAT4 c) { color = c; }
 private:
 	// シーン定数バッファ
 	struct CBScene
@@ -45,4 +50,6 @@ private:
 	DirectX::XMFLOAT3 trailPositions[2][MAX_POLYGON];
 	bool spline;
 	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
+
+	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 #include "GamePlay/Object/Particle/compute_particle_system.h"
 #include "System/Graphic/RenderContext.h"
 
@@ -20,7 +21,12 @@ public:
 	void Emit(const compute_particle_system::emit_particle_data& data) {
 		if (system) system->emit(data);
 	}
+
+	// ゲッターセッター
+	bool SetTexture(const std::string& texturePath, DirectX::XMUINT2 splitCount = { 1, 1 });
 private:
+	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
+
 	// シーン定数バッファ
 	struct CBScene
 	{
