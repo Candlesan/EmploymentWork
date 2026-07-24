@@ -178,6 +178,7 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
             // Trailクラスに過去座標として記録させる
             if (trailRenderer)
             {
+                trailRenderer->SetWidthScales(node.trail.widthStart, node.trail.widthMiddle, node.trail.widthEnd);
                 trailRenderer->Update(root, tip);
             }
 
@@ -452,12 +453,22 @@ void EffectEditor::DrawTrailInspector(TrailConfig& trailConfig)
         }
     }
     ImGui::SameLine();
-    ImGui::Text(u8"Mesh: %s", trailConfig.texturePath.c_str());
+    ImGui::Text(u8": %s", trailConfig.texturePath.c_str());
     ImGui::Separator();
 
     ImGui::DragFloat(u8"寿命##Trail", &trailConfig.lifeTime, 0.05f, 0.1f, 10.0f);
     ImGui::DragFloat(u8"発生遅延(秒)##Trail", &trailConfig.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
+    ImGui::Separator();
+
     ImGui::DragFloat(u8"幅(太さ)##Trail", &trailConfig.width, 0.1f);
+    ImGui::Separator();
+
+    ImGui::Text(u8"【幅スケール (形状)】");
+    ImGui::DragFloat(u8"先端(頭)##Trail", &trailConfig.widthStart, 0.01f, 0.0f, 5.0f, "%.2f");
+    ImGui::DragFloat(u8"中央##Trail", &trailConfig.widthMiddle, 0.01f, 0.0f, 5.0f, "%.2f");
+    ImGui::DragFloat(u8"末端(尻)##Trail", &trailConfig.widthEnd, 0.01f, 0.0f, 5.0f, "%.2f");
+    ImGui::Separator();
+
     if (ImGui::ColorEdit4(u8"色##Trail", &trailConfig.color.x))
     {
         if (trailRenderer)

@@ -140,11 +140,37 @@ void Trail::Render(const RenderContext& rc)
 	{
 		float uvV = (float)i / (MAX_POLYGON - 1); // 0が新しい端、1が古い端
 
+		// uvV(0.0～1,0)の位置に応じて前・中・後ろの倍率を補間計算
+		float scale = 1.0f;
+		if (uvV < 0.5f)
+		{
+			// 前半: widthStart -> widthMiddle への変化
+			scale = widthStart + (widthMiddle - widthStart) * (uvV * 2.0f);
+		}
+		else
+		{
+			// 後半: widthMiddle -> widthEnd への変化
+			scale = widthMiddle + (widthEnd - widthMiddle) * ((uvV * 0.5f) * 2.0f);
+		}
+
+		// 根本と先端の元座標を取得
+		DirectX::XMVECTOR pRoot = DirectX::XMLoadFloat3(&trailPositions[0][i]);
+		DirectX::XMVECTOR pTip = DirectX::XMLoadFloat3(&trailPositions[1][i]);
+
+		// 根本から先端へ向かうベクトルを計算
+		DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(pTip, pRoot);
+
+		// 太さベクトルに計算した倍率を掛けて、新しい先端座標を求める！
+		DirectX::XMVECTOR newTip = DirectX::XMVectorAdd(pRoot, DirectX::XMVectorScale(dir, scale));
+
+		DirectX::XMFLOAT3 finalTip;
+		DirectX::XMStoreFloat3(&finalTip, newTip);
+
 		v[i * 2 + 0].position = trailPositions[0][i]; // 根本
 		v[i * 2 + 0].color = color;
 		v[i * 2 + 0].texcoord = { uvV, 0.0f };
 
-		v[i * 2 + 1].position = trailPositions[1][i]; // 根本
+		v[i * 2 + 1].position = finalTip; // 根本
 		v[i * 2 + 1].color = color;
 		v[i * 2 + 1].texcoord = { uvV, 1.0f };
 	}

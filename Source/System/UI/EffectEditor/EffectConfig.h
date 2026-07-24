@@ -70,6 +70,12 @@ struct TrailConfig
 {
 	std::string texturePath = "";
 	float width = 1.0f;
+
+	float widthStart  = 1.0f; // æ’[
+	float widthMiddle = 1.0f; // ’†‰›
+	float widthEnd    = 0.0f; // ––’[
+
+
 	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	float lifeTime = 1.0f;
 	float delayTime = 0.0f;

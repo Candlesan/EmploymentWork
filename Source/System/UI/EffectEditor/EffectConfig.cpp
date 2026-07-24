@@ -77,6 +77,9 @@ void EffectConfig::Save(const std::string& filePath)
         // --- ÉgÉåÉCÉãê›íË ---
         nodeJson["trail"]["texturePath"] = node.trail.texturePath;
         nodeJson["trail"]["width"] = node.trail.width;
+        nodeJson["trail"]["widthStart"] = node.trail.widthStart;
+        nodeJson["trail"]["widthMiddle"] = node.trail.widthMiddle;
+        nodeJson["trail"]["widthEnd"] = node.trail.widthEnd;
         nodeJson["trail"]["color"] = { node.trail.color.x, node.trail.color.y, node.trail.color.z, node.trail.color.w };
         nodeJson["trail"]["lifeTime"] = node.trail.lifeTime;
         nodeJson["trail"]["delayTime"] = node.trail.delayTime;
@@ -192,6 +195,9 @@ void EffectConfig::Load(const std::string& filePath)
                     const auto& t = nodeJson["trail"];
                     node.trail.texturePath = t.value("texturePath", "Data/Sprite/Trail/T_TrailMask_09.png");
                     node.trail.width = t.value("width", 1.0f);
+                    node.trail.widthStart = t.value("widthStart", 1.0f);
+                    node.trail.widthMiddle = t.value("widthMiddle", 1.0f);
+                    node.trail.widthEnd = t.value("widthEnd", 0.0f);
                     node.trail.lifeTime = t.value("lifeTime", 1.0f);
                     node.trail.delayTime = t.value("delayTime", 0.0f);
 

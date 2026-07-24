@@ -20,6 +20,13 @@ public:
 	// ゲッターセッター
 	bool SetTexture(const std::string& texturePath);
 	void SetColor(DirectX::XMFLOAT4 c) { color = c; }
+
+	// 前・中・後ろの倍率をセットする関数
+	void SetWidthScales(float start, float middle, float end) {
+		widthStart = start;
+		widthMiddle = middle;
+		widthEnd = end;
+	}
 private:
 	// シーン定数バッファ
 	struct CBScene
@@ -52,4 +59,9 @@ private:
 	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
 
 	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
+
+	// 倍率を保持する変数
+	float widthStart = 1.0f;
+	float widthMiddle = 1.0f;
+	float widthEnd = 0.0f;
 };
