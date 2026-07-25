@@ -67,12 +67,18 @@ void EffectConfig::Save(const std::string& filePath)
 
         // --- メッシュVFX設定 ---
         nodeJson["meshVfx"]["meshPath"] = node.meshVfx.meshPath;
+        nodeJson["meshVfx"]["texturePath"] = node.meshVfx.texturePath;
+        nodeJson["meshVfx"]["noisePath"] = node.meshVfx.noisePath;
+        nodeJson["meshVfx"]["uvScrollSpeed"] = { node.meshVfx.uvScrollSpeed.x, node.meshVfx.uvScrollSpeed.y };
         nodeJson["meshVfx"]["useMesh"] = node.meshVfx.useMesh;
         nodeJson["meshVfx"]["scale"] = { node.meshVfx.scale.x, node.meshVfx.scale.y };
         nodeJson["meshVfx"]["rotationSpeed"] = { node.meshVfx.rotationSpeed.x, node.meshVfx.rotationSpeed.y, node.meshVfx.rotationSpeed.z };
         nodeJson["meshVfx"]["color"] = { node.meshVfx.color.x, node.meshVfx.color.y, node.meshVfx.color.z, node.meshVfx.color.w };
+        nodeJson["meshVfx"]["noiseUvOffset"] = { node.meshVfx.noiseUvOffset.x, node.meshVfx.noiseUvOffset.y};
+        nodeJson["meshVfx"]["distortionPower"] = node.meshVfx.distortionPower;
         nodeJson["meshVfx"]["lifeTime"] = node.meshVfx.lifeTime;
         nodeJson["meshVfx"]["delayTime"] = node.meshVfx.delayTime;
+        nodeJson["meshVfx"]["blendMode"] = node.meshVfx.blendMode;
 
         // --- トレイル設定 ---
         nodeJson["trail"]["texturePath"] = node.trail.texturePath;
@@ -180,12 +186,18 @@ void EffectConfig::Load(const std::string& filePath)
                 {
                     const auto& m = nodeJson["meshVfx"];
                     node.meshVfx.meshPath = m.value("meshPath", "");
+                    node.meshVfx.texturePath = m.value("noisePath", "");
+                    node.meshVfx.noisePath = m.value("texturePath", "");
                     node.meshVfx.useMesh = m.value("useMesh", false);
                     node.meshVfx.lifeTime = m.value("lifeTime", 1.0f);
                     node.meshVfx.delayTime = m.value("delayTime", 0.0f);
+                    node.meshVfx.distortionPower = m.value("distortionPower", 0.0f);
+                    node.meshVfx.blendMode = m.value("blendMode", 0.0f);
 
+                    if (m.find("uvScrollSpeed") != m.end()) node.meshVfx.uvScrollSpeed = { m["uvScrollSpeed"][0], m["uvScrollSpeed"][1] };
+                    if (m.find("noiseUvOffset") != m.end()) node.meshVfx.noiseUvOffset = { m["noiseUvOffset"][0], m["noiseUvOffset"][1] };
                     if (m.find("color") != m.end()) node.meshVfx.color = { m["color"][0], m["color"][1], m["color"][2], m["color"][3] };
-                    if (m.find("scale") != m.end()) node.meshVfx.scale = { m["scale"][0], m["scale"][1] };
+                    if (m.find("scale") != m.end()) node.meshVfx.scale = { m["scale"][0], m["scale"][1], m["scale"][2] };
                     if (m.find("rotationSpeed") != m.end()) node.meshVfx.rotationSpeed = { m["rotationSpeed"][0], m["rotationSpeed"][1], m["rotationSpeed"][2] };
                 }
 

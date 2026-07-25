@@ -11,7 +11,7 @@ Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
 
     // デフォルトテクスチャの読み込み
     GpuResourceUtils::LoadTexture(device,
-        "Data/Sprite/Particle/particle256x256.png",
+        "Data/Sprite/Particle/texture/particle256x256.png",
         shader_resource_view.GetAddressOf(),
         &texture2d_desc);
 

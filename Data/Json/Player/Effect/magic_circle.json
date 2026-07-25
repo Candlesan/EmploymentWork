@@ -131,7 +131,7 @@
                     1
                 ],
                 "spriteType": 0,
-                "texturePath": "Data\\Sprite\\Particle\\mc_white.png",
+                "texturePath": "Data\\Sprite\\Particle\\texture\\mc_white.png",
                 "uvScrollSpeed": [
                     0.0,
                     0.0

@@ -1,6 +1,7 @@
 #include "EffectEditor.h"
 #include "System/UI/Dialog.h"
 #include "System/Graphic/Graphics.h"
+#include "System/Renderer/Shader/meshVFX/meshVFX.h"
 #include <imgui.h>
 #include <ctime>
 #include <cstdlib>
@@ -135,22 +136,25 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 
             currentMeshTime += elapsedTime;
 
-            // Scale: XとYの設定しかないため、幅と奥行き(XとZ)を均等に拡縮する
-            DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.meshVfx.scale.x, node.meshVfx.scale.y, node.meshVfx.scale.x);
+            if (vfxMeshModel)
+            {
+                // Scale: XとYの設定しかないため、幅と奥行き(XとZ)を均等に拡縮する
+                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.meshVfx.scale.x, node.meshVfx.scale.y, node.meshVfx.scale.z);
 
-            // Rotation: 回転スピード × 経過時間 で自転させる
-            float rx = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.x * currentMeshTime);
-            float ry = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.y * currentMeshTime);
-            float rz = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.z * currentMeshTime);
-            DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(rx, ry, rz);
+                // Rotation: 回転スピード × 経過時間 で自転させる
+                float rx = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.x * currentMeshTime);
+                float ry = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.y * currentMeshTime);
+                float rz = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.z * currentMeshTime);
+                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(rx, ry, rz);
 
-            // Translation: テスト発生位置
-            DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(testSpawnPos.x, testSpawnPos.y, testSpawnPos.z);
+                // Translation: テスト発生位置
+                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(testSpawnPos.x, testSpawnPos.y, testSpawnPos.z);
 
-            // トランスフォーム行列を合成してモデルに適用
-            DirectX::XMFLOAT4X4 worldTransform;
-            DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
-            vfxMeshModel->UpdateTransform(worldTransform);
+                // トランスフォーム行列を合成してモデルに適用
+                DirectX::XMFLOAT4X4 worldTransform;
+                DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
+                vfxMeshModel->UpdateTransform(worldTransform);
+            }
         }
         // トレイルの処理
         else if (node.type == EffectNodeType::Trail)
@@ -221,26 +225,78 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 // 描画処理
 void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
 {
-    // メッシュVFXの描画登録
-    if (isPlaying && currentConfig.nodes[selectedNodeIndex].meshVfx.useMesh && vfxMeshModel)
+    if (isPlaying)
     {
-        // 寿命が来るまで描画
-        if (currentMeshTime <= currentConfig.nodes[selectedNodeIndex].meshVfx.lifeTime)
+        for (const auto& node : currentConfig.nodes)
         {
-            modelRenderer->Draw(ShaderId::PBR, vfxMeshModel);
-        }
-    }
+            if (!node.visible) continue;
 
-    // トレイルの描画
-    if (isPlaying && trailRenderer && currentConfig.nodes[selectedNodeIndex].type == EffectNodeType::Trail)
-    {
-        trailRenderer->Render(rc);
+            if (node.type == EffectNodeType::Trail && trailRenderer)
+            {
+                trailRenderer->Render(rc);
+            }
+        }
     }
 
     // パーティクルの描画
     if (particleManager)
     {
         particleManager->Render(rc);
+    }
+}
+
+void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
+{
+    if (isPlaying && vfxMeshModel)
+    {
+        for (const auto& node : currentConfig.nodes)
+        {
+            if (!node.visible) continue;
+
+            if (node.type == EffectNodeType::Mesh)
+            {
+                if (currentMeshTime <= node.meshVfx.lifeTime)
+                {
+                    // ModelRendererから meshVFX シェーダーを取得
+                    // ModelRenderer に GetShader 関数などを渡すか、直接セットする形を用意
+                    auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
+                    if (shader)
+                    {
+                        // テクスチャをセット
+                        shader->SetTexture(node.meshVfx.texturePath);
+                        shader->SetNoiseTexture(node.meshVfx.noisePath);
+
+                        shader->SetDistortionPower(node.meshVfx.distortionPower);
+
+                        DirectX::XMFLOAT2 noiseUvOffset = {
+                            node.meshVfx.noiseUvOffset.x * currentMeshTime,
+                            node.meshVfx.noiseUvOffset.y * currentMeshTime
+                        };
+                        shader->SetNoiseUvOffset(noiseUvOffset);
+
+                        shader->SetBlendMode(node.meshVfx.blendMode);
+                        
+                        // 生存時間に応じてアルファ値の計算
+                        float alphaRate = 1.0f - (currentMeshTime / node.meshVfx.lifeTime);
+
+                        DirectX::XMFLOAT4 finalColor = node.meshVfx.color;
+                        //finalColor.w *= alphaRate;
+
+                        // 色をセット
+                        shader->SetColor(finalColor);
+                        // 経過時間 × スクロール速度 で UV オフセットを計算してセット！
+                        DirectX::XMFLOAT2 uvOffset = {
+                            node.meshVfx.uvScrollSpeed.x * currentMeshTime,
+                            node.meshVfx.uvScrollSpeed.y * currentMeshTime
+                        };
+                        shader->SetUvOffset(uvOffset);
+                    }
+
+                    // MeshVFX シェーダーを指定して描画登録！
+                    modelRenderer->Draw(ShaderId::MeshVFX, vfxMeshModel);
+                }
+            }
+        }
     }
 }
 
@@ -319,7 +375,7 @@ void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
         if (ImGui::BeginTabItem(u8"描画共通"))
         {
             // テクスチャ選択
-            if (ImGui::Button(u8"読込"))
+            if (ImGui::Button(u8"読込##Particle"))
             {
                 char filePath[MAX_PATH] = { 0 };
                 HWND hwnd = Graphics::Instance().GetWindowHandle();
@@ -384,44 +440,97 @@ void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
 }
 void EffectEditor::DrawMeshVfxInspector(MeshVfxConfig& meshVfxConfig)
 {
-    ImGui::Checkbox(u8"Use Mesh VFX", &meshVfxConfig.useMesh);
+    if (ImGui::Button(u8"読込##Mesh"))
+    {
+        char filePath[MAX_PATH] = { 0 };
+        HWND hwnd = Graphics::Instance().GetWindowHandle();
+        if (Dialog::OpenFileName(filePath, MAX_PATH,
+            "GLTF/GLB File\0*.gltf;*.glb\0\0",
+            "モデルを開く",
+            hwnd) == DialogResult::OK)
+        {
+            std::string pathStr = filePath;
+
+            // Dataという文字を探してそれ以降のパスを切り取る
+            size_t pos = pathStr.find("Data");
+            if (pos != std::string::npos)
+            {
+                pathStr = pathStr.substr(pos);
+            }
+
+            meshVfxConfig.meshPath = pathStr;
+            ID3D11Device* device = Graphics::Instance().GetDevice();
+            vfxMeshModel = std::make_shared<Model>(device, pathStr.c_str());
+
+            DirectX::XMFLOAT4X4 identity;
+            DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
+            vfxMeshModel->UpdateTransform(identity);
+        }
+    }
+    ImGui::SameLine();
+    ImGui::Text(u8": %s", meshVfxConfig.meshPath.c_str());
+
     ImGui::Separator();
 
-    if (meshVfxConfig.useMesh)
+    // テクスチャ読み込みUIを追加！
+    if (ImGui::Button(u8"テクスチャ読込##Mesh"))
     {
-        ImGui::Text(u8"Mesh: %s", meshVfxConfig.meshPath.c_str());
-        ImGui::SameLine();
-        if (ImGui::Button(u8"Select Mesh (.gltf/.glb)"))
+        char filePath[MAX_PATH] = { 0 };
+        HWND hwnd = Graphics::Instance().GetWindowHandle();
+        if (Dialog::OpenFileName(filePath, MAX_PATH,
+            "PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
+            "テクスチャ選択",
+            hwnd) == DialogResult::OK)
         {
-            char filePath[MAX_PATH] = { 0 };
-            HWND hwnd = Graphics::Instance().GetWindowHandle();
-            if (Dialog::OpenFileName(filePath, MAX_PATH,
-                "GLTF/GLB File\0*.gltf;*.glb\0\0",
-                "モデルを開く",
-                hwnd) == DialogResult::OK)
-            {
-                std::string pathStr = filePath;
+            std::string pathStr = filePath;
+            size_t pos = pathStr.find("Data");
+            if (pos != std::string::npos) pathStr = pathStr.substr(pos);
 
-                // Dataという文字を探してそれ以降のパスを切り取る
-                size_t pos = pathStr.find("Data");
-                if (pos != std::string::npos)
-                {
-                    pathStr = pathStr.substr(pos);
-                }
-
-                meshVfxConfig.meshPath = pathStr;
-                ID3D11Device* device = Graphics::Instance().GetDevice();
-                vfxMeshModel = std::make_shared<Model>(device, pathStr.c_str());
-            }
+            meshVfxConfig.texturePath = pathStr;
         }
-        ImGui::Separator();
-
-        ImGui::DragFloat(u8"寿命##Mesh", &meshVfxConfig.lifeTime, 0.05f, 0.1f, 10.0f);
-        ImGui::ColorEdit4(u8"色##Mesh", &meshVfxConfig.color.x);
-        ImGui::DragFloat2(u8"大きさ##Mesh", &meshVfxConfig.scale.x, 0.05f, 0.01f, 50.0f);
-        ImGui::DragFloat3(u8"回転速度##Mesh", &meshVfxConfig.rotationSpeed.x, 1.0f);
-        ImGui::DragFloat(u8"発生遅延(秒)##Mesh", &meshVfxConfig.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
     }
+
+    ImGui::SameLine();
+    ImGui::Text(u8": %s", meshVfxConfig.texturePath.c_str());
+    if (ImGui::Button(u8"ノイズテクスチャ読込##Mesh"))
+    {
+        char filePath[MAX_PATH] = { 0 };
+        HWND hwnd = Graphics::Instance().GetWindowHandle();
+        if (Dialog::OpenFileName(filePath, MAX_PATH,
+            "PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
+            "テクスチャ選択",
+            hwnd) == DialogResult::OK)
+        {
+            std::string pathStr = filePath;
+            size_t pos = pathStr.find("Data");
+            if (pos != std::string::npos) pathStr = pathStr.substr(pos);
+
+            meshVfxConfig.noisePath = pathStr;
+        }
+    }
+    ImGui::SameLine();
+    ImGui::Text(u8": %s", meshVfxConfig.noisePath.c_str());
+
+    ImGui::Separator();
+
+    ImGui::DragFloat(u8"寿命##Mesh", &meshVfxConfig.lifeTime, 0.1f);
+    ImGui::DragFloat(u8"発生遅延(秒)##Mesh", &meshVfxConfig.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
+    ImGui::Separator();
+
+    const char* blendItems[] = { "通常半透明 (Alpha)", "加算合成 (Additive)" };
+    ImGui::Combo(u8"ブレンドモード##Mesh", &meshVfxConfig.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
+    ImGui::Separator();
+
+    ImGui::DragFloat3(u8"大きさ##Mesh", &meshVfxConfig.scale.x, 0.1f);
+    ImGui::DragFloat3(u8"回転速度##Mesh", &meshVfxConfig.rotationSpeed.x, 1.0f);
+    ImGui::ColorEdit4(u8"色##Mesh", &meshVfxConfig.color.x);
+    ImGui::Separator();
+
+    ImGui::DragFloat2(u8"UVスクロール速度##Mesh", &meshVfxConfig.uvScrollSpeed.x, 0.01f, -10.0f, 10.0f, "%.2f");
+    ImGui::Separator();
+
+    ImGui::DragFloat(u8"ノイズの強さ##Mesh", &meshVfxConfig.distortionPower, 0.05f, 0.0f, 10.0f, "%.2fs");
+    ImGui::DragFloat2(u8"ノイズUVスクロール速度##Mesh", &meshVfxConfig.noiseUvOffset.x, 0.01f, -10.0f, 10.0f, "%.2f");
 }
 void EffectEditor::DrawTrailInspector(TrailConfig& trailConfig)
 {

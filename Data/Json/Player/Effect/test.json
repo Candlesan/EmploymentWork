@@ -20,6 +20,7 @@
                 "scale": [
                     1.0,
                     1.0
+                    1.0
                 ],
                 "useMesh": false
             },
@@ -130,7 +131,7 @@
                     4
                 ],
                 "spriteType": 7,
-                "texturePath": "Data\\Sprite\\Particle\\particle256x256.png"
+                "texturePath": "Data\\Sprite\\Particle\\texture\\particle256x256.png"
             },
             "type": 0,
             "visible": true
@@ -264,7 +265,7 @@
                     4
                 ],
                 "spriteType": 0,
-                "texturePath": "Data\\Sprite\\Particle\\particle256x256.png"
+                "texturePath": "Data\\Sprite\\Particle\\texture\\particle256x256.png"
             },
             "type": 0,
             "visible": true

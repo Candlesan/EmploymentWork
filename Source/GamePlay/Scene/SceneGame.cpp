@@ -323,6 +323,8 @@ void SceneGame::Render()
 		// エネミー描画
 		enemy->Render(rc, modelRenderer);
 
+		// メッシュVFX描画
+		effectEditor->RenderMeshVFX(modelRenderer);
 
 		framebuffers[0]->clear(dc);
 		framebuffers[0]->activate(dc);

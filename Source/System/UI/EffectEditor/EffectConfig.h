@@ -12,6 +12,13 @@ enum class EffectNodeType
 	Trail,
 };
 
+// ブレンドモードの定義
+enum class BlendMode
+{
+	Alpha,    // 通常半透明 (Transparency)
+	Add,      // 加算合成 (Additive)
+};
+
 // パーティクル構造体
 struct ParticleEffectConfig
 {
@@ -56,13 +63,22 @@ struct ParticleEffectConfig
 // メッシュVFX構造体
 struct MeshVfxConfig
 {
-	std::string meshPath = "";									// 使うモデル
+	std::string meshPath = "";									// モデルパス
+	std::string texturePath = "";								// テクスチャパス
+	std::string noisePath = "";									// ノイズテクスチャパス
+	DirectX::XMFLOAT2 uvScrollSpeed = {0.0f, 0.0f};				// UVスクロール速度
+
 	bool useMesh = false;										// メッシュを使うか
-	DirectX::XMFLOAT2 scale = { 1.0f, 1.0f };					// スケール
-	DirectX::XMFLOAT3 rotationSpeed = { 0.0f, 100.0f, 0.0f };	// 自転速度
+	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };				// スケール
+	DirectX::XMFLOAT3 rotationSpeed = { 0.0f, 0.0f, 0.0f };		// 自転速度
 	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };		// RGBA
+	DirectX::XMFLOAT2 noiseUvOffset = { 0.0f, 0.0f };
+	float distortionPower = 0.0f;
+
 	float lifeTime = 1.0f;										// 寿命
 	float delayTime = 0.0f;										// パーティクルを生成するまでの時間
+
+	int blendMode = 0; // 0: Alpha, 1: Add
 };
 
 // 軌跡構造体

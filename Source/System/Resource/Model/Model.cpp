@@ -702,10 +702,21 @@ void Model::BuildMeshes(ID3D11Device* device)
 	for (Mesh& mesh : meshes)
 	{
 		// 参照マテリアル設定
-		mesh.material = &materials.at(mesh.materialIndex);
+		if (mesh.materialIndex < materials.size())
+		{
+			mesh.material = &materials.at(mesh.materialIndex);
+		}
+		else
+		{
+			// またリアルが見つからない場合・インデックス外の場合は0番目を使う
+			mesh.material = !materials.empty() ? &materials[0] : nullptr;
+		}
 
 		// 参照ノード設定
-		mesh.node = &nodes.at(mesh.nodeIndex);
+		if (mesh.nodeIndex < nodes.size())
+		{
+			mesh.node = &nodes[mesh.nodeIndex];
+		}
 
 		// 頂点バッファ
 		{

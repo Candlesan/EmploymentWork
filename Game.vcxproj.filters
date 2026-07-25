@@ -208,6 +208,12 @@
     <Filter Include="Source\System\UI\EffectEditor">
       <UniqueIdentifier>{5d591b14-53ae-43e3-8430-5f74daa3a54e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\meshVFX">
+      <UniqueIdentifier>{b696236d-760b-4560-8be6-2a3e0a825d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\Shader\meshVFX">
+      <UniqueIdentifier>{7ddd6af1-8b3f-47a5-815a-f4ef035190aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -501,6 +507,9 @@
     <ClInclude Include="Source\System\UI\EffectEditor\EffectEditor.h">
       <Filter>Source\System\UI\EffectEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Shader\meshVFX\meshVFX.h">
+      <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -752,6 +761,9 @@
     <ClCompile Include="Source\System\UI\EffectEditor\EffectConfig.cpp">
       <Filter>Source\System\UI\EffectEditor</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Shader\meshVFX\meshVFX.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -802,6 +814,9 @@
     </None>
     <None Include="Shader\Common\fullscreen_quad.hlsli">
       <Filter>Shader\Common</Filter>
+    </None>
+    <None Include="Shader\meshVFX\meshVFX.hlsli">
+      <Filter>Shader\meshVFX</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -912,6 +927,12 @@
     </FxCompile>
     <FxCompile Include="Shader\Common\fullscreen_quad_vs.hlsl">
       <Filter>Shader\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\meshVFX\meshVFX_vs.hlsl">
+      <Filter>Shader\meshVFX</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\meshVFX\meshVFX_ps.hlsl">
+      <Filter>Shader\meshVFX</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

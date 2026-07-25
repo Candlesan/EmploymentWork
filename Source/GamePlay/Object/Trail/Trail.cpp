@@ -27,7 +27,7 @@ void Trail::Initialize()
 	}
 
 	// インプットレイアウト
-		// 入力レイアウト
+	// 入力レイアウト
 	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -227,6 +227,11 @@ bool Trail::SetTexture(const std::string& texturePath)
 
 	D3D11_TEXTURE2D_DESC texture2d_desc;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+
+	// パスが変わっていないなら、重いロード処理をスキップする！
+	static std::string currentPath = "";
+	if (currentPath == texturePath && shaderResourceView != nullptr) return true;
+	currentPath = texturePath;
 
 	try
 	{

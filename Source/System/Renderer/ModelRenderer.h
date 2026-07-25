@@ -13,6 +13,7 @@ enum class ShaderId
 	Basic,
 	Lambert,
 	PBR,
+	MeshVFX,
 
 	EnumCount
 };
@@ -29,6 +30,16 @@ public:
 	// 描画実行
 	void Render(const RenderContext& rc);
 
+	// 指定した ShaderId の Shader ポインタを取得するゲッターを追加！
+	Shader* GetShader(ShaderId shaderId)
+	{
+		int index = static_cast<int>(shaderId);
+		if (index >= 0 && index < static_cast<int>(ShaderId::EnumCount))
+		{
+			return shaders[index].get();
+		}
+		return nullptr;
+	}
 private:
 	struct CbScene
 	{

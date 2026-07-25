@@ -32,6 +32,7 @@ public:
 
 	// •`‰æˆ—
 	void Render(const RenderContext& rc, ModelRenderer* modelRenderer);
+	void RenderMeshVFX(ModelRenderer* modelRenderer);
 
 private:
 	// UI‚Ì•`‰æƒp[ƒc

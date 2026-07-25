@@ -192,6 +192,7 @@
     <ClInclude Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.h" />
     <ClInclude Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h" />
+    <ClInclude Include="Source\System\Renderer\Shader\meshVFX\meshVFX.h" />
     <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
     <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h" />
@@ -279,6 +280,7 @@
     <ClCompile Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp" />
+    <ClCompile Include="Source\System\Renderer\Shader\meshVFX\meshVFX.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\PBR\PBRShader.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp" />
@@ -306,6 +308,7 @@
     <None Include="Shader\Common\shading_functions.hlsli" />
     <None Include="Shader\Common\Skinning.hlsli" />
     <None Include="Shader\Lambert\Lambert.hlsli" />
+    <None Include="Shader\meshVFX\meshVFX.hlsli" />
     <None Include="Shader\Particle\compute_particle.hlsli" />
     <None Include="Shader\Particle\compute_particle_bitonic_sort.hlsli" />
     <None Include="Shader\PBR\PBRShader.hlsli" />
@@ -361,6 +364,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\Lambert\LambertVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\meshVFX\meshVFX_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\meshVFX\meshVFX_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
