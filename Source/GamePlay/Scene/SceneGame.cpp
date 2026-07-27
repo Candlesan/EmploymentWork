@@ -314,6 +314,9 @@ void SceneGame::Render()
 
 	// 3Dモデル描画
 	{
+		framebuffers[0]->clear(dc);
+		framebuffers[0]->activate(dc);
+
 		// ステージ描画
 		stage->Render(rc, modelRenderer);
 
@@ -323,29 +326,26 @@ void SceneGame::Render()
 		// エネミー描画
 		enemy->Render(rc, modelRenderer);
 
-		// メッシュVFX描画
-		effectEditor->RenderMeshVFX(modelRenderer);
-
-		framebuffers[0]->clear(dc);
-		framebuffers[0]->activate(dc);
-
 		// 全モデル描画
 		modelRenderer->Render(rc);
-
-		// エフェクト描画 
-		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
-
-		//player.RenderTrail(rc);
 
 		// スカイマップ描画
 		skyMap->Draw(rc);
 
-		shapeRenderer->DrawSphere({ 5.0f, 1.0f, 0.0f }, 1.0f, { 1.0f, 0.0f, 1.0f, 1.0f });
+		// エフェクト描画 
+		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
+
+		// エフェクト描画
+		effectEditor->Render(rc, modelRenderer);
+
+		// メッシュVFX描画
+		effectEditor->RenderMeshVFX(modelRenderer);
+		modelRenderer->Render(rc);
+
 
 		// シェイプレンダラ描画
+		shapeRenderer->DrawSphere({ 5.0f, 1.0f, 0.0f }, 1.0f, { 1.0f, 0.0f, 1.0f, 1.0f });
 		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
-
-		effectEditor->Render(rc, modelRenderer);
 
 		framebuffers[0]->deactivate(dc);
 
@@ -373,7 +373,6 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
-		//particleManager->Render(rc);
 	}
 }
 

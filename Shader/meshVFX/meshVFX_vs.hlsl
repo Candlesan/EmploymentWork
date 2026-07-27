@@ -10,7 +10,7 @@ VS_OUT main(
     VS_OUT vout;
     vout.position = mul(position, worldViewProjection);
     vout.color = vfxColor;
-    vout.texcoord = texcoord + uvOffset;
+    vout.texcoord = texcoord;
 
     return vout;
 }

@@ -46,6 +46,8 @@ void meshVFX::Begin(const RenderContext& rc)
 	dc->VSSetShader(vertexShader.Get(), nullptr, 0);
 	dc->PSSetShader(pixelShader.Get(), nullptr, 0);
 
+	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestOnly), 0);
+
 	// ”¼“§–¾ƒuƒŒƒ“ƒh
 	if (blendMode == 1) // ‰ÁZ‡¬ (Additive)
 	{
