@@ -29,4 +29,6 @@ private:
 	int selectedNodeIndex = -1;
 
 	std::vector<std::string> animationNames; 
+
+	bool isNeedRebuild = false;
 };

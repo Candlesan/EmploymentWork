@@ -48,10 +48,10 @@ public:
 	float GetMoveSpeed() const { return moveSpeed; }
 
 	// ‘Ì—Í
-	void SetHealth(float h) { health = h; }
-	float GetHealth() { return health; }
-	void SetMaxHealth(float h) { MaxHealth = h; }
-	float GetMaxHealth() { return MaxHealth; }
+	void SetHealth(float h) { status.currentHp = h; }
+	float GetHealth() { return status.currentHp; }
+	void SetMaxHealth(float h) { status.maxHp = h; }
+	float GetMaxHealth() { return status.maxHp; }
 
 	// ù‰ñ‘¬“xæ“¾
 	float GetTurnSpeed() const { return turnSpeed; }

@@ -207,6 +207,14 @@ void SceneGame::Update(float elapsedTime)
 		}
 		wasF2DownLastFrame = f2Down;
 
+		// F7でデバッグプリミティブの表示のON/OFF
+		static bool wasF7DownLastFrame = false;
+		bool f7Down = (GetAsyncKeyState(VK_F7) & 0x8000) != 0;
+		if (f7Down && !wasF7DownLastFrame) {
+			showDebugPrimitive = !showDebugPrimitive;
+		}
+		wasF7DownLastFrame = f7Down;
+
 		// エフェクトエディターの更新
 		effectEditor->Update(Graphics::Instance().GetDeviceContext(), elapsedTime);
 
@@ -342,10 +350,13 @@ void SceneGame::Render()
 		effectEditor->RenderMeshVFX(modelRenderer);
 		modelRenderer->Render(rc);
 
-
 		// シェイプレンダラ描画
 		shapeRenderer->DrawSphere({ 5.0f, 1.0f, 0.0f }, 1.0f, { 1.0f, 0.0f, 1.0f, 1.0f });
-		shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
+
+		if (showDebugPrimitive)
+		{
+			shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
+		}
 
 		framebuffers[0]->deactivate(dc);
 

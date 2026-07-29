@@ -44,11 +44,11 @@ void Enemy::Initialize()
 
 
 	// ステータスの設定
-	health = 30000;
-	MaxHealth = 30000.0f;
-	maxPoise = 1200.0f;
-	baseAttackPower = 1400.0f;
-	currentPoise = 1200.0f;
+	//health = 30000;
+	//MaxHealth = 30000.0f;
+	//maxPoise = 1200.0f;
+	//baseAttackPower = 1400.0f;
+	//currentPoise = 1200.0f;
 
 	invincibleTimer = 0.0f;
 
@@ -167,13 +167,13 @@ void Enemy::DrawGUI()
 
 		if (ImGui::Button(u8"HP前回"))
 		{
-			health = MaxHealth;
+			status.currentHp = status.maxHp;
 		}
-		ImGui::Text("Health: %f.0", health);
+		ImGui::Text("Health: %f.0", status.currentHp);
 		ImGui::Text("Damage: %f.0", lastDamage);
 		ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
 		ImGui::Separator();
-		ImGui::Text("currentPoise: %f.0", currentPoise);
+		ImGui::Text("currentPoise: %f.0", status.currentGuardDurability);
 		ImGui::Separator();
 		ImGui::Text("attackCoolTimer: %f.0", attackCoolTimer);
 		ImGui::Separator();

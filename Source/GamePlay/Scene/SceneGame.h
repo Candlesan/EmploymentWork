@@ -110,4 +110,7 @@ private:
 
 	std::unique_ptr<EffectEditor> effectEditor;
 	bool showVfxEditor = false;
+
+	// デバックプリミティブの描画のONとOFF
+	bool showDebugPrimitive = true;
 };

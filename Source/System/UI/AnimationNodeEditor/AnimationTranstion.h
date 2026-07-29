@@ -22,8 +22,6 @@ enum class TransitionConditionType
 	IsGround,			//	地面にいるかどうか
 
 	IsLockOn,			// ロックオン中
-	HavePotion,			// ポーションがある
-	HealCooldownReady,	// 回復のクールダウン中か
 	IsGuarding,			// ガード中
 
 	PositionX,			// 位置:X座標
@@ -99,8 +97,6 @@ struct TransitionContext
 	int   buttonUp;
 	bool  IsGround;
 	bool  isLockOn;
-	bool  havePotion;
-	bool  healCooldownReady;
 	bool  isGuarding;
 	bool IsCancelable;
 	bool IsFalling;

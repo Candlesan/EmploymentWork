@@ -68,6 +68,20 @@ void BehaviorTreeGraph::RemoveLink(ed::LinkId id)
 		links.erase(it);
 }
 
+void BehaviorTreeGraph::UpdateParentNames()
+{
+	// 全ノードの parentName をリセット
+	for (auto& node : nodes) {
+		if (node.name != "Root") node.parentName = "";
+	}
+	// リンクを巡回して、行き先ノードの parentName に親の名前を入れる
+	for (auto& link : links) {
+		std::string parentName = "";
+		for (auto& n : nodes) if (n.pinOut == link.startPin) parentName = n.name;
+		for (auto& n : nodes) if (n.pinIn == link.endPin) n.parentName = parentName;
+	}
+}
+
 void BehaviorTreeGraph::Save(const std::string& path)
 {
 

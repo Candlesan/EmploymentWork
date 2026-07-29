@@ -34,13 +34,12 @@ void Player::Initialize()
 	// パラメータ初期化
 	moveSpeed = 7.0f;
 	maxMoveSpeed = 7.0f;
-	health = 1400.0f;
-	MaxHealth = 1400.0f;
-	Stamina = 150;
-	MaxStamina = 150;
-	currentPoise = 100.0f;
-	maxPoise = 100.0f;
-	baseAttackPower = 860.0f;
+	status.currentHp = 100.0f;
+	status.maxHp = 100.0f;
+	status.currentMagic = 100.0f;
+	status.maxMagic = 100.0f;
+	status.maxGuardDurability = 100.0f;
+	status.currentGuardDurability = 100.0f;
 	invincibleTimer = 0.0f;
 
 	weight = 0.5f;
@@ -220,6 +219,9 @@ void Player::Update(float elapsedTime)
 	// タイマーを更新する関数
 	UpdateTimers(elapsedTime);
 
+	// ステータスの更新
+	UpdateStatus(elapsedTime);
+
 	// プレイヤーの状態を計算する関数
 	CalculateStatusParameters();
 
@@ -228,12 +230,8 @@ void Player::Update(float elapsedTime)
 	if (!isTyping && !isPreviewMode)
 	{
 		InputMove(elapsedTime);
-
-		if (!isGuarding) Heal(elapsedTime);
-
 		UpdateStateTransitions(elapsedTime);
 		UpdateUpperBodyTransitions(elapsedTime);
-
 	}
 	else if (isTyping && !isPreviewMode)
 	{
@@ -310,14 +308,50 @@ void Player::DrawGUI()
 		{
 			if (ImGui::Button(u8"HP全回復"))
 			{
-				health = maxHealth;
+				status.currentHp = status.maxHp;
 			}
-			ImGui::Text(u8"体力 (HP): %f.0", health);
+			ImGui::SameLine();
+			if (ImGui::Button(u8"魔力全回復"))
+			{
+				status.currentMagic = status.maxMagic;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"ガード耐久値全回復"))
+			{
+				status.currentGuardDurability = status.maxGuardDurability;
+			}
+			ImGui::Text(u8"体力 : %f.0", status.currentHp);
+			ImGui::DragFloat(u8"体力", &status.currentHp, 0.1f);
 			ImGui::Separator();
-			ImGui::Text(u8"直前の被ダメージ: %f.0", lastDamage);
+
+			ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
+			ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
+			ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
+			ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
+			ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
+			ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
+			if (ImGui::Button(u8"魔力消費"))
+			{
+				ConsumMagic(10.0f, magicRecoverDelay);
+			}
+			ImGui::Checkbox(u8"防御魔法展開時", &status.isGuarding);
 			ImGui::Separator();
-			ImGui::Text(u8"現在の体幹値: %f.0", currentPoise);
+
+			ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
+			ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
+			ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
+			ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
+			ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
 			ImGui::Separator();
+
+			ImGui::Text(u8"ガード耐久値 : %f.0", status.currentGuardDurability);
+			ImGui::DragFloat(u8"ガード耐久値", &status.currentGuardDurability, 0.1f);
+			if (ImGui::Button(u8"耐久値減少"))
+			{
+				OnGuardHit(10.0f);
+			}
+			ImGui::Separator();
+
 			ImGui::Text(u8"無敵残り時間: %f.0", invincibleTimer);
 			ImGui::Separator();
 			ImGui::Text(u8"風状態残り時間: %f.0", windDashAvailTimer);
@@ -354,13 +388,6 @@ void Player::DrawGUI()
 
 			ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
 			ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
-
-			if (ImGui::Button(u8"ポーション残量リセット"))
-			{
-				potion = 14;
-			}
-			ImGui::Text(u8"所持ポーション数: %d", potion);
-			ImGui::Separator();
 
 			if (isGuarding) {
 				ImGui::Text(u8"防衛状態: ガード中");
@@ -431,7 +458,7 @@ void Player::DrawGUI()
 		// 魔法関係
 		if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			if(ImGui::Button(u8"保存"))
+			if (ImGui::Button(u8"保存"))
 			{
 				config.Save();
 			}
@@ -558,6 +585,8 @@ void Player::DrawGUI()
 		GetCurrentAnimationSeconds(),
 		GetCurrentAnimationLength()
 	);
+
+	RefreshStateConfigs();
 }
 
 // デバックプリミティブ描画
@@ -628,37 +657,6 @@ void Player::MagicInput()
 	}
 }
 
-// 回復
-void Player::Heal(float elapsedTime)
-{
-	GamePad gamePad = Input::Instance().GetGamePad();
-
-	if ((gamePad.GetButtonDown() & GamePad::BTN_X) && healCoolDownTimer < 0.1f && potion > 0) {
-		potion--; // 一つ使う
-		healCoolDownTimer = 0.5f;
-		regeneTimer = 1.0f;
-	}
-
-
-	if (healCoolDownTimer > 0.0f)
-	{
-		healCoolDownTimer -= elapsedTime;
-	}
-
-	if (regeneTimer > 0.0f)
-	{
-		float healStep = healValue * elapsedTime;
-
-		health += healStep;
-
-		regeneTimer -= elapsedTime;
-
-		if (health > MaxHealth) health = MaxHealth;
-
-		if (regeneTimer < 0.0f) regeneTimer = 0.0f;
-	}
-}
-
 // グラフを追加する
 void Player::AddGraph(std::string name)
 {
@@ -700,7 +698,7 @@ void Player::UpdateSounds(const std::string& state)
 // 敵の攻撃が当たった時に、ジャスト回避か被弾化かを判断する関数
 void Player::OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime)
 {
-	if (health <= 0) return;
+	if (status.currentHp <= 0) return;
 
 	if (isAvoid && animSequence.GetRange("JastAvoidFream"))
 	{
@@ -1226,7 +1224,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 
 			// 名前からアニメーション番号に変換する
 			int animIndexA = GetModel()->GetAnimationIndex(stateConfigs[stateA].animationName.c_str());
-			int animIndexB= GetModel()->GetAnimationIndex(stateConfigs[stateB].animationName.c_str());
+			int animIndexB = GetModel()->GetAnimationIndex(stateConfigs[stateB].animationName.c_str());
 
 			// Animatorに加算ブレンドを依頼する
 			animator->PlayBaseMix(animIndexA, animIndexB, nextNode->mixRate, false, 0.2f, false, false);
@@ -1533,7 +1531,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 
 	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
 	{
-		rbButtonHoldTime += elapsedTime; 
+		rbButtonHoldTime += elapsedTime;
 	}
 	else
 	{
@@ -1554,12 +1552,10 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.IsGround = IsGround();
 	ctx.isLockOn = (lockOnTargetPos != nullptr);
-	ctx.havePotion = (potion > 0);
-	ctx.healCooldownReady = (healCoolDownTimer < 0.1f);
 	ctx.isGuarding = isGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
-	ctx.inputDir = CalculateRelativeInputDir(); 
+	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.WindDashAttack = WindDashAttackDistance;
 
 	return ctx;
@@ -1610,7 +1606,7 @@ void Player::EnterSubGraph(const std::string& subGraphPath, const TransitionCont
 			}
 
 			// 最初のステートへ切り替え！
-			if (!firstState.empty()) 
+			if (!firstState.empty())
 			{
 				// そのステート（ノード）の情報を取得する
 				AnimNode* firstNode = nullptr;
@@ -1804,7 +1800,7 @@ void Player::UpdateLockAt(float elapsedTime)
 	float maxLookAngle = DirectX::XMConvertToRadians(120.0f);
 	if (angle > maxLookAngle)
 	{
-		angle = maxLookAngle; 
+		angle = maxLookAngle;
 	}
 
 	DirectX::XMVECTOR currentSpineRotation = DirectX::XMLoadFloat4(&spineNode.rotation);
@@ -1971,4 +1967,19 @@ AnimNode* Player::FindNodeByName(const std::string& stateName)
 		}
 	}
 	return nullptr; // 見つからなかったら nullptr
+}
+
+void Player::RefreshStateConfigs()
+{
+	// メモリ上の transitionGraphs から最新の config データを stateConfigs に反映する
+	for (const auto& graph : transitionGraphs)
+	{
+		for (const auto& node : graph.nodes)
+		{
+			if (node.type == NodeType::Animation)
+			{
+				stateConfigs[node.StateName] = node.config;
+			}
+		}
+	}
 }

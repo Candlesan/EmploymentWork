@@ -221,6 +221,25 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 
 	ed::SetCurrentEditor(nullptr);
 
+	if (isNeedRebuild)
+	{
+		if (tree != nullptr)
+		{
+			delete tree;
+			tree = new BehaviorTree();
+		}
+		if (enemy != nullptr)
+		{
+			enemy->ClearActiveNode();
+		}
+
+		// エディター実行用ツリーに流し込む
+		ApplyToTree(tree, enemy, graph);
+		graph.UpdateParentNames();
+
+		isNeedRebuild = false;
+	}
+
 	DrawInspector(graph);
 }
 

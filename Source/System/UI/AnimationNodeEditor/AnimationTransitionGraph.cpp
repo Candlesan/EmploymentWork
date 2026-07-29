@@ -167,14 +167,6 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.isLockOn;
 			break;
 
-		case TransitionConditionType::HavePotion:
-			result = ctx.havePotion;
-			break;
-
-		case TransitionConditionType::HealCooldownReady:
-			result = ctx.healCooldownReady;
-			break;
-
 		case TransitionConditionType::IsGuarding:
 			result = ctx.isGuarding;
 			break;	

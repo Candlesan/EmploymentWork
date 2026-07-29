@@ -49,7 +49,6 @@ public:
 	//  外部からのアクション命令（プレイヤーを動かす外からのトリガー）
 	// =========================================================================
 	void MagicInput();
-	void Heal(float elapsedTime);
 	void AddGraph(std::string name);              
 	void UpdateSounds(const std::string& state);  
 	void OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime);
@@ -59,7 +58,7 @@ public:
 	// =========================================================================
 	void SetEnemy(Enemy* e) { enemy = e; }
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos);
-	void SetLastDamage(float d) { lastDamage = d; }
+	//void SetLastDamage(float d) { lastDamage = d; }
 	void SetIsHit(bool hit) { isHit = hit; }
 
 	// =========================================================================
@@ -124,6 +123,7 @@ private:
 
 	AnimNode* FindNodeByName(const std::string& stateName);
 
+	void RefreshStateConfigs();
 private:
 	// =========================================================================
 	//  メンバ変数（大量にあるので、ジャンルごとに綺麗にグループ化！）
@@ -139,14 +139,6 @@ private:
 	float moveLength = 0.0f;
 
 	// ── 戦闘・ステータス（HP・スタミナ・無敵） ──
-	float health = 1400.0f;
-	float maxHealth = 1400.0f;
-	float stamina = 150.0f;
-	float maxStamina = 150.0f;
-	float currentPoise = 100.0f;
-	float maxPoise = 100.0f;
-	float baseAttackPower = 860.0f;
-	float lastDamage = 0.0f;
 	float invincibleTimer = 0.0f;
 	float windDashAvailTimer = 0.3f;
 	float runDisableTimer = 0.0f;
@@ -171,12 +163,6 @@ private:
 	float enemyFromDistance = 0.0f;
 	float lockedEnemyDistance = 0.0f;
 
-	// ── 回復（ポーション） ──
-	int potion = 14;
-	float healValue = 810;
-	float healCoolDownTimer = 0.0f;
-	float regeneTimer = 0.0f;
-
 	// ── 魔法 ──
 	MagicManager magicManager;
 	WindBladeMagic::WindBladeConfig config;
@@ -185,6 +171,7 @@ private:
 	bool isMagicAttack = true;
 
 	float DashSpeed = 20.0f;
+	float magicRecoverDelay = 0.0f;
 
 	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
 	float previousAngleY = 0.0f;

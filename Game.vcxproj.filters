@@ -762,7 +762,7 @@
       <Filter>Source\System\UI\EffectEditor</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\meshVFX\meshVFX.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

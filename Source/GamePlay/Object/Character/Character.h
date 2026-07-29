@@ -13,6 +13,43 @@ struct AttackResult
 	float poiseDamage;
 };
 
+// キャラクターの基本情報
+struct CharacterStatus
+{
+	// --- 体力系 ---
+	float maxHp = 100.0f;				 // 最大体力
+	float currentHp = 100.0f;			 // 現在の体力
+										 
+	// --- 魔力系 ---					  
+	float maxMagic = 100.0f;			   // 最大魔力
+	float currentMagic = 100.0f;		   // 現在の魔力量
+	float magicRecoverSpeed = 5.0f;        // 基本の回復速度
+	float currentMagicRecoverSpeed = 5.0f; // 自然回復速度
+	float magicRecoverDelayTimer = 0.0f;   // 魔力が回復し始めるまでの遅延
+
+	// --- ヒート値 ---
+	float maxHeat = 100.0f;				// 最大ヒート値
+	float currentHeat = 0.0f;			// 現在のヒート値
+	float heatIncreaseSpeed = 5.0f;		// ヒート値の増加スピード
+	float heatRecoverSpeed = 5.0f;		// ヒート値の回復速度
+
+	// --- 防御系 ---
+	float maxGuardDurability = 100.0f;		// 最大ガード耐久値
+	float currentGuardDurability = 100.0f;	// 現在のガード耐久値
+	float guardRecoverSpeed = 5.0f;			// ガード耐久値の回復速度
+
+	// --- ダウン系 ---
+	float downTimer = 0.0f; // 魔力切れをしたときに使うタイマー
+
+	// --- 状態フラグ ---
+	bool isDown = false; // 魔力切れダウン中か
+	bool isBurst = false; // オーバーヒートしたか
+	bool isGuarding = false; // ガード中か
+	bool isFlying = false; // 飛行中か
+	bool isAttack = false; // 攻撃中か
+	bool isRapidFire = false; // 連射攻撃か
+};
+
 class Character
 {
 public:
@@ -88,6 +125,12 @@ public:
 	// ステータス更新（毎フレーム呼ぶ）
 	void UpdateStatus(float elapsedTime);
 
+	// 魔力消費
+	void ConsumMagic(float amount, float DelayTime);
+
+	// ガード耐久値減少
+	void OnGuardHit(float amount);
+
 	// ----- 移動 / 回転 -----
 
 	// 移動処理（入力 vx, vz, speed を受け取る）
@@ -104,6 +147,9 @@ public:
 
 	// ステージ外移動制限
 	void AreaRestriction();
+
+	// ステータスを取得する
+	const CharacterStatus& GetStatus() const { return status; }
 
 private:
 	// ----- 内部：移動・速度更新ヘルパー -----
@@ -141,14 +187,17 @@ protected:
 	// 死亡した時に呼ばれる
 	virtual void OnDead() {}
 
-	// 体幹が削り切られた（ダウンした）時に呼ばれる
+	// ダウンした時に呼ばれる
 	virtual void OnDown() {}
 
 protected:
+	CharacterStatus status;		  // 現在のステータス
+	CharacterStatus defaltStatus; // 初期データ
+
 	// 位置・回転・スケール・行列
 	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 angle    = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 scale    = { 1.0f, 1.0f, 1.0f };
+	DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
 	DirectX::XMFLOAT4X4 transform =
 	{
 		1, 0, 0, 0,
@@ -162,12 +211,12 @@ protected:
 
 	// 移動関連
 	float maxMoveSpeed = 5.0f;   // 最大速度
-	float moveVecX     = 0.0f;   // 移動ベクトル（X軸方向）
-	float moveVecZ     = 0.0f;   // 移動ベクトル（Z軸方向）
+	float moveVecX = 0.0f;   // 移動ベクトル（X軸方向）
+	float moveVecZ = 0.0f;   // 移動ベクトル（Z軸方向）
 
-	float friction     = 15.0f;  // 摩擦力
+	float friction = 15.0f;  // 摩擦力
 	float acceleration = 50.0f;  // 加速度
-	float gravity      = -9.8f;  // 重力
+	float gravity = -9.8f;  // 重力
 
 	// 当たり判定
 	float radius = 0.5f;  // 半径
@@ -175,21 +224,6 @@ protected:
 	float weight = 0.5f;  // 重さ
 
 	bool isGround = false; // 地面と接地しているか
-
-	// ステータス
-	float health    = 10.0f; // 現在体力
-	float MaxHealth = 10.0f; // 最大体力
-
-	float Stamina    = 150.0f; // 現在持久力
-	float MaxStamina = 150.0f; // 最大持久力
-
-	// 体幹（Poise）
-	float maxPoise           = 100.0f; // 最大体幹値
-	float currentPoise       = 100.0f; // 現在の体幹値
-	float baseAttackPower    = 1.0f;   // 基本攻撃力
-	float basePoisePower     = 50.0f;  // 基本体幹削り値
-	float poiseRecoveryDelay = 0.0f;   // 回復開始までの猶予タイマー
-	float poiseFullResetTimer= 0.0f;   // 30秒後に強制全回復用
 
 	// 無敵時間
 	float invincibleTimer = 0.0f;

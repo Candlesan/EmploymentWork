@@ -80,7 +80,8 @@ public:
 	void AddLink(ed::PinId from, ed::PinId to); // 矢印の追加
 	void RemoveNode(ed::NodeId id); // ノードの削除
 	void RemoveLink(ed::LinkId id); // 矢印の削除
-
+	void UpdateParentNames();
+	
 	void Save(const std::string& path); // Jsonファイルに保存する
 	void Load(const std::string& path); // Jsonファイルを読み込む
 

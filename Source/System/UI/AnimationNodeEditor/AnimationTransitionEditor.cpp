@@ -749,9 +749,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "IsCancelable",		TransitionConditionType::IsCancelable },
 				{ "IsFalling",			TransitionConditionType::IsFalling },
 
-				{ "HavePotion",			TransitionConditionType::HavePotion },
-				{ "HealCooldownReady",	TransitionConditionType::HealCooldownReady },
-
 				{ "WindDashAttack",	TransitionConditionType::WindDashAttack },
 
 				{ "InputDir",			TransitionConditionType::InputDir },          

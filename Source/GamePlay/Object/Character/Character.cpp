@@ -106,28 +106,13 @@ void Character::UpdateInvincibleTimer(float elapsedTime)
 //ダメージを与える
 bool Character::ApplyDamage(float damage, float invincibleTime, float poiseDamage)
 {
-	if (this->invincibleTimer > 0.0f || this->health <= 0) return false;
+	if (this->invincibleTimer > 0.0f || this->status.currentHp <= 0) return false;
 
 	this->invincibleTimer = invincibleTime;
-	this->health -= damage;
-
-	// 強靭削り処理：相手の強靭値（currentPoise）を実数値で減らす
-	this->currentPoise -= poiseDamage;
-
-	// 攻撃を受けたので回復を停止して、タイマーをセット
-	this->poiseRecoveryDelay = (maxPoise / 1200.0f) * 9.0f;
-	if (this->poiseRecoveryDelay < 5.0f) this->poiseRecoveryDelay = 5.0f;
-
-	this->poiseFullResetTimer = 0.0f; // 30秒タイマーをセット
-
-	if (this->currentPoise <= 0.0f)
-	{
-		this->OnDown(); // 0になったらダウン
-		this->currentPoise = this->maxPoise; // リセット
-	}
+	this->status.currentHp -= damage;
 
 	// 死亡・ダメージ通知
-	if (this->health <= 0) this->OnDead();
+	if (this->status.currentHp <= 0) this->OnDead();
 	else this->OnDamage();
 
 	return true;
@@ -137,7 +122,7 @@ bool Character::ApplyDamage(float damage, float invincibleTime, float poiseDamag
 AttackResult Character::CalculateAttackResult(float damageRate, float poiseValue)
 {
 	AttackResult res;
-	res.damage = this->baseAttackPower * damageRate;
+	res.damage = damageRate;
 	res.poiseDamage = poiseValue;
 	return res;
 }
@@ -148,27 +133,123 @@ void Character::UpdateStatus(float elapsedTime)
 	// 無敵タイマー
 	if (invincibleTimer > 0.0f) invincibleTimer -= elapsedTime;
 
-	// 最後の被弾から一定時間経過したら秒間130で回復させる
-	if (poiseRecoveryDelay > 0.0f)
+	// 魔力回復
+	// 攻撃していないまたはガードしながら攻撃していないとき
+	if ((!status.isGuarding && !status.isAttack) || status.isGuarding)
 	{
-		poiseRecoveryDelay -= elapsedTime;
-	}
-	else
-	{
-		if (currentPoise < maxPoise)
+		// ディレイタイマーがあるか
+		if (status.magicRecoverDelayTimer > 0.0f)
 		{
-			currentPoise += 130.0f * elapsedTime; // 急速回復
-			if (currentPoise > maxPoise) currentPoise = maxPoise;
+			status.magicRecoverDelayTimer -= elapsedTime;
+
+			// ディレイタイマーが0いかにならないようにする/
+			// ダウン中ならディレイタイマーを0にする
+			if (status.magicRecoverDelayTimer <= 0.0f || status.isDown)
+			{
+				status.magicRecoverDelayTimer = 0;
+			}
+				
+		}
+		else if (status.isDown) // ダウン中は急速に回復させる
+		{
+			if (status.currentMagic < status.maxMagic)
+			{
+				//　仮で5倍の速度で回復させる
+				status.currentMagicRecoverSpeed = (status.magicRecoverSpeed * 5.0f);
+				status.currentMagic += status.currentMagicRecoverSpeed * elapsedTime;
+
+				// 最大値を超えないようにする
+				if (status.currentMagic > status.maxMagic)
+				{
+					status.currentMagic = status.maxMagic; // 最大値を超えないようにする
+
+					status.isDown = false; // 最大値まで回復させたらフラグを折る
+				}
+					
+			}
+		}
+		else // ディレイタイマーがなくなったら魔力を回復する
+		{
+			if (status.currentMagic < status.maxMagic)
+			{
+				//　ガード中なら魔力の回復量を半分にする
+				status.currentMagicRecoverSpeed = status.isGuarding ? (status.magicRecoverSpeed * 0.5) : status.magicRecoverSpeed;
+
+				// 魔力を回復させる
+				status.currentMagic += status.currentMagicRecoverSpeed * elapsedTime;
+
+				// 最大値を超えないようにする
+				if (status.currentMagic > status.maxMagic)
+					status.currentMagic = status.maxMagic;
+			}
+			else
+			{
+				// 魔力が満タンの時は回復速度を0にしておく
+				status.currentMagicRecoverSpeed = 0;
+			}
 		}
 	}
 
-	// 被弾してから30秒経ったら、回復中でも最大にする
-	poiseFullResetTimer += elapsedTime;
-	if (poiseFullResetTimer >= 30.0f)
+	// ヒート値回復
+	if (status.isRapidFire)
 	{
-		currentPoise = maxPoise;
-		poiseFullResetTimer = 0.0f;
+		status.currentHeat += status.heatIncreaseSpeed * elapsedTime;
+
+		if (status.currentHeat > status.maxHeat)
+			status.currentHeat = status.maxHeat;
 	}
+	else
+	{
+		if (status.currentHeat > 0.0f)
+		{
+			// ヒート値があったら下げていく
+			status.currentHeat -= status.heatRecoverSpeed * elapsedTime;
+
+			// ヒート値が0よりも低かったら
+			if (status.currentHeat < 0.0f)
+				status.currentHeat = 0.0f;
+		}
+	}
+
+	// ガード値回復
+	if (!status.isGuarding) // ガードしてないとき
+	{
+		// 現在の数値が最大値よりも少なかったら
+		if (status.currentGuardDurability < status.maxGuardDurability)
+		{
+			status.currentGuardDurability += status.guardRecoverSpeed * elapsedTime;
+		}
+
+		// 現在の値が最大値を超えていたら
+		if (status.currentGuardDurability > status.maxGuardDurability)
+			status.currentGuardDurability = status.maxGuardDurability;
+	}
+}
+
+// 魔力消費
+void Character::ConsumMagic(float amount, float DelayTime)
+{
+	// 魔力を減らす
+	status.currentMagic -= amount;
+
+	// 0以下にならないようにする
+	if (status.currentMagic <= 0.0f)
+	{
+		status.currentMagic = 0.0f; 
+		status.isDown = true; // 0以下になったらダウンをONにする
+	}
+
+	// 遅延をセットする
+	status.magicRecoverDelayTimer = DelayTime;
+}
+
+// ガード耐久値減少
+void Character::OnGuardHit(float amount)
+{
+	status.currentGuardDurability -= amount;
+
+	if (status.currentGuardDurability < 0.0f)
+		status.currentGuardDurability = 0.0f;
 }
 
 void Character::AreaRestriction()

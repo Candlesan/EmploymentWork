@@ -111,7 +111,7 @@ void CollisionManager::CollisionEnemyWeaponVsPlayer(Player& player, Enemy& enemy
 			if (!isGuarding && !isAvoid) {
 				// hitの中にダメージ情報が入っているのでそのまま使える！
 				AttackResult res = enemy.CalculateAttackResult(hit.damageRate, hit.poiseRate);
-				player.SetLastDamage(res.damage);
+				//player.SetLastDamage(res.damage);
 				player.OnHitEnemyAttack(res.damage, hit.invincibleTime, res.poiseDamage);
 			}
 		}
