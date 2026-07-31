@@ -1,7 +1,6 @@
 #include "ActionDerived.h"
 #include "System/Core/Mathf.h"
 #include "GamePlay/Object/Character/Player/Player.h"
-#include "GamePlay/Object/Magic/MagicType/Enemy/BloodSpear.h"
 
 #include <stdlib.h>
 #include <string>
@@ -110,8 +109,8 @@ void BloodSpearAction::OnEnter()
         float waitTime = 1.0f + (i * Mathf::RandomRange(0.1f, 0.5f));
 
         // ‘„‚ð¶¬‚·‚é
-        BloodSpearMagic* spear = new BloodSpearMagic(&owner->GetMagicManager());
-        spear->Launch(spawnPos, waitTime);
+        //BloodSpearMagic* spear = new BloodSpearMagic(&owner->GetMagicManager());
+        //spear->Launch(spawnPos, waitTime);
     }
 }
 

@@ -2,6 +2,8 @@
 #include "System/Renderer/ShapeRenderer.h"
 #include "System/Graphic/RenderContext.h"
 
+#include "GamePlay/Object/Collision/Collision.h"
+
 #include <memory>
 
 // 前方宣言
@@ -34,15 +36,24 @@ public:
 	// スケール取得 
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 
+	// トランスフォーム取得
+	const DirectX::XMFLOAT4X4& GetTransfor() const { return transform; }
+
 	// 半径取得
 	float GetRadius() const { return radius; }
+	void SetRadius(float r) { radius = r; }
 
 	// 高さ
 	float GetHeight() const { return height; }
+	void SetHeight(float h) { height = h; }
 
 	// ダメージ取得
 	virtual float GetDamage() const { return damage; }
 	void SetDamage(float d) { damage = d; }
+
+	// 形状のゲッター/ セッター
+	void SetShape(HitBoxShape s) { shape = s; }
+	HitBoxShape GetShape() const { return shape; }
 protected:
 	// 行列更新処理 
 	void UpdateTransform();
@@ -57,4 +68,6 @@ protected:
 	float damage = 1.0f;
 
 	MagicManager* manager = nullptr;
+
+	HitBoxShape shape = HitBoxShape::Sphere;
 };

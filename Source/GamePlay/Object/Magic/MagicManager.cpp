@@ -1,4 +1,7 @@
 #include "MagicManager.h"
+#include "GamePlay/Object/Magic/MagicProjectile.h"
+#include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMove.h"
+
 
 //コンストラクタ
 MagicManager::MagicManager()

@@ -57,7 +57,7 @@ void Player::Initialize()
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
 	trail.Initialize();              // トレイルの初期化
-	config.Load();					// 魔法の初期化
+	normalMagicConfig.Load();		// 魔法の初期化
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
@@ -302,6 +302,22 @@ void Player::DrawGUI()
 {
 	ImGui::Begin(u8"プレイヤー");
 	{
+		// アニメーション遷移状態
+		if (ImGui::CollapsingHeader(u8"アニメーションステート状況", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			auto it = stateConfigs.find(currentState);
+
+			if (it != stateConfigs.end())
+			{
+				ImGui::Text(u8"現在の全身ステート: %s", it->second.animationName.c_str());
+			}
+			else
+			{
+				ImGui::Text(u8"現在の全身ステート: なし(または不明)");
+			}
+
+			ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
+		}
 
 		// パラメーター
 		if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
@@ -404,6 +420,41 @@ void Player::DrawGUI()
 			}
 		}
 
+		// 魔法関係
+		if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button(u8"保存##Normal"))
+			{
+				normalMagicConfig.Save();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"読み込み##Normal"))
+			{
+				normalMagicConfig.Load(); // JSONから読み込み[cite: 22]
+			}
+			ImGui::Separator();
+
+			ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
+			ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
+			ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
+			ImGui::Separator();
+
+			ImGui::Text(u8"--- 通常撃ち ---");
+			ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
+			ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
+			ImGui::Separator();
+
+			ImGui::Text(u8"--- チャージ撃ち  ---");
+			ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
+			ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
+			ImGui::Separator();
+
+			ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
+			ImGui::Separator();
+
+			ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
+		}
+
 		// トランスフォーム情報
 		if (ImGui::CollapsingHeader(u8"トランスフォーム (位置・回転・拡縮)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -453,60 +504,6 @@ void Player::DrawGUI()
 		{
 			ImGui::DragFloat3(u8"エフェクト根本位置", &rootOffset.x, 0.01f);
 			ImGui::DragFloat3(u8"エフェクト先端位置", &tipOffset.x, 0.01f);
-		}
-
-		// 魔法関係
-		if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			if (ImGui::Button(u8"保存"))
-			{
-				config.Save();
-			}
-
-			ImGui::SameLine();
-
-			if (ImGui::Button(u8"読み込み"))
-			{
-				config.Load();
-			}
-
-			{
-				ImGui::Text(u8"(風の刃)");
-				ImGui::DragFloat(u8"威力 (Damage)", &config.damage, 0.1f);
-				ImGui::DragFloat(u8"弾速 (Speed)", &config.speed, 0.1f);
-				ImGui::DragFloat(u8"消滅までの寿命", &config.lifeTimer, 0.1f);
-				ImGui::DragFloat(u8"当たり判定の大きさ", &config.hitRadius, 0.1f);
-				ImGui::DragFloat(u8"エフェクトの大きさ", &config.scale, 0.1f);
-				ImGui::DragFloat3(u8"球が出る位置", &config.spawnOffset.x, 0.1f);
-				ImGui::DragFloat(u8"射出前の溜め時間", &config.waitTimer, 0.1f);
-				ImGui::DragFloat(u8"魔法のクールダウン", &coolDownValue, 0.1f);
-			}
-
-			{
-				ImGui::Text(u8"(風の槍)");
-				{
-					ImGui::DragFloat(u8"突進した速度", &DashSpeed, 0.1f);
-					ImGui::Separator();
-					ImGui::Text(u8"突進した距離: %f.0", WindDashAttackDistance);
-				}
-			}
-		}
-
-		// アニメーション遷移状態
-		if (ImGui::CollapsingHeader(u8"アニメーションステート状況", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			auto it = stateConfigs.find(currentState);
-
-			if (it != stateConfigs.end())
-			{
-				ImGui::Text(u8"現在の全身ステート: %s", it->second.animationName.c_str());
-			}
-			else
-			{
-				ImGui::Text(u8"現在の全身ステート: なし(または不明)");
-			}
-
-			ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
 		}
 
 		// 移動時の背骨の傾き
@@ -635,25 +632,29 @@ void Player::MagicInput()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	if (animSequence.GetEvent("MagicInput"))
+
+	if(gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
 	{
 		if (magicCoolDownTimer > 0.0f) return;
 
-		// 風の刃の設定と生成
-		{
-			MagicSpawnInfo spawnInfo;
-			spawnInfo.position = position;
-			spawnInfo.angleY = angle.y;
-			spawnInfo.targetEnemy = enemy;
+		// カメラの前方向を取得する
+		Camera& camera = CameraManager::Instance().GetMainCamera();
+		DirectX::XMFLOAT3 dir = camera.GetFront();
 
-			config.spawnOffset.y = 1.0f;
+		// 魔法の設定
+		MagicSpawnInfo spawnInfo;
+		spawnInfo.position = position;
+		spawnInfo.direction = dir;
+		spawnInfo.owner = this;
+		spawnInfo.target = enemy;
 
-			// 魔法を生成する
-			WindBladeMagic::Emit(&magicManager, spawnInfo, config);
+		spawnInfo.holdTime = rtButtonHoldTime;
 
-			// 魔法を撃った後にクールダウンをセットする
-			magicCoolDownTimer = coolDownValue;
-		}
+		// 通常魔法を呼び出す
+		NormalMagic::Emit(&magicManager, spawnInfo, normalMagicConfig);
+
+		// クールダウンをセット
+		magicCoolDownTimer = coolDownValue;
 	}
 }
 
@@ -1536,6 +1537,15 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	else
 	{
 		rbButtonHoldTime = 0.0f;
+	}
+
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
+	{
+		rtButtonHoldTime += elapsedTime;
+	}
+	else
+	{
+		rtButtonHoldTime = 0.0f;
 	}
 
 	UpdateStateBehavior();

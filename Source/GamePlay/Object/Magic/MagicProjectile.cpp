@@ -29,8 +29,9 @@ void MagicProjectile::Update(float elapsedTime)
 			if (Magic != nullptr)
 			{
 				magicHandle = Magic->Play(position, config.scale);
-				state = ProjectileState::Fire;
 			}
+
+			state = ProjectileState::Fire;
 		}
 
 		break;
@@ -70,8 +71,38 @@ void MagicProjectile::Render(const RenderContext& rc)
 // デバッグプリミティブ描画
 void MagicProjectile::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	// 球を描画
-	renderer->DrawSphere(position, radius, { 1, 0, 1, 1 });
+	switch (shape)
+	{
+	case HitBoxShape::Sphere:
+		// 球を描画
+		renderer->DrawSphere(position, radius, { 1, 0, 1, 1 });
+
+		break;
+	case HitBoxShape::Capsule:
+		// 中心座標・向き・長さからカプセル描画用の行列を作成
+		DirectX::XMVECTOR cPos = DirectX::XMLoadFloat3(&position); // 中心座標
+		DirectX::XMVECTOR dir = DirectX::XMLoadFloat3(&direction);
+		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		if (fabsf(direction.y) > 0.999f)
+		{
+			up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		}
+
+		DirectX::XMMATRIX view = DirectX::XMMatrixLookToLH(cPos, dir, up);
+		DirectX::XMMATRIX world = DirectX::XMMatrixInverse(nullptr, view);
+
+		// Y軸方向へ伸ばすために90度回転
+		world = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f)) * world;
+
+		DirectX::XMFLOAT4X4 capsuleTransform;
+		DirectX::XMStoreFloat4x4(&capsuleTransform, world);
+
+		// 向きの合ったカプセルを描画！
+		renderer->DrawCapsule(capsuleTransform, radius, height, { 1.0f, 0.0f, 1.0f, 1.0f });
+
+		break;
+	}
 }
 
 // エフェクトを消す関数

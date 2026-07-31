@@ -2,20 +2,24 @@
 #include <DirectXMath.h>
 #include "json.hpp"
 
-class Enemy;
+// 前方宣言
+class Character;
 
 // 発射情報
 struct MagicSpawnInfo
 {
-	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f }; // プレイヤーの座標
-	float angleY = 0.0f;                               // プレイヤーの向き
-	Enemy* targetEnemy = nullptr;                      // ロックオンしてる敵
+	Character* target = nullptr;					    // 射撃対象
+	Character* owner = nullptr;							// 射撃者
+	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };  // プレイヤーの座標
+	DirectX::XMFLOAT3 direction = { 0.0f, 0.0f, 0.0f }; // 撃つ方向
+	float holdTime = 1.0f;								// 長押しした時間
+	float angleY = 0.0f;                                // プレイヤーの向き
 };
 
 // 魔法を出すための情報
 struct MagicInfo
 {
-	float damage = 100.0f; // ダメージ
+	float damage = 1.0f; // ダメージ
 
 	float speed = 20.0f; // 球の飛ぶ速度
 	float lifeTimer = 3.0f; // 球が消えるまでの時間

@@ -158,8 +158,7 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicProjectile.h" />
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.h" />
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Particle\compute_particle_system.h" />
     <ClInclude Include="Source\GamePlay\Object\Particle\Compute_Particle.h" />
     <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h" />
@@ -249,8 +248,7 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicProjectile.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.cpp" />
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Particle\Compute_Particle.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Particle\compute_particle_system.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp" />

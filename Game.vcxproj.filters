@@ -181,18 +181,6 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType">
       <UniqueIdentifier>{f989ee99-016b-4ecf-8d35-97da2587d692}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Player">
-      <UniqueIdentifier>{9ef62409-9558-41ea-95c1-2d1acfffe8a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic">
-      <UniqueIdentifier>{99e0d4e1-0b97-4b34-aae2-9d25b75a5bd0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Player\WindSpearMagic">
-      <UniqueIdentifier>{2bf5dd5d-72c0-4d28-8594-dfe06adb6fec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\Enemy">
-      <UniqueIdentifier>{64981090-fa45-4298-992c-4f015d289f71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\System\Renderer\Shader\bloom">
       <UniqueIdentifier>{9e774987-599a-48c4-90ba-91cdecf9bb40}</UniqueIdentifier>
     </Filter>
@@ -213,6 +201,15 @@
     </Filter>
     <Filter Include="Source\System\Renderer\Shader\meshVFX">
       <UniqueIdentifier>{7ddd6af1-8b3f-47a5-815a-f4ef035190aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\NormalMagic">
+      <UniqueIdentifier>{9af6660c-2e08-4dc6-8987-6282056fff05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\RapidMagic">
+      <UniqueIdentifier>{f14cc332-e3ce-44fe-ba4c-ada8fb32512d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\DefenseMagic">
+      <UniqueIdentifier>{c3cc6b6c-0103-467b-933a-e6868e7c0f4e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -465,12 +462,6 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicManager.h">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.h">
-      <Filter>Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.h">
-      <Filter>Source\GamepPlay\Object\Magic\MagicType\Enemy</Filter>
-    </ClInclude>
     <ClInclude Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.h">
       <Filter>Source\System\Renderer\Shader\FrameBuffer</Filter>
     </ClInclude>
@@ -510,6 +501,7 @@
     <ClInclude Include="Source\System\Renderer\Shader\meshVFX\meshVFX.h">
       <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -722,12 +714,6 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicManager.cpp">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Player\WindBladeMagic\WindBladeMagic.cpp">
-      <Filter>Source\GamepPlay\Object\Magic\MagicType\Player\WindBladeMagic</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\Enemy\BloodSpear.cpp">
-      <Filter>Source\GamepPlay\Object\Magic\MagicType\Enemy</Filter>
-    </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.cpp">
       <Filter>Source\System\Renderer\Shader\FrameBuffer</Filter>
     </ClCompile>
@@ -763,6 +749,9 @@
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\Shader\meshVFX\meshVFX.cpp">
       <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

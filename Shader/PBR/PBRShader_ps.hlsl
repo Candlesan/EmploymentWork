@@ -131,7 +131,7 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     // IBLèàóù
     float3 ambient = ambient_color.rgb * ambient_color.a;
     total_diffuse += ambient * DiffuseIBL(N, V, roughness, diffuse_reflectance, F0, diffuse_iem, samplerLinear);
-    total_specular += ambient * SpecularIBL(N, V, roughness, F0, lut_ggx, specular_pmrem, samplerLinear);
+    total_specular += ambient * SpecularIBL(N, V, roughness, F0, lut_ggx, specular_pmrem, samplerLinear); 
 
     // é’ï¡èàóù
     total_diffuse = lerp(total_diffuse, total_diffuse * occlusion_factor, occlusionStrength);

@@ -12,7 +12,7 @@
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Trail/Trail.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
-#include "GamePlay/Object/Magic/MagicType/Player/WindBladeMagic/WindBladeMagic.h"
+#include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 
 #include <memory>
 
@@ -165,7 +165,7 @@ private:
 
 	// „Ÿ„Ÿ –‚–@ „Ÿ„Ÿ
 	MagicManager magicManager;
-	WindBladeMagic::WindBladeConfig config;
+	NormalMagic::NormalMagicConfig normalMagicConfig;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 0.0f;
 	bool isMagicAttack = true;

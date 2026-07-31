@@ -1,0 +1,17 @@
+{
+    "chargeDamage": 10.0,
+    "chargeRadius": 1.0,
+    "chargeTimeThreshold": 0.5,
+    "damage": 1.0,
+    "hitHeight": 1.0,
+    "hitRadius": 1.0,
+    "lifeTimer": 3.0,
+    "normalDamage": 5.0,
+    "normalRadius": 0.5,
+    "range": 300.0,
+    "scale": 1.0,
+    "spawnOffsetX": 0.0,
+    "spawnOffsetY": 1.0,
+    "spawnOffsetZ": 0.0,
+    "speed": 20.0
+}
