@@ -1,0 +1,174 @@
+{
+    "effectName": "NewEffect",
+    "nodes": [
+        {
+            "meshVfx": {
+                "blendMode": 0,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "delayTime": 0.0,
+                "distortionPower": 0.0,
+                "lifeTime": 1.0,
+                "meshPath": "",
+                "noisePath": "",
+                "noiseUvOffset": [
+                    0.0,
+                    0.0
+                ],
+                "rotationSpeed": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "texturePath": "",
+                "useMesh": false,
+                "uvScrollSpeed": [
+                    0.0,
+                    0.0
+                ]
+            },
+            "name": "雪",
+            "particle": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "delayTime": 0.0,
+                "duration": 0.0,
+                "emitCount": 1000,
+                "isBillboard": true,
+                "isLoop": true,
+                "lifeTime": 10.0,
+                "position": [
+                    0.0,
+                    30.0,
+                    0.0
+                ],
+                "positionAcceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "positionAccelerationRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "positionRange": [
+                    100.0,
+                    1.0,
+                    100.0
+                ],
+                "positionVelocity": [
+                    0.0,
+                    -5.0,
+                    0.0
+                ],
+                "positionVelocityRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotationAcceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotationAccelerationRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotationRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotationVelocity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotationVelocityRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.1
+                ],
+                "scaleAcceleration": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaleAccelerationRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaleRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaleVelocity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaleVelocityRange": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "spawnInterval": 1.0,
+                "splitCount": [
+                    4,
+                    4
+                ],
+                "spriteType": 4,
+                "texturePath": "Data\\Sprite\\Particle\\texture\\particle256x256.png",
+                "uvScrollSpeed": [
+                    0.0,
+                    0.0
+                ]
+            },
+            "trail": {
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "delayTime": 0.0,
+                "lifeTime": 1.0,
+                "texturePath": "",
+                "width": 1.0,
+                "widthEnd": 0.0,
+                "widthMiddle": 1.0,
+                "widthStart": 1.0
+            },
+            "type": 0,
+            "visible": true
+        }
+    ]
+}

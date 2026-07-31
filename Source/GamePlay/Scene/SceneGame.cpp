@@ -3,6 +3,7 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Audio/Audio.h"
 #include "System/Effect/EffectManager.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 #include "System/Core/Input/Input.h"
 #include "System/UI/Dialog.h"
 
@@ -98,6 +99,9 @@ void SceneGame::Initialize()
 	// エフェクトエディター初期化
 	effectEditor = std::make_unique<EffectEditor>();
 	effectEditor->Initialize(device);
+
+	// 自作エフェクトマネージャー初期化
+	CustomEffectManager::Instance().Initialize(device);
 }
 
 // 終了化
@@ -243,6 +247,9 @@ void SceneGame::Update(float elapsedTime)
 
 		// エフェクト更新処理 
 		EffectManager::Instance().Update(delta);
+
+		// 自作エフェクトマネージャ更新
+		CustomEffectManager::Instance().Update(delta);
 	}
 }
 
@@ -346,8 +353,15 @@ void SceneGame::Render()
 		// エフェクト描画
 		effectEditor->Render(rc, modelRenderer);
 
+		// 自作エフェクトマネージャー描画
+		CustomEffectManager::Instance().Render(rc);
+
 		// メッシュVFX描画
 		effectEditor->RenderMeshVFX(modelRenderer);
+
+		// 自作エフェクトマネージャーのメッシュVFX描画
+		CustomEffectManager::Instance().RenderMeshVFX(modelRenderer);
+
 		modelRenderer->Render(rc);
 
 		// シェイプレンダラ描画
@@ -645,6 +659,45 @@ void SceneGame::DrawGUI()
 	{
 		effectEditor->DrawGUI();
 	}
+
+	// SceneGame.cpp の DrawGUI() 内
+	ImGui::Begin(u8"エフェクトマネージャーテスト");
+	{
+		if (ImGui::Button(u8"エフェクトJSONをロード"))
+		{
+			char filepath[MAX_PATH] = { 0 };
+			HWND hwnd = Graphics::Instance().GetWindowHandle();
+
+			// ダイアログを開いてJSONファイルを選択[cite: 25]
+			if (Dialog::OpenFileName(filepath, MAX_PATH, "JSON File\0*.json\0\0", "エフェクト読込", hwnd) == DialogResult::OK)
+			{
+				// パスからファイル名を取り出してエフェクト名にする
+				char filename[MAX_PATH];
+				_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+
+				// マネージャーにロード＆キャッシュさせる！[cite: 22, 23]
+				CustomEffectManager::Instance().LoadEffectConfig(filename, filepath);
+			}
+		}
+
+		ImGui::Separator();
+
+		// プレイヤーの足元にテスト再生してみるボタン
+		char effectNameBuf[128];
+		strncpy_s(effectNameBuf, effectName.c_str(), sizeof(effectNameBuf));
+		if (ImGui::InputText(u8"エフェクト名入力", effectNameBuf, sizeof(effectNameBuf)))
+		{
+			effectName = effectNameBuf;
+		}
+		ImGui::Separator();
+
+		// キャッシュしておいたエフェクトを再生
+		if (ImGui::Button(u8"エフェクト再生"))
+		{
+			CustomEffectManager::Instance().PlayEffect(effectName.c_str(), {0.0f, 0.0f, 0.0f});
+		}
+	}
+	ImGui::End();
 
 	player.DrawGUI();
 	enemy->DrawGUI();

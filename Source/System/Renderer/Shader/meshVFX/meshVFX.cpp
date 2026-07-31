@@ -115,8 +115,15 @@ bool meshVFX::SetTexture(const std::string& texturePath)
 {
 	if (!device || texturePath.empty()) return false;
 
+	// メンテクスチャ側にもパスの比較を入れてあげる！
+	static std::string currentPath = "";
+	if (currentPath == texturePath && shaderResourceView != nullptr) return true;
+	currentPath = texturePath;
+
 	D3D11_TEXTURE2D_DESC texture2d_desc;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+	HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+	if (FAILED(hr)) return false;
 
 	try
 	{

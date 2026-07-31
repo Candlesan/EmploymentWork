@@ -7,4 +7,5 @@ public:
 	// 指定範囲のランダム値を計算する
 	static float RandomRange(float min, float max);
 	static int RandomRange(int min, int max);
+	static float RandFloat();
 };

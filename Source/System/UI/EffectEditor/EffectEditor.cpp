@@ -148,7 +148,7 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
                 DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(rx, ry, rz);
 
                 // Translation: テスト発生位置
-                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(testSpawnPos.x, testSpawnPos.y, testSpawnPos.z);
+                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.meshVfx.position.x, node.meshVfx.position.y, node.meshVfx.position.z);
 
                 // トランスフォーム行列を合成してモデルに適用
                 DirectX::XMFLOAT4X4 worldTransform;
@@ -521,6 +521,7 @@ void EffectEditor::DrawMeshVfxInspector(MeshVfxConfig& meshVfxConfig)
     ImGui::Combo(u8"ブレンドモード##Mesh", &meshVfxConfig.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
     ImGui::Separator();
 
+    ImGui::DragFloat3(u8"位置##Mesh", &meshVfxConfig.position.x, 0.1f);
     ImGui::DragFloat3(u8"大きさ##Mesh", &meshVfxConfig.scale.x, 0.1f);
     ImGui::DragFloat3(u8"回転速度##Mesh", &meshVfxConfig.rotationSpeed.x, 1.0f);
     ImGui::ColorEdit4(u8"色##Mesh", &meshVfxConfig.color.x);

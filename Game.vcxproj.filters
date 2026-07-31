@@ -211,6 +211,9 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType\DefenseMagic">
       <UniqueIdentifier>{c3cc6b6c-0103-467b-933a-e6868e7c0f4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\UI\EffectEditor\EffectManager">
+      <UniqueIdentifier>{a27d48c2-644f-4922-ad9e-c4f2ea5b0a50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -501,7 +504,15 @@
     <ClInclude Include="Source\System\Renderer\Shader\meshVFX\meshVFX.h">
       <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.h">
+      <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.h">
+      <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -751,7 +762,13 @@
       <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.cpp">
+      <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.cpp">
+      <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

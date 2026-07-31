@@ -4,6 +4,7 @@
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
 #include "GamePlay/Object/Particle/Compute_Particle.h"
 #include <memory>
+#include <string>
 
 // モデル
 #include "Gameplay/Object/Stage/Stage.h"
@@ -113,4 +114,6 @@ private:
 
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;
+
+	std::string effectName;
 };

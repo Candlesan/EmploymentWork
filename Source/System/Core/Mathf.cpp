@@ -18,3 +18,10 @@ int Mathf::RandomRange(int min, int max)
 	// min`max‚Ü‚Å‚Ìƒ‰ƒ“ƒ_ƒ€’l‚É•ÏŠ·
 	return min + (max - min) * value;
 }
+
+// -1.0f`1.0f‚ÌŠÔ‚ğƒ‰ƒ“ƒ_ƒ€‚Å•Ô‚·ŠÖ”
+float Mathf::RandFloat()
+{
+	return (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 2.0f - 1.0f;
+}
+

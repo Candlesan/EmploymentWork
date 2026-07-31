@@ -55,8 +55,8 @@ void EffectConfig::Save(const std::string& filePath)
         nodeJson["particle"]["rotationAccelerationRange"] = { node.particle.rotationAccelerationRange.x, node.particle.rotationAccelerationRange.y, node.particle.rotationAccelerationRange.z };
 
         // КgСе
-        nodeJson["particle"]["scale"] = { node.particle.scale.x, node.particle.scale.y };
-        nodeJson["particle"]["scaleRange"] = { node.particle.scaleRange.x, node.particle.scaleRange.y };
+        nodeJson["particle"]["scale"] = { node.particle.scale.x, node.particle.scale.y, node.particle.scale.z };
+        nodeJson["particle"]["scaleRange"] = { node.particle.scaleRange.x, node.particle.scaleRange.y, node.particle.scaleRange.z };
         nodeJson["particle"]["scaleVelocity"] = { node.particle.scaleVelocity.x, node.particle.scaleVelocity.y, node.particle.scaleVelocity.z };
         nodeJson["particle"]["scaleVelocityRange"] = { node.particle.scaleVelocityRange.x, node.particle.scaleVelocityRange.y, node.particle.scaleVelocityRange.z };
         nodeJson["particle"]["scaleAcceleration"] = { node.particle.scaleAcceleration.x, node.particle.scaleAcceleration.y, node.particle.scaleAcceleration.z };
@@ -71,7 +71,8 @@ void EffectConfig::Save(const std::string& filePath)
         nodeJson["meshVfx"]["noisePath"] = node.meshVfx.noisePath;
         nodeJson["meshVfx"]["uvScrollSpeed"] = { node.meshVfx.uvScrollSpeed.x, node.meshVfx.uvScrollSpeed.y };
         nodeJson["meshVfx"]["useMesh"] = node.meshVfx.useMesh;
-        nodeJson["meshVfx"]["scale"] = { node.meshVfx.scale.x, node.meshVfx.scale.y };
+        nodeJson["meshVfx"]["position"] = { node.meshVfx.position.x, node.meshVfx.position.y, node.meshVfx.position.z };
+        nodeJson["meshVfx"]["scale"] = { node.meshVfx.scale.x, node.meshVfx.scale.y, node.meshVfx.scale.z };
         nodeJson["meshVfx"]["rotationSpeed"] = { node.meshVfx.rotationSpeed.x, node.meshVfx.rotationSpeed.y, node.meshVfx.rotationSpeed.z };
         nodeJson["meshVfx"]["color"] = { node.meshVfx.color.x, node.meshVfx.color.y, node.meshVfx.color.z, node.meshVfx.color.w };
         nodeJson["meshVfx"]["noiseUvOffset"] = { node.meshVfx.noiseUvOffset.x, node.meshVfx.noiseUvOffset.y};
@@ -170,8 +171,8 @@ void EffectConfig::Load(const std::string& filePath)
                     if (p.find("rotationAccelerationRange") != p.end()) node.particle.rotationAccelerationRange = { p["rotationAccelerationRange"][0], p["rotationAccelerationRange"][1], p["rotationAccelerationRange"][2] };
 
                     // КgСе
-                    if (p.find("scale") != p.end()) node.particle.scale = { p["scale"][0], p["scale"][1] };
-                    if (p.find("scaleRange") != p.end()) node.particle.scaleRange = { p["scaleRange"][0], p["scaleRange"][1] };
+                    if (p.find("scale") != p.end()) node.particle.scale = { p["scale"][0], p["scale"][1], p["scale"][2] };
+                    if (p.find("scaleRange") != p.end()) node.particle.scaleRange = { p["scaleRange"][0], p["scaleRange"][1], p["scaleRange"][2] };
                     if (p.find("scaleVelocity") != p.end()) node.particle.scaleVelocity = { p["scaleVelocity"][0], p["scaleVelocity"][1], p["scaleVelocity"][2] };
                     if (p.find("scaleVelocityRange") != p.end()) node.particle.scaleVelocityRange = { p["scaleVelocityRange"][0], p["scaleVelocityRange"][1], p["scaleVelocityRange"][2] };
                     if (p.find("scaleAcceleration") != p.end()) node.particle.scaleAcceleration = { p["scaleAcceleration"][0], p["scaleAcceleration"][1], p["scaleAcceleration"][2] };
@@ -186,8 +187,8 @@ void EffectConfig::Load(const std::string& filePath)
                 {
                     const auto& m = nodeJson["meshVfx"];
                     node.meshVfx.meshPath = m.value("meshPath", "");
-                    node.meshVfx.texturePath = m.value("noisePath", "");
-                    node.meshVfx.noisePath = m.value("texturePath", "");
+                    node.meshVfx.texturePath = m.value("texturePath", "");
+                    node.meshVfx.noisePath = m.value("noisePath", "");
                     node.meshVfx.useMesh = m.value("useMesh", false);
                     node.meshVfx.lifeTime = m.value("lifeTime", 1.0f);
                     node.meshVfx.delayTime = m.value("delayTime", 0.0f);
@@ -197,6 +198,7 @@ void EffectConfig::Load(const std::string& filePath)
                     if (m.find("uvScrollSpeed") != m.end()) node.meshVfx.uvScrollSpeed = { m["uvScrollSpeed"][0], m["uvScrollSpeed"][1] };
                     if (m.find("noiseUvOffset") != m.end()) node.meshVfx.noiseUvOffset = { m["noiseUvOffset"][0], m["noiseUvOffset"][1] };
                     if (m.find("color") != m.end()) node.meshVfx.color = { m["color"][0], m["color"][1], m["color"][2], m["color"][3] };
+                    if (m.find("position") != m.end()) node.meshVfx.position = { m["position"][0], m["position"][1], m["position"][2] };
                     if (m.find("scale") != m.end()) node.meshVfx.scale = { m["scale"][0], m["scale"][1], m["scale"][2] };
                     if (m.find("rotationSpeed") != m.end()) node.meshVfx.rotationSpeed = { m["rotationSpeed"][0], m["rotationSpeed"][1], m["rotationSpeed"][2] };
                 }

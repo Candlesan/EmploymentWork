@@ -50,8 +50,8 @@ struct ParticleEffectConfig
 	DirectX::XMFLOAT3 rotationAcceleration = { 0.0f, 0.0f, 0.0f };		// 回転の加速度
 	DirectX::XMFLOAT3 rotationAccelerationRange = { 0.0f, 0.0f, 0.0f }; // 回転の加速度のバラつき
 
-	DirectX::XMFLOAT2 scale = { 1.0f, 1.0f };							// スケール
-	DirectX::XMFLOAT2 scaleRange = { 0.0f, 0.0f };						// 大きさのバラつき
+	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };						// スケール
+	DirectX::XMFLOAT3 scaleRange = { 0.0f, 0.0f, 0.0f };						// 大きさのバラつき
 	DirectX::XMFLOAT3 scaleVelocity = { 0.0f, 0.0f, 0.0f };				// 拡大速度
 	DirectX::XMFLOAT3 scaleVelocityRange = { 0.0f, 0.0f, 0.0f };		// 拡大速度のばらつき
 	DirectX::XMFLOAT3 scaleAcceleration = { 0.0f, 0.0f, 0.0f };			// 拡大速度の加速度
@@ -69,6 +69,7 @@ struct MeshVfxConfig
 	DirectX::XMFLOAT2 uvScrollSpeed = {0.0f, 0.0f};				// UVスクロール速度
 
 	bool useMesh = false;										// メッシュを使うか
+	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };				// スケール
 	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };				// スケール
 	DirectX::XMFLOAT3 rotationSpeed = { 0.0f, 0.0f, 0.0f };		// 自転速度
 	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };		// RGBA

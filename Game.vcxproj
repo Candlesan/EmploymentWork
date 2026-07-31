@@ -210,6 +210,8 @@
     <ClInclude Include="Source\System\UI\Dialog.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectConfig.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectEditor.h" />
+    <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.h" />
+    <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp" />
@@ -295,6 +297,8 @@
     <ClCompile Include="Source\System\UI\Dialog.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectConfig.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectEditor.cpp" />
+    <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.cpp" />
+    <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
