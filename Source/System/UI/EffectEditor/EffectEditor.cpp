@@ -12,10 +12,6 @@ void EffectEditor::Initialize(ID3D11Device* device)
 	 // パーティクルマネージャーの初期化
 	particleManager = std::make_unique<Compute_Particle>(device);
 
-    // トレイルの初期化
-    trailRenderer = std::make_unique<Trail>();
-    trailRenderer->Initialize();
-
     srand(static_cast<unsigned int>(time(nullptr)));
 }
 
@@ -24,18 +20,18 @@ void EffectEditor::DrawGUI()
 {
 	ImGui::Begin(u8"エフェクトエディター");
 
-	// ツールバー
-	DrawFileToolbar();
-	ImGui::Separator();
-
-    // ノード一覧
-    DrawNodeList();
-    ImGui::Separator();
-
     if (selectedNodeIndex >= currentConfig.nodes.size())
     {
         selectedNodeIndex = 0;
     }
+
+    // ツールバー
+    DrawFileToolbar();
+    ImGui::Separator();
+
+    DrawNodeList();
+    ImGui::Separator();
+
 
     // 選択中のノードを参照で受け取る
     auto& selectedNode = currentConfig.nodes[selectedNodeIndex];
@@ -49,28 +45,7 @@ void EffectEditor::DrawGUI()
     }
     ImGui::Separator();
 
-    if (selectedNode.type == EffectNodeType::Particle)
-    {
-        if (ImGui::CollapsingHeader(u8"パーティクル設定", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            DrawParticleInspector(selectedNode.particle);
-        }
-    }
-    else if (selectedNode.type == EffectNodeType::Mesh)
-    {
-        if (ImGui::CollapsingHeader(u8"メッシュVFX設定", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            DrawMeshVfxInspector(selectedNode.meshVfx);
-        }
-    }
-    // DrawGUI 内
-    else if (selectedNode.type == EffectNodeType::Trail)
-    {
-        if (ImGui::CollapsingHeader(u8"トレイル設定", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            DrawTrailInspector(selectedNode.trail);
-        }
-    }
+    DrawNodeInspector(selectedNode);
     ImGui::End();
 }
 
@@ -86,9 +61,9 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
 
     for (auto& node : currentConfig.nodes)
     {
-        if (node.type == EffectNodeType::Particle)
+        if (node.type == RenderType::Particle)
         {
-            node.particle.spawnTimer = node.particle.spawnInterval;
+            node.spawnTimer = node.spawnInterval;
         }
     }
 
@@ -110,56 +85,94 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 
     // エフェクト全体の時間を進める
     effectTimer += elapsedTime;
+    SyncRuntimeNodes();
 
     //　ノードごとに走査する
     bool anyNodeActive = false; // まだ再生しているノードがあるか
 
     float maxDuration = 0.0f;
 
-    for (auto& node : currentConfig.nodes)
+    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
+        auto& node = currentConfig.nodes[i];
+        auto& rNode = runtimeNodes[i];
+
         if (!node.visible) continue;
 
+        // UVスクロールの時間を進める
+        rNode.currentUvOffset.x += node.uvScrollSpeed.x * elapsedTime;
+        rNode.currentUvOffset.y += node.uvScrollSpeed.y * elapsedTime;
+        rNode.currentUvOffset.x = fmodf(rNode.currentUvOffset.x, 1.0f);
+        rNode.currentUvOffset.y = fmodf(rNode.currentUvOffset.y, 1.0f);
+
         // パーティクルノードの処理
-        if (node.type == EffectNodeType::Particle)
+        if (node.type == RenderType::Particle)
         {
             // ノードの生存時間をチェック
-            if (node.particle.duration > maxDuration)
+            if (node.duration > maxDuration)
             {
-                maxDuration = node.particle.duration;
+                maxDuration = node.duration;
             }
         }
         // メッシュの処理
-        else if (node.type == EffectNodeType::Mesh)
+        else if (node.type == RenderType::Mesh)
         {
-            if (effectTimer < node.meshVfx.delayTime) continue;
+            if (effectTimer < node.delayTime) continue;
 
-            currentMeshTime += elapsedTime;
-
-            if (vfxMeshModel)
+            if (rNode.meshModel)
             {
-                // Scale: XとYの設定しかないため、幅と奥行き(XとZ)を均等に拡縮する
-                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.meshVfx.scale.x, node.meshVfx.scale.y, node.meshVfx.scale.z);
+                float t = effectTimer - node.delayTime;
 
-                // Rotation: 回転スピード × 経過時間 で自転させる
-                float rx = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.x * currentMeshTime);
-                float ry = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.y * currentMeshTime);
-                float rz = DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.z * currentMeshTime);
-                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(rx, ry, rz);
+                // 拡大時間経過で大きく/小さくする
+                // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
+                DirectX::XMFLOAT3 currentScale = {
+                    node.scale.x + (node.scaleVelocity.x * t) + (0.5f * node.scaleAcceleration.x * t * t),
+                    node.scale.y + (node.scaleVelocity.y * t) + (0.5f * node.scaleAcceleration.y * t * t),
+                    node.scale.z + (node.scaleVelocity.z * t) + (0.5f * node.scaleAcceleration.z * t * t)
+                };
 
-                // Translation: テスト発生位置
-                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.meshVfx.position.x, node.meshVfx.position.y, node.meshVfx.position.z);
+                // マイナスにならないようにガード
+                currentScale.x = (std::max)(0.0f, currentScale.x);
+                currentScale.y = (std::max)(0.0f, currentScale.y);
+                currentScale.z = (std::max)(0.0f, currentScale.z);
+
+                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(currentScale.x, currentScale.y, currentScale.z);
+
+                // 回転
+                DirectX::XMFLOAT3 currentRot = {
+                            node.rotation.x + (node.rotationVelocity.x * t) + (0.5f * node.rotationAcceleration.x * t * t),
+                            node.rotation.y + (node.rotationVelocity.y * t) + (0.5f * node.rotationAcceleration.y * t * t),
+                            node.rotation.z + (node.rotationVelocity.z * t) + (0.5f * node.rotationAcceleration.z * t * t)
+                };
+                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+                    DirectX::XMConvertToRadians(currentRot.x),
+                    DirectX::XMConvertToRadians(currentRot.y),
+                    DirectX::XMConvertToRadians(currentRot.z)
+                );
+
+                // 位置
+                DirectX::XMFLOAT3 currentPos = {
+                            node.position.x + (node.positionVelocity.x * t) + (0.5f * node.positionAcceleration.x * t * t),
+                            node.position.y + (node.positionVelocity.y * t) + (0.5f * node.positionAcceleration.y * t * t),
+                            node.position.z + (node.positionVelocity.z * t) + (0.5f * node.positionAcceleration.z * t * t)
+                };
+
+                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
+                    testSpawnPos.x + currentPos.x,
+                    testSpawnPos.y + currentPos.y,
+                    testSpawnPos.z + currentPos.z
+                );
 
                 // トランスフォーム行列を合成してモデルに適用
                 DirectX::XMFLOAT4X4 worldTransform;
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
-                vfxMeshModel->UpdateTransform(worldTransform);
+                rNode.meshModel->UpdateTransform(worldTransform);
             }
         }
         // トレイルの処理
-        else if (node.type == EffectNodeType::Trail)
+        else if (node.type == RenderType::Trail)
         {
-            if (effectTimer < node.trail.delayTime) continue;
+            if (effectTimer < node.delayTime) continue;
 
             // エフェクト時間経過に合わせて、テスト位置を中心に円を描くように座標を計算する
             float speed = 5.0f; // 速度
@@ -175,23 +188,23 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 
             DirectX::XMFLOAT3 tip = {
                 root.x,
-                root.y + node.trail.width, // 幅（太さ）分だけ上にする
+                root.y + node.width, // 幅（太さ）分だけ上にする
                 root.z
             };
 
             // Trailクラスに過去座標として記録させる
-            if (trailRenderer)
+            if (rNode.trail)
             {
-                trailRenderer->SetWidthScales(node.trail.widthStart, node.trail.widthMiddle, node.trail.widthEnd);
-                trailRenderer->Update(root, tip);
+                rNode.trail->SetWidthScales(node.widthStart, node.widthMiddle, node.widthEnd);
+                rNode.trail->Update(root, tip);
             }
 
-            if (node.trail.lifeTime > maxDuration) maxDuration = node.trail.lifeTime;
+            if (node.lifeTime > maxDuration) maxDuration = node.lifeTime;
         }
 
-        if (node.meshVfx.lifeTime > maxDuration)
+        if (node.lifeTime > maxDuration)
         {
-            maxDuration = node.meshVfx.lifeTime;
+            maxDuration = node.lifeTime;
         }
     }
 
@@ -204,7 +217,7 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
         bool isLoop = false;
         for (const auto& node : currentConfig.nodes)
         {
-            if (node.type == EffectNodeType::Particle && node.particle.isLoop)
+            if (node.type == RenderType::Particle && node.isLoop)
             {
                 isLoop = true;
                 break;
@@ -227,13 +240,17 @@ void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
 {
     if (isPlaying)
     {
-        for (const auto& node : currentConfig.nodes)
+        for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
         {
+            auto& node = currentConfig.nodes[i];
+            if (i >= runtimeNodes.size()) break;
+            auto& rNode = runtimeNodes[i];
+
             if (!node.visible) continue;
 
-            if (node.type == EffectNodeType::Trail && trailRenderer)
+            if (node.type == RenderType::Trail && rNode.trail)
             {
-                trailRenderer->Render(rc);
+                rNode.trail->Render(rc);
             }
         }
     }
@@ -247,81 +264,89 @@ void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
 
 void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 {
-    if (isPlaying && vfxMeshModel)
+    if (!isPlaying) return;
+
+    // シェーダーの開始処理（パイプライン設定）
+    auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
+    if (!shader) return;
+
+    ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
-        for (const auto& node : currentConfig.nodes)
+        auto& node = currentConfig.nodes[i];
+        if (i >= runtimeNodes.size()) break;
+        auto& rNode = runtimeNodes[i];
+
+        if (!node.visible || node.type != RenderType::Mesh) continue;
+
+        if (rNode.meshModel && currentMeshTime <= node.lifeTime)
         {
-            if (!node.visible) continue;
+            // このノード専用のパラメータをシェーダーにセット
+            shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
+            shader->SetDistortionPower(node.distortionPower);
 
-            if (node.type == EffectNodeType::Mesh)
+            DirectX::XMFLOAT2 noiseUvOffset = {
+                node.noiseUvOffset.x * currentMeshTime,
+                node.noiseUvOffset.y * currentMeshTime
+            };
+            shader->SetNoiseUvOffset(noiseUvOffset);
+            shader->SetBlendMode(node.blendMode);
+            shader->SetColor(node.color); // このノード固有の色
+            shader->SetUvOffset(rNode.currentUvOffset);
+
+            // モデル内の各メッシュを即時描画
+            RenderContext rc;
+            rc.deviceContext = dc;
+            rc.renderState = Graphics::Instance().GetRenderState();
+            rc.camera = &CameraManager::Instance().GetMainCamera(); // カメラ参照
+
+            shader->Begin(rc);
+
+            for (const auto& mesh : rNode.meshModel->GetMeshes())
             {
-                if (currentMeshTime <= node.meshVfx.lifeTime)
-                {
-                    // ModelRendererから meshVFX シェーダーを取得
-                    // ModelRenderer に GetShader 関数などを渡すか、直接セットする形を用意
-                    auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
-                    if (shader)
-                    {
-                        // テクスチャをセット
-                        shader->SetTexture(node.meshVfx.texturePath);
-                        shader->SetNoiseTexture(node.meshVfx.noisePath);
+                // 頂点バッファ・インデックスバッファをセット
+                UINT stride = sizeof(Model::Vertex);
+                UINT offset = 0;
+                dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+                dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+                dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-                        shader->SetDistortionPower(node.meshVfx.distortionPower);
-
-                        DirectX::XMFLOAT2 noiseUvOffset = {
-                            node.meshVfx.noiseUvOffset.x * currentMeshTime,
-                            node.meshVfx.noiseUvOffset.y * currentMeshTime
-                        };
-                        shader->SetNoiseUvOffset(noiseUvOffset);
-
-                        shader->SetBlendMode(node.meshVfx.blendMode);
-                        
-                        // 生存時間に応じてアルファ値の計算
-                        float alphaRate = 1.0f - (currentMeshTime / node.meshVfx.lifeTime);
-
-                        DirectX::XMFLOAT4 finalColor = node.meshVfx.color;
-                        //finalColor.w *= alphaRate;
-
-                        // 色をセット
-                        shader->SetColor(finalColor);
-                        // 経過時間 × スクロール速度 で UV オフセットを計算してセット！
-                        DirectX::XMFLOAT2 uvOffset = {
-                            node.meshVfx.uvScrollSpeed.x * currentMeshTime,
-                            node.meshVfx.uvScrollSpeed.y * currentMeshTime
-                        };
-                        shader->SetUvOffset(uvOffset);
-                    }
-
-                    // MeshVFX シェーダーを指定して描画登録！
-                    modelRenderer->Draw(ShaderId::MeshVFX, vfxMeshModel);
-                }
+                // 行列とパラメータを定数バッファに更新して描画コール！
+                shader->Update(rc, mesh);
+                dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
             }
+
+            shader->End(rc);
         }
     }
 }
 
 // UIの描画パーツ
-void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
+void EffectEditor::DrawNodeInspector(NodeConfig& node)
 {
+    ImGui::Checkbox(u8"このノードを表示する##VisibleCheck", &node.visible);
+    ImGui::Separator();
+
     if (ImGui::BeginTabBar(u8"ParticleTabs"))
     {
         //　共通タブ
         if (ImGui::BeginTabItem(u8"共通"))
         {
-            ImGui::DragInt(u8"生成数##Particle", &particleConfig.emitCount, 1);
+            ImGui::DragInt(u8"生成数##Particle", &node.emitCount, 1);
             ImGui::Separator();
 
             ImGui::Separator();
 
-            ImGui::DragFloat(u8"寿命##Particle", &particleConfig.lifeTime, 0.05f, 0.1f, 10.0f);
+            ImGui::DragFloat(u8"寿命##Particle", &node.lifeTime, 0.05f, 0.1f, 10.0f);
             ImGui::Separator();
 
-            ImGui::Checkbox(u8"ループ再生##Particle", &particleConfig.isLoop);
+            ImGui::Checkbox(u8"ループ再生##Particle", &node.isLoop);
             ImGui::Separator();
 
-            ImGui::DragFloat(u8"生成間隔(秒)##Particle", &particleConfig.spawnInterval, 0.01f, 0.01f, 5.0f, "%.2fs");
-            ImGui::DragFloat(u8"存続時間(秒)##Particle", &particleConfig.duration, 0.1f, 0.0f, 60.0f, u8"%.1fs (0=無限)");
-            ImGui::DragFloat(u8"発生遅延(秒)##Particle", &particleConfig.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
+            ImGui::DragFloat(u8"生成間隔(秒)##Particle", &node.spawnInterval, 0.01f, 0.01f, 5.0f, "%.2fs");
+            ImGui::DragFloat(u8"存続時間(秒)##Particle", &node.duration, 0.1f, 0.0f, 60.0f, u8"%.1fs (0=無限)");
+            ImGui::DragFloat(u8"発生遅延(秒)##Particle", &node.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
 
             ImGui::EndTabItem();
         }
@@ -329,14 +354,14 @@ void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
         // 位置タブ
         if (ImGui::BeginTabItem(u8"位置"))
         {
-            ImGui::DragFloat3(u8"初期位置##Pos", &particleConfig.position.x, 0.1f);
-            ImGui::DragFloat3(u8"位置ばらつき##Pos", &particleConfig.positionRange.x, 0.1f);
+            ImGui::DragFloat3(u8"初期位置##Pos", &node.position.x, 0.1f);
+            ImGui::DragFloat3(u8"位置ばらつき##Pos", &node.positionRange.x, 0.1f);
             ImGui::Separator();
-            ImGui::DragFloat3(u8"初速度##Pos", &particleConfig.positionVelocity.x, 0.1f);
-            ImGui::DragFloat3(u8"初速度ばらつき##Pos", &particleConfig.positionVelocityRange.x, 0.1f);
+            ImGui::DragFloat3(u8"初速度##Pos", &node.positionVelocity.x, 0.1f);
+            ImGui::DragFloat3(u8"初速度ばらつき##Pos", &node.positionVelocityRange.x, 0.1f);
             ImGui::Separator();
-            ImGui::DragFloat3(u8"加速度##Pos", &particleConfig.positionAcceleration.x, 0.1f);
-            ImGui::DragFloat3(u8"加速度ばらつき##Pos", &particleConfig.positionAccelerationRange.x, 0.1f);
+            ImGui::DragFloat3(u8"加速度##Pos", &node.positionAcceleration.x, 0.1f);
+            ImGui::DragFloat3(u8"加速度ばらつき##Pos", &node.positionAccelerationRange.x, 0.1f);
 
             ImGui::EndTabItem();
         }
@@ -344,14 +369,14 @@ void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
         // 回転タブ
         if (ImGui::BeginTabItem(u8"回転"))
         {
-            ImGui::DragFloat3(u8"初期回転##Rot", &particleConfig.rotation.x, 0.1f);
-            ImGui::DragFloat3(u8"回転ばらつき##Rot", &particleConfig.rotationRange.x, 0.1f);
+            ImGui::DragFloat3(u8"初期回転##Rot", &node.rotation.x, 0.1f);
+            ImGui::DragFloat3(u8"回転ばらつき##Rot", &node.rotationRange.x, 0.1f);
             ImGui::Separator();
-            ImGui::DragFloat3(u8"角速度##Rot", &particleConfig.rotationVelocity.x, 0.1f);
-            ImGui::DragFloat3(u8"角速度ばらつき##Rot", &particleConfig.rotationVelocityRange.x, 0.1f);
+            ImGui::DragFloat3(u8"角速度##Rot", &node.rotationVelocity.x, 0.1f);
+            ImGui::DragFloat3(u8"角速度ばらつき##Rot", &node.rotationVelocityRange.x, 0.1f);
             ImGui::Separator();
-            ImGui::DragFloat3(u8"回転加速度##Rot", &particleConfig.rotationAcceleration.x, 0.1f);
-            ImGui::DragFloat3(u8"回転加速度ばらつき##Rot", &particleConfig.rotationAccelerationRange.x, 0.1f);
+            ImGui::DragFloat3(u8"回転加速度##Rot", &node.rotationAcceleration.x, 0.1f);
+            ImGui::DragFloat3(u8"回転加速度ばらつき##Rot", &node.rotationAccelerationRange.x, 0.1f);
 
             ImGui::EndTabItem();
         }
@@ -359,14 +384,14 @@ void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
         // 拡大（スケール）タブ
         if (ImGui::BeginTabItem(u8"拡大"))
         {
-            ImGui::DragFloat2(u8"初期拡大##Scale", &particleConfig.scale.x, 0.01f);
-            ImGui::DragFloat2(u8"拡大ばらつき##Scale", &particleConfig.scaleRange.x, 0.01f);
+            ImGui::DragFloat3(u8"初期拡大##Scale", &node.scale.x, 0.01f);
+            ImGui::DragFloat3(u8"拡大ばらつき##Scale", &node.scaleRange.x, 0.01f);
             ImGui::Separator();
-            ImGui::DragFloat2(u8"拡大速度##Scale", &particleConfig.scaleVelocity.x, 0.01f);
-            ImGui::DragFloat2(u8"拡大速度ばらつき##Scale", &particleConfig.scaleVelocityRange.x, 0.01f);
+            ImGui::DragFloat3(u8"拡大速度##Scale", &node.scaleVelocity.x, 0.01f);
+            ImGui::DragFloat3(u8"拡大速度ばらつき##Scale", &node.scaleVelocityRange.x, 0.01f);
             ImGui::Separator();
-            ImGui::DragFloat2(u8"拡大加速度##Scale", &particleConfig.scaleAcceleration.x, 0.01f);
-            ImGui::DragFloat2(u8"拡大加速度ばらつき##Scale", &particleConfig.scaleAccelerationRange.x, 0.01f);
+            ImGui::DragFloat3(u8"拡大加速度##Scale", &node.scaleAcceleration.x, 0.01f);
+            ImGui::DragFloat3(u8"拡大加速度ばらつき##Scale", &node.scaleAccelerationRange.x, 0.01f);
 
             ImGui::EndTabItem();
         }
@@ -394,197 +419,174 @@ void EffectEditor::DrawParticleInspector(ParticleEffectConfig& particleConfig)
                         pathStr = pathStr.substr(pos);
                     }
 
-                    currentConfig.nodes[selectedNodeIndex].particle.texturePath = pathStr;
+                    currentConfig.nodes[selectedNodeIndex].texturePath = pathStr;
 
                     if (particleManager)
                     {
                         particleManager->SetTexture(
                             pathStr,
-                            { (UINT)currentConfig.nodes[selectedNodeIndex].particle.splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].particle.splitCount[1] }
+                            { (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[1] }
                         );
                     }
                 }
             }
             ImGui::SameLine();
 
-            ImGui::Text(u8": % s", particleConfig.texturePath.c_str());
-            ImGui::Separator();
+            ImGui::Text(u8": % s", node.texturePath.c_str());
 
-            ImGui::Checkbox(u8"ビルボード##Particle", &particleConfig.isBillboard); 
-            ImGui::Separator();
-
-            if (ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", particleConfig.splitCount))
+            if (!node.texturePath.empty())
             {
-                // 分割数の数値をいじった瞬間にGPU側の設定も更新する
-                if (particleManager && !particleConfig.texturePath.empty()) {
-                    particleManager->SetTexture(particleConfig.texturePath, { (UINT)particleConfig.splitCount[0], (UINT)particleConfig.splitCount[1] });
+                if (ImGui::Button(u8"テクスチャ解除##TextuerClear"))
+                {
+                    node.texturePath = "";
+
+                    if (particleManager)
+                    {
+                        particleManager->SetTexture("", { 1, 1 });
+                    }
                 }
             }
 
-            ImGui::SliderInt(u8"コマ番号##Particle", &particleConfig.spriteType, 0, 15);
-            ImGui::DragFloat2(u8"UVスクロール速度(X,Y)##Particle", &particleConfig.uvScrollSpeed.x, 0.01f, -10.0f, 10.0f, "%.2f");
+            ImGui::Separator();
+
+
+            ImGui::Checkbox(u8"ビルボード##Particle", &node.isBillboard);
+            ImGui::Separator();
+
+            const char* blendItems[] = { u8"通常半透明 (Alpha)", u8"加算 (Additive)" };
+            ImGui::Combo(u8"ブレンドモード##Mesh", &node.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
+            ImGui::Separator();
+
+
+            if (ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", node.splitCount))
+            {
+                // 分割数の数値をいじった瞬間にGPU側の設定も更新する
+                if (particleManager && !node.texturePath.empty()) {
+                    particleManager->SetTexture(node.texturePath, { (UINT)node.splitCount[0], (UINT)node.splitCount[1] });
+                }
+            }
+
+            ImGui::SliderInt(u8"コマ番号##Particle", &node.spriteType, 0, 15);
+            ImGui::DragFloat2(u8"UVスクロール速度(X,Y)##Particle", &node.uvScrollSpeed.x, 0.01f, -10.0f, 10.0f, "%.2f");
 
             ImGui::EndTabItem();
         }
 
         // カラータブ
-        if (ImGui::BeginTabItem(u8"カラー"))
+        if (ImGui::BeginTabItem(u8"描画"))
         {
-            ImGui::ColorEdit4(u8"色##Color", &particleConfig.color.x);
+            const char* renderTypeItems[] = {
+                u8"スプライト",
+                u8"モデル",
+                u8"軌跡",
+                u8"無し"
+            };
+            int currentType = static_cast<int>(node.type);
+
+            if (ImGui::Combo(u8"描画方法##RenderTypeCombo", &currentType, renderTypeItems, IM_ARRAYSIZE(renderTypeItems)))
+            {
+                node.type = static_cast<RenderType>(currentType);
+            }
+            ImGui::Separator();
+
+            ImGui::ColorEdit4(u8"色##Color", &node.color.x);
+            ImGui::Separator();
+
+            if (node.type == RenderType::Mesh)
+            {
+                // モデル読込 (.gltf / .glb)
+                if (ImGui::Button(u8"モデル読込##Mesh"))
+                {
+                    char filePath[MAX_PATH] = { 0 };
+                    HWND hwnd = Graphics::Instance().GetWindowHandle();
+                    if (Dialog::OpenFileName(filePath, MAX_PATH, "GLTF/GLB File\0*.gltf;*.glb\0\0", "モデル選択", hwnd) == DialogResult::OK)
+                    {
+                        std::string pathStr = filePath;
+                        size_t pos = pathStr.find("Data");
+                        if (pos != std::string::npos) pathStr = pathStr.substr(pos);
+
+                        node.meshPath = pathStr;
+                        ID3D11Device* device = Graphics::Instance().GetDevice();
+
+                        SyncRuntimeNodes();
+
+                        if (selectedNodeIndex < runtimeNodes.size())
+                        {
+                            runtimeNodes[selectedNodeIndex].meshModel = std::make_shared<Model>(device, pathStr.c_str());
+                        }
+                    }
+                }
+                ImGui::SameLine();
+
+                ImGui::Text(u8": %s", node.meshPath.c_str());
+                ImGui::Separator();
+
+                if (!node.meshPath.empty())
+                {
+                    if (ImGui::Button(u8"モデル解除##MeshClear"))
+                    {
+                        // 設定データのパスをクリア
+                        node.meshPath = "";
+
+                        // 実際に保持している 3Dモデルポインタを nullptr で解放
+                        SyncRuntimeNodes(); // 安全のためサイズ同期
+                        if (selectedNodeIndex < runtimeNodes.size())
+                        {
+                            runtimeNodes[selectedNodeIndex].meshModel = nullptr;
+                        }
+                    }
+                }
+                ImGui::Separator();
+
+                // テクスチャ ＆ ノイズテクスチャ
+                if (ImGui::Button(u8"ノイズテクスチャ読込##Mesh"))
+                {
+                    char filePath[MAX_PATH] = { 0 };
+                    HWND hwnd = Graphics::Instance().GetWindowHandle();
+                    if (Dialog::OpenFileName(filePath, MAX_PATH,
+                        "PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
+                        "テクスチャ選択",
+                        hwnd) == DialogResult::OK)
+                    {
+                        std::string pathStr = filePath;
+                        size_t pos = pathStr.find("Data");
+                        if (pos != std::string::npos) pathStr = pathStr.substr(pos);
+
+                        node.noisePath = pathStr;
+                    }
+                }
+                ImGui::SameLine();
+
+                ImGui::Text(u8": %s", node.noisePath.c_str());
+                ImGui::Separator();
+
+                if (!node.noisePath.empty())
+                {
+                    if (ImGui::Button(u8"ノイズテクスチャ解除##NoiseClear"))
+                    {
+                        node.noisePath = "";        // パスをクリア
+                        node.distortionPower = 0.0f; // 歪みの強さも0に戻しておく
+                    }
+                }
+                ImGui::Separator();
+
+                ImGui::DragFloat(u8"ノイズの強さ", &node.distortionPower, 0.05f, 0.0f, 10.0f);
+                ImGui::DragFloat2(u8"ノイズUVスクロール", &node.noiseUvOffset.x, 0.01f, -10.0f, 10.0f);
+            }
+            else if (node.type == RenderType::Trail)
+            {
+                // トレイル用テクスチャ読込 ＆ 幅設定
+                ImGui::DragFloat(u8"幅(太さ)", &node.width, 0.1f);
+                ImGui::Text(u8"【幅スケール (形状)】");
+                ImGui::DragFloat(u8"先端(頭)", &node.widthStart, 0.01f, 0.0f, 5.0f);
+                ImGui::DragFloat(u8"中央", &node.widthMiddle, 0.01f, 0.0f, 5.0f);
+                ImGui::DragFloat(u8"末端(尻)", &node.widthEnd, 0.01f, 0.0f, 5.0f);
+            }
 
             ImGui::EndTabItem();
         }
 
-        ImGui::EndTabBar(); 
-    }
-}
-void EffectEditor::DrawMeshVfxInspector(MeshVfxConfig& meshVfxConfig)
-{
-    if (ImGui::Button(u8"読込##Mesh"))
-    {
-        char filePath[MAX_PATH] = { 0 };
-        HWND hwnd = Graphics::Instance().GetWindowHandle();
-        if (Dialog::OpenFileName(filePath, MAX_PATH,
-            "GLTF/GLB File\0*.gltf;*.glb\0\0",
-            "モデルを開く",
-            hwnd) == DialogResult::OK)
-        {
-            std::string pathStr = filePath;
-
-            // Dataという文字を探してそれ以降のパスを切り取る
-            size_t pos = pathStr.find("Data");
-            if (pos != std::string::npos)
-            {
-                pathStr = pathStr.substr(pos);
-            }
-
-            meshVfxConfig.meshPath = pathStr;
-            ID3D11Device* device = Graphics::Instance().GetDevice();
-            vfxMeshModel = std::make_shared<Model>(device, pathStr.c_str());
-
-            DirectX::XMFLOAT4X4 identity;
-            DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
-            vfxMeshModel->UpdateTransform(identity);
-        }
-    }
-    ImGui::SameLine();
-    ImGui::Text(u8": %s", meshVfxConfig.meshPath.c_str());
-
-    ImGui::Separator();
-
-    // テクスチャ読み込みUIを追加！
-    if (ImGui::Button(u8"テクスチャ読込##Mesh"))
-    {
-        char filePath[MAX_PATH] = { 0 };
-        HWND hwnd = Graphics::Instance().GetWindowHandle();
-        if (Dialog::OpenFileName(filePath, MAX_PATH,
-            "PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
-            "テクスチャ選択",
-            hwnd) == DialogResult::OK)
-        {
-            std::string pathStr = filePath;
-            size_t pos = pathStr.find("Data");
-            if (pos != std::string::npos) pathStr = pathStr.substr(pos);
-
-            meshVfxConfig.texturePath = pathStr;
-        }
-    }
-
-    ImGui::SameLine();
-    ImGui::Text(u8": %s", meshVfxConfig.texturePath.c_str());
-    if (ImGui::Button(u8"ノイズテクスチャ読込##Mesh"))
-    {
-        char filePath[MAX_PATH] = { 0 };
-        HWND hwnd = Graphics::Instance().GetWindowHandle();
-        if (Dialog::OpenFileName(filePath, MAX_PATH,
-            "PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
-            "テクスチャ選択",
-            hwnd) == DialogResult::OK)
-        {
-            std::string pathStr = filePath;
-            size_t pos = pathStr.find("Data");
-            if (pos != std::string::npos) pathStr = pathStr.substr(pos);
-
-            meshVfxConfig.noisePath = pathStr;
-        }
-    }
-    ImGui::SameLine();
-    ImGui::Text(u8": %s", meshVfxConfig.noisePath.c_str());
-
-    ImGui::Separator();
-
-    ImGui::DragFloat(u8"寿命##Mesh", &meshVfxConfig.lifeTime, 0.1f);
-    ImGui::DragFloat(u8"発生遅延(秒)##Mesh", &meshVfxConfig.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
-    ImGui::Separator();
-
-    const char* blendItems[] = { "通常半透明 (Alpha)", "加算合成 (Additive)" };
-    ImGui::Combo(u8"ブレンドモード##Mesh", &meshVfxConfig.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
-    ImGui::Separator();
-
-    ImGui::DragFloat3(u8"位置##Mesh", &meshVfxConfig.position.x, 0.1f);
-    ImGui::DragFloat3(u8"大きさ##Mesh", &meshVfxConfig.scale.x, 0.1f);
-    ImGui::DragFloat3(u8"回転速度##Mesh", &meshVfxConfig.rotationSpeed.x, 1.0f);
-    ImGui::ColorEdit4(u8"色##Mesh", &meshVfxConfig.color.x);
-    ImGui::Separator();
-
-    ImGui::DragFloat2(u8"UVスクロール速度##Mesh", &meshVfxConfig.uvScrollSpeed.x, 0.01f, -10.0f, 10.0f, "%.2f");
-    ImGui::Separator();
-
-    ImGui::DragFloat(u8"ノイズの強さ##Mesh", &meshVfxConfig.distortionPower, 0.05f, 0.0f, 10.0f, "%.2fs");
-    ImGui::DragFloat2(u8"ノイズUVスクロール速度##Mesh", &meshVfxConfig.noiseUvOffset.x, 0.01f, -10.0f, 10.0f, "%.2f");
-}
-void EffectEditor::DrawTrailInspector(TrailConfig& trailConfig)
-{
-    // テクスチャ選択
-    if (ImGui::Button(u8"読み込み##Trail"))
-    {
-        char filePath[MAX_PATH] = { 0 };
-        HWND hwnd = Graphics::Instance().GetWindowHandle();
-        if (Dialog::OpenFileName(filePath, MAX_PATH,
-            "PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
-            "テクスチャ選択",
-            hwnd) == DialogResult::OK)
-        {
-            std::string pathStr = filePath;
-
-            // Dataという文字を探してそれ以降のパスを切り取る
-            size_t pos = pathStr.find("Data");
-            if (pos != std::string::npos)
-            {
-                pathStr = pathStr.substr(pos);
-            }
-
-            trailConfig.texturePath = pathStr;
-
-            if (trailRenderer)
-            {
-                trailRenderer->SetTexture(pathStr);
-            }
-        }
-    }
-    ImGui::SameLine();
-    ImGui::Text(u8": %s", trailConfig.texturePath.c_str());
-    ImGui::Separator();
-
-    ImGui::DragFloat(u8"寿命##Trail", &trailConfig.lifeTime, 0.05f, 0.1f, 10.0f);
-    ImGui::DragFloat(u8"発生遅延(秒)##Trail", &trailConfig.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
-    ImGui::Separator();
-
-    ImGui::DragFloat(u8"幅(太さ)##Trail", &trailConfig.width, 0.1f);
-    ImGui::Separator();
-
-    ImGui::Text(u8"【幅スケール (形状)】");
-    ImGui::DragFloat(u8"先端(頭)##Trail", &trailConfig.widthStart, 0.01f, 0.0f, 5.0f, "%.2f");
-    ImGui::DragFloat(u8"中央##Trail", &trailConfig.widthMiddle, 0.01f, 0.0f, 5.0f, "%.2f");
-    ImGui::DragFloat(u8"末端(尻)##Trail", &trailConfig.widthEnd, 0.01f, 0.0f, 5.0f, "%.2f");
-    ImGui::Separator();
-
-    if (ImGui::ColorEdit4(u8"色##Trail", &trailConfig.color.x))
-    {
-        if (trailRenderer)
-        {
-            trailRenderer->SetColor(trailConfig.color);
-        }
+        ImGui::EndTabBar();
     }
 }
 void EffectEditor::DrawFileToolbar()
@@ -617,91 +619,44 @@ void EffectEditor::DrawFileToolbar()
         {
             currentConfig.Load(filepath);
 
-            if (particleManager && !currentConfig.nodes[selectedNodeIndex].particle.texturePath.empty())
+            SyncRuntimeNodes();
+
+            if (particleManager && !currentConfig.nodes[selectedNodeIndex].texturePath.empty())
             {
                 particleManager->SetTexture(
-                    currentConfig.nodes[selectedNodeIndex].particle.texturePath,
-                    { (UINT)currentConfig.nodes[selectedNodeIndex].particle.splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].particle.splitCount[1] }
+                    currentConfig.nodes[selectedNodeIndex].texturePath,
+                    { (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[1] }
                 );
             }
 
             // メッシュパスが有効ならモデルもリロード
-            if (currentConfig.nodes[selectedNodeIndex].meshVfx.useMesh && !currentConfig.nodes[selectedNodeIndex].meshVfx.meshPath.empty())
+            if (!currentConfig.nodes[selectedNodeIndex].meshPath.empty())
             {
                 ID3D11Device* device = Graphics::Instance().GetDevice();
-                vfxMeshModel = std::make_shared<Model>(device, currentConfig.nodes[selectedNodeIndex].meshVfx.meshPath.c_str());
+                runtimeNodes[selectedNodeIndex].meshModel = std::make_shared<Model>(device, currentConfig.nodes[selectedNodeIndex].meshPath.c_str());
             }
         }
     }
 
-	// テスト再生ボタン
-	if (ImGui::Button(u8"再生"))
-	{
-		PlayTestEffect(testSpawnPos);
-	}
+    // テスト再生ボタン
+    if (ImGui::Button(u8"再生"))
+    {
+        PlayTestEffect(testSpawnPos);
+    }
 }
 void EffectEditor::DrawNodeList()
 {
     ImGui::Text(u8"【ノード一覧】");
 
-    if (ImGui::Button(u8"+ パーティクル追加"))
+    if (ImGui::Button(u8"+ ノード追加"))
     {
-        EffectNode newNode;
-        newNode.name = "Particle Node" + std::to_string((currentConfig.nodes.size()) + 1);
-        newNode.type = EffectNodeType::Particle;
+        NodeConfig newNode;
+        newNode.name = "Node " + std::to_string(currentConfig.nodes.size() + 1);
+        newNode.type = RenderType::Particle;
         currentConfig.nodes.push_back(newNode);
-        selectedNodeIndex = static_cast<int>(currentConfig.nodes.size() - 1); // 追加したものを選択する
-
+        selectedNodeIndex = static_cast<int>(currentConfig.nodes.size() - 1);
     }
     ImGui::SameLine();
-    if (ImGui::Button(u8"+ メッシュVFX追加"))
-    {
-        EffectNode newNode;
-        newNode.name = "Mesh Node" + std::to_string((currentConfig.nodes.size()) + 1);
-        newNode.type = EffectNodeType::Mesh;
-        currentConfig.nodes.push_back(newNode);
-        selectedNodeIndex = static_cast<int>(currentConfig.nodes.size() - 1); // 追加したものを選択する
-    }
-    ImGui::SameLine();
-    if (ImGui::Button(u8"+ トレイル追加"))
-    {
-        EffectNode newNode;
-        newNode.name = "Trail Node" + std::to_string((currentConfig.nodes.size()) + 1);
-        newNode.type = EffectNodeType::Trail;
-        currentConfig.nodes.push_back(newNode);
-        selectedNodeIndex = static_cast<int>(currentConfig.nodes.size() - 1); // 追加したものを選択する
-    }
-
-    ImGui::Separator();
-
-    // ノードのリストを表示
-    if (ImGui::ListBoxHeader("##NodeListBox", ImVec2(-FLT_MIN, 120)))
-    {
-        for (int i = 0; i < currentConfig.nodes.size(); i++)
-        {
-            auto& node = currentConfig.nodes[i];
-
-            bool isSelected = (selectedNodeIndex == i);
-
-            // 種別アイコンの突きのラベル
-            std::string label = u8"[粒] ";
-            if (node.type == EffectNodeType::Mesh) label = u8"[網] ";
-            else if (node.type == EffectNodeType::Trail) label = u8"[帯] ";
-            label += node.name;
-
-            if (ImGui::Selectable(label.c_str(), isSelected))
-            {
-                selectedNodeIndex = i;
-            }
-
-            if (isSelected)
-            {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-
-        ImGui::ListBoxFooter();
-    }
 
     // ノードが1個しかない時は削除できないようにする
     if (currentConfig.nodes.size() > 1)
@@ -715,7 +670,51 @@ void EffectEditor::DrawNodeList()
             }
         }
     }
+    ImGui::Separator();
+
+    // ノード一覧
+    for (int i = 0; i < currentConfig.nodes.size(); i++)
+    {
+        auto& node = currentConfig.nodes[i];
+        bool isSelected = (selectedNodeIndex == i);
+
+        ImGui::PushID(i); // ID被り防止
+
+        // 表示 / 非表示 切り替えボタン（目アイコン風）
+        const char* eyeIcon = node.visible ? u8" [ON] " : u8"[OFF]";
+        if (node.visible)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); // 緑色
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.2f, 0.2f, 1.0f)); // 赤色
+        }
+
+        if (ImGui::Button(eyeIcon))
+        {
+            node.visible = !node.visible;
+        }
+        ImGui::PopStyleColor();
+
+        ImGui::SameLine();
+
+        // ノードの選択ラベル
+        std::string label = u8"[スプライト] ";
+        if (node.type == RenderType::Mesh) label = u8"[モデル] ";
+        else if (node.type == RenderType::Trail) label = u8"[トレイル] ";
+        label += node.name;
+
+        if (ImGui::Selectable(label.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick))
+        {
+            selectedNodeIndex = i;
+        }
+
+        ImGui::PopID();
+    }
+    ImGui::Separator();
 }
+
 
 // -1.0f～1.0fの間をランダムで返す関数
 float EffectEditor::RandFloat()
@@ -723,20 +722,21 @@ float EffectEditor::RandFloat()
     return (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 2.0f - 1.0f;
 }
 
+// エフェクトを出す
 void EffectEditor::EmitParticles(float elapsedTime)
 {
     // 全ノードを順番にチェックして発生させる
     for (auto& node : currentConfig.nodes)
     {
         // パーティクルノード以外、または非表示ノードはスキップ
-        if (node.type != EffectNodeType::Particle || !node.visible) continue;
+        if (node.type != RenderType::Particle || !node.visible) continue;
 
-        auto& pConfig = node.particle;
+        auto& pConfig = node;
 
-        if (effectTimer < node.particle.delayTime) continue;
+        if (effectTimer < node.delayTime) continue;
 
-        float activeTime = effectTimer - node.particle.delayTime;
-        if (node.particle.duration > 0.0f && activeTime >= node.particle.duration) continue;
+        float activeTime = effectTimer - node.delayTime;
+        if (node.duration > 0.0f && activeTime >= node.duration) continue;
 
         // ノード個別のタイマーを進める
         pConfig.spawnTimer += elapsedTime;
@@ -826,6 +826,55 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 data.color = pConfig.color;
 
                 particleManager->Emit(data);
+            }
+        }
+    }
+}
+
+// ノード数に合わせて runtimeNodes のサイズやリソースを更新する関数
+void EffectEditor::SyncRuntimeNodes()
+{
+    ID3D11Device* device = Graphics::Instance().GetDevice();
+    runtimeNodes.resize(currentConfig.nodes.size());
+
+    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
+    {
+        auto& node = currentConfig.nodes[i];
+        auto& rNode = runtimeNodes[i];
+
+        // メッシュの場合、モデルが未ロード or パスが変わっていたらロード
+        if (node.type == RenderType::Mesh && !node.meshPath.empty())
+        {
+            if (!rNode.meshModel)
+            {
+                rNode.meshModel = std::make_shared<Model>(device, node.meshPath.c_str());
+            }
+
+            if (!node.texturePath.empty())
+            {
+                D3D11_TEXTURE2D_DESC texture2d_desc;
+                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+                HRESULT hr = GpuResourceUtils::LoadTexture(device, node.texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+
+                rNode.shaderResourceView = srv;
+            }
+
+            if (!node.noisePath.empty())
+            {
+                D3D11_TEXTURE2D_DESC texture2d_desc;
+                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+                HRESULT hr = GpuResourceUtils::LoadTexture(device, node.noisePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+
+                rNode.noiseShaderResourceView = srv;
+            }
+        }
+        // トレイルの場合、未初期化なら生成
+        else if (node.type == RenderType::Trail)
+        {
+            if (!rNode.trail)
+            {
+                rNode.trail = std::make_shared<Trail>();
+                rNode.trail->Initialize();
             }
         }
     }

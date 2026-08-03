@@ -36,30 +36,36 @@ public:
 
 private:
 	// UIの描画パーツ
-	void DrawParticleInspector(ParticleEffectConfig& particleConfig);
-	void DrawMeshVfxInspector(MeshVfxConfig& meshVfxConfig);
-	void DrawTrailInspector(TrailConfig& trailConfig);
+	void DrawNodeInspector(NodeConfig& node);
 	void DrawFileToolbar();
 	void DrawNodeList();
-
 
 	// ヘルパー関数
 	float RandFloat();
 	void EmitParticles(float elapsedTime);
+	void SyncRuntimeNodes();
 private:
+	// エディター再生・プレビュー用の1ノード分リソース
+	struct RuntimeNode
+	{
+		std::shared_ptr<Model> meshModel = nullptr;  // そのノード専用の3Dモデル
+		std::shared_ptr<Trail> trail = nullptr;      // そのノード専用のトレイル
+		DirectX::XMFLOAT2 currentUvOffset = { 0.0f, 0.0f }; // UV加算用
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
+	};
+
 	EffectConfig currentConfig; // 現在調整中の設定データ
 
 	// テスト用の描画用のリソース
+
 	std::unique_ptr<Compute_Particle> particleManager;	// パーティクル制御
-	std::shared_ptr<Model> vfxMeshModel;				// メッシュVFXモデル
-	std::shared_ptr<Trail> trailRenderer;				// トレイル
+	std::vector<RuntimeNode> runtimeNodes;        // 各ノード専用のリソース配列！
 
 	// 再生状態
 	bool isPlaying = false;
 	float currentMeshTime = 0.0f;
 	DirectX::XMFLOAT3 testSpawnPos = { 0.0f, 1.0f, 0.0f };
-
 	float effectTimer = 0.0f;	// エフェクト開始からの経過時間
-
 	int selectedNodeIndex = 0; // 選択中のノード
 };

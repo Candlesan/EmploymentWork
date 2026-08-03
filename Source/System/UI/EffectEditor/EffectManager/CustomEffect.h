@@ -36,12 +36,26 @@ private:
 	void EmitParticles(float elapsedTime);
 
 private:
+	// 実行時（再生中）の1ノード分のインスタンス
+	struct RuntimeNode
+	{
+		NodeConfig config; // 設定データ
+		std::shared_ptr<Model> meshModel = nullptr;
+		std::shared_ptr<Trail> trail = nullptr;
+		DirectX::XMFLOAT2 currentUvOffset = { 0.0f, 0.0f };	// 毎フレーム加算していくUV位置
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
+	};
+
+
 	EffectConfig config;
-	DirectX::XMFLOAT3 position, scale, angle = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+	DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
+
 	float effectTimer = 0.0f; // 経過時間
 	bool isPlaying = false; // エフェクト再生中か
+	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列！
 	std::unique_ptr<Compute_Particle> particleManager; // パーティクル用
-	std::shared_ptr<Model> vfxMeshModel; // メッシュVFX用
-	std::shared_ptr<Trail> trailRenderer; // トレイル用
 };
 

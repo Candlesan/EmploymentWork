@@ -6,95 +6,74 @@
 // 保存
 void EffectConfig::Save(const std::string& filePath)
 {
-	using json = nlohmann::json;
-	json j;
-
-    // 全体の名前
+    using json = nlohmann::json;
+    json j;
     j["effectName"] = effectName;
-
-    // ノードリスト
     j["nodes"] = json::array();
 
     for (auto& node : nodes)
     {
-        json nodeJson;
+        json n;
+        // 基本情報
+        n["name"] = node.name;
+        n["type"] = static_cast<int>(node.type); // RenderType
+        n["visible"] = node.visible;
+        n["blendMode"] = node.blendMode;
 
-        // ノード基本情報
-        nodeJson["name"] = node.name;
-        nodeJson["type"] = static_cast<int>(node.type);
-        nodeJson["visible"] = node.visible;
+        // 時間・ループ
+        n["emitCount"] = node.emitCount;
+        n["lifeTime"] = node.lifeTime;
+        n["delayTime"] = node.delayTime;
+        n["duration"] = node.duration;
+        n["spawnInterval"] = node.spawnInterval;
+        n["spawnTimer"] = node.spawnTimer;
+        n["isLoop"] = node.isLoop;
 
-        // --- パーティクル設定 ---
-        nodeJson["particle"]["texturePath"] = node.particle.texturePath;
-        nodeJson["particle"]["spriteType"] = node.particle.spriteType;
-        nodeJson["particle"]["splitCount"] = { node.particle.splitCount[0], node.particle.splitCount[1] };
-        nodeJson["particle"]["emitCount"] = node.particle.emitCount;
-        nodeJson["particle"]["lifeTime"] = node.particle.lifeTime;
-        nodeJson["particle"]["delayTime"] = node.particle.delayTime;
+        // UV
+        n["uvScrollSpeed"] = { node.uvScrollSpeed.x, node.uvScrollSpeed.y };
+        n["noiseUvOffset"] = { node.noiseUvOffset.x, node.noiseUvOffset.y };
 
-        nodeJson["particle"]["isLoop"] = node.particle.isLoop;
-        nodeJson["particle"]["isBillboard"] = node.particle.isBillboard;
-        nodeJson["particle"]["spawnInterval"] = node.particle.spawnInterval;
-        nodeJson["particle"]["duration"] = node.particle.duration;
-        nodeJson["particle"]["uvScrollSpeed"] = { node.particle.uvScrollSpeed.x, node.particle.uvScrollSpeed.y };
+        // トランスフォーム (位置/回転/拡大)
+        n["position"] = { node.position.x, node.position.y, node.position.z };
+        n["positionRange"] = { node.positionRange.x, node.positionRange.y, node.positionRange.z };
+        n["positionVelocity"] = { node.positionVelocity.x, node.positionVelocity.y, node.positionVelocity.z };
+        n["positionVelocityRange"] = { node.positionVelocityRange.x, node.positionVelocityRange.y, node.positionVelocityRange.z };
+        n["positionAcceleration"] = { node.positionAcceleration.x, node.positionAcceleration.y, node.positionAcceleration.z };
+        n["positionAccelerationRange"] = { node.positionAccelerationRange.x, node.positionAccelerationRange.y, node.positionAccelerationRange.z };
 
-        // 位置
-        nodeJson["particle"]["position"] = { node.particle.position.x, node.particle.position.y, node.particle.position.z };
-        nodeJson["particle"]["positionRange"] = { node.particle.positionRange.x, node.particle.positionRange.y, node.particle.positionRange.z };
-        nodeJson["particle"]["positionVelocity"] = { node.particle.positionVelocity.x, node.particle.positionVelocity.y, node.particle.positionVelocity.z };
-        nodeJson["particle"]["positionVelocityRange"] = { node.particle.positionVelocityRange.x, node.particle.positionVelocityRange.y, node.particle.positionVelocityRange.z };
-        nodeJson["particle"]["positionAcceleration"] = { node.particle.positionAcceleration.x, node.particle.positionAcceleration.y, node.particle.positionAcceleration.z };
-        nodeJson["particle"]["positionAccelerationRange"] = { node.particle.positionAccelerationRange.x, node.particle.positionAccelerationRange.y, node.particle.positionAccelerationRange.z };
+        n["rotation"] = { node.rotation.x, node.rotation.y, node.rotation.z };
+        n["rotationRange"] = { node.rotationRange.x, node.rotationRange.y, node.rotationRange.z };
+        n["rotationVelocity"] = { node.rotationVelocity.x, node.rotationVelocity.y, node.rotationVelocity.z };
+        n["rotationVelocityRange"] = { node.rotationVelocityRange.x, node.rotationVelocityRange.y, node.rotationVelocityRange.z };
+        n["rotationAcceleration"] = { node.rotationAcceleration.x, node.rotationAcceleration.y, node.rotationAcceleration.z };
+        n["rotationAccelerationRange"] = { node.rotationAccelerationRange.x, node.rotationAccelerationRange.y, node.rotationAccelerationRange.z };
 
-        // 回転
-        nodeJson["particle"]["rotation"] = { node.particle.rotation.x, node.particle.rotation.y, node.particle.rotation.z };
-        nodeJson["particle"]["rotationRange"] = { node.particle.rotationRange.x, node.particle.rotationRange.y, node.particle.rotationRange.z };
-        nodeJson["particle"]["rotationVelocity"] = { node.particle.rotationVelocity.x, node.particle.rotationVelocity.y, node.particle.rotationVelocity.z };
-        nodeJson["particle"]["rotationVelocityRange"] = { node.particle.rotationVelocityRange.x, node.particle.rotationVelocityRange.y, node.particle.rotationVelocityRange.z };
-        nodeJson["particle"]["rotationAcceleration"] = { node.particle.rotationAcceleration.x, node.particle.rotationAcceleration.y, node.particle.rotationAcceleration.z };
-        nodeJson["particle"]["rotationAccelerationRange"] = { node.particle.rotationAccelerationRange.x, node.particle.rotationAccelerationRange.y, node.particle.rotationAccelerationRange.z };
+        n["scale"] = { node.scale.x, node.scale.y, node.scale.z };
+        n["scaleRange"] = { node.scaleRange.x, node.scaleRange.y, node.scaleRange.z };
+        n["scaleVelocity"] = { node.scaleVelocity.x, node.scaleVelocity.y, node.scaleVelocity.z };
+        n["scaleVelocityRange"] = { node.scaleVelocityRange.x, node.scaleVelocityRange.y, node.scaleVelocityRange.z };
+        n["scaleAcceleration"] = { node.scaleAcceleration.x, node.scaleAcceleration.y, node.scaleAcceleration.z };
+        n["scaleAccelerationRange"] = { node.scaleAccelerationRange.x, node.scaleAccelerationRange.y, node.scaleAccelerationRange.z };
 
-        // 拡大
-        nodeJson["particle"]["scale"] = { node.particle.scale.x, node.particle.scale.y, node.particle.scale.z };
-        nodeJson["particle"]["scaleRange"] = { node.particle.scaleRange.x, node.particle.scaleRange.y, node.particle.scaleRange.z };
-        nodeJson["particle"]["scaleVelocity"] = { node.particle.scaleVelocity.x, node.particle.scaleVelocity.y, node.particle.scaleVelocity.z };
-        nodeJson["particle"]["scaleVelocityRange"] = { node.particle.scaleVelocityRange.x, node.particle.scaleVelocityRange.y, node.particle.scaleVelocityRange.z };
-        nodeJson["particle"]["scaleAcceleration"] = { node.particle.scaleAcceleration.x, node.particle.scaleAcceleration.y, node.particle.scaleAcceleration.z };
-        nodeJson["particle"]["scaleAccelerationRange"] = { node.particle.scaleAccelerationRange.x, node.particle.scaleAccelerationRange.y, node.particle.scaleAccelerationRange.z };
+        n["color"] = { node.color.x, node.color.y, node.color.z, node.color.w };
 
-        // 色
-        nodeJson["particle"]["color"] = { node.particle.color.x, node.particle.color.y, node.particle.color.z, node.particle.color.w };
+        // 固有パラメータ
+        n["texturePath"] = node.texturePath;
+        n["splitCount"] = { node.splitCount[0], node.splitCount[1] };
+        n["spriteType"] = node.spriteType;
+        n["isBillboard"] = node.isBillboard;
 
-        // --- メッシュVFX設定 ---
-        nodeJson["meshVfx"]["meshPath"] = node.meshVfx.meshPath;
-        nodeJson["meshVfx"]["texturePath"] = node.meshVfx.texturePath;
-        nodeJson["meshVfx"]["noisePath"] = node.meshVfx.noisePath;
-        nodeJson["meshVfx"]["uvScrollSpeed"] = { node.meshVfx.uvScrollSpeed.x, node.meshVfx.uvScrollSpeed.y };
-        nodeJson["meshVfx"]["useMesh"] = node.meshVfx.useMesh;
-        nodeJson["meshVfx"]["position"] = { node.meshVfx.position.x, node.meshVfx.position.y, node.meshVfx.position.z };
-        nodeJson["meshVfx"]["scale"] = { node.meshVfx.scale.x, node.meshVfx.scale.y, node.meshVfx.scale.z };
-        nodeJson["meshVfx"]["rotationSpeed"] = { node.meshVfx.rotationSpeed.x, node.meshVfx.rotationSpeed.y, node.meshVfx.rotationSpeed.z };
-        nodeJson["meshVfx"]["color"] = { node.meshVfx.color.x, node.meshVfx.color.y, node.meshVfx.color.z, node.meshVfx.color.w };
-        nodeJson["meshVfx"]["noiseUvOffset"] = { node.meshVfx.noiseUvOffset.x, node.meshVfx.noiseUvOffset.y};
-        nodeJson["meshVfx"]["distortionPower"] = node.meshVfx.distortionPower;
-        nodeJson["meshVfx"]["lifeTime"] = node.meshVfx.lifeTime;
-        nodeJson["meshVfx"]["delayTime"] = node.meshVfx.delayTime;
-        nodeJson["meshVfx"]["blendMode"] = node.meshVfx.blendMode;
+        n["meshPath"] = node.meshPath;
+        n["noisePath"] = node.noisePath;
+        n["distortionPower"] = node.distortionPower;
 
-        // --- トレイル設定 ---
-        nodeJson["trail"]["texturePath"] = node.trail.texturePath;
-        nodeJson["trail"]["width"] = node.trail.width;
-        nodeJson["trail"]["widthStart"] = node.trail.widthStart;
-        nodeJson["trail"]["widthMiddle"] = node.trail.widthMiddle;
-        nodeJson["trail"]["widthEnd"] = node.trail.widthEnd;
-        nodeJson["trail"]["color"] = { node.trail.color.x, node.trail.color.y, node.trail.color.z, node.trail.color.w };
-        nodeJson["trail"]["lifeTime"] = node.trail.lifeTime;
-        nodeJson["trail"]["delayTime"] = node.trail.delayTime;
+        n["width"] = node.width;
+        n["widthStart"] = node.widthStart;
+        n["widthMiddle"] = node.widthMiddle;
+        n["widthEnd"] = node.widthEnd;
 
-        // 完成したノードデータ1個分を全体の「nodes」配列に追加
-        j["nodes"].push_back(nodeJson);
+        j["nodes"].push_back(n);
     }
-
 
     std::ofstream file(filePath);
     if (file.is_open())
@@ -125,98 +104,70 @@ void EffectConfig::Load(const std::string& filePath)
         {
             for (const auto& nodeJson : j["nodes"])
             {
-                EffectNode node;
+                NodeConfig node;
 
                 // ノード基本情報
                 node.name = nodeJson.value("name", "Node");
-                node.type = static_cast<EffectNodeType>(nodeJson.value("type", 0));
+                node.type = static_cast<RenderType>(nodeJson.value("type", 0));
                 node.visible = nodeJson.value("visible", true);
 
-                // --- パーティクル ---
-                if (nodeJson.find("particle") != nodeJson.end())
-                {
-                    const auto& p = nodeJson["particle"];
-                    node.particle.texturePath = p.value("texturePath", "");
-                    node.particle.spriteType = p.value("spriteType", 0);
+                node.texturePath = nodeJson.value("texturePath", "");
+                node.noisePath = nodeJson.value("noisePath", "");
+                node.spriteType =  nodeJson.value("spriteType", 0);
 
-                    if (p.find("splitCount") != p.end()) {
-                        node.particle.splitCount[0] = p["splitCount"][0];
-                        node.particle.splitCount[1] = p["splitCount"][1];
-                    }
-
-                    node.particle.emitCount = p.value("emitCount", 1);
-                    node.particle.lifeTime = p.value("lifeTime", 1.0f);
-                    node.particle.isLoop = p.value("isLoop", true);
-                    node.particle.isBillboard = p.value("isBillboard", true);
-                    node.particle.spawnInterval = p.value("spawnInterval", 0.1f);
-                    node.particle.duration = p.value("duration", 1.0f);
-                    node.particle.delayTime = p.value("delayTime", 0.0f);
-                    node.particle.spawnTimer = 0.0f;
-                    if (p.find("uvScrollSpeed") != p.end()) node.particle.uvScrollSpeed = { p["uvScrollSpeed"][0], p["uvScrollSpeed"][1] };
-
-                    // 位置
-                    if (p.find("position") != p.end()) node.particle.position = { p["position"][0], p["position"][1], p["position"][2] };
-                    if (p.find("positionRange") != p.end()) node.particle.positionRange = { p["positionRange"][0], p["positionRange"][1], p["positionRange"][2] };
-                    if (p.find("positionVelocity") != p.end()) node.particle.positionVelocity = { p["positionVelocity"][0], p["positionVelocity"][1], p["positionVelocity"][2] };
-                    if (p.find("positionVelocityRange") != p.end()) node.particle.positionVelocityRange = { p["positionVelocityRange"][0], p["positionVelocityRange"][1], p["positionVelocityRange"][2] };
-                    if (p.find("positionAcceleration") != p.end()) node.particle.positionAcceleration = { p["positionAcceleration"][0], p["positionAcceleration"][1], p["positionAcceleration"][2] };
-                    if (p.find("positionAccelerationRange") != p.end()) node.particle.positionAccelerationRange = { p["positionAccelerationRange"][0], p["positionAccelerationRange"][1], p["positionAccelerationRange"][2] };
-
-                    // 回転
-                    if (p.find("rotation") != p.end()) node.particle.rotation = { p["rotation"][0], p["rotation"][1], p["rotation"][2] };
-                    if (p.find("rotationRange") != p.end()) node.particle.rotationRange = { p["rotationRange"][0], p["rotationRange"][1], p["rotationRange"][2] };
-                    if (p.find("rotationVelocity") != p.end()) node.particle.rotationVelocity = { p["rotationVelocity"][0], p["rotationVelocity"][1], p["rotationVelocity"][2] };
-                    if (p.find("rotationVelocityRange") != p.end()) node.particle.rotationVelocityRange = { p["rotationVelocityRange"][0], p["rotationVelocityRange"][1], p["rotationVelocityRange"][2] };
-                    if (p.find("rotationAcceleration") != p.end()) node.particle.rotationAcceleration = { p["rotationAcceleration"][0], p["rotationAcceleration"][1], p["rotationAcceleration"][2] };
-                    if (p.find("rotationAccelerationRange") != p.end()) node.particle.rotationAccelerationRange = { p["rotationAccelerationRange"][0], p["rotationAccelerationRange"][1], p["rotationAccelerationRange"][2] };
-
-                    // 拡大
-                    if (p.find("scale") != p.end()) node.particle.scale = { p["scale"][0], p["scale"][1], p["scale"][2] };
-                    if (p.find("scaleRange") != p.end()) node.particle.scaleRange = { p["scaleRange"][0], p["scaleRange"][1], p["scaleRange"][2] };
-                    if (p.find("scaleVelocity") != p.end()) node.particle.scaleVelocity = { p["scaleVelocity"][0], p["scaleVelocity"][1], p["scaleVelocity"][2] };
-                    if (p.find("scaleVelocityRange") != p.end()) node.particle.scaleVelocityRange = { p["scaleVelocityRange"][0], p["scaleVelocityRange"][1], p["scaleVelocityRange"][2] };
-                    if (p.find("scaleAcceleration") != p.end()) node.particle.scaleAcceleration = { p["scaleAcceleration"][0], p["scaleAcceleration"][1], p["scaleAcceleration"][2] };
-                    if (p.find("scaleAccelerationRange") != p.end()) node.particle.scaleAccelerationRange = { p["scaleAccelerationRange"][0], p["scaleAccelerationRange"][1], p["scaleAccelerationRange"][2] };
-
-                    // 色
-                    if (p.find("color") != p.end()) node.particle.color = { p["color"][0], p["color"][1], p["color"][2], p["color"][3] };
+                if (nodeJson.find("splitCount") != nodeJson.end()) {
+                    node.splitCount[0] = nodeJson["splitCount"][0];
+                    node.splitCount[1] = nodeJson["splitCount"][1];
                 }
 
-                // --- メッシュVFX ---
-                if (nodeJson.find("meshVfx") != nodeJson.end())
-                {
-                    const auto& m = nodeJson["meshVfx"];
-                    node.meshVfx.meshPath = m.value("meshPath", "");
-                    node.meshVfx.texturePath = m.value("texturePath", "");
-                    node.meshVfx.noisePath = m.value("noisePath", "");
-                    node.meshVfx.useMesh = m.value("useMesh", false);
-                    node.meshVfx.lifeTime = m.value("lifeTime", 1.0f);
-                    node.meshVfx.delayTime = m.value("delayTime", 0.0f);
-                    node.meshVfx.distortionPower = m.value("distortionPower", 0.0f);
-                    node.meshVfx.blendMode = m.value("blendMode", 0.0f);
+                node.emitCount = nodeJson.value("emitCount", 1);
+                node.lifeTime  = nodeJson.value("lifeTime", 1.0f);
+                node.isLoop    = nodeJson.value("isLoop", true);
+                node.isBillboard   = nodeJson.value("isBillboard", true);
+                node.spawnInterval = nodeJson.value("spawnInterval", 0.1f);
+                node.duration =  nodeJson.value("duration", 1.0f);
+                node.delayTime = nodeJson.value("delayTime", 0.0f);
+                node.spawnTimer = 0.0f;
+                node.blendMode = nodeJson.value("blendMode", 0.0f);
 
-                    if (m.find("uvScrollSpeed") != m.end()) node.meshVfx.uvScrollSpeed = { m["uvScrollSpeed"][0], m["uvScrollSpeed"][1] };
-                    if (m.find("noiseUvOffset") != m.end()) node.meshVfx.noiseUvOffset = { m["noiseUvOffset"][0], m["noiseUvOffset"][1] };
-                    if (m.find("color") != m.end()) node.meshVfx.color = { m["color"][0], m["color"][1], m["color"][2], m["color"][3] };
-                    if (m.find("position") != m.end()) node.meshVfx.position = { m["position"][0], m["position"][1], m["position"][2] };
-                    if (m.find("scale") != m.end()) node.meshVfx.scale = { m["scale"][0], m["scale"][1], m["scale"][2] };
-                    if (m.find("rotationSpeed") != m.end()) node.meshVfx.rotationSpeed = { m["rotationSpeed"][0], m["rotationSpeed"][1], m["rotationSpeed"][2] };
-                }
+                if (nodeJson.find("uvScrollSpeed") != nodeJson.end()) node.uvScrollSpeed = { nodeJson["uvScrollSpeed"][0], nodeJson["uvScrollSpeed"][1] };
+                if (nodeJson.find("noiseUvOffset") != nodeJson.end()) node.noiseUvOffset = { nodeJson["noiseUvOffset"][0], nodeJson["noiseUvOffset"][1] };
 
-                // --- トレイル ---
-                if (nodeJson.find("trail") != nodeJson.end())
-                {
-                    const auto& t = nodeJson["trail"];
-                    node.trail.texturePath = t.value("texturePath", "Data/Sprite/Trail/T_TrailMask_09.png");
-                    node.trail.width = t.value("width", 1.0f);
-                    node.trail.widthStart = t.value("widthStart", 1.0f);
-                    node.trail.widthMiddle = t.value("widthMiddle", 1.0f);
-                    node.trail.widthEnd = t.value("widthEnd", 0.0f);
-                    node.trail.lifeTime = t.value("lifeTime", 1.0f);
-                    node.trail.delayTime = t.value("delayTime", 0.0f);
+                // 位置
+                if (nodeJson.find("position") != nodeJson.end()) node.position = { nodeJson["position"][0], nodeJson["position"][1], nodeJson["position"][2] };
+                if (nodeJson.find("positionRange") != nodeJson.end()) node.positionRange = { nodeJson["positionRange"][0], nodeJson["positionRange"][1], nodeJson["positionRange"][2] };
+                if (nodeJson.find("positionVelocity") != nodeJson.end()) node.positionVelocity = { nodeJson["positionVelocity"][0], nodeJson["positionVelocity"][1], nodeJson["positionVelocity"][2] };
+                if (nodeJson.find("positionVelocityRange") != nodeJson.end()) node.positionVelocityRange = { nodeJson["positionVelocityRange"][0], nodeJson["positionVelocityRange"][1], nodeJson["positionVelocityRange"][2] };
+                if (nodeJson.find("positionAcceleration") != nodeJson.end()) node.positionAcceleration = { nodeJson["positionAcceleration"][0], nodeJson["positionAcceleration"][1], nodeJson["positionAcceleration"][2] };
+                if (nodeJson.find("positionAccelerationRange") != nodeJson.end()) node.positionAccelerationRange = { nodeJson["positionAccelerationRange"][0], nodeJson["positionAccelerationRange"][1], nodeJson["positionAccelerationRange"][2] };
 
-                    if (t.find("color") != t.end()) node.trail.color = { t["color"][0], t["color"][1], t["color"][2], t["color"][3] };
-                }
+                // 回転
+                if (nodeJson.find("rotation") != nodeJson.end()) node.rotation = { nodeJson["rotation"][0], nodeJson["rotation"][1], nodeJson["rotation"][2] };
+                if (nodeJson.find("rotationRange") != nodeJson.end()) node.rotationRange = { nodeJson["rotationRange"][0], nodeJson["rotationRange"][1], nodeJson["rotationRange"][2] };
+                if (nodeJson.find("rotationVelocity") != nodeJson.end()) node.rotationVelocity = { nodeJson["rotationVelocity"][0], nodeJson["rotationVelocity"][1], nodeJson["rotationVelocity"][2] };
+                if (nodeJson.find("rotationVelocityRange") != nodeJson.end()) node.rotationVelocityRange = { nodeJson["rotationVelocityRange"][0], nodeJson["rotationVelocityRange"][1], nodeJson["rotationVelocityRange"][2] };
+                if (nodeJson.find("rotationAcceleration") != nodeJson.end()) node.rotationAcceleration = { nodeJson["rotationAcceleration"][0], nodeJson["rotationAcceleration"][1], nodeJson["rotationAcceleration"][2] };
+                if (nodeJson.find("rotationAccelerationRange") != nodeJson.end()) node.rotationAccelerationRange = { nodeJson["rotationAccelerationRange"][0], nodeJson["rotationAccelerationRange"][1], nodeJson["rotationAccelerationRange"][2] };
+
+                // 拡大
+                if (nodeJson.find("scale") != nodeJson.end()) node.scale = { nodeJson["scale"][0], nodeJson["scale"][1], nodeJson["scale"][2] };
+                if (nodeJson.find("scaleRange") != nodeJson.end()) node.scaleRange = { nodeJson["scaleRange"][0], nodeJson["scaleRange"][1], nodeJson["scaleRange"][2] };
+                if (nodeJson.find("scaleVelocity") != nodeJson.end()) node.scaleVelocity = { nodeJson["scaleVelocity"][0], nodeJson["scaleVelocity"][1], nodeJson["scaleVelocity"][2] };
+                if (nodeJson.find("scaleVelocityRange") != nodeJson.end()) node.scaleVelocityRange = { nodeJson["scaleVelocityRange"][0], nodeJson["scaleVelocityRange"][1], nodeJson["scaleVelocityRange"][2] };
+                if (nodeJson.find("scaleAcceleration") != nodeJson.end()) node.scaleAcceleration = { nodeJson["scaleAcceleration"][0], nodeJson["scaleAcceleration"][1], nodeJson["scaleAcceleration"][2] };
+                if (nodeJson.find("scaleAccelerationRange") != nodeJson.end()) node.scaleAccelerationRange = { nodeJson["scaleAccelerationRange"][0], nodeJson["scaleAccelerationRange"][1], nodeJson["scaleAccelerationRange"][2] };
+
+                // 色
+                if (nodeJson.find("color") != nodeJson.end()) node.color = { nodeJson["color"][0], nodeJson["color"][1], nodeJson["color"][2], nodeJson["color"][3] };
+
+                node.meshPath = nodeJson.value("meshPath", "");
+                node.distortionPower = nodeJson.value("distortionPower", 0.0f);
+
+                node.width = nodeJson.value("width", 1.0f);
+                node.widthStart = nodeJson.value("widthStart", 1.0f);
+                node.widthMiddle = nodeJson.value("widthMiddle", 1.0f);
+                node.widthEnd = nodeJson.value("widthEnd", 0.0f);
+
 
                 // 読み込んだノードを追加
                 nodes.push_back(node);

@@ -13,17 +13,43 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
     // パーティクルを読み込む
     particleManager = std::make_unique<Compute_Particle>(device);
 
-    // トレイルを読み込む
-    trailRenderer = std::make_shared<Trail>();
-    trailRenderer->Initialize();
-
-    // モデルをロードする
-    for (auto& node : config.nodes)
+    for (const auto& nodeConfig : config.nodes)
     {
-        if (node.type == EffectNodeType::Mesh && !node.meshVfx.meshPath.empty())
+        RuntimeNode rNode;
+        rNode.config = nodeConfig;
+
+        // メッシュノードなら、そのノードのパスでモデルを生成
+        if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
         {
-            vfxMeshModel = std::make_shared<Model>(device, node.meshVfx.meshPath.c_str());
+            rNode.meshModel = std::make_unique<Model>(device, nodeConfig.meshPath.c_str());
+
+            if (!nodeConfig.texturePath.empty())
+            {
+                D3D11_TEXTURE2D_DESC texture2d_desc;
+                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+                HRESULT hr = GpuResourceUtils::LoadTexture(device, nodeConfig.texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+
+                rNode.shaderResourceView = srv;
+            }
+
+            if (!nodeConfig.noisePath.empty())
+            {
+                D3D11_TEXTURE2D_DESC texture2d_desc;
+                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+                HRESULT hr = GpuResourceUtils::LoadTexture(device, nodeConfig.noisePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+
+                rNode.noiseShaderResourceView = srv;
+            }
+
         }
+        // トレイルノードなら、個別にTrailインスタンスを生成
+        else if (nodeConfig.type == RenderType::Trail)
+        {
+            rNode.trail = std::make_shared<Trail>();
+            rNode.trail->Initialize();
+        }
+
+        runTimeNodes.push_back(rNode);
     }
 }
 
@@ -54,41 +80,79 @@ void CustomEffect::Update(float elapsedTime)
 
     float maxDuration = 0.0f;
 
-    // ① まず全ノードをチェックして、行列の計算や一番長い寿命（maxDuration）を調べる
-    for (auto& node : config.nodes)
+    for (auto& node : runTimeNodes)
     {
-        if (!node.visible) continue;
+        if (!node.config.visible) continue;
+
+        // UVスクロールの時間を進める
+        node.currentUvOffset.x += node.config.uvScrollSpeed.x * elapsedTime;
+        node.currentUvOffset.y += node.config.uvScrollSpeed.y * elapsedTime;
+
+        node.currentUvOffset.x = fmodf(node.currentUvOffset.x, 1.0f);
+        node.currentUvOffset.y = fmodf(node.currentUvOffset.y, 1.0f);
 
         // パーティクル
-        if (node.type == EffectNodeType::Particle)
+        if (node.config.type == RenderType::Particle)
         {
-            if (node.particle.duration > maxDuration) maxDuration = node.particle.duration;
+            if (node.config.duration > maxDuration) maxDuration = node.config.duration;
         }
         // メッシュVFX
-        else if (node.type == EffectNodeType::Mesh)
+        else if (node.config.type == RenderType::Mesh)
         {
-            if (effectTimer < node.meshVfx.delayTime) continue;
+            if (effectTimer < node.config.delayTime) continue;
 
-            if (vfxMeshModel)
+            // メッシュノードごとの発生からの経過時間を計算
+            float activeTime = effectTimer - node.config.delayTime;
+            float t = activeTime; // 物理計算用の時間
+
+            if (node.meshModel)
             {
-                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(node.meshVfx.scale.x, node.meshVfx.scale.y, node.meshVfx.scale.z);
-                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-                    this->angle.x + DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.x * effectTimer),
-                    this->angle.y + DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.y * effectTimer),
-                    this->angle.z + DirectX::XMConvertToRadians(node.meshVfx.rotationSpeed.z * effectTimer));
-                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(node.meshVfx.position.x + this->position.x, node.meshVfx.position.y + this->position.y, node.meshVfx.position.z + this->position.z);
+                // 拡大（時間経過でのスケール変化 ＋ 拡大速度 ＋ 拡大加速度）
+                DirectX::XMFLOAT3 currentScale = {
+                    node.config.scale.x + (node.config.scaleVelocity.x * t) + (0.5f * node.config.scaleAcceleration.x * t * t),
+                    node.config.scale.y + (node.config.scaleVelocity.y * t) + (0.5f * node.config.scaleAcceleration.y * t * t),
+                    node.config.scale.z + (node.config.scaleVelocity.z * t) + (0.5f * node.config.scaleAcceleration.z * t * t)
+                };
+                // マイナス値にならないようにガード
+                currentScale.x = (std::max)(0.0f, currentScale.x);
+                currentScale.y = (std::max)(0.0f, currentScale.y);
+                currentScale.z = (std::max)(0.0f, currentScale.z);
 
+                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(currentScale.x, currentScale.y, currentScale.z);
+
+                // 回転（初期回転 ＋ 初期角度 ＋ 自転・回転速度 ＋ 回転加速度）
+                DirectX::XMFLOAT3 currentRot = {
+                    this->angle.x + DirectX::XMConvertToRadians(node.config.rotation.x + (node.config.rotationVelocity.x * t) + (0.5f * node.config.rotationAcceleration.x * t * t)),
+                    this->angle.y + DirectX::XMConvertToRadians(node.config.rotation.y + (node.config.rotationVelocity.y * t) + (0.5f * node.config.rotationAcceleration.y * t * t)),
+                    this->angle.z + DirectX::XMConvertToRadians(node.config.rotation.z + (node.config.rotationVelocity.z * t) + (0.5f * node.config.rotationAcceleration.z * t * t))
+                };
+                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+                    DirectX::XMConvertToRadians(currentRot.x),
+                    DirectX::XMConvertToRadians(currentRot.y),
+                    DirectX::XMConvertToRadians(currentRot.z)
+                );
+
+                // 位置（Play時のエフェクト発生位置 ＋ ノード初期位置 ＋ 移動速度 ＋ 移動加速度）
+                DirectX::XMFLOAT3 currentPos = {
+                    this->position.x + node.config.position.x + (node.config.positionVelocity.x * t) + (0.5f * node.config.positionAcceleration.x * t * t),
+                    this->position.y + node.config.position.y + (node.config.positionVelocity.y * t) + (0.5f * node.config.positionAcceleration.y * t * t),
+                    this->position.z + node.config.position.z + (node.config.positionVelocity.z * t) + (0.5f * node.config.positionAcceleration.z * t * t)
+                };
+                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(currentPos.x, currentPos.y, currentPos.z);
+
+                // 行列を合成してモデルに適用
                 DirectX::XMFLOAT4X4 worldTransform;
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
 
-                if (vfxMeshModel) vfxMeshModel->UpdateTransform(worldTransform);
-                if (node.meshVfx.lifeTime > maxDuration) maxDuration = node.meshVfx.lifeTime;
+                node.meshModel->UpdateTransform(worldTransform);
+
+                if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
             }
         }
         // トレイル
-        else if (node.type == EffectNodeType::Trail)
+        else if (node.config.type == RenderType::Trail)
         {
-            if (effectTimer < node.trail.delayTime) continue;
+            if (effectTimer < node.config.delayTime) continue;
 
             DirectX::XMFLOAT3 root = {
                 this->position.x,
@@ -98,31 +162,30 @@ void CustomEffect::Update(float elapsedTime)
 
             DirectX::XMFLOAT3 tip = {
                 root.x,
-                root.y + node.trail.width,
+                root.y + node.config.width,
                 root.z
             };
 
-            if (trailRenderer)
+            if (node.trail)
             {
-                trailRenderer->SetWidthScales(node.trail.widthStart, node.trail.widthMiddle, node.trail.widthEnd);
-                trailRenderer->Update(root, tip);
+                node.trail->SetWidthScales(node.config.widthStart, node.config.widthMiddle, node.config.widthEnd);
+                node.trail->Update(root, tip);
             }
 
-            if (node.trail.lifeTime > maxDuration) maxDuration = node.trail.lifeTime;
+            if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
         }
-    } // 👈 ⭕ for 文はここで閉じる！
+    } 
 
-    // ② 全ノードの更新チェックが終わった後に1回だけパーティクルを生成する！
     EmitParticles(elapsedTime);
 
-    // ③ 寿命判定も 1フレームに1回だけ行う！
+    // 寿命を進める
     if (maxDuration > 0.0f && effectTimer >= maxDuration)
     {
         bool isLoop = false;
 
-        for (const auto& node : config.nodes)
+        for (const auto& node : runTimeNodes)
         {
-            if (node.type == EffectNodeType::Particle && node.particle.isLoop)
+            if (node.config.type == RenderType::Particle && node.config.isLoop)
             {
                 isLoop = true;
                 break;
@@ -145,13 +208,13 @@ void CustomEffect::Render(RenderContext& rc)
 {
     if (isPlaying)
     {
-        for (const auto& node : config.nodes)
+        for (const auto& node : runTimeNodes)
         {
-            if (!node.visible) continue;
+            if (!node.config.visible) continue;
 
-            if (node.type == EffectNodeType::Trail && trailRenderer)
+            if (node.config.type == RenderType::Trail && node.trail)
             {
-                trailRenderer->Render(rc);
+                node.trail->Render(rc);
             }
         }
     }
@@ -165,54 +228,67 @@ void CustomEffect::Render(RenderContext& rc)
 
 void CustomEffect::RenderMeshVFX(ModelRenderer* modelRenderer)
 {
-    if (isPlaying && vfxMeshModel)
-    {
-        for (const auto& node : config.nodes)
-        {
-            if (!node.visible) continue;
+    if (!isPlaying) return;
 
-            if (node.type == EffectNodeType::Mesh)
+    for (auto& rNode : runTimeNodes)
+    {
+        if (isPlaying && rNode.meshModel)
+        {
+            if (!rNode.config.visible) continue;
+
+            if (rNode.config.type == RenderType::Mesh)
             {
-                float activeTime = effectTimer - node.meshVfx.delayTime;
-                if (effectTimer >= node.meshVfx.delayTime && activeTime <= node.meshVfx.lifeTime)
+                float activeTime = effectTimer - rNode.config.delayTime;
+                if (effectTimer >= rNode.config.delayTime && activeTime <= rNode.config.lifeTime)
                 {
                     // ModelRendererから meshVFX シェーダーを取得
                     // ModelRenderer に GetShader 関数などを渡すか、直接セットする形を用意
                     auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
+
+                    ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
                     if (shader)
                     {
                         // テクスチャをセット
-                        shader->SetTexture(node.meshVfx.texturePath);
-                        shader->SetNoiseTexture(node.meshVfx.noisePath);
-
-                        shader->SetDistortionPower(node.meshVfx.distortionPower);
+                        shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
+                        shader->SetDistortionPower(rNode.config.distortionPower);
 
                         DirectX::XMFLOAT2 noiseUvOffset = {
-                            node.meshVfx.noiseUvOffset.x * effectTimer,
-                            node.meshVfx.noiseUvOffset.y * effectTimer
+                            rNode.config.noiseUvOffset.x * effectTimer,
+                            rNode.config.noiseUvOffset.y * effectTimer
                         };
                         shader->SetNoiseUvOffset(noiseUvOffset);
+                        shader->SetBlendMode(rNode.config.blendMode);
+                        shader->SetColor(rNode.config.color);
+                        shader->SetUvOffset(rNode.currentUvOffset);
 
-                        shader->SetBlendMode(node.meshVfx.blendMode);
+                        // モデル内の各メッシュを即時描画
+                        RenderContext rc;
+                        rc.deviceContext = dc;
+                        rc.renderState = Graphics::Instance().GetRenderState();
+                        rc.camera = &CameraManager::Instance().GetMainCamera(); // カメラ参照
 
-                        // 生存時間に応じてアルファ値の計算
-                        float alphaRate = 1.0f - (effectTimer / node.meshVfx.lifeTime);
+                        shader->Begin(rc);
 
-                        DirectX::XMFLOAT4 finalColor = node.meshVfx.color;
-                        //finalColor.w *= alphaRate;
+                        for (const auto& mesh : rNode.meshModel->GetMeshes())
+                        {
+                            // 頂点バッファ・インデックスバッファをセット
+                            UINT stride = sizeof(Model::Vertex);
+                            UINT offset = 0;
+                            dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+                            dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+                            dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-                        // 色をセット
-                        shader->SetColor(finalColor);
-                        // 経過時間 × スクロール速度 で UV オフセットを計算してセット！
-                        DirectX::XMFLOAT2 uvOffset = {
-                            node.meshVfx.uvScrollSpeed.x * effectTimer,
-                            node.meshVfx.uvScrollSpeed.y * effectTimer
-                        };
-                        shader->SetUvOffset(uvOffset);
+                            // 行列とパラメータを定数バッファに更新して描画コール！
+                            shader->Update(rc, mesh);
+                            dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+                        }
+
+                        shader->End(rc);
                     }
 
                     // MeshVFX シェーダーを指定して描画登録！
-                    modelRenderer->Draw(ShaderId::MeshVFX, vfxMeshModel);
+                    modelRenderer->Draw(ShaderId::MeshVFX, rNode.meshModel);
                 }
             }
         }
@@ -235,26 +311,26 @@ bool CustomEffect::IsFinished()
 void CustomEffect::EmitParticles(float elapsedTime)
 {
     // 全ノードを順番にチェックして発生させる
-    for (auto& node : config.nodes)
+    for (auto& node : runTimeNodes)
     {
         // パーティクルノード以外、または非表示ノードはスキップ
-        if (node.type != EffectNodeType::Particle || !node.visible) continue;
+        if (node.config.type != RenderType::Particle || !node.config.visible) continue;
 
-        auto& pConfig = node.particle;
+        auto& pConfig = node.config;
 
-        if (effectTimer < node.particle.delayTime) continue;
+        if (effectTimer < node.config.delayTime) continue;
 
-        float activeTime = effectTimer - node.particle.delayTime;
-        if (node.particle.duration > 0.0f && activeTime >= node.particle.duration) continue;
+        float activeTime = effectTimer - node.config.delayTime;
+        if (node.config.duration > 0.0f && activeTime >= node.config.duration) continue;
 
         // ノード個別のタイマーを進める
         pConfig.spawnTimer += elapsedTime;
 
         float rand = Mathf::RandFloat();
 
-        if (pConfig.spawnTimer >= pConfig.spawnInterval)
+        if (pConfig.spawnTimer >=pConfig.spawnInterval)
         {
-            pConfig.spawnTimer -= pConfig.spawnInterval;
+           pConfig.spawnTimer -=pConfig.spawnInterval;
 
             // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
             if (particleManager && !pConfig.texturePath.empty())
@@ -263,35 +339,35 @@ void CustomEffect::EmitParticles(float elapsedTime)
             }
 
             // 生成数分 for 文で回す
-            for (int i = 0; i < pConfig.emitCount; i++)
+            for (int i = 0; i <pConfig.emitCount; i++)
             {
                 compute_particle_system::emit_particle_data data;
                 data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
 
                 data.parameter.x = static_cast<float>(pConfig.spriteType);
-                data.parameter.y = pConfig.lifeTime;
-                data.parameter.z = pConfig.uvScrollSpeed.x;
-                data.parameter.w = pConfig.uvScrollSpeed.y;
+                data.parameter.y =pConfig.lifeTime;
+                data.parameter.z =pConfig.uvScrollSpeed.x;
+                data.parameter.w =pConfig.uvScrollSpeed.y;
 
                 // 位置
                 data.position = {
-                   pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
-                   pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
-                   pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
+                  pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
+                  pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
+                  pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
                    1.0f
                 };
                 // 初速度
                 data.posVelocity = {
-                    pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
-                    pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
-                    pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
+                   pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
+                   pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
+                   pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
                     0.0f
                 };
                 // 加速度
                 data.posAcceleration = {
-                    pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * Mathf::RandFloat()),
-                    pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * Mathf::RandFloat()),
-                    pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * Mathf::RandFloat()),
+                   pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * Mathf::RandFloat()),
+                   pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * Mathf::RandFloat()),
+                   pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * Mathf::RandFloat()),
                     0.0f
                 };
 

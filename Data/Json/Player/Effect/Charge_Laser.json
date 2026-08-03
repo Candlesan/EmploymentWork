@@ -1,0 +1,529 @@
+{
+    "effectName": "NewEffect",
+    "nodes": [
+        {
+            "blendMode": 1,
+            "color": [
+                0.36347106099128723,
+                0.6029399037361145,
+                0.6447876691818237,
+                1.0
+            ],
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 0.0,
+            "emitCount": 1,
+            "isBillboard": true,
+            "isLoop": false,
+            "lifeTime": 5.0,
+            "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
+            "name": "Laser",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                0.0,
+                -1.0,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                150.0,
+                1.0
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocity": [
+                -0.800000011920929,
+                -0.800000011920929,
+                -0.800000011920929
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 5.0,
+            "spawnTimer": 0.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\aurora01.png",
+            "type": 1,
+            "uvScrollSpeed": [
+                1.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "blendMode": 0,
+            "color": [
+                1.0,
+                0.9999899864196777,
+                0.9999899864196777,
+                0.1568627506494522
+            ],
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 0.0,
+            "emitCount": 1,
+            "isBillboard": true,
+            "isLoop": false,
+            "lifeTime": 5.0,
+            "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
+            "name": "Laser2",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                0.0,
+                27.399999618530273,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.5,
+                150.0,
+                0.5
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocity": [
+                -0.5,
+                -0.5,
+                -0.5
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 5.0,
+            "spawnTimer": 0.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "",
+            "type": 1,
+            "uvScrollSpeed": [
+                5.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "blendMode": 1,
+            "color": [
+                0.9999899864196777,
+                0.9999912977218628,
+                1.0,
+                1.0
+            ],
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 0.0,
+            "emitCount": 1,
+            "isBillboard": true,
+            "isLoop": false,
+            "lifeTime": 5.0,
+            "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
+            "name": "Laser3",
+            "noisePath": "",
+            "noiseUvOffset": [
+                -1.0,
+                1.0
+            ],
+            "position": [
+                0.0,
+                -1.0,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.6000000238418579,
+                150.0,
+                0.6000000238418579
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocity": [
+                -0.5,
+                -0.5,
+                -0.5
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 5.0,
+            "spawnTimer": 0.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\T_Random_53.png",
+            "type": 1,
+            "uvScrollSpeed": [
+                -1.0,
+                1.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "blendMode": 1,
+            "color": [
+                0.4040488302707672,
+                0.9343629479408264,
+                0.8301941156387329,
+                1.0
+            ],
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 0.0,
+            "emitCount": 1,
+            "isBillboard": true,
+            "isLoop": false,
+            "lifeTime": 5.0,
+            "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
+            "name": "Node 4",
+            "noisePath": "",
+            "noiseUvOffset": [
+                1.0,
+                1.0
+            ],
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.800000011920929,
+                150.0,
+                0.800000011920929
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocity": [
+                -0.5,
+                -0.5,
+                -0.5
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 5.0,
+            "spawnTimer": 0.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "",
+            "type": 1,
+            "uvScrollSpeed": [
+                -1.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        }
+    ]
+}

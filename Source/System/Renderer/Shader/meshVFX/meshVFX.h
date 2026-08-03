@@ -20,12 +20,17 @@ public:
 	void SetBlendMode(int mode) { blendMode = mode; }
 
 	// ゲッターセッター
-	bool SetTexture(const std::string& texturePath);
-	bool SetNoiseTexture(const std::string& texturePath);
 	void SetColor(DirectX::XMFLOAT4 c) { vfxColor = c; }
 	void SetUvOffset(DirectX::XMFLOAT2 offset) { uvOffset = offset; }
 	void SetNoiseUvOffset(DirectX::XMFLOAT2 offset) { noiseUvOffset = offset; } 
-	void SetDistortionPower(float power) { distortionPower = power; }           
+	void SetDistortionPower(float power) { distortionPower = power; } 
+
+	void SetCurrentTextures(ID3D11ShaderResourceView* srv, ID3D11ShaderResourceView* noiseSrv)
+	{
+		shaderResourceView = srv;
+		noiseShaderResourceView = noiseSrv;
+	}
+
 private:
 	// シーン定数バッファ
 	struct CBScene
