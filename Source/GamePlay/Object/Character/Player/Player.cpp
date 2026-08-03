@@ -216,6 +216,9 @@ void Player::Update(float elapsedTime)
 		jumpPressed = false;
 	}
 
+	// GUIの表示/非表示
+	ShowDebugSwitch();
+
 	// タイマーを更新する関数
 	UpdateTimers(elapsedTime);
 
@@ -290,8 +293,11 @@ void Player::Update(float elapsedTime)
 // 描画処理
 void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 {
-	renderer->Draw(ShaderId::PBR, player);
-	renderer->Draw(ShaderId::PBR, weapon.model);
+	if (showPlayer)
+	{
+		renderer->Draw(ShaderId::PBR, player);
+		renderer->Draw(ShaderId::PBR, weapon.model);
+	}
 
 	// 魔法描画
 	magicManager.Render(rc);
@@ -300,290 +306,300 @@ void Player::Render(RenderContext& rc, ModelRenderer* renderer)
 // GUI描画
 void Player::DrawGUI()
 {
-	ImGui::Begin(u8"プレイヤー");
+	// プレイヤーのパラメーターのON/OFF
+	if (showPlayerParameter)
 	{
-		// アニメーション遷移状態
-		if (ImGui::CollapsingHeader(u8"アニメーションステート状況", ImGuiTreeNodeFlags_DefaultOpen))
+		ImGui::Begin(u8"プレイヤー");
 		{
-			auto it = stateConfigs.find(currentState);
+			ImGui::Checkbox(u8"プレイヤーの表示", &showPlayer);
 
-			if (it != stateConfigs.end())
+			// アニメーション遷移状態
+			if (ImGui::CollapsingHeader(u8"アニメーションステート状況", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::Text(u8"現在の全身ステート: %s", it->second.animationName.c_str());
+				auto it = stateConfigs.find(currentState);
+
+				if (it != stateConfigs.end())
+				{
+					ImGui::Text(u8"現在の全身ステート: %s", it->second.animationName.c_str());
+				}
+				else
+				{
+					ImGui::Text(u8"現在の全身ステート: なし(または不明)");
+				}
+
+				ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
 			}
-			else
+
+			// パラメーター
+			if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::Text(u8"現在の全身ステート: なし(または不明)");
+				if (ImGui::Button(u8"HP全回復"))
+				{
+					status.currentHp = status.maxHp;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(u8"魔力全回復"))
+				{
+					status.currentMagic = status.maxMagic;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(u8"ガード耐久値全回復"))
+				{
+					status.currentGuardDurability = status.maxGuardDurability;
+				}
+				ImGui::Text(u8"体力 : %f.0", status.currentHp);
+				ImGui::DragFloat(u8"体力", &status.currentHp, 0.1f);
+				ImGui::Separator();
+
+				ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
+				ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
+				ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
+				ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
+				ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
+				ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
+				if (ImGui::Button(u8"魔力消費"))
+				{
+					ConsumMagic(10.0f, magicRecoverDelay);
+				}
+				ImGui::Checkbox(u8"防御魔法展開時", &status.isGuarding);
+				ImGui::Separator();
+
+				ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
+				ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
+				ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
+				ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
+				ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
+				ImGui::Separator();
+
+				ImGui::Text(u8"ガード耐久値 : %f.0", status.currentGuardDurability);
+				ImGui::DragFloat(u8"ガード耐久値", &status.currentGuardDurability, 0.1f);
+				if (ImGui::Button(u8"耐久値減少"))
+				{
+					OnGuardHit(10.0f);
+				}
+				ImGui::Separator();
+
+				ImGui::Text(u8"無敵残り時間: %f.0", invincibleTimer);
+				ImGui::Separator();
+				ImGui::Text(u8"風状態残り時間: %f.0", windDashAvailTimer);
+				ImGui::Separator();
+				ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
+				ImGui::Separator();
+				ImGui::Text(u8"スロー演出残り時間: %f.0", justAvoidSlowTimer);
+				ImGui::Separator();
+				ImGui::Text(u8"首の回転: %f.0", debugAngle);
+				ImGui::Separator();
+
+				ImGui::Text(u8"基本移動速度: %f.0", moveSpeed);
+				ImGui::Text(u8"物理速力 (Velocity): %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
+				ImGui::Text(u8"スティック入力強度: %.3f", moveLength);
+				ImGui::Text(u8"ターゲットとの距離: %.3f", enemyFromDistance);
+				if (IsGround())
+				{
+					ImGui::Text(u8"接地状態: 地面");
+				}
+				else
+				{
+					ImGui::Text(u8"接地状態: 空中");
+				}
+				ImGui::Separator();
+
+				// 入力方向のデバッグ表示
+				const char* debugDirNames[] = {
+					u8"入力なし", u8"前", u8"右前", u8"左前", u8"右", u8"後", u8"右後", u8"左後", u8"左"
+				};
+				ImGui::Text(u8"入力角度: %.2f", debug_degree);
+				ImGui::Text(u8"判定された入力方向: %s", debugDirNames[debug_dirIndex]);
+
+				ImGui::Separator();
+
+				ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
+				ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
+
+				if (isGuarding) {
+					ImGui::Text(u8"防衛状態: ガード中");
+				}
+				else {
+					ImGui::Text(u8"防衛状態: ガードなし");
+				}
+
+				if (isAvoid) {
+					ImGui::Text(u8"アクション状態: 回避中");
+				}
+				else {
+					ImGui::Text(u8"アクション状態: 通常時");
+				}
 			}
 
-			ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
-		}
-
-		// パラメーター
-		if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			if (ImGui::Button(u8"HP全回復"))
+			// 魔法関係
+			if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				status.currentHp = status.maxHp;
+				if (ImGui::Button(u8"保存##Normal"))
+				{
+					normalMagicConfig.Save();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(u8"読み込み##Normal"))
+				{
+					normalMagicConfig.Load(); // JSONから読み込み[cite: 22]
+				}
+				ImGui::Separator();
+
+				ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
+				ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
+				ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
+				ImGui::Separator();
+
+				ImGui::Text(u8"--- 通常撃ち ---");
+				ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
+				ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
+				ImGui::Separator();
+
+				ImGui::Text(u8"--- チャージ撃ち  ---");
+				ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
+				ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
+				ImGui::Separator();
+
+				ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
+				ImGui::Separator();
+
+				ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
 			}
-			ImGui::SameLine();
-			if (ImGui::Button(u8"魔力全回復"))
+
+			// トランスフォーム情報
+			if (ImGui::CollapsingHeader(u8"トランスフォーム (位置・回転・拡縮)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				status.currentMagic = status.maxMagic;
+				ImGui::DragFloat3(u8"座標 (Position)", &position.x);
+
+				DirectX::XMFLOAT3 a;
+				a.x = DirectX::XMConvertToDegrees(angle.x);
+				a.y = DirectX::XMConvertToDegrees(angle.y);
+				a.z = DirectX::XMConvertToDegrees(angle.z);
+				ImGui::DragFloat3(u8"回転角度 (Angle)", &a.x);
+				angle.x = DirectX::XMConvertToRadians(a.x);
+				angle.y = DirectX::XMConvertToRadians(a.y);
+				angle.z = DirectX::XMConvertToRadians(a.z);
+
+				ImGui::DragFloat3(u8"拡縮比 (Scale)", &scale.x);
 			}
-			ImGui::SameLine();
-			if (ImGui::Button(u8"ガード耐久値全回復"))
+
+			// 当たり判定情報
+			if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				status.currentGuardDurability = status.maxGuardDurability;
+				ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
+				ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
+				ImGui::DragFloat(u8"デバッグ用描画オフセット", &debugOffset, 0.1f);
 			}
-			ImGui::Text(u8"体力 : %f.0", status.currentHp);
-			ImGui::DragFloat(u8"体力", &status.currentHp, 0.1f);
-			ImGui::Separator();
 
-			ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
-			ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
-			ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
-			ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
-			ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
-			ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
-			if (ImGui::Button(u8"魔力消費"))
+			// 武器のアタッチメント情報
+			if (ImGui::CollapsingHeader(u8"武器アタッチメント (手元・位置調整)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ConsumMagic(10.0f, magicRecoverDelay);
+				ImGui::DragFloat3(u8"武器のローカル位置##1", &weapon.position.x, 0.01f);
+				ImGui::DragFloat3(u8"武器のローカル角度##1", &weapon.angle.x, 0.01f);
+				ImGui::DragFloat3(u8"武器のローカルスケール##1", &weapon.scale.x, 0.01f);
+
+				ImGui::DragFloat3(u8"攻撃判定の位置ズレ##1", &weapon.weaponHitOffset.x, 0.1f);
+				ImGui::DragFloat3(u8"攻撃判定の角度ズレ##1", &weapon.weaponAngleOffset.x, 0.1f);
+				ImGui::DragFloat(u8"攻撃判定の半径##1", &weapon.weaponRadius, 0.1f);
+				ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
+
+				ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
+				ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
+				ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
+				ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
+				ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
 			}
-			ImGui::Checkbox(u8"防御魔法展開時", &status.isGuarding);
-			ImGui::Separator();
 
-			ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
-			ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
-			ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
-			ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
-			ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
-			ImGui::Separator();
-
-			ImGui::Text(u8"ガード耐久値 : %f.0", status.currentGuardDurability);
-			ImGui::DragFloat(u8"ガード耐久値", &status.currentGuardDurability, 0.1f);
-			if (ImGui::Button(u8"耐久値減少"))
+			// トレイル
+			if (ImGui::CollapsingHeader(u8"武器軌跡エフェクト (トレイル)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				OnGuardHit(10.0f);
+				ImGui::DragFloat3(u8"エフェクト根本位置", &rootOffset.x, 0.01f);
+				ImGui::DragFloat3(u8"エフェクト先端位置", &tipOffset.x, 0.01f);
 			}
-			ImGui::Separator();
 
-			ImGui::Text(u8"無敵残り時間: %f.0", invincibleTimer);
-			ImGui::Separator();
-			ImGui::Text(u8"風状態残り時間: %f.0", windDashAvailTimer);
-			ImGui::Separator();
-			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
-			ImGui::Separator();
-			ImGui::Text(u8"スロー演出残り時間: %f.0", justAvoidSlowTimer);
-			ImGui::Separator();
-			ImGui::Text(u8"首の回転: %f.0", debugAngle);
-			ImGui::Separator();
-
-			ImGui::Text(u8"基本移動速度: %f.0", moveSpeed);
-			ImGui::Text(u8"物理速力 (Velocity): %.2f, %.2f, %.2f", velocity.x, velocity.y, velocity.z);
-			ImGui::Text(u8"スティック入力強度: %.3f", moveLength);
-			ImGui::Text(u8"ターゲットとの距離: %.3f", enemyFromDistance);
-			if (IsGround())
+			// 移動時の背骨の傾き
+			if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::Text(u8"接地状態: 地面");
-			}
-			else
-			{
-				ImGui::Text(u8"接地状態: 空中");
-			}
-			ImGui::Separator();
-
-			// 入力方向のデバッグ表示
-			const char* debugDirNames[] = {
-				u8"入力なし", u8"前", u8"右前", u8"左前", u8"右", u8"後", u8"右後", u8"左後", u8"左"
-			};
-			ImGui::Text(u8"入力角度: %.2f", debug_degree);
-			ImGui::Text(u8"判定された入力方向: %s", debugDirNames[debug_dirIndex]);
-
-			ImGui::Separator();
-
-			ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
-			ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
-
-			if (isGuarding) {
-				ImGui::Text(u8"防衛状態: ガード中");
-			}
-			else {
-				ImGui::Text(u8"防衛状態: ガードなし");
-			}
-
-			if (isAvoid) {
-				ImGui::Text(u8"アクション状態: 回避中");
-			}
-			else {
-				ImGui::Text(u8"アクション状態: 通常時");
+				ImGui::DragFloat(u8"しなりの強さ", &targetSpineAngle, 0.1f);
+				ImGui::DragFloat(u8"しなりの戻り速度", &spineAngleSpeed, 0.1f);
 			}
 		}
-
-		// 魔法関係
-		if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			if (ImGui::Button(u8"保存##Normal"))
-			{
-				normalMagicConfig.Save();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button(u8"読み込み##Normal"))
-			{
-				normalMagicConfig.Load(); // JSONから読み込み[cite: 22]
-			}
-			ImGui::Separator();
-
-			ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
-			ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
-			ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
-			ImGui::Separator();
-
-			ImGui::Text(u8"--- 通常撃ち ---");
-			ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
-			ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
-			ImGui::Separator();
-
-			ImGui::Text(u8"--- チャージ撃ち  ---");
-			ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
-			ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
-			ImGui::Separator();
-
-			ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
-			ImGui::Separator();
-
-			ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
-		}
-
-		// トランスフォーム情報
-		if (ImGui::CollapsingHeader(u8"トランスフォーム (位置・回転・拡縮)", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat3(u8"座標 (Position)", &position.x);
-
-			DirectX::XMFLOAT3 a;
-			a.x = DirectX::XMConvertToDegrees(angle.x);
-			a.y = DirectX::XMConvertToDegrees(angle.y);
-			a.z = DirectX::XMConvertToDegrees(angle.z);
-			ImGui::DragFloat3(u8"回転角度 (Angle)", &a.x);
-			angle.x = DirectX::XMConvertToRadians(a.x);
-			angle.y = DirectX::XMConvertToRadians(a.y);
-			angle.z = DirectX::XMConvertToRadians(a.z);
-
-			ImGui::DragFloat3(u8"拡縮比 (Scale)", &scale.x);
-		}
-
-		// 当たり判定情報
-		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
-			ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
-			ImGui::DragFloat(u8"デバッグ用描画オフセット", &debugOffset, 0.1f);
-		}
-
-		// 武器のアタッチメント情報
-		if (ImGui::CollapsingHeader(u8"武器アタッチメント (手元・位置調整)", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat3(u8"武器のローカル位置##1", &weapon.position.x, 0.01f);
-			ImGui::DragFloat3(u8"武器のローカル角度##1", &weapon.angle.x, 0.01f);
-			ImGui::DragFloat3(u8"武器のローカルスケール##1", &weapon.scale.x, 0.01f);
-
-			ImGui::DragFloat3(u8"攻撃判定の位置ズレ##1", &weapon.weaponHitOffset.x, 0.1f);
-			ImGui::DragFloat3(u8"攻撃判定の角度ズレ##1", &weapon.weaponAngleOffset.x, 0.1f);
-			ImGui::DragFloat(u8"攻撃判定の半径##1", &weapon.weaponRadius, 0.1f);
-			ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
-
-			ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
-			ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
-			ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
-			ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
-			ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
-		}
-
-		// トレイル
-		if (ImGui::CollapsingHeader(u8"武器軌跡エフェクト (トレイル)", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat3(u8"エフェクト根本位置", &rootOffset.x, 0.01f);
-			ImGui::DragFloat3(u8"エフェクト先端位置", &tipOffset.x, 0.01f);
-		}
-
-		// 移動時の背骨の傾き
-		if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat(u8"しなりの強さ", &targetSpineAngle, 0.1f);
-			ImGui::DragFloat(u8"しなりの戻り速度", &spineAngleSpeed, 0.1f);
-		}
-	}
-	ImGui::End();
-
-	ImGui::Begin(u8"ステート遷移グラフエディタ");
-	std::string clickedNode = transitionEditor.Draw(
-		transitionGraphs,
-		currentState, activeGraphStack,
-		currentOverlayState, upperGraphStack
-	);
-	ImGui::End();
-
-	// ノードがダブルクリックされたらプレビューモードに切り替える
-	if (clickedNode != "")
-	{
-		editingState = clickedNode;
-		AnimNode* node = FindNodeByName(editingState);
-		if (node)
-		{
-			// 本当のアニメーション名（WindSpear_B）を使ってモデルのアニメーションを再生！
-			std::string realAnimName = node->assetName.empty() ? node->config.animationName : node->assetName;
-			ChangeAnimationState(realAnimName);
-		}
-		isPreviewMode = true;
-		ImGui::SetWindowFocus("Player Sequencer");
-	}
-
-	if (isPreviewMode)
-	{
-		ImGui::Begin(u8"プレビュー再生タイムライン");
-
-		if (ImGui::Button(u8"▶ ゲーム画面に戻る"))
-		{
-			isPreviewMode = false;
-			ChangeAnimationState("Idle");
-		}
-		ImGui::SameLine();
-
-		float length = GetCurrentAnimationLength();
-
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
-		ImGui::SameLine();
-		ImGui::Text(u8"  時間: %.2f / %.2f 秒", animationSeconds, length);
-
-		ImGui::SetNextItemWidth(-1);
-		if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
-		{
-			isBlending = false;
-		}
-
 		ImGui::End();
 	}
 
-	std::string displayState = isPreviewMode ? editingState : currentState;
-
-	auto* animData = animSequence.FindAnimationData(displayState);
-	if (animData)
+	// アニメーション遷移エディターのON/OFF
+	if (showAnimarionTransitionEditor)
 	{
-		AnimNode* currentNode = FindNodeByName(displayState);
-		if (currentNode && !currentNode->assetName.empty())
+		ImGui::Begin(u8"ステート遷移グラフエディタ");
+		std::string clickedNode = transitionEditor.Draw(
+			transitionGraphs,
+			currentState, activeGraphStack,
+			currentOverlayState, upperGraphStack
+		);
+		ImGui::End();
+
+		// ノードがダブルクリックされたらプレビューモードに切り替える
+		if (clickedNode != "")
 		{
-			animData->assetName = currentNode->assetName;
+			editingState = clickedNode;
+			AnimNode* node = FindNodeByName(editingState);
+			if (node)
+			{
+				// 本当のアニメーション名（WindSpear_B）を使ってモデルのアニメーションを再生！
+				std::string realAnimName = node->assetName.empty() ? node->config.animationName : node->assetName;
+				ChangeAnimationState(realAnimName);
+			}
+			isPreviewMode = true;
+			ImGui::SetWindowFocus("Player Sequencer");
 		}
+
+		if (isPreviewMode)
+		{
+			ImGui::Begin(u8"プレビュー再生タイムライン");
+
+			if (ImGui::Button(u8"▶ ゲーム画面に戻る"))
+			{
+				isPreviewMode = false;
+				ChangeAnimationState("Idle");
+			}
+			ImGui::SameLine();
+
+			float length = GetCurrentAnimationLength();
+
+			ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
+			ImGui::SameLine();
+			ImGui::Text(u8"  時間: %.2f / %.2f 秒", animationSeconds, length);
+
+			ImGui::SetNextItemWidth(-1);
+			if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
+			{
+				isBlending = false;
+			}
+
+			ImGui::End();
+		}
+
+		std::string displayState = isPreviewMode ? editingState : currentState;
+
+		auto* animData = animSequence.FindAnimationData(displayState);
+		if (animData)
+		{
+			AnimNode* currentNode = FindNodeByName(displayState);
+			if (currentNode && !currentNode->assetName.empty())
+			{
+				animData->assetName = currentNode->assetName;
+			}
+		}
+
+		sequencerEditor.DrawEditor(
+			animSequence,
+			displayState,
+			GetCurrentAnimationSeconds(),
+			GetCurrentAnimationLength()
+		);
+
+		RefreshStateConfigs();
 	}
-
-	sequencerEditor.DrawEditor(
-		animSequence,
-		displayState,
-		GetCurrentAnimationSeconds(),
-		GetCurrentAnimationLength()
-	);
-
-	RefreshStateConfigs();
 }
 
 // デバックプリミティブ描画
@@ -1962,6 +1978,7 @@ AudioSource* Player::GetOrLoadSound(const std::string& soundName)
 	}
 }
 
+//　ノードの名前を探す関数
 AnimNode* Player::FindNodeByName(const std::string& stateName)
 {
 	// Playerが持っているすべての遷移グラフ（transitionGraphs）から探す
@@ -1979,6 +1996,7 @@ AnimNode* Player::FindNodeByName(const std::string& stateName)
 	return nullptr; // 見つからなかったら nullptr
 }
 
+// ノードの設定を最新にする関数
 void Player::RefreshStateConfigs()
 {
 	// メモリ上の transitionGraphs から最新の config データを stateConfigs に反映する
@@ -1992,4 +2010,24 @@ void Player::RefreshStateConfigs()
 			}
 		}
 	}
+}
+
+// GUIの表示/非表示
+void Player::ShowDebugSwitch()
+{
+	// F4でアニメーション遷移エディターの表示をON/OFF
+	static bool wasF4DownLastFrame = false;
+	bool f4Down = (GetAsyncKeyState(VK_F4) & 0x8000) != 0;
+	if (f4Down && !wasF4DownLastFrame) {
+		showAnimarionTransitionEditor = !showAnimarionTransitionEditor;
+	}
+	wasF4DownLastFrame = f4Down;
+
+	// F9でプレイヤーのパラメーターの表示をON/OFF
+	static bool wasF9DownLastFrame = false;
+	bool f9Down = (GetAsyncKeyState(VK_F9) & 0x8000) != 0;
+	if (f9Down && !wasF9DownLastFrame) {
+		showPlayerParameter = !showPlayerParameter;
+	}
+	wasF9DownLastFrame = f9Down;
 }

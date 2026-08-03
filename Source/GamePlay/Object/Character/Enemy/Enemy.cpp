@@ -113,6 +113,9 @@ void Enemy::Update(float elapsedTime)
 		}
 	}
 
+	// GUIの表示/非表示
+	ShowDebugSwitch();
+
 	// 魔法の更新処理
 	magicManager.Update(elapsedTime);
 
@@ -148,6 +151,7 @@ void Enemy::Update(float elapsedTime)
 // 描画処理
 void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 {
+	if(showEnemy)
 	renderer->Draw(ShaderId::PBR, enemy);
 }
 
@@ -161,110 +165,120 @@ void Enemy::DrawGUI()
 		str = activeNode->GetName();
 	}
 
-	ImGui::Begin("Enemy");
+	// 敵のパラメーターの表示/非表示
+	if (showEnemyParameter)
 	{
-		AttackResult res;
-
-		if (ImGui::Button(u8"HP前回"))
+		ImGui::Begin("Enemy");
 		{
-			status.currentHp = status.maxHp;
+			AttackResult res;
+
+			ImGui::Checkbox(u8"敵の表示", &showEnemy);
+
+			if (ImGui::Button(u8"HP前回"))
+			{
+				status.currentHp = status.maxHp;
+			}
+			ImGui::Text("Health: %f.0", status.currentHp);
+			ImGui::Text("Damage: %f.0", lastDamage);
+			ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
+			ImGui::Separator();
+			ImGui::Text("currentPoise: %f.0", status.currentGuardDurability);
+			ImGui::Separator();
+			ImGui::Text("attackCoolTimer: %f.0", attackCoolTimer);
+			ImGui::Separator();
+			ImGui::Text("runTimer: %f.0", runTimer);
+			ImGui::Separator();
+			ImGui::Text(u8"Behavior　%s", str.c_str());
+			std::string animState = GetCurrentState();
+			ImGui::Text(u8"AnimState: %s", animState.c_str());
+
+			// トランスフォーム情報
+			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat3("Position", &position.x);
+
+				DirectX::XMFLOAT3 a;
+				a.x = DirectX::XMConvertToDegrees(angle.x);
+				a.y = DirectX::XMConvertToDegrees(angle.y);
+				a.z = DirectX::XMConvertToDegrees(angle.z);
+				ImGui::DragFloat3("Angle", &angle.x);
+				// 表示用に度数法に変換した後、再度ラジアンで戻す処理
+				angle.x = DirectX::XMConvertToRadians(a.x);
+				angle.y = DirectX::XMConvertToRadians(a.y);
+				angle.z = DirectX::XMConvertToRadians(a.z);
+
+				ImGui::DragFloat3("Scale", &scale.x);
+			}
+
+			// 当たり判定情報
+			if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
+				ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
+				ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
+			}
 		}
-		ImGui::Text("Health: %f.0", status.currentHp);
-		ImGui::Text("Damage: %f.0", lastDamage);
-		ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
-		ImGui::Separator();
-		ImGui::Text("currentPoise: %f.0", status.currentGuardDurability);
-		ImGui::Separator();
-		ImGui::Text("attackCoolTimer: %f.0", attackCoolTimer);
-		ImGui::Separator();
-		ImGui::Text("runTimer: %f.0", runTimer);
-		ImGui::Separator();
-		ImGui::Text(u8"Behavior　%s", str.c_str());
-		std::string animState = GetCurrentState();
-		ImGui::Text(u8"AnimState: %s", animState.c_str());
-
-		// トランスフォーム情報
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat3("Position", &position.x);
-
-			DirectX::XMFLOAT3 a;
-			a.x = DirectX::XMConvertToDegrees(angle.x);
-			a.y = DirectX::XMConvertToDegrees(angle.y);
-			a.z = DirectX::XMConvertToDegrees(angle.z);
-			ImGui::DragFloat3("Angle", &angle.x);
-			// 表示用に度数法に変換した後、再度ラジアンで戻す処理
-			angle.x = DirectX::XMConvertToRadians(a.x);
-			angle.y = DirectX::XMConvertToRadians(a.y);
-			angle.z = DirectX::XMConvertToRadians(a.z);
-
-			ImGui::DragFloat3("Scale", &scale.x);
-		}
-
-		// 当たり判定情報
-		if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
-			ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
-			ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
-		}
-	}
-	ImGui::End();
-
-	ImGui::Begin("BTEditor");
-	if (ImGui::Button("AI:ON/OFF"))
-	{
-		AISwitch = !AISwitch;
-	}
-	btEditor.Draw(btGraph, aiTree, this);
-	ImGui::End();
-
-	if (btEditor.requestOpenSequencer)
-	{
-		isPreviewMode = true;
-		editingState = btEditor.selectedAnimName;
-
-		ChangeAnimationState(editingState); // アニメーションを対象の技に切り替え
-		ImGui::SetWindowFocus("Enemy Sequencer");
-
-		btEditor.requestOpenSequencer = false; // フラグを戻す
-	}
-
-	// プレビューモード用の小さな操作ウィンドウ
-	if (isPreviewMode)
-	{
-		ImGui::Begin("Preview Timeline");
-
-		if (ImGui::Button(u8"▶ ゲームに戻る"))
-		{
-			isPreviewMode = false;
-			ClearActiveNode(); // AIのステートをリセットして最初から考え直させる
-			ChangeAnimationState("Idle");
-		}
-		ImGui::SameLine();
-
-		float length = GetCurrentAnimationLength();
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
-		ImGui::SameLine();
-		ImGui::Text("  Time: %.2f / %.2f s", animationSeconds, length);
-
-		ImGui::SetNextItemWidth(-1);
-		if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
-		{
-			isBlending = false; // スライダー操作中はブレンドを切る
-		}
-
 		ImGui::End();
 	}
 
-	// シーケンサー本体の描画
-	std::string displayState = isPreviewMode ? editingState : currentState;
-	sequencerEditor.DrawEditor(
-		animSequence,
-		displayState,
-		GetCurrentAnimationSeconds(),
-		GetCurrentAnimationLength()
-	);
+	// BTEditorの表示/非表示
+	if (showbtEditor)
+	{
+		ImGui::Begin("BTEditor");
+		if (ImGui::Button("AI:ON/OFF"))
+		{
+			AISwitch = !AISwitch;
+		}
+		btEditor.Draw(btGraph, aiTree, this);
+		ImGui::End();
+
+		if (btEditor.requestOpenSequencer)
+		{
+			isPreviewMode = true;
+			editingState = btEditor.selectedAnimName;
+
+			ChangeAnimationState(editingState); // アニメーションを対象の技に切り替え
+			ImGui::SetWindowFocus("Enemy Sequencer");
+
+			btEditor.requestOpenSequencer = false; // フラグを戻す
+		}
+
+		// プレビューモード用の小さな操作ウィンドウ
+		if (isPreviewMode)
+		{
+			ImGui::Begin("Preview Timeline");
+
+			if (ImGui::Button(u8"▶ ゲームに戻る"))
+			{
+				isPreviewMode = false;
+				ClearActiveNode(); // AIのステートをリセットして最初から考え直させる
+				ChangeAnimationState("Idle");
+			}
+			ImGui::SameLine();
+
+			float length = GetCurrentAnimationLength();
+			ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "[%s]", editingState.c_str());
+			ImGui::SameLine();
+			ImGui::Text("  Time: %.2f / %.2f s", animationSeconds, length);
+
+			ImGui::SetNextItemWidth(-1);
+			if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
+			{
+				isBlending = false; // スライダー操作中はブレンドを切る
+			}
+
+			ImGui::End();
+		}
+
+		// シーケンサー本体の描画
+		std::string displayState = isPreviewMode ? editingState : currentState;
+		sequencerEditor.DrawEditor(
+			animSequence,
+			displayState,
+			GetCurrentAnimationSeconds(),
+			GetCurrentAnimationLength()
+		);
+	}
 }
 
 // デバックプリミティブ描画
@@ -535,4 +549,24 @@ AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 		sounds[soundName] = nullptr;
 		return nullptr;
 	}
+}
+
+// GUIの表示/非表示
+void Enemy::ShowDebugSwitch()
+{
+	// F3でビヘイビアツリーエディターの表示をON/OFF
+	static bool wasF3DownLastFrame = false;
+	bool f3Down = (GetAsyncKeyState(VK_F3) & 0x8000) != 0;
+	if (f3Down && !wasF3DownLastFrame) {
+		showbtEditor = !showbtEditor;
+	}
+	wasF3DownLastFrame = f3Down;
+
+	// F8で敵のパラメーターの表示をON/OFF
+	static bool wasF8DownLastFrame = false;
+	bool f8Down = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
+	if (f8Down && !wasF8DownLastFrame) {
+		showEnemyParameter = !showEnemyParameter;
+	}
+	wasF8DownLastFrame = f8Down;
 }

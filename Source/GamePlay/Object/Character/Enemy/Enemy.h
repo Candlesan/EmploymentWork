@@ -96,6 +96,9 @@ private:
 
 	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
+
+	// GUIの表示/非表示
+	void ShowDebugSwitch();
 private:
 	std::shared_ptr<Model> enemy;
 
@@ -145,4 +148,9 @@ private:
 
 	// 魔法関係
 	MagicManager magicManager;
+
+	//  --- デバック関係 ---
+	bool showbtEditor = false;
+	bool showEnemyParameter = true;
+	bool showEnemy = true;
 };

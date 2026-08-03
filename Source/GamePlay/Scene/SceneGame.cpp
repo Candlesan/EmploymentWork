@@ -203,21 +203,8 @@ void SceneGame::Update(float elapsedTime)
 		// 当たり判定更新
 		collisonManager.Update(player, *enemy);
 
-		// F2でエディターの表示をON/OFF
-		static bool wasF2DownLastFrame = false;
-		bool f2Down = (GetAsyncKeyState(VK_F2) & 0x8000) != 0;
-		if (f2Down && !wasF2DownLastFrame) {
-			showVfxEditor = !showVfxEditor;
-		}
-		wasF2DownLastFrame = f2Down;
-
-		// F7でデバッグプリミティブの表示のON/OFF
-		static bool wasF7DownLastFrame = false;
-		bool f7Down = (GetAsyncKeyState(VK_F7) & 0x8000) != 0;
-		if (f7Down && !wasF7DownLastFrame) {
-			showDebugPrimitive = !showDebugPrimitive;
-		}
-		wasF7DownLastFrame = f7Down;
+		// デバック表示のON/OFFを切り替える関数
+		ShowDebugSwitch();
 
 		// エフェクトエディターの更新
 		effectEditor->Update(Graphics::Instance().GetDeviceContext(), elapsedTime);
@@ -325,7 +312,6 @@ void SceneGame::Render()
 		enemy->RenderDebugPrimitive(shapeRenderer, false);
 
 	}
-
 
 	// 3Dモデル描画
 	{
@@ -498,206 +484,210 @@ void SceneGame::DrawGUI()
 	// プレイヤーを取得
 	Player& player = Player::Instance();
 
-	ImGui::Begin(u8"デバック");
+	// デバック用の便利機能のON/Off
+	if (showDebugOption)
 	{
-		// 一時停止ボタン
-		if (isPaused) {
-			if (ImGui::Button(u8"再開 (F5)")) isPaused = false;
-		}
-		else {
-			if (ImGui::Button(u8"一時停止 (F5)")) isPaused = true;
-		}
-		ImGui::SameLine();
-
-		// 1フレーム送りボタン（ポーズ中のみ有効）
-		if (!isPaused)
+		ImGui::Begin(u8"デバック");
 		{
-			// ポーズ中じゃない時は、見た目をグレー（無効っぽく）にする
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
-		}
-
-		if (ImGui::Button(u8"1フレーム進める (F6)")) {
-			// ポーズ中のみ処理を受け付ける
+			// 一時停止ボタン
 			if (isPaused) {
-				stepNextFrame = true;
+				if (ImGui::Button(u8"再開 (F5)")) isPaused = false;
 			}
-		}
+			else {
+				if (ImGui::Button(u8"一時停止 (F5)")) isPaused = true;
+			}
+			ImGui::SameLine();
 
-		if (!isPaused)
-		{
-			// 色の設定を元に戻す
-			ImGui::PopStyleColor(3);
-		}
-
-		ImGui::Separator();
-		ImGui::Text(u8"再生速度");
-
-		// 0.01 (ほぼ停止) から 1.0 (通常) までのスライダー
-		ImGui::SliderFloat(u8"再生スケール", &timeScale, 0.01f, 1.0f, "%.2f");
-
-		if (ImGui::Button(u8"再生時間を元に戻す")) {
-			timeScale = 1.0f;
-		}
-	}
-	ImGui::End();
-
-	ImGui::Begin(u8"カメラ");
-	{
-		// モード切り替え用のラジオボタン
-		int mode = static_cast<int>(cameraMode);
-		if (ImGui::RadioButton(u8"ゲームカメラ (サードパーソン)", &mode, 0)) {
-			cameraMode = CameraMode::Game;
-		}
-		ImGui::SameLine();
-
-		if (ImGui::RadioButton(u8"デバックカメラ (フリーカメラ)", &mode, 1)) {
-			cameraMode = CameraMode::Debug;
-			// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
-			debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
-		}
-		ImGui::Separator();
-
-		ImGui::DragFloat(u8"距離", &cameraRange, 0.1f);
-		gameCamera->SetRange(cameraRange);
-	}
-	ImGui::End();
-
-	ImGui::Begin(u8"シェーダー");
-	{
-		if (ImGui::CollapsingHeader(u8"ライト", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			DirectionalLight& light = lightManager.GetDirectionalLight();
-
-			// 1. GUIで値を操作
-			if (ImGui::DragFloat3(u8"ライトの向き", &light.direction.x, 0.01f, -1.0f, 1.0f))
+			// 1フレーム送りボタン（ポーズ中のみ有効）
+			if (!isPaused)
 			{
-				// 2. 値が変更されたら、ベクトルを数学的に正しい状態（長さ1）に直す
-				DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
+				// ポーズ中じゃない時は、見た目をグレー（無効っぽく）にする
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+			}
 
-				// ベクトルの長さがほぼ0（全要素0など）でないかチェック
-				if (DirectX::XMVector3LengthSq(vDir).m128_f32[0] > 0.0001f)
-				{
-					vDir = DirectX::XMVector3Normalize(vDir);
-					DirectX::XMStoreFloat3(&light.direction, vDir);
-				}
-				else
-				{
-					// もし完全に0になったらデフォルトの向き（真下など）に戻す安全策
-					light.direction = { 0.0f, -1.0f, 0.0f };
+			if (ImGui::Button(u8"1フレーム進める (F6)")) {
+				// ポーズ中のみ処理を受け付ける
+				if (isPaused) {
+					stepNextFrame = true;
 				}
 			}
 
-			ImGui::ColorEdit3(u8"ライトの色", &light.color.x);
-
-			// 3. 補正した値をマネージャーにセット
-			lightManager.SetDirectionalLight(light);
-		}
-
-		if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat(u8"金属度", &pbrMetalness, 0.01f, -1.0f, 1.0f);
-			ImGui::DragFloat(u8"粗さ", &pbrRoughness, 0.01f, -1.0f, 1.0f);
-		}
-
-		if (ImGui::CollapsingHeader(u8"シャドウマップ", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			Graphics& graphics = Graphics::Instance();
-			ShadowMap* shadowMap = graphics.GetShadowMap();
-			RenderContext rc;
-
-			ImGui::SliderFloat(u8"影の減衰", &shadowAttenuation, 0.0f, 1.0f);
-			ImGui::SliderFloat(u8"シャドウバイアス", &shadowBias, 0.0f, 0.01f);
-
-			ImGui::Text(u8"テクスチャ");
-			ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
-		}
-
-		if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat(u8"ブローム抽出閾値", &bloom_extraction, 0.01f, +0.0f, +5.0f);
-			ImGui::DragFloat(u8"ブローム強度", &bloom_intensity, 0.01f, +0.0f, +5.0f);
-			ImGui::DragFloat(u8"露出", &bloomer->exposure, 0.01f, 0.0f, 1.0f);
-
-			bloomer->bloom_extraction_threshold = bloom_extraction;
-			bloomer->bloom_intensity = bloom_intensity;
+			if (!isPaused)
+			{
+				// 色の設定を元に戻す
+				ImGui::PopStyleColor(3);
+			}
 
 			ImGui::Separator();
+			ImGui::Text(u8"再生速度");
 
-			// グロー抽出
-			ImGui::Text(u8"グロー抽出");
-			ImGui::Image((ImTextureID)bloomer->get_glkow_extraction(), ImVec2(256, 256));
+			// 0.01 (ほぼ停止) から 1.0 (通常) までのスライダー
+			ImGui::SliderFloat(u8"再生スケール", &timeScale, 0.01f, 1.0f, "%.2f");
 
-			// ガウシアンブラー各段階
-			for (size_t i = 0; i < bloom::downsampled_count; ++i)
-			{
-				ImGui::Text(u8"ガウシアンブラー [%zu][0]", i);
-				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 0), ImVec2(256, 256));
-				ImGui::Text(u8"ガウシアンブラー [%zu][1]", i);
-				ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
+			if (ImGui::Button(u8"再生時間を元に戻す")) {
+				timeScale = 1.0f;
 			}
 		}
+		ImGui::End();
 
-		ImGui::Separator();
-		ImGui::Text(u8"---- マテリアル リアルタイム編集 ----");
+		ImGui::Begin(u8"カメラ");
+		{
+			// モード切り替え用のラジオボタン
+			int mode = static_cast<int>(cameraMode);
+			if (ImGui::RadioButton(u8"ゲームカメラ (サードパーソン)", &mode, 0)) {
+				cameraMode = CameraMode::Game;
+			}
+			ImGui::SameLine();
 
-		// 日本語ラベルでモデルごとのマテリアルエディタを呼び出す
-		DrawModelMaterialEditor(u8"プレイヤー：服・髪のマテリアル", &player);
-		DrawModelMaterialEditor(u8"敵：体・鎧のマテリアル", enemy.get());
+			if (ImGui::RadioButton(u8"デバックカメラ (フリーカメラ)", &mode, 1)) {
+				cameraMode = CameraMode::Debug;
+				// 切り替えた瞬間に現在のカメラ位置をデバッグ用カメラに同期させる
+				debugCamera->SyncCameraToController(CameraManager::Instance().GetMainCamera());
+			}
+			ImGui::Separator();
+
+			ImGui::DragFloat(u8"距離", &cameraRange, 0.1f);
+			gameCamera->SetRange(cameraRange);
+		}
+		ImGui::End();
+
+		ImGui::Begin(u8"シェーダー");
+		{
+			if (ImGui::CollapsingHeader(u8"ライト", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				DirectionalLight& light = lightManager.GetDirectionalLight();
+
+				// 1. GUIで値を操作
+				if (ImGui::DragFloat3(u8"ライトの向き", &light.direction.x, 0.01f, -1.0f, 1.0f))
+				{
+					// 2. 値が変更されたら、ベクトルを数学的に正しい状態（長さ1）に直す
+					DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
+
+					// ベクトルの長さがほぼ0（全要素0など）でないかチェック
+					if (DirectX::XMVector3LengthSq(vDir).m128_f32[0] > 0.0001f)
+					{
+						vDir = DirectX::XMVector3Normalize(vDir);
+						DirectX::XMStoreFloat3(&light.direction, vDir);
+					}
+					else
+					{
+						// もし完全に0になったらデフォルトの向き（真下など）に戻す安全策
+						light.direction = { 0.0f, -1.0f, 0.0f };
+					}
+				}
+
+				ImGui::ColorEdit3(u8"ライトの色", &light.color.x);
+
+				// 3. 補正した値をマネージャーにセット
+				lightManager.SetDirectionalLight(light);
+			}
+
+			if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat(u8"金属度", &pbrMetalness, 0.01f, -1.0f, 1.0f);
+				ImGui::DragFloat(u8"粗さ", &pbrRoughness, 0.01f, -1.0f, 1.0f);
+			}
+
+			if (ImGui::CollapsingHeader(u8"シャドウマップ", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				Graphics& graphics = Graphics::Instance();
+				ShadowMap* shadowMap = graphics.GetShadowMap();
+				RenderContext rc;
+
+				ImGui::SliderFloat(u8"影の減衰", &shadowAttenuation, 0.0f, 1.0f);
+				ImGui::SliderFloat(u8"シャドウバイアス", &shadowBias, 0.0f, 0.01f);
+
+				ImGui::Text(u8"テクスチャ");
+				ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+			}
+
+			if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat(u8"ブローム抽出閾値", &bloom_extraction, 0.01f, +0.0f, +5.0f);
+				ImGui::DragFloat(u8"ブローム強度", &bloom_intensity, 0.01f, +0.0f, +5.0f);
+				ImGui::DragFloat(u8"露出", &bloomer->exposure, 0.01f, 0.0f, 1.0f);
+
+				bloomer->bloom_extraction_threshold = bloom_extraction;
+				bloomer->bloom_intensity = bloom_intensity;
+
+				ImGui::Separator();
+
+				// グロー抽出
+				ImGui::Text(u8"グロー抽出");
+				ImGui::Image((ImTextureID)bloomer->get_glkow_extraction(), ImVec2(256, 256));
+
+				// ガウシアンブラー各段階
+				for (size_t i = 0; i < bloom::downsampled_count; ++i)
+				{
+					ImGui::Text(u8"ガウシアンブラー [%zu][0]", i);
+					ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 0), ImVec2(256, 256));
+					ImGui::Text(u8"ガウシアンブラー [%zu][1]", i);
+					ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
+				}
+			}
+
+			ImGui::Separator();
+			ImGui::Text(u8"---- マテリアル リアルタイム編集 ----");
+
+			// 日本語ラベルでモデルごとのマテリアルエディタを呼び出す
+			DrawModelMaterialEditor(u8"プレイヤー：服・髪のマテリアル", &player);
+			DrawModelMaterialEditor(u8"敵：体・鎧のマテリアル", enemy.get());
+		}
+		ImGui::End();
+
+		ImGui::Begin(u8"当たり判定");
+		{
+			// SceneGame.cpp の DrawGUI() の中
+			ImGui::Checkbox(u8"ジャスト回避テスト用の球を配置", &showDebugSphere);
+		}
+		ImGui::End();
 	}
-	ImGui::End();
 
-	ImGui::Begin(u8"当たり判定");
-	{
-		// SceneGame.cpp の DrawGUI() の中
-		ImGui::Checkbox(u8"ジャスト回避テスト用の球を配置", &showDebugSphere);
-	}
-	ImGui::End();
-
-	if (showVfxEditor)
+	// エフェクトエディターの表示
+	if (showEffectEditor)
 	{
 		effectEditor->DrawGUI();
+
+		//ImGui::Begin(u8"エフェクトマネージャーテスト");
+		//{
+		//	if (ImGui::Button(u8"エフェクトJSONをロード"))
+		//	{
+		//		char filepath[MAX_PATH] = { 0 };
+		//		HWND hwnd = Graphics::Instance().GetWindowHandle();
+
+		//		// ダイアログを開いてJSONファイルを選択[cite: 25]
+		//		if (Dialog::OpenFileName(filepath, MAX_PATH, "JSON File\0*.json\0\0", "エフェクト読込", hwnd) == DialogResult::OK)
+		//		{
+		//			// パスからファイル名を取り出してエフェクト名にする
+		//			char filename[MAX_PATH];
+		//			_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+
+		//			// マネージャーにロード＆キャッシュさせる！[cite: 22, 23]
+		//			CustomEffectManager::Instance().LoadEffectConfig(filename, filepath);
+		//		}
+		//	}
+
+		//	ImGui::Separator();
+
+		//	// プレイヤーの足元にテスト再生してみるボタン
+		//	char effectNameBuf[128];
+		//	strncpy_s(effectNameBuf, effectName.c_str(), sizeof(effectNameBuf));
+		//	if (ImGui::InputText(u8"エフェクト名入力", effectNameBuf, sizeof(effectNameBuf)))
+		//	{
+		//		effectName = effectNameBuf;
+		//	}
+		//	ImGui::Separator();
+
+		//	// キャッシュしておいたエフェクトを再生
+		//	if (ImGui::Button(u8"エフェクト再生"))
+		//	{
+		//		CustomEffectManager::Instance().PlayEffect(effectName.c_str(), { 0.0f, 0.0f, 0.0f });
+		//	}
+		//}
+		//ImGui::End();
 	}
-
-	// SceneGame.cpp の DrawGUI() 内
-	ImGui::Begin(u8"エフェクトマネージャーテスト");
-	{
-		if (ImGui::Button(u8"エフェクトJSONをロード"))
-		{
-			char filepath[MAX_PATH] = { 0 };
-			HWND hwnd = Graphics::Instance().GetWindowHandle();
-
-			// ダイアログを開いてJSONファイルを選択[cite: 25]
-			if (Dialog::OpenFileName(filepath, MAX_PATH, "JSON File\0*.json\0\0", "エフェクト読込", hwnd) == DialogResult::OK)
-			{
-				// パスからファイル名を取り出してエフェクト名にする
-				char filename[MAX_PATH];
-				_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
-
-				// マネージャーにロード＆キャッシュさせる！[cite: 22, 23]
-				CustomEffectManager::Instance().LoadEffectConfig(filename, filepath);
-			}
-		}
-
-		ImGui::Separator();
-
-		// プレイヤーの足元にテスト再生してみるボタン
-		char effectNameBuf[128];
-		strncpy_s(effectNameBuf, effectName.c_str(), sizeof(effectNameBuf));
-		if (ImGui::InputText(u8"エフェクト名入力", effectNameBuf, sizeof(effectNameBuf)))
-		{
-			effectName = effectNameBuf;
-		}
-		ImGui::Separator();
-
-		// キャッシュしておいたエフェクトを再生
-		if (ImGui::Button(u8"エフェクト再生"))
-		{
-			CustomEffectManager::Instance().PlayEffect(effectName.c_str(), {0.0f, 0.0f, 0.0f});
-		}
-	}
-	ImGui::End();
 
 	player.DrawGUI();
 	enemy->DrawGUI();
@@ -819,4 +809,32 @@ void SceneGame::OnResize(float width, float height)
 	// 初期化時に設定していたパラメータを再設定
 	bloomer->bloom_intensity = bloom_intensity;
 	bloomer->bloom_extraction_threshold = bloom_extraction;
+}
+
+// デバック表示のON/OFFを切り替える関数
+void SceneGame::ShowDebugSwitch()
+{
+	// F2でデバックの便利機能の表示をON/OFF
+	static bool wasF2DownLastFrame = false;
+	bool f2Down = (GetAsyncKeyState(VK_F2) & 0x8000) != 0;
+	if (f2Down && !wasF2DownLastFrame) {
+		showDebugOption = !showDebugOption;
+	}
+	wasF2DownLastFrame = f2Down;
+
+	// F7でデバッグプリミティブの表示のON/OFF
+	static bool wasF7DownLastFrame = false;
+	bool f7Down = (GetAsyncKeyState(VK_F7) & 0x8000) != 0;
+	if (f7Down && !wasF7DownLastFrame) {
+		showDebugPrimitive = !showDebugPrimitive;
+	}
+	wasF7DownLastFrame = f7Down;
+
+	// F7でデバッグプリミティブの表示のON/OFF
+	static bool wasF10DownLastFrame = false;
+	bool f10Down = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+	if (f10Down && !wasF10DownLastFrame) {
+		showEffectEditor = !showEffectEditor;
+	}
+	wasF10DownLastFrame = f10Down;
 }

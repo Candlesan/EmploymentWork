@@ -50,6 +50,9 @@ public:
 
 	// 画面比率修正関数
 	void OnResize(float width, float height);
+
+	// デバック表示のON/OFFを切り替える関数
+	void ShowDebugSwitch();
 private:
 	// 3Dモデル
 	std::unique_ptr<Stage> stage;
@@ -109,11 +112,14 @@ private:
 	CollisionManager collisonManager;
 	bool showDebugSphere = false;
 
+	// エフェクトエディター関係
 	std::unique_ptr<EffectEditor> effectEditor;
-	bool showVfxEditor = false;
+	std::string effectName;
+	bool showEffectEditor = true;
 
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;
 
-	std::string effectName;
+	// デバック用のカメラや再生速度などの便利機能のON/OFF
+	bool showDebugOption = true; 
 };

@@ -119,11 +119,18 @@ private:
 	void CalculateStatusParameters();
 	void CalculationRootAndTip();
 	void CalculateSpineRotation(float elapsedTime);
+
+	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
+	//　ノードの名前を探す関数
 	AnimNode* FindNodeByName(const std::string& stateName);
 
+	// ノードの設定を最新にする関数
 	void RefreshStateConfigs();
+
+	// GUIの表示/非表示
+	void ShowDebugSwitch();
 private:
 	// =========================================================================
 	//  メンバ変数（大量にあるので、ジャンルごとに綺麗にグループ化！）
@@ -223,4 +230,9 @@ private:
 
 	// ── サウンド ──
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
+
+	// ── デバック ──
+	bool showAnimarionTransitionEditor = true;
+	bool showPlayerParameter = true;
+	bool showPlayer = true;
 };
