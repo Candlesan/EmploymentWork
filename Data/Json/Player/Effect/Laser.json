@@ -15,7 +15,7 @@
             "emitCount": 1,
             "isBillboard": true,
             "isLoop": false,
-            "lifeTime": 1000.0,
+            "lifeTime": 1.0,
             "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
             "name": "Laser",
             "noisePath": "",
@@ -104,16 +104,16 @@
                 0.0
             ],
             "scaleVelocity": [
-                0.0,
-                0.0,
-                0.0
+                -0.800000011920929,
+                -0.800000011920929,
+                -0.800000011920929
             ],
             "scaleVelocityRange": [
                 0.0,
                 0.0,
                 0.0
             ],
-            "spawnInterval": 0.0,
+            "spawnInterval": 1.0,
             "spawnTimer": 0.0,
             "splitCount": [
                 1,
@@ -146,7 +146,7 @@
             "emitCount": 1,
             "isBillboard": true,
             "isLoop": false,
-            "lifeTime": 1000.0,
+            "lifeTime": 1.0,
             "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
             "name": "Laser2",
             "noisePath": "",
@@ -235,16 +235,16 @@
                 0.0
             ],
             "scaleVelocity": [
-                0.0,
-                0.0,
-                0.0
+                -0.5,
+                -0.5,
+                -0.5
             ],
             "scaleVelocityRange": [
                 0.0,
                 0.0,
                 0.0
             ],
-            "spawnInterval": 0.0,
+            "spawnInterval": 1.0,
             "spawnTimer": 0.0,
             "splitCount": [
                 1,
@@ -256,137 +256,6 @@
             "uvScrollSpeed": [
                 5.0,
                 0.0
-            ],
-            "visible": true,
-            "width": 1.0,
-            "widthEnd": 0.0,
-            "widthMiddle": 1.0,
-            "widthStart": 1.0
-        },
-        {
-            "blendMode": 1,
-            "color": [
-                0.9999899864196777,
-                0.9999977350234985,
-                1.0,
-                1.0
-            ],
-            "delayTime": 0.0,
-            "distortionPower": 0.0,
-            "duration": 0.0,
-            "emitCount": 1,
-            "isBillboard": true,
-            "isLoop": false,
-            "lifeTime": 1000.0,
-            "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
-            "name": "Laser3",
-            "noisePath": "",
-            "noiseUvOffset": [
-                -1.0,
-                1.0
-            ],
-            "position": [
-                0.0,
-                -1.0,
-                0.0
-            ],
-            "positionAcceleration": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "positionAccelerationRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "positionRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "positionVelocity": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "positionVelocityRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotation": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotationAcceleration": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotationAccelerationRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotationRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotationVelocity": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "rotationVelocityRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scale": [
-                0.30000001192092896,
-                150.0,
-                0.30000001192092896
-            ],
-            "scaleAcceleration": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scaleAccelerationRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scaleRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scaleVelocity": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "scaleVelocityRange": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "spawnInterval": 0.5,
-            "spawnTimer": 0.0,
-            "splitCount": [
-                1,
-                1
-            ],
-            "spriteType": 0,
-            "texturePath": "Data\\Sprite\\Particle\\texture\\aurora01.png",
-            "type": 1,
-            "uvScrollSpeed": [
-                -1.0,
-                1.0
             ],
             "visible": true,
             "width": 1.0,

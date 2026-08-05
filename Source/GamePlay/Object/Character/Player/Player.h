@@ -173,6 +173,7 @@ private:
 	// „Ÿ„Ÿ –‚–@ „Ÿ„Ÿ
 	MagicManager magicManager;
 	NormalMagic::NormalMagicConfig normalMagicConfig;
+	NormalMagic normalMagic;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 0.0f;
 	bool isMagicAttack = true;

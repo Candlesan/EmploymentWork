@@ -22,9 +22,10 @@ enum class BlendMode
 // 描画方式
 enum class RenderType
 {
-	Particle, // 従来の2Dビルボード/スプライト
-	Mesh,     // 3Dモデルメッシュ
-	Trail     // 軌跡（トレイル）
+	Particle = 0, // 2Dビルボード
+	Mesh = 1, // 3DメッシュVFX
+	Trail = 2, // 軌跡
+	None = 3
 };
 
 // ノード設定

@@ -24,11 +24,12 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	}
 
 	float ax = gamePad.GetAxisRX();
-	float ay = gamePad.GetAxisRY();
+	float ay = -gamePad.GetAxisRY();
 
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
+	// Y軸反転がOnの時はリバースさせる
+	if (isInvertY)
 	{
-		ax = ay = 0.0f;
+		ay = -ay;
 	}
 
 	// カメラの回転速度

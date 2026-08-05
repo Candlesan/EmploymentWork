@@ -8,6 +8,21 @@
     "lifeTimer": 3.0,
     "normalDamage": 5.0,
     "normalRadius": 0.5,
+    "offsetAngle": [
+        90.0,
+        0.0,
+        0.0
+    ],
+    "offsetPosition": [
+        0.0,
+        1.0,
+        0.0
+    ],
+    "offsetScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
     "range": 300.0,
     "scale": 1.0,
     "spawnOffsetX": 0.0,

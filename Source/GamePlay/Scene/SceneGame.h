@@ -122,4 +122,6 @@ private:
 
 	// デバック用のカメラや再生速度などの便利機能のON/OFF
 	bool showDebugOption = true; 
+
+	bool invertY = false;
 };

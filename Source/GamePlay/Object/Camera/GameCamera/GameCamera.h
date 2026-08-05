@@ -25,6 +25,7 @@ public:
 	void SetLockOnTarget(Enemy* e) { lockOnTarget = e; }
 	Enemy* GetLockOnTarget() const { return lockOnTarget; }
 	bool IsLockOn() const { return cameraMode == CameraMode::RockOn; }
+	void SetInvertY(bool y) { isInvertY = y; }
 
 private:
 	enum class CameraMode 
@@ -46,5 +47,7 @@ private:
 	float defaultFov = 45.0f; // 通常時のFOV
 	float maxFov = 65.0f; // 最大FOV
 	float targetFov = 0.0f;
+
+	bool isInvertY = false; // true：リバース / false：ノーマル
 };
 

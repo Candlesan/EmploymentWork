@@ -57,6 +57,7 @@ void Player::Initialize()
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
 	trail.Initialize();              // トレイルの初期化
+	normalMagic.Initialize();
 	normalMagicConfig.Load();		// 魔法の初期化
 
 	// アニメーションポーズと初期ステートの設定
@@ -434,36 +435,42 @@ void Player::DrawGUI()
 			// 魔法関係
 			if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				if (ImGui::Button(u8"保存##Normal"))
+				if (ImGui::CollapsingHeader(u8"通常攻撃", ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					normalMagicConfig.Save();
+					if (ImGui::Button(u8"保存##Normal"))
+					{
+						normalMagicConfig.Save();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"読み込み##Normal"))
+					{
+						normalMagicConfig.Load(); // JSONから読み込み
+					}
+					ImGui::Separator();
+
+					ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
+					ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
+					ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
+					ImGui::Separator();
+
+					ImGui::Text(u8"--- 通常撃ち ---");
+					ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
+					ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
+					ImGui::Separator();
+
+					ImGui::Text(u8"--- チャージ撃ち  ---");
+					ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
+					ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
+					ImGui::Separator();
+
+					ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
+					ImGui::Separator();
+
+					ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
+					ImGui::Separator();
+
+					normalMagic.DrawGUI(normalMagicConfig);
 				}
-				ImGui::SameLine();
-				if (ImGui::Button(u8"読み込み##Normal"))
-				{
-					normalMagicConfig.Load(); // JSONから読み込み[cite: 22]
-				}
-				ImGui::Separator();
-
-				ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
-				ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
-				ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
-				ImGui::Separator();
-
-				ImGui::Text(u8"--- 通常撃ち ---");
-				ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
-				ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
-				ImGui::Separator();
-
-				ImGui::Text(u8"--- チャージ撃ち  ---");
-				ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
-				ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
-				ImGui::Separator();
-
-				ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
-				ImGui::Separator();
-
-				ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
 			}
 
 			// トランスフォーム情報
@@ -667,7 +674,7 @@ void Player::MagicInput()
 		spawnInfo.holdTime = rtButtonHoldTime;
 
 		// 通常魔法を呼び出す
-		NormalMagic::Emit(&magicManager, spawnInfo, normalMagicConfig);
+		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 
 		// クールダウンをセット
 		magicCoolDownTimer = coolDownValue;

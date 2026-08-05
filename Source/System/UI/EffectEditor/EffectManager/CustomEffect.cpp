@@ -314,7 +314,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
     for (auto& node : runTimeNodes)
     {
         // パーティクルノード以外、または非表示ノードはスキップ
-        if (node.config.type != RenderType::Particle || !node.config.visible) continue;
+        if (node.config.type != RenderType::Particle) continue;
+        if (!node.config.visible) continue;
 
         auto& pConfig = node.config;
 

@@ -38,7 +38,7 @@ void CustomEffectManager::PlayEffect(const std::string& effectName, DirectX::XMF
 	effect->Initialize(device, it->second);
 
 	// エフェクトを再生する
-	effect->Play(position, scale, angle);
+	effect->Play(position, angle, scale);
 
 	// 再生中のエフェクトをリストに追加する
 	activeEffects.push_back(effect);

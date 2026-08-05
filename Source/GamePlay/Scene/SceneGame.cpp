@@ -91,9 +91,6 @@ void SceneGame::Initialize()
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
 
-	//// パーティクル生成
-	//particleManager = std::make_unique<Compute_Particle>(device);
-
 	Load("Data/Model/Json/Material/Player/player_material.json", &player);
 
 	// エフェクトエディター初期化
@@ -534,6 +531,12 @@ void SceneGame::DrawGUI()
 
 		ImGui::Begin(u8"カメラ");
 		{
+			if (ImGui::Checkbox(u8"Y軸反転", &invertY))
+			{
+				gameCamera->SetInvertY(invertY);
+			}
+			ImGui::Separator();
+
 			// モード切り替え用のラジオボタン
 			int mode = static_cast<int>(cameraMode);
 			if (ImGui::RadioButton(u8"ゲームカメラ (サードパーソン)", &mode, 0)) {
@@ -650,43 +653,43 @@ void SceneGame::DrawGUI()
 	{
 		effectEditor->DrawGUI();
 
-		//ImGui::Begin(u8"エフェクトマネージャーテスト");
-		//{
-		//	if (ImGui::Button(u8"エフェクトJSONをロード"))
-		//	{
-		//		char filepath[MAX_PATH] = { 0 };
-		//		HWND hwnd = Graphics::Instance().GetWindowHandle();
+		ImGui::Begin(u8"エフェクトマネージャーテスト");
+		{
+			if (ImGui::Button(u8"エフェクトJSONをロード"))
+			{
+				char filepath[MAX_PATH] = { 0 };
+				HWND hwnd = Graphics::Instance().GetWindowHandle();
 
-		//		// ダイアログを開いてJSONファイルを選択[cite: 25]
-		//		if (Dialog::OpenFileName(filepath, MAX_PATH, "JSON File\0*.json\0\0", "エフェクト読込", hwnd) == DialogResult::OK)
-		//		{
-		//			// パスからファイル名を取り出してエフェクト名にする
-		//			char filename[MAX_PATH];
-		//			_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
+				// ダイアログを開いてJSONファイルを選択[cite: 25]
+				if (Dialog::OpenFileName(filepath, MAX_PATH, "JSON File\0*.json\0\0", "エフェクト読込", hwnd) == DialogResult::OK)
+				{
+					// パスからファイル名を取り出してエフェクト名にする
+					char filename[MAX_PATH];
+					_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
 
-		//			// マネージャーにロード＆キャッシュさせる！[cite: 22, 23]
-		//			CustomEffectManager::Instance().LoadEffectConfig(filename, filepath);
-		//		}
-		//	}
+					// マネージャーにロード＆キャッシュさせる！[cite: 22, 23]
+					CustomEffectManager::Instance().LoadEffectConfig(filename, filepath);
+				}
+			}
 
-		//	ImGui::Separator();
+			ImGui::Separator();
 
-		//	// プレイヤーの足元にテスト再生してみるボタン
-		//	char effectNameBuf[128];
-		//	strncpy_s(effectNameBuf, effectName.c_str(), sizeof(effectNameBuf));
-		//	if (ImGui::InputText(u8"エフェクト名入力", effectNameBuf, sizeof(effectNameBuf)))
-		//	{
-		//		effectName = effectNameBuf;
-		//	}
-		//	ImGui::Separator();
+			// プレイヤーの足元にテスト再生してみるボタン
+			char effectNameBuf[128];
+			strncpy_s(effectNameBuf, effectName.c_str(), sizeof(effectNameBuf));
+			if (ImGui::InputText(u8"エフェクト名入力", effectNameBuf, sizeof(effectNameBuf)))
+			{
+				effectName = effectNameBuf;
+			}
+			ImGui::Separator();
 
-		//	// キャッシュしておいたエフェクトを再生
-		//	if (ImGui::Button(u8"エフェクト再生"))
-		//	{
-		//		CustomEffectManager::Instance().PlayEffect(effectName.c_str(), { 0.0f, 0.0f, 0.0f });
-		//	}
-		//}
-		//ImGui::End();
+			// キャッシュしておいたエフェクトを再生
+			if (ImGui::Button(u8"エフェクト再生"))
+			{
+				CustomEffectManager::Instance().PlayEffect(effectName.c_str(), { 0.0f, 0.0f, 0.0f });
+			}
+		}
+		ImGui::End();
 	}
 
 	player.DrawGUI();
