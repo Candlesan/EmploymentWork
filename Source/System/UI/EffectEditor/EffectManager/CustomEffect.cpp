@@ -279,7 +279,7 @@ void CustomEffect::RenderMeshVFX(ModelRenderer* modelRenderer)
                             dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
                             dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-                            // 行列とパラメータを定数バッファに更新して描画コール！
+                            // 行列とパラメータを定数バッファに更新して描画コール
                             shader->Update(rc, mesh);
                             dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
                         }
@@ -287,8 +287,9 @@ void CustomEffect::RenderMeshVFX(ModelRenderer* modelRenderer)
                         shader->End(rc);
                     }
 
+                    // シーンとここで2重でmodelRendererのRenderを呼んでるから重くなっている！
                     // MeshVFX シェーダーを指定して描画登録！
-                    modelRenderer->Draw(ShaderId::MeshVFX, rNode.meshModel);
+                    //modelRenderer->Draw(ShaderId::MeshVFX, rNode.meshModel);
                 }
             }
         }

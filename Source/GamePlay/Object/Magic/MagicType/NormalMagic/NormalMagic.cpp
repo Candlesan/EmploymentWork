@@ -12,7 +12,8 @@
 
 void NormalMagic::Initialize()
 {
-	CustomEffectManager::Instance().LoadEffectConfig(effectName, "Data/Json/Player/Effect/" + effectName + ".json");
+	CustomEffectManager::Instance().LoadEffectConfig(normalMagic, "Data/Json/Player/Effect/" + normalMagic + ".json");
+	CustomEffectManager::Instance().LoadEffectConfig(chargeMagic, "Data/Json/Player/Effect/" + chargeMagic + ".json");
 }
 
 void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const NormalMagicConfig& config)
@@ -63,7 +64,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	magic->SetWaitTimer(0.01f);
 	magic->SetLifeTimer(0.1f);
 
-	// ★ ① 位置のオフセット計算 (config.offsetPosition を使用)
+	// 位置のオフセット計算
 	DirectX::XMFLOAT3 finalPos =
 	{
 		startPos.x + config.offsetPosition.x,
@@ -71,18 +72,18 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 		startPos.z + config.offsetPosition.z
 	};
 
-	// ★ ② 方向ベクトル (info.direction) から Yaw (Y回転) と Pitch (X回転) を計算！
+	// 方向ベクトル
 	float yaw = atan2f(info.direction.x, info.direction.z);
 	float pitch = -asinf(info.direction.y);
 
-	// ★ ③ 計算した回転角度（度数法） ＋ オフセット角度 (config.offsetAngle)
+	// 計算した回転角度
 	DirectX::XMFLOAT3 finalAngle = {
 		DirectX::XMConvertToDegrees(pitch) + config.offsetAngle.x,
 		DirectX::XMConvertToDegrees(yaw) + config.offsetAngle.y,
 		0.0f + config.offsetAngle.z
 	};
 
-	// ★ ④ スケール計算 (config.offsetScale を使用)
+	// スケール計算
 	DirectX::XMFLOAT3 finalScale =
 	{
 		config.offsetScale.x,
@@ -92,8 +93,13 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 	if (!isCharged)
 	{
-		// 最終座標と角度でエフェクトを再生！
-		CustomEffectManager::Instance().PlayEffect(effectName, finalPos, finalAngle, finalScale);
+		// 通常攻撃
+		CustomEffectManager::Instance().PlayEffect(normalMagic, finalPos, finalAngle, finalScale);
+	}
+	else
+	{
+		// チャージ攻撃
+		CustomEffectManager::Instance().PlayEffect(chargeMagic, finalPos, finalAngle, finalScale);
 	}
 }
 

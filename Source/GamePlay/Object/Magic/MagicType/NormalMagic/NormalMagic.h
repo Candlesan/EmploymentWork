@@ -54,8 +54,6 @@ public:
                 if (j.find("chargeRadius") != j.end()) chargeRadius = j["chargeRadius"];
                 if (j.find("range") != j.end()) range = j["range"];
                 if (j.find("chargeTimeThreshold") != j.end()) chargeTimeThreshold = j["chargeTimeThreshold"];
-
-                // ★ 配列インデックスを修正 [0], [1], [2] に！
                 if (j.find("offsetPosition") != j.end()) offsetPosition = { j["offsetPosition"][0], j["offsetPosition"][1], j["offsetPosition"][2] };
                 if (j.find("offsetAngle") != j.end()) offsetAngle = { j["offsetAngle"][0], j["offsetAngle"][1], j["offsetAngle"][2] };
                 if (j.find("offsetScale") != j.end()) offsetScale = { j["offsetScale"][0], j["offsetScale"][1], j["offsetScale"][2] };
@@ -73,5 +71,6 @@ public:
     void DrawGUI(NormalMagicConfig& config);
 
 private:
-    std::string effectName = "Laser"; // 読み込むエフェクト名
+    std::string normalMagic = "Laser"; // 読み込むエフェクト名
+    std::string chargeMagic = "Charge_Laser"; // 読み込むエフェクト名
 };
