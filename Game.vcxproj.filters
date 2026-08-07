@@ -513,7 +513,9 @@
     <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.h">
       <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Flight\FlightController.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -771,7 +773,7 @@
     <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.cpp">
       <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GamePlay\Object\Flight\FlightController.cpp">
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
