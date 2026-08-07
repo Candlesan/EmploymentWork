@@ -1,0 +1,60 @@
+{
+    "damage": 0.009999999776482582,
+    "gaurdDamage": 2.0,
+    "hitHeight": 1.0,
+    "hitRadius": 0.25,
+    "lifeTimer": 3.0,
+    "offsetAngle": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "offsetPosition": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "offsetScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "rapidInterval": 0.05000000074505806,
+    "scale": 1.0,
+    "spawnOffsetX": 0.0,
+    "spawnOffsetY": 1.0,
+    "spawnOffsetZ": 0.0,
+    "spawnOffsets": [
+        [
+            -1.0,
+            1.0,
+            0.0
+        ],
+        [
+            -2.0,
+            0.5,
+            0.0
+        ],
+        [
+            -1.0,
+            -0.5,
+            0.0
+        ],
+        [
+            1.0,
+            1.0,
+            0.0
+        ],
+        [
+            2.0,
+            0.5,
+            0.0
+        ],
+        [
+            1.0,
+            -0.5,
+            0.0
+        ]
+    ],
+    "speed": 150.0
+}

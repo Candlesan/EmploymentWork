@@ -237,7 +237,7 @@ void Player::Update(float elapsedTime)
 	if (!isTyping && !isPreviewMode)
 	{
 		// 魔法を撃つ
-		MagicInput();
+		MagicInput(elapsedTime);
 
 		// 移動処理
 		InputMove(elapsedTime);

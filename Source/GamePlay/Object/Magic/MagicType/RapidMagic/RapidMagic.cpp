@@ -1,7 +1,4 @@
 #include "RapidMagic.h"
-#include "GamePlay/Object/Character/Character.h"
-#include "GamePlay/Object/Collision/Collision.h"
-#include "GamePlay/Object/Collision/CollisionManager.h"
 #include "GamePlay/Object/Magic/MagicProjectile.h"
 #include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMove.h"
 
