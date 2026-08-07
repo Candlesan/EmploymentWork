@@ -56,10 +56,11 @@ void Player::Initialize()
 	// 各種システムの初期化（
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
-	trail.Initialize();              // トレイルの初期化
+	trail.Initialize(); // トレイルの初期化
 	normalMagic.Initialize();
-	normalMagicConfig.Load();		// 魔法の初期化
+	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
 	rapidMagic.Initialize();
+	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
 
 
 	// アニメーションポーズと初期ステートの設定

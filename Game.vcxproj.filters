@@ -214,6 +214,9 @@
     <Filter Include="Source\System\UI\EffectEditor\EffectManager">
       <UniqueIdentifier>{a27d48c2-644f-4922-ad9e-c4f2ea5b0a50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Flight">
+      <UniqueIdentifier>{3874ac6d-4799-4580-a9e1-ded72546897e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -516,6 +519,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Flight\FlightController.h">
+      <Filter>Source\GamepPlay\Object\Flight</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -773,8 +779,11 @@
     <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.cpp">
       <Filter>Source\System\UI\EffectEditor\EffectManager</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Flight\FlightController.cpp">
+      <Filter>Source\GamepPlay\Object\Flight</Filter>
+    </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
