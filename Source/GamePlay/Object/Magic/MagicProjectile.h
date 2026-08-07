@@ -8,7 +8,7 @@
 class MagicProjectile : public MagicBase
 {
 public:
-	MagicProjectile(MagicManager* manager, const std::string& effectPath);
+	MagicProjectile(MagicManager* manager, const std::string& effectPath = "");
 	~MagicProjectile() override;
 
 	void Update(float elapsedTime) override;

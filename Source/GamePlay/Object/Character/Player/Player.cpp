@@ -59,6 +59,8 @@ void Player::Initialize()
 	trail.Initialize();              // トレイルの初期化
 	normalMagic.Initialize();
 	normalMagicConfig.Load();		// 魔法の初期化
+	rapidMagic.Initialize();
+
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
@@ -229,7 +231,8 @@ void Player::Update(float elapsedTime)
 	// プレイヤーの状態を計算する関数
 	CalculateStatusParameters();
 
-	MagicInput();
+	// 魔法入力
+	MagicInput(elapsedTime);
 
 	if (!isTyping && !isPreviewMode)
 	{
@@ -435,7 +438,7 @@ void Player::DrawGUI()
 			// 魔法関係
 			if (ImGui::CollapsingHeader(u8"魔法パラメータ設定", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				if (ImGui::CollapsingHeader(u8"通常攻撃", ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(u8"通常魔法", ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					if (ImGui::Button(u8"保存##Normal"))
 					{
@@ -470,6 +473,34 @@ void Player::DrawGUI()
 					ImGui::Separator();
 
 					normalMagic.DrawGUI(normalMagicConfig);
+				}
+
+				if (ImGui::CollapsingHeader(u8"連射魔法", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					if (ImGui::Button(u8"保存##Rapid"))
+					{
+						rapidMagicConfig.Save();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"読み込み##Rapid"))
+					{
+						rapidMagicConfig.Load(); // JSONから読み込み
+					}
+					ImGui::Separator();
+
+					ImGui::DragFloat(u8"発射感覚", &rapidMagicConfig.rapidInterval, 0.01f);
+					ImGui::DragFloat(u8"生身へのダメージ", &rapidMagicConfig.damage, 0.1f);
+					ImGui::DragFloat(u8"防御魔法へのダメージ", &rapidMagicConfig.gaurdDamage, 0.1f);
+					ImGui::DragFloat(u8"魔法の速度", &rapidMagicConfig.speed, 0.1f);
+
+
+					ImGui::DragFloat3(u8"手元オフセット", &rapidMagicConfig.spawnOffset.x, 0.1f);
+					ImGui::Separator();
+
+					ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
+					ImGui::Separator();
+
+					rapidMagic.DrawGUI(rapidMagicConfig);
 				}
 			}
 
@@ -651,12 +682,11 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 // =========================================================================
 
 // 魔法射出
-void Player::MagicInput()
+void Player::MagicInput(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-
-	if(gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
+	if(gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER)
 	{
 		if (magicCoolDownTimer > 0.0f) return;
 
@@ -671,13 +701,46 @@ void Player::MagicInput()
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
 
-		spawnInfo.holdTime = rtButtonHoldTime;
+		spawnInfo.holdTime = rbButtonHoldTime;
 
 		// 通常魔法を呼び出す
 		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 
 		// クールダウンをセット
 		magicCoolDownTimer = coolDownValue;
+	}
+
+
+	if(gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
+	{
+		if (magicCoolDownTimer > 0.0f) return;
+
+		status.isRapidFire = true;
+
+		// カメラの前方向を取得する
+		Camera& camera = CameraManager::Instance().GetMainCamera();
+		DirectX::XMFLOAT3 dir = camera.GetFront();
+
+		// 魔法の設定
+		MagicSpawnInfo spawnInfo;
+		spawnInfo.position = position;
+		spawnInfo.direction = dir;
+		spawnInfo.owner = this;
+		spawnInfo.target = enemy;
+
+		spawnInfo.holdTime = rtButtonHoldTime;
+
+		rapidMagicConfig.damage = 0.01f;
+		rapidMagicConfig.gaurdDamage = 2.0f;
+		rapidMagicConfig.hitRadius = 0.25f;
+		rapidMagicConfig.speed = 150.0f;
+
+		// 連射魔法を呼び出す
+		rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, status.isRapidFire);
+	}
+	else
+	{
+		status.isRapidFire = false;
 	}
 }
 
@@ -979,17 +1042,6 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	// 風の槍のチャージアタック時は通常移動をスキップする
-	if (animSequence.GetRange("DashAttack"))
-	{
-		WindChargeAttack(elapsedTime);
-		return;
-	}
-	else
-	{
-		WindDashAttackDistance = 0.0f;
-	}
-
 	std::string state = GetCurrentState();
 	bool isHybridState = (state.find("Avoid") != std::string::npos ||
 		state.find("Dash") != std::string::npos);
@@ -1089,18 +1141,6 @@ RelativeInputDir Player::CalculateRelativeInputDir()
 //  専用技
 // =========================================================================
 
-// RBを長押ししたときの技変化（突進）
-void Player::WindChargeAttack(float elapsedTime)
-{
-	// プレイヤーの前方向を計算する
-	float s = sinf(angle.y);
-	float c = cosf(angle.y);
-
-	Move(s, c, DashSpeed);
-
-	float stepDistance = DashSpeed * elapsedTime;
-	WindDashAttackDistance += stepDistance;
-}
 
 
 // =========================================================================

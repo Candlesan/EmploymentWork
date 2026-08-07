@@ -13,6 +13,7 @@
 #include "GamePlay/Object/Trail/Trail.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
+#include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
 
 #include <memory>
 
@@ -48,9 +49,9 @@ public:
 	// =========================================================================
 	//  外部からのアクション命令（プレイヤーを動かす外からのトリガー）
 	// =========================================================================
-	void MagicInput();
-	void AddGraph(std::string name);              
-	void UpdateSounds(const std::string& state);  
+	void MagicInput(float elapsedTime);
+	void AddGraph(std::string name);
+	void UpdateSounds(const std::string& state);
 	void OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime);
 
 	// =========================================================================
@@ -103,7 +104,6 @@ private:
 	RelativeInputDir CalculateRelativeInputDir();
 
 	// ── 専用技 ──
-	void WindChargeAttack(float elapsedTime);
 
 	// ── ステートマシン・先行入力 ──
 	void UpdateStateTransitions(float elapsedTime);
@@ -174,11 +174,13 @@ private:
 	MagicManager magicManager;
 	NormalMagic::NormalMagicConfig normalMagicConfig;
 	NormalMagic normalMagic;
+	RapidMagic::RapidMagicConfig rapidMagicConfig;
+	RapidMagic rapidMagic;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 0.0f;
 	bool isMagicAttack = true;
+	bool rapidInterval = 0.1f;
 
-	float DashSpeed = 20.0f;
 	float magicRecoverDelay = 0.0f;
 
 	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
