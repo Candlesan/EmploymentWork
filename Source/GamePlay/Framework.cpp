@@ -37,6 +37,22 @@ Framework::Framework(HWND hWnd)
 
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneGame);
+
+
+	// 最初にボーダーレスのフルスクリーンを作る
+	ToggleFullscreen();
+
+	// グラフィック基盤をリサイズする
+	Graphics::Instance().OnResize();
+
+	float w = Graphics::Instance().GetScreenWidth();
+	float h = Graphics::Instance().GetScreenHeight();
+
+	Scene* currentScene = SceneManager::Instance().GetCurrentScene();
+	if (currentScene != nullptr)
+	{
+		currentScene->OnResize(w, h);
+	}
 }
 
 // デストラクタ
