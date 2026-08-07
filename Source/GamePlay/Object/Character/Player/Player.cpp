@@ -229,12 +229,21 @@ void Player::Update(float elapsedTime)
 	// プレイヤーの状態を計算する関数
 	CalculateStatusParameters();
 
-	MagicInput();
-
 	if (!isTyping && !isPreviewMode)
 	{
+		// 魔法を撃つ
+		MagicInput();
+
+		// 移動処理
 		InputMove(elapsedTime);
+
+		// 飛行状態を更新
+		UpdateFly(elapsedTime);
+
+		// アニメーション遷移
 		UpdateStateTransitions(elapsedTime);
+
+		// 上半身のアニメーション遷移
 		UpdateUpperBodyTransitions(elapsedTime);
 	}
 	else if (isTyping && !isPreviewMode)
@@ -736,6 +745,23 @@ void Player::OnHitEnemyAttack(float damage, float poiseDamage, float invincibleT
 	ApplyDamage(damage, invincibleTime, poiseDamage);
 }
 
+// 飛行の更新処理
+void Player::UpdateFly(float elapsedTime)
+{
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	// 入力をまとめる
+	FlightInput input;
+	input.isAButtonDown = (gamePad.GetButton() & GamePad::BTN_A) != 0;
+	input.isAButtonUp = (gamePad.GetButtonUp() & GamePad::BTN_A) != 0;
+
+	// 入力状態を渡す
+	flightController.ProcessInput(input, elapsedTime);
+
+	// 状態を更新する
+	flightController.Update(this, elapsedTime);
+}
+
 
 // =========================================================================
 //  セッター（インライン以外）
@@ -1166,34 +1192,34 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentState)
 	{
-		// ジャンプ処理
-		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
-		{
-			if (IsGround())
-			{
-				Jump(jumpSpeed);
+		//// ジャンプ処理
+		//if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
+		//{
+		//	if (IsGround())
+		//	{
+		//		Jump(jumpSpeed);
 
-				// 空中に飛び出すときに勢いを載せる
-				if (moveLength > 0.1f)
-				{
-					float mvX = moveVec.x / moveLength;
-					float mvZ = moveVec.z / moveLength;
+		//		// 空中に飛び出すときに勢いを載せる
+		//		if (moveLength > 0.1f)
+		//		{
+		//			float mvX = moveVec.x / moveLength;
+		//			float mvZ = moveVec.z / moveLength;
 
-					// 走ってるときの速度を掛けてVelocityに送る
-					float jumpForwardSpeed = maxMoveSpeed;
-					velocity.x = mvX * jumpForwardSpeed;
-					velocity.z = mvZ * jumpForwardSpeed;
-				}
-				else
-				{
-					velocity.x = 0.0f;
-					velocity.z = 0.0f;
-				}
+		//			// 走ってるときの速度を掛けてVelocityに送る
+		//			float jumpForwardSpeed = maxMoveSpeed;
+		//			velocity.x = mvX * jumpForwardSpeed;
+		//			velocity.z = mvZ * jumpForwardSpeed;
+		//		}
+		//		else
+		//		{
+		//			velocity.x = 0.0f;
+		//			velocity.z = 0.0f;
+		//		}
 
-				jumpCount++;
-				bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
-			}
-		}
+		//		jumpCount++;
+		//		bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+		//	}
+		//}
 
 		// アクションを実行する
 		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
@@ -1344,31 +1370,31 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentOverlayState)
 	{
-		// ジャンプ処理
-		if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
-		{
-			Jump(jumpSpeed);
+		//// ジャンプ処理
+		//if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
+		//{
+		//	Jump(jumpSpeed);
 
-			// 空中に飛び出すときに勢いを載せる
-			if (moveLength > 0.1f)
-			{
-				float mvX = moveVec.x / moveLength;
-				float mvZ = moveVec.z / moveLength;
+		//	// 空中に飛び出すときに勢いを載せる
+		//	if (moveLength > 0.1f)
+		//	{
+		//		float mvX = moveVec.x / moveLength;
+		//		float mvZ = moveVec.z / moveLength;
 
-				// 走ってるときの速度を掛けてVelocityに送る
-				float jumpForwardSpeed = maxMoveSpeed;
-				velocity.x = mvX * jumpForwardSpeed;
-				velocity.z = mvZ * jumpForwardSpeed;
-			}
-			else
-			{
-				velocity.x = 0.0f;
-				velocity.z = 0.0f;
-			}
+		//		// 走ってるときの速度を掛けてVelocityに送る
+		//		float jumpForwardSpeed = maxMoveSpeed;
+		//		velocity.x = mvX * jumpForwardSpeed;
+		//		velocity.z = mvZ * jumpForwardSpeed;
+		//	}
+		//	else
+		//	{
+		//		velocity.x = 0.0f;
+		//		velocity.z = 0.0f;
+		//	}
 
-			jumpCount++;
-			bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
-		}
+		//	jumpCount++;
+		//	bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
+		//}
 
 		// アクションを実行する
 		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);

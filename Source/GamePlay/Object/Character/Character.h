@@ -4,6 +4,7 @@
 #include "System/Renderer/ModelRenderer.h"
 #include "System/Renderer/ShapeRenderer.h"
 #include "GamePlay/Object/Collision/Collision.h"
+#include "GamePlay/Object/Flight/FlightController.h"
 
 
 // ダメージの種類（返り値用の構造体）
@@ -193,6 +194,7 @@ protected:
 protected:
 	CharacterStatus status;		  // 現在のステータス
 	CharacterStatus defaltStatus; // 初期データ
+	FlightController flightController; // 飛行情報
 
 	// 位置・回転・スケール・行列
 	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };

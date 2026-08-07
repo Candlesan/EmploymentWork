@@ -11,88 +11,14 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
+                    "threshold": 50.0,
+                    "type": 21
                 }
             ],
-            "fromState": "Entry",
+            "fromState": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
             "priority": 0,
             "toSlot": 0,
-            "toState": "AS_Jump_Combat_Start_0_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.17499999701976776,
-                    "type": 1
-                }
-            ],
-            "fromState": "AS_Jump_Combat_Start_0_Seq_0",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 10
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 6
-                }
-            ],
-            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 8
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": true,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 16
-                }
-            ],
-            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "AS_Jump_Combat_Stop_0_Seq_0"
+            "toState": "AS_Skill_02_01_End_Seq_0"
         },
         {
             "Actions": [],
@@ -109,7 +35,7 @@
                     "type": 0
                 }
             ],
-            "fromState": "AS_Jump_Combat_Stop_0_Seq_0",
+            "fromState": "AS_Skill_02_01_End_Seq_0",
             "priority": 0,
             "toSlot": 0,
             "toState": "Exit"
@@ -125,91 +51,20 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 0.4000000059604645,
-                    "type": 1
+                    "threshold": 0.0,
+                    "type": 20
                 }
             ],
-            "fromState": "AS_Jump_Combat_Start_F_0_Seq_0",
+            "fromState": "Entry",
             "priority": 0,
             "toSlot": 0,
-            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 6
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": true,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 19
-                }
-            ],
-            "fromState": "Entry",
-            "priority": 1,
-            "toSlot": 0,
-            "toState": "AS_Jump_Combat_Start_F_0_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": true,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
-                }
-            ],
-            "fromState": "Entry",
-            "priority": 2,
-            "toSlot": 0,
-            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+            "toState": "AS_Attack_Air_to_Floor_02_Loop_Seq_0"
         }
     ],
     "nodes": [
         {
             "StateName": "Entry",
-            "config": {
-                "animationName": "",
-                "blendTime": 0.0,
-                "loop": false,
-                "targetBoneName": "",
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "mixRate": 0.0,
-            "position": [
-                -191.0,
-                265.0
-            ],
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "Exit",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
@@ -220,17 +75,18 @@
             },
             "mixRate": 0.0,
             "position": [
-                417.0,
-                249.0
+                -44.0,
+                73.0
             ],
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "AS_Jump_Combat_Start_0_Seq_0",
+            "StateName": "Exit",
+            "assetName": "",
             "config": {
-                "animationName": "AS_Jump_Combat_Start_0_Seq_0",
-                "blendTime": 0.10000000149011612,
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
                 "useRootMotion": false,
@@ -238,17 +94,18 @@
             },
             "mixRate": 0.0,
             "position": [
-                1.0,
-                185.0
+                -44.0,
+                361.0
             ],
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "AS_Jump_Combat_Loop_0_Seq_0",
+            "StateName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+            "assetName": "",
             "config": {
-                "animationName": "AS_Jump_Combat_Loop_0_Seq_0",
-                "blendTime": 1.0,
+                "animationName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
                 "loop": true,
                 "targetBoneName": "",
                 "useRootMotion": false,
@@ -256,44 +113,27 @@
             },
             "mixRate": 0.0,
             "position": [
-                3.0,
+                -44.0,
+                169.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Skill_02_01_End_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Skill_02_01_End_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -44.0,
                 265.0
-            ],
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "AS_Jump_Combat_Stop_0_Seq_0",
-            "config": {
-                "animationName": "AS_Jump_Combat_Stop_0_Seq_0",
-                "blendTime": 0.0,
-                "loop": false,
-                "targetBoneName": "",
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "mixRate": 0.0,
-            "position": [
-                5.0,
-                345.0
-            ],
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "AS_Jump_Combat_Start_F_0_Seq_0",
-            "config": {
-                "animationName": "AS_Jump_Combat_Start_F_0_Seq_0",
-                "blendTime": 0.0,
-                "loop": false,
-                "targetBoneName": "",
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "mixRate": 0.0,
-            "position": [
-                1.0,
-                105.0
             ],
             "subGraphPath": "",
             "type": 0

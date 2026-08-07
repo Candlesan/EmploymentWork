@@ -52,6 +52,7 @@ public:
 	void AddGraph(std::string name);              
 	void UpdateSounds(const std::string& state);  
 	void OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime);
+	void UpdateFly(float elapsedTime);
 
 	// =========================================================================
 	//  セッター（外部からデータをセットする窓口）
