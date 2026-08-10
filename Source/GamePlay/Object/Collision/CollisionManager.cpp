@@ -1,212 +1,246 @@
 #include "CollisionManager.h"
+#include "GamePlay/Object/Character/Player/Player.h"
+#include "GamePlay/Object/Character/Enemy/Enemy.h"
+#include "GamePlay/Object/Stage/Stage.h"
+#include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
+#include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
+#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
+#include "GamePlay/Object/Character/Character.h"
 
+// 更新処理
 void CollisionManager::Update(Player& player, Enemy& enemy)
 {
-	CollisonPlayervsEnemy(player, enemy);
-	CollisionPlayerWeaponVsEnemy(player, enemy);
-	CollisionEnemyWeaponVsPlayer(player, enemy);
-	CollisionMagicVsEnemy(player, enemy);
-	CollisionEnemyMagicVsPlayer(player, enemy);
-	CollisionDebugSphereVsPlayer(player);
+	std::vector<Collider> colliders = GatherColliders(player, enemy);
+	CheckCollisions(colliders);
 }
 
-// プレイヤーと敵の当たり判定
-void CollisionManager::CollisonPlayervsEnemy(Player& player, Enemy& enemy)
+// 当たった時の処理
+void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
+	const DirectX::XMFLOAT3& outPosA, const DirectX::XMFLOAT3& outPosB)
 {
-	// プレイヤーを取得
-	DirectX::XMFLOAT3 outPositionA, outPositionB;
-	if (Collision::IntersectCapsuleVsCapsule(
-		player.GetPosition(),
-		player.GetCapsuleDirection(),
-		player.GetHeight(),
-		player.GetRadius(),
-		player.GetWeight(),
-		enemy.GetPosition(),
-		enemy.GetCapsuleDirection(),
-		enemy.GetHeight(),
-		enemy.GetRadius(),
-		enemy.GetWeight(),
-		outPositionA,
-		outPositionB
-	))
+	// aが魔法で、bがキャラクターの場合ダメージ
+	if (IsMagicTag(a.category) && IsCharacterTag(b.category))
 	{
-		// 押し出し処理
-		player.SetPosition(outPositionA);
-		enemy.SetPosition(outPositionB);
+		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
+		Character* target = static_cast<Character*>(b.owner);
+
+		target->ApplyDamage(magic->GetDamage());
+		magic->OnTerminate(); // 当たったら魔法を消す
+
 	}
-}
 
-// 武器と敵の当たり判定
-void CollisionManager::CollisionPlayerWeaponVsEnemy(Player& player, Enemy& enemy)
-{
-
-	// プレイヤーの現在有効な攻撃判定をすべて取得！
-	std::vector<Character::HitBoxInfo> playerHits = player.GetActiveHitBoxes();
-
-	for (const auto& hit : playerHits)
+	// aもbもキャラクターの場合押し出し処理
+	if (IsCharacterTag(a.category) && IsCharacterTag(b.category))
 	{
-		bool isHit = false;
-		DirectX::XMFLOAT3 outPosA, outPosB, outPos;
+		Character* targetA = static_cast<Character*>(a.owner);
+		Character* targetB = static_cast<Character*>(b.owner);
 
-		if (hit.shape == HitBoxShape::Capsule) {
-			isHit = Collision::IntersectCapsuleVsCapsule(
-				hit.position, hit.direction, hit.height, hit.radius, 1.0f,
-				enemy.GetPosition(), enemy.GetCapsuleDirection(), enemy.GetHeight(), enemy.GetRadius(), enemy.GetWeight(),
-				outPosA, outPosB
-			);
-		}
-		else if (hit.shape == HitBoxShape::Sphere) {
-			isHit = Collision::IntersectSphereVsCapsule(
-				hit.position, hit.radius,
-				enemy.GetPosition(), enemy.GetCapsuleDirection(), enemy.GetHeight(), enemy.GetRadius(),
-				outPos
-			);
-		}
-
-		if (isHit) {
-			// ダメージ処理
-			if (hit.damageRate > 0.0f) {
-				AttackResult res = player.CalculateAttackResult(hit.damageRate, hit.poiseRate);
-				enemy.SetLastDamage(res.damage);
-				enemy.ApplyDamage(res.damage, hit.invincibleTime, res.poiseDamage);
-			}
-		}
+		targetA->SetPosition(outPosA); // Collisionが計算してくれた座標をそのまま反映
+		targetB->SetPosition(outPosB);
 	}
+
 }
 
-// 敵の攻撃とプレイヤーの当たり判定
-void CollisionManager::CollisionEnemyWeaponVsPlayer(Player& player, Enemy& enemy)
+// このタグは魔法系か？
+bool CollisionManager::IsMagicTag(CollisitionTag tag)
 {
-
-	// 敵の現在有効な攻撃判定をすべて取得！
-	std::vector<Character::HitBoxInfo> enemyHits = enemy.GetActiveHitBoxes();
-
-	for (const auto& hit : enemyHits)
-	{
-		bool isHit = false;
-		DirectX::XMFLOAT3 outPos, outPosA, outPosB;
-
-		// 形状に合わせて判定関数を変える
-		if (hit.shape == HitBoxShape::Capsule) {
-			isHit = Collision::IntersectCapsuleVsCapsule(
-				hit.position, hit.direction, hit.height, hit.radius, 1.0f,
-				player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(), 1.0f,
-				outPosA, outPosB);
-		}
-		else if (hit.shape == HitBoxShape::Sphere) {
-			isHit = Collision::IntersectSphereVsCapsule(
-				hit.position, hit.radius,
-				player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(),
-				outPos);
-		}
-
-		// 当たっていたらダメージ処理
-		if (isHit) {
-			player.SetIsHit(true);
-			bool isGuarding = player.GetIsGuarding();
-			bool isAvoid = player.GetIsAvoid();
-
-			if (isGuarding) player.SetIsHit(true);
-
-			if (!isGuarding && !isAvoid) {
-				// hitの中にダメージ情報が入っているのでそのまま使える！
-				AttackResult res = enemy.CalculateAttackResult(hit.damageRate, hit.poiseRate);
-				//player.SetLastDamage(res.damage);
-				player.OnHitEnemyAttack(res.damage, hit.invincibleTime, res.poiseDamage);
-			}
-		}
-	}
+	return tag == CollisitionTag::PlayerNomalMagic || tag == CollisitionTag::PlayerRapidMagic
+		|| tag == CollisitionTag::EnemyNormalMagic || tag == CollisitionTag::EnemyRapidMagic;
 }
 
-// 敵と魔法の当たり判定
-void CollisionManager::CollisionMagicVsEnemy(Player& player, Enemy& enemy)
+// このタグはキャラクター本体か？
+bool CollisionManager::IsCharacterTag(CollisitionTag tag)
 {
-	MagicManager& magicManager = player.GetMagicManager();
+	return tag == CollisitionTag::PlayerBody || tag == CollisitionTag::EnemyBody;
+}
 
-	// 存在する魔法の数だけループ
-	for (int i = 0; i < magicManager.GetMagicCount(); ++i)
+// 1フレーム分のColliderをかき集める
+std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& enemy)
+{
+	std::vector<Collider> colliders;
+
+	// プレイヤー本体
+	Collider playerBody;
+	playerBody.category = CollisitionTag::PlayerBody;
+	playerBody.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyBody)
+		| static_cast<uint32_t>(CollisitionTag::EnemyNormalMagic) | static_cast<uint32_t>(CollisitionTag::EnemyRapidMagic);
+	playerBody.shape = HitBoxShape::Capsule;
+	playerBody.pos = player.GetPosition();
+	playerBody.dir = player.GetCapsuleDirection();
+	playerBody.radius = player.GetRadius();
+	playerBody.height = player.GetHeight();
+	playerBody.owner = &player;
+	colliders.push_back(playerBody);
+
+	// 敵本体
+	Collider enemyBody;
+	enemyBody.category = CollisitionTag::EnemyBody;
+	enemyBody.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerBody)
+		| static_cast<uint32_t>(CollisitionTag::PlayerNomalMagic) | static_cast<uint32_t>(CollisitionTag::PlayerRapidMagic);
+	enemyBody.shape = HitBoxShape::Capsule;
+	enemyBody.pos = enemy.GetPosition();
+	enemyBody.dir = enemy.GetCapsuleDirection();
+	enemyBody.radius = enemy.GetRadius();
+	enemyBody.height = enemy.GetHeight();
+	enemyBody.owner = &enemy;
+	colliders.push_back(enemyBody);
+
+	// プレイヤーの魔法
+	MagicManager& playerMagicMgr = player.GetMagicManager();
+	for (int i = 0; i < playerMagicMgr.GetMagicCount(); ++i)
 	{
-		MagicBase* magic = magicManager.getMagic(i);
+		MagicBase* pMagic = playerMagicMgr.getMagic(i);
 
-		DirectX::XMFLOAT3 outPos;
+		if (!pMagic->GetIsAlive()) continue;
 
-		// 魔法と敵の当たり判定
-		if (Collision::IntersectSphereVsCapsule(
-			magic->GetPosition(), magic->GetRadius(),
-			enemy.GetPosition(), enemy.GetCapsuleDirection(), enemy.GetHeight(), enemy.GetRadius(),
-			outPos))
+		Collider playerMagic; // ループごとに作る
+
+		// 魔法の種類でカテゴリーを分ける
+		if (pMagic->GetMagicKind() == MagicKind::Normal)
 		{
-			// ダメージを与える
-			enemy.ApplyDamage(magic->GetDamage(), 0.3, 10.0f);
-
-			// 魔法自体を消滅させる
-			magic->OnTerminate();
+			playerMagic.category = CollisitionTag::PlayerNomalMagic;
+			playerMagic.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyBody)
+				| static_cast<uint32_t>(CollisitionTag::EnemyGaurdMagic) | static_cast<uint32_t>(CollisitionTag::EnemyNormalMagic);
 		}
+		else// MagicKind::Rapid
+		{
+			playerMagic.category = CollisitionTag::PlayerRapidMagic;
+			playerMagic.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyBody)
+				| static_cast<uint32_t>(CollisitionTag::EnemyGaurdMagic) | static_cast<uint32_t>(CollisitionTag::EnemyRapidMagic);
+		}
+		playerMagic.shape = pMagic->GetShape();
+		playerMagic.pos = pMagic->GetPosition();
+		playerMagic.dir = pMagic->GetDirection();
+		playerMagic.radius = pMagic->GetRadius();
+		playerMagic.height = pMagic->GetHeight();
+		playerMagic.owner = pMagic;
+
+		colliders.push_back(playerMagic); // 1匹分をvectorに積む
 	}
+
+	//　敵の魔法
+	MagicManager& enemyMagicMgr = enemy.GetMagicManager();
+	for (int i = 0; i < enemyMagicMgr.GetMagicCount(); ++i)
+	{
+		MagicBase* eMagic = enemyMagicMgr.getMagic(i);
+		if (!eMagic->GetIsAlive()) continue;
+
+		Collider enemyMagic; // ループごとに作る
+
+		// 魔法の種類でカテゴリーを分ける
+		if (eMagic->GetMagicKind() == MagicKind::Normal)
+		{
+			enemyMagic.category = CollisitionTag::EnemyNormalMagic;
+			enemyMagic.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerBody)
+				| static_cast<uint32_t>(CollisitionTag::PlayerGaurdMagic) | static_cast<uint32_t>(CollisitionTag::PlayerNomalMagic);
+		}
+		else// MagicKind::Rapid
+		{
+			enemyMagic.category = CollisitionTag::EnemyRapidMagic;
+			enemyMagic.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerBody)
+				| static_cast<uint32_t>(CollisitionTag::PlayerGaurdMagic) | static_cast<uint32_t>(CollisitionTag::PlayerRapidMagic);
+		}
+		enemyMagic.shape = eMagic->GetShape();
+		enemyMagic.pos = eMagic->GetPosition();
+		enemyMagic.dir = eMagic->GetDirection();
+		enemyMagic.radius = eMagic->GetRadius();
+		enemyMagic.height = eMagic->GetHeight();
+		enemyMagic.owner = eMagic;
+
+		colliders.push_back(enemyMagic); // 1匹分をvectorに積む
+	}
+
+	// プレイヤーの防御魔法
+	DefenseMagic& playerDefenseMagic = player.GetDefenseMagic();
+	if (playerDefenseMagic.GetIsActive())
+	{
+		Collider playerGuardCollider;
+		playerGuardCollider.category = CollisitionTag::PlayerGaurdMagic;
+		playerGuardCollider.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyNormalMagic)
+			| static_cast<uint32_t>(CollisitionTag::EnemyRapidMagic);
+		playerGuardCollider.shape = HitBoxShape::Sphere;
+		playerGuardCollider.pos = playerDefenseMagic.GetGaurdPosition();
+		playerGuardCollider.radius = playerDefenseMagic.GetGaurdRadius();
+		playerGuardCollider.owner = &player;
+		colliders.push_back(playerGuardCollider);
+	}
+
+	// 敵の防御魔法
+	DefenseMagic& enemyDefenseMagic = enemy.GetDefenseMagic();
+	if (enemyDefenseMagic.GetIsActive())
+	{
+		Collider enemyGuardCollider;
+		enemyGuardCollider.category = CollisitionTag::EnemyGaurdMagic;
+		enemyGuardCollider.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerNomalMagic)
+			| static_cast<uint32_t>(CollisitionTag::PlayerRapidMagic);
+		enemyGuardCollider.shape = HitBoxShape::Sphere;
+		enemyGuardCollider.pos = enemyDefenseMagic.GetGaurdPosition();
+		enemyGuardCollider.radius = enemyDefenseMagic.GetGaurdRadius();
+		enemyGuardCollider.owner = &enemy;
+		colliders.push_back(enemyGuardCollider);
+	}
+
+	return colliders;
 }
 
-// 敵の魔法とPlayerの当たり判定
-void CollisionManager::CollisionEnemyMagicVsPlayer(Player& player, Enemy& enemy)
+// 集めたColliderを総当たりでチェックする
+void CollisionManager::CheckCollisions(std::vector<Collider>& colliders)
 {
-
-	MagicManager& enemyMagicManger = enemy.GetMagicManager();
-
-	for (int i = 0; i < enemyMagicManger.GetMagicCount(); ++i)
+	for (size_t i = 0; i < colliders.size(); ++i)
 	{
-		// 槍のデータを取り出す
-		MagicBase* magic = enemyMagicManger.getMagic(i);
-		if (!magic) continue;
-
-		bool isHit = false;
-
-		DirectX::XMFLOAT3 outPosA, outPosB;
-		isHit = Collision::IntersectCapsuleVsCapsule(
-			magic->GetPosition(),
-			magic->GetDirection(),
-			magic->GetHeight(),
-			magic->GetRadius(),
-			0.0f,
-			player.GetPosition(),
-			player.GetCapsuleDirection(),
-			player.GetHeight(),
-			player.GetRadius(),
-			0.0f,
-			outPosA,
-			outPosB);
-
-		if (isHit)
+		for (size_t j = 0; j < colliders.size(); ++j)
 		{
-			bool isGuarding = player.GetIsGuarding();
-			bool isAvoid = player.GetIsAvoid();
+			if (i == j) continue; // 自分自身とは判定しない
 
-			if (!isGuarding && !isAvoid)
+			Collider& a = colliders[i];
+			Collider& b = colliders[j];
+
+			// aがbを狙ってるか?（マスクの判定）
+			uint32_t bTag = static_cast<uint32_t>(b.category);
+			if ((a.targetMask & bTag) == 0) continue; // aの狙ってるリストの中に、bのタグが1個も含まれてない
+
+			// 形状に応じた当たり判定を取る
+			bool hit = false;
+			DirectX::XMFLOAT3 outPosA, outPosB;
+
+			if (a.shape == HitBoxShape::Capsule && b.shape == HitBoxShape::Capsule)
 			{
-				player.ApplyDamage(magic->GetDamage(), 0.5f, 10.0f);
+				// カプセル同士の当たり判定
+				hit = Collision::IntersectCapsuleVsCapsule(
+					a.pos, a.dir, a.height, a.radius, 1.0f,
+					b.pos, b.dir, b.height, b.radius, 1.0f,
+					outPosA, outPosB);
+			}
+			else if (a.shape == HitBoxShape::Sphere && b.shape == HitBoxShape::Capsule)
+			{
+				// 球とカプセルの当たり判定
+				hit = Collision::IntersectSphereVsCapsule(
+					a.pos, a.radius,
+					b.pos, b.dir, b.height, b.radius,
+					outPosA);
+			}
+			else if (a.shape == HitBoxShape::Capsule && b.shape == HitBoxShape::Sphere)
+			{
+				// 球とカプセルの当たり判定
+				hit = Collision::IntersectSphereVsCapsule(
+					b.pos, b.radius,
+					a.pos, a.dir, a.height, a.radius,
+					outPosA);
+			}
+			else
+			{
+				// 球と球の当たり判定
+				hit = Collision::IntersectSphereVsSpere(
+					a.pos, a.radius,
+					b.pos, b.radius,
+					outPosA);
 			}
 
-			// 当たった槍は消滅させる
-			magic->OnTerminate();
-		}
-	}
-}
-
-// デバック用の当たり判定
-void CollisionManager::CollisionDebugSphereVsPlayer(Player& player)
-{
-	DirectX::XMFLOAT3 debugSpherePos = { 5.0f, 1.0f, 0.0f };
-	float debugSphereRadius = 1.0f;
-
-	DirectX::XMFLOAT3 outPos;
-
-	//プレイヤーのカプセルと、この固定の球が触れているかチェック
-	if (Collision::IntersectSphereVsCapsule(
-		debugSpherePos, debugSphereRadius,
-		player.GetPosition(), player.GetCapsuleDirection(), player.GetHeight(), player.GetRadius(),
-		outPos))
-	{
-		if (!player.GetIsGuarding())
-		{
-			player.OnHitEnemyAttack(10.0f, 5.0f, 0.5f);
+			// 当たっていたら判定後の処理に渡す
+			if (hit)
+			{
+				ResolveCollision(a, b, outPosA, outPosB);
+			}
 		}
 	}
 }

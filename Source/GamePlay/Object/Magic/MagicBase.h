@@ -9,6 +9,9 @@
 // 前方宣言
 class MagicManager;
 
+// 魔法の種類
+enum class MagicKind {Normal, Rapid};
+
 class MagicBase
 {
 public:
@@ -51,9 +54,15 @@ public:
 	virtual float GetDamage() const { return damage; }
 	void SetDamage(float d) { damage = d; }
 
-	// 形状のゲッター/ セッター
+	// 形状のゲッター/セッター
 	void SetShape(HitBoxShape s) { shape = s; }
 	HitBoxShape GetShape() const { return shape; }
+
+	// 魔法の種類のゲッター/セッター
+	MagicKind GetMagicKind() const { return magicKind; }
+	void SetMagicKind(MagicKind k) { magicKind = k; }
+
+	bool GetIsAlive() const { return isAlive; }
 protected:
 	// 行列更新処理 
 	void UpdateTransform();
@@ -66,8 +75,10 @@ protected:
 	float radius = 1.0f;
 	float height = 1.0f;
 	float damage = 1.0f;
+	bool isAlive = true;
 
 	MagicManager* manager = nullptr;
 
 	HitBoxShape shape = HitBoxShape::Sphere;
+	MagicKind magicKind = MagicKind::Normal;
 };

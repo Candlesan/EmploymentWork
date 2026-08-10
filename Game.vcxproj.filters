@@ -522,6 +522,9 @@
     <ClInclude Include="Source\GamePlay\Object\Flight\FlightController.h">
       <Filter>Source\GamepPlay\Object\Flight</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -784,6 +787,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

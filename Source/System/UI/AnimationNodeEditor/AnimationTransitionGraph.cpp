@@ -194,10 +194,6 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.IsFalling;
 			break;
 
-		case TransitionConditionType::WindDashAttack:
-			result = (ctx.WindDashAttack >= cond.threshold);
-			break;
-
 		case TransitionConditionType::Always:
 			result = true;
 			break;

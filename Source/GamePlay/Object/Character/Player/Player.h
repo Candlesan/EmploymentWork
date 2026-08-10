@@ -14,6 +14,7 @@
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
+#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
 
 #include <memory>
 
@@ -52,7 +53,6 @@ public:
 	void MagicInput(float elapsedTime);
 	void AddGraph(std::string name);
 	void UpdateSounds(const std::string& state);
-	void OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime);
 	void UpdateFly(float elapsedTime);
 
 	// =========================================================================
@@ -81,6 +81,7 @@ public:
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
 	MagicManager& GetMagicManager() { return magicManager; }
+	DefenseMagic GetDefenseMagic() { return defenseMagic; }
 	std::vector<HitBoxInfo> GetActiveHitBoxes() const override;
 	float GetJustAvoidSlowTimer() const { return justAvoidSlowTimer; }
 
@@ -147,8 +148,6 @@ private:
 	float moveLength = 0.0f;
 
 	// ── 戦闘・ステータス（HP・スタミナ・無敵） ──
-	float invincibleTimer = 0.0f;
-	float windDashAvailTimer = 0.3f;
 	float runDisableTimer = 0.0f;
 	float staminaCooldownTimer = 0.0f;
 	bool haveStamina = false;
@@ -177,6 +176,7 @@ private:
 	NormalMagic normalMagic;
 	RapidMagic::RapidMagicConfig rapidMagicConfig;
 	RapidMagic rapidMagic;
+	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 0.0f;
 	bool isMagicAttack = true;
@@ -201,9 +201,7 @@ private:
 	float dropSpeed = 5.0f;
 	float dropStartT = 0.0f;
 	float dropEndT = 0.0f;
-	float justAvoidSlowTimer = 0.0f;
 	float lookAtWeight = 0.0f;
-	float WindDashAttackDistance = 0.0f;
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;

@@ -108,7 +108,7 @@ void MagicProjectile::RenderDebugPrimitive(ShapeRenderer* renderer)
 // エフェクトを消す関数
 void MagicProjectile::OnTerminate()
 {
-	isAlive = true;
+	isAlive = false;
 
 	if (magicHandle != -1)
 	{

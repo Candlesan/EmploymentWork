@@ -118,7 +118,7 @@ public:
 	// ----- ダメージ / ステータス -----
 
 	// ダメージを与える（無敵時間・体幹ダメージを考慮）
-	virtual bool ApplyDamage(float damage, float invincibleTime, float poiseDamage = 0.0f);
+	virtual bool ApplyDamage(float damage);
 
 	// 体幹削り計算（プレイヤーが呼ぶ用）
 	AttackResult CalculateAttackResult(float damageRate, float poiseValue);
@@ -151,6 +151,7 @@ public:
 
 	// ステータスを取得する
 	const CharacterStatus& GetStatus() const { return status; }
+	void SetStatus(CharacterStatus& s) { status = s; }
 
 private:
 	// ----- 内部：移動・速度更新ヘルパー -----
@@ -173,9 +174,6 @@ protected:
 
 	// 速度処理の総合更新
 	void UpdateVelocity(float elapsedTime);
-
-	// 無敵時間の更新
-	void UpdateInvincibleTimer(float elapsedTime);
 
 	// ----- 継承先フック -----
 
@@ -226,9 +224,6 @@ protected:
 	float weight = 0.5f;  // 重さ
 
 	bool isGround = false; // 地面と接地しているか
-
-	// 無敵時間
-	float invincibleTimer = 0.0f;
 
 	// ステージの広さ
 	float stageRadius = 97.5f;

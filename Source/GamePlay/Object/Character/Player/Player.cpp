@@ -40,7 +40,6 @@ void Player::Initialize()
 	status.maxMagic = 100.0f;
 	status.maxGuardDurability = 100.0f;
 	status.currentGuardDurability = 100.0f;
-	invincibleTimer = 0.0f;
 
 	weight = 0.5f;
 	radius = 0.4f;
@@ -395,13 +394,7 @@ void Player::DrawGUI()
 				}
 				ImGui::Separator();
 
-				ImGui::Text(u8"無敵残り時間: %f.0", invincibleTimer);
-				ImGui::Separator();
-				ImGui::Text(u8"風状態残り時間: %f.0", windDashAvailTimer);
-				ImGui::Separator();
 				ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
-				ImGui::Separator();
-				ImGui::Text(u8"スロー演出残り時間: %f.0", justAvoidSlowTimer);
 				ImGui::Separator();
 				ImGui::Text(u8"首の回転: %f.0", debugAngle);
 				ImGui::Separator();
@@ -794,23 +787,6 @@ void Player::UpdateSounds(const std::string& state)
 	}
 }
 
-// 敵の攻撃が当たった時に、ジャスト回避か被弾化かを判断する関数
-void Player::OnHitEnemyAttack(float damage, float poiseDamage, float invincibleTime)
-{
-	if (status.currentHp <= 0) return;
-
-	if (isAvoid && animSequence.GetRange("JastAvoidFream"))
-	{
-		invincibleTime = 1.0f; // しばらく無敵
-		justAvoidSlowTimer = 0.3f; // スロー設定
-
-		return; // ダメージ処理はせずに終了
-	}
-
-	// ジャスト回避じゃなかったら、普通にダメージを通す
-	ApplyDamage(damage, invincibleTime, poiseDamage);
-}
-
 // 飛行の更新処理
 void Player::UpdateFly(float elapsedTime)
 {
@@ -1075,11 +1051,10 @@ void Player::InputMove(float elapsedTime)
 	bool isHybridState = (state.find("Avoid") != std::string::npos ||
 		state.find("Dash") != std::string::npos);
 
-	bool windMode = windDashAvailTimer > 0.0f;
 
-	if ((!useRootMotion && !useRootMotionEx) || isHybridState || windMode)
+	if ((!useRootMotion && !useRootMotionEx) || isHybridState)
 	{
-		float finalSpeed = (isHybridState || windMode) ? moveSpeed : 3.0f;
+		float finalSpeed = (isHybridState) ? moveSpeed : 3.0f;
 
 		// 移動処理
 		Move(moveVec.x, moveVec.z, finalSpeed);
@@ -1658,7 +1633,6 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
 	ctx.inputDir = CalculateRelativeInputDir();
-	ctx.WindDashAttack = WindDashAttackDistance;
 
 	return ctx;
 }
@@ -1790,27 +1764,6 @@ void Player::UpdateTimers(float elapsedTime)
 	{
 		magicCoolDownTimer -= elapsedTime;
 	}
-
-	// 風状態の経過時間を更新
-	if (windDashAvailTimer > 0.0f)
-	{
-		windDashAvailTimer -= elapsedTime;
-		if (windDashAvailTimer < 0.0f) windDashAvailTimer = 0.0f;
-	}
-
-	// スロー演出中のタイマーを更新
-	if (justAvoidSlowTimer > 0.0f)
-	{
-		justAvoidSlowTimer -= elapsedTime;
-		if (justAvoidSlowTimer < 0.0f)
-		{
-			windDashAvailTimer = 5.0f; // 風ダッシュ起動
-			justAvoidSlowTimer = 0.0f;
-		}
-	}
-
-	// 無敵時間更新
-	UpdateInvincibleTimer(elapsedTime);
 }
 
 // ルックアット処理更新

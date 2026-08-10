@@ -43,15 +43,6 @@ void Enemy::Initialize()
 	gravity = 0.0f;
 
 
-	// ステータスの設定
-	//health = 30000;
-	//MaxHealth = 30000.0f;
-	//maxPoise = 1200.0f;
-	//baseAttackPower = 1400.0f;
-	//currentPoise = 1200.0f;
-
-	invincibleTimer = 0.0f;
-
 	// アニメーション設定
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
@@ -124,9 +115,6 @@ void Enemy::Update(float elapsedTime)
 	// ステータス更新
 	UpdateStatus(elapsedTime);
 
-	// 無敵時間更新
-	UpdateInvincibleTimer(elapsedTime);
-
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
@@ -180,7 +168,6 @@ void Enemy::DrawGUI()
 			}
 			ImGui::Text("Health: %f.0", status.currentHp);
 			ImGui::Text("Damage: %f.0", lastDamage);
-			ImGui::Text("InvincibleTimer: %f.0", invincibleTimer);
 			ImGui::Separator();
 			ImGui::Text("currentPoise: %f.0", status.currentGuardDurability);
 			ImGui::Separator();

@@ -91,24 +91,8 @@ void Character::UpdateVelocity(float elapsedTime)
 	UpdateVerticalMove(elapsedTime);
 }
 
-// 無敵時間更新
-void Character::UpdateInvincibleTimer(float elapsedTime)
+bool Character::ApplyDamage(float damage)
 {
-	// 無敵時間が0以上あったら無敵じかんを減らす
-	if (invincibleTimer > 0.0f)
-	{
-		invincibleTimer -= elapsedTime;
-	}
-
-	if (invincibleTimer <= 0.0f) invincibleTimer = 0.0f; // 無敵時間が0以下になったら0に直す
-}
-
-//ダメージを与える
-bool Character::ApplyDamage(float damage, float invincibleTime, float poiseDamage)
-{
-	if (this->invincibleTimer > 0.0f || this->status.currentHp <= 0) return false;
-
-	this->invincibleTimer = invincibleTime;
 	this->status.currentHp -= damage;
 
 	// 死亡・ダメージ通知
@@ -130,9 +114,6 @@ AttackResult Character::CalculateAttackResult(float damageRate, float poiseValue
 // ステータス更新
 void Character::UpdateStatus(float elapsedTime)
 {
-	// 無敵タイマー
-	if (invincibleTimer > 0.0f) invincibleTimer -= elapsedTime;
-
 	// 魔力回復
 	// 攻撃していないまたはガードしながら攻撃していないとき
 	if ((!status.isGuarding && !status.isAttack) || status.isGuarding)

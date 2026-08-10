@@ -749,8 +749,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "IsCancelable",		TransitionConditionType::IsCancelable },
 				{ "IsFalling",			TransitionConditionType::IsFalling },
 
-				{ "WindDashAttack",	TransitionConditionType::WindDashAttack },
-
 				{ "InputDir",			TransitionConditionType::InputDir },          
 				{ "PositionX",			TransitionConditionType::PositionX },    
 				{ "PositionY",			TransitionConditionType::PositionY },           
@@ -872,11 +870,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 					cond.targetDir = (RelativeInputDir)currentDirIdx;
 				}
 
-				break;
-			}
-			case TransitionConditionType::WindDashAttack:
-			{
-				ImGui::DragFloat("Thershold", &cond.threshold, 0.01f, 0.0f, 1000.0f);
 				break;
 			}
 			}

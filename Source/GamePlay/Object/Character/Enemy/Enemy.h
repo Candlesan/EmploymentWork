@@ -10,6 +10,7 @@
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorData.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
+#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
 
 #include <memory>
 #include <unordered_map>
@@ -79,6 +80,7 @@ public:
 	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
 
 	MagicManager& GetMagicManager()  { return magicManager; }
+	DefenseMagic& GetDefenseMagic() { return defenseMagic; } // データを渡すときは値渡しにする
 
 private:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
@@ -148,6 +150,7 @@ private:
 
 	// 魔法関係
 	MagicManager magicManager;
+	DefenseMagic defenseMagic;
 
 	//  --- デバック関係 ---
 	bool showbtEditor = false;

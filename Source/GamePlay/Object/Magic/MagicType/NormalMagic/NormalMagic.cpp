@@ -56,7 +56,9 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 		}
 	}
 
+	// 魔法のパラメータを設定
 	MagicProjectile* magic = new MagicProjectile(manager, "");
+	magic->SetMagicKind(MagicKind::Normal);
 	magic->SetShape(HitBoxShape::Capsule);
 	magic->SetRadius(radius);
 	magic->SetHeight(range);

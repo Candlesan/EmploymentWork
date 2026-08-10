@@ -30,7 +30,7 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 
 	// 直進移動コンポーネントセット
 	magic->SetMoveComponent(std::make_unique<StraightMove>());
-
+	magic->SetMagicKind(MagicKind::Rapid);
 	magic->SetShape(HitBoxShape::Sphere); // 球体
 	magic->SetRadius(config.hitRadius);    // 当たり判定の半径
 	magic->SetSpeed(config.speed);        // 弾速
