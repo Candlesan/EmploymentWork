@@ -83,7 +83,6 @@ public:
 	MagicManager& GetMagicManager() { return magicManager; }
 	DefenseMagic GetDefenseMagic() { return defenseMagic; }
 	std::vector<HitBoxInfo> GetActiveHitBoxes() const override;
-	float GetJustAvoidSlowTimer() const { return justAvoidSlowTimer; }
 
 protected:
 	// =========================================================================

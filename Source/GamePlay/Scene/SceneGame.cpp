@@ -115,13 +115,6 @@ void SceneGame::Update(float elapsedTime)
 	// 演出用の倍率
 	float gameplayEffectScale = 1.0f;
 
-	// ジャスト回避したときのスロータイマーが動いてるなら
-	if (Player::Instance().GetJustAvoidSlowTimer() > 0.0f)
-	{
-		// スロー中なら、演出用の倍率を落とす
-		gameplayEffectScale = 1.0f * 0.3f; // 元のコードの意図を維持
-	}
-
 	float delta = elapsedTime * timeScale * gameplayEffectScale;
 
 	// --- キー入力：F5/F6 のエッジ検出（押下の立ち上がり） ---

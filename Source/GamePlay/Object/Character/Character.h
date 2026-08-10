@@ -11,7 +11,6 @@
 struct AttackResult
 {
 	float damage;
-	float poiseDamage;
 };
 
 // キャラクターの基本情報
@@ -119,9 +118,6 @@ public:
 
 	// ダメージを与える（無敵時間・体幹ダメージを考慮）
 	virtual bool ApplyDamage(float damage);
-
-	// 体幹削り計算（プレイヤーが呼ぶ用）
-	AttackResult CalculateAttackResult(float damageRate, float poiseValue);
 
 	// ステータス更新（毎フレーム呼ぶ）
 	void UpdateStatus(float elapsedTime);

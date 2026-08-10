@@ -52,6 +52,7 @@ private:
 	// ヘルパー関数
 	bool IsMagicTag(CollisitionTag tag);
 	bool IsCharacterTag(CollisitionTag tag);
+	bool IsGuardTag(CollisitionTag tag);
 private:
 
 	// 1フレーム分のColliderをかき集める

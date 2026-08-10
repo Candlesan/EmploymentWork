@@ -28,9 +28,17 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		magic->OnTerminate(); // 当たったら魔法を消す
 
 	}
+	// aが魔法でbが防御魔法の場合
+	else if (IsMagicTag(a.category) && IsGuardTag(b.category))
+	{
+		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
+		Character* guardOwner = static_cast<Character*>(b.owner);
 
+		guardOwner->OnGuardHit(magic->GetDamage());  // ガード耐久値を削る
+		magic->OnTerminate(); // 魔法は消える
+	}
 	// aもbもキャラクターの場合押し出し処理
-	if (IsCharacterTag(a.category) && IsCharacterTag(b.category))
+	else if (IsCharacterTag(a.category) && IsCharacterTag(b.category))
 	{
 		Character* targetA = static_cast<Character*>(a.owner);
 		Character* targetB = static_cast<Character*>(b.owner);
@@ -38,6 +46,7 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		targetA->SetPosition(outPosA); // Collisionが計算してくれた座標をそのまま反映
 		targetB->SetPosition(outPosB);
 	}
+
 
 }
 
@@ -52,6 +61,11 @@ bool CollisionManager::IsMagicTag(CollisitionTag tag)
 bool CollisionManager::IsCharacterTag(CollisitionTag tag)
 {
 	return tag == CollisitionTag::PlayerBody || tag == CollisitionTag::EnemyBody;
+}
+
+bool CollisionManager::IsGuardTag(CollisitionTag tag)
+{
+	return tag == CollisitionTag::PlayerGaurdMagic || tag == CollisitionTag::EnemyGaurdMagic;
 }
 
 // 1フレーム分のColliderをかき集める
@@ -207,8 +221,8 @@ void CollisionManager::CheckCollisions(std::vector<Collider>& colliders)
 			{
 				// カプセル同士の当たり判定
 				hit = Collision::IntersectCapsuleVsCapsule(
-					a.pos, a.dir, a.height, a.radius, 1.0f,
-					b.pos, b.dir, b.height, b.radius, 1.0f,
+					a.pos, a.dir, a.height, a.radius, 0.1f,
+					b.pos, b.dir, b.height, b.radius, 0.1f,
 					outPosA, outPosB);
 			}
 			else if (a.shape == HitBoxShape::Sphere && b.shape == HitBoxShape::Capsule)

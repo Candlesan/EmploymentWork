@@ -93,22 +93,17 @@ void Character::UpdateVelocity(float elapsedTime)
 
 bool Character::ApplyDamage(float damage)
 {
+	// HPを減らす
 	this->status.currentHp -= damage;
+
+	// HPが0以下だったら0にする
+	if (this->status.currentHp <= 0.0f) this->status.currentHp = 0.0f;
 
 	// 死亡・ダメージ通知
 	if (this->status.currentHp <= 0) this->OnDead();
 	else this->OnDamage();
 
 	return true;
-}
-
-// 体幹削り計算用（プレイヤーが呼ぶ用）
-AttackResult Character::CalculateAttackResult(float damageRate, float poiseValue)
-{
-	AttackResult res;
-	res.damage = damageRate;
-	res.poiseDamage = poiseValue;
-	return res;
 }
 
 // ステータス更新

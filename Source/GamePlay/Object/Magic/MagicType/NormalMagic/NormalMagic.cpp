@@ -52,7 +52,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 		if (isHit)
 		{
-			info.target->ApplyDamage(damage, 0.5f, 10.0f);
+			info.target->ApplyDamage(damage);
 		}
 	}
 
