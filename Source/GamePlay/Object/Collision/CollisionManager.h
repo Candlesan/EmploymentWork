@@ -18,10 +18,10 @@ enum class CollisitionTag : uint32_t
 	EnemyBody			= 1 << 1, // 敵本体       
 	PlayerNomalMagic	= 1 << 2, // プレイヤーの通常攻撃魔法
 	PlayerRapidMagic	= 1 << 3, // プレイヤーの連射魔法
-	PlayerGaurdMagic	= 1 << 4, // プレイヤーの防御魔法
+	PlayerDefenseMagic	= 1 << 4, // プレイヤーの防御魔法
 	EnemyNormalMagic	= 1 << 5, // 敵の通常攻撃魔法
 	EnemyRapidMagic		= 1 << 6, // 敵の連射魔法
-	EnemyGaurdMagic		= 1 << 7, // 敵の防御魔法
+	EnemyDefenseMagic		= 1 << 7, // 敵の防御魔法
 	Stage				= 1 << 8, // ステージ
 };
 
@@ -52,7 +52,7 @@ private:
 	// ヘルパー関数
 	bool IsMagicTag(CollisitionTag tag);
 	bool IsCharacterTag(CollisitionTag tag);
-	bool IsGuardTag(CollisitionTag tag);
+	bool IsDefenseTag(CollisitionTag tag);
 private:
 
 	// 1フレーム分のColliderをかき集める

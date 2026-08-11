@@ -36,13 +36,13 @@ public:
             j["offsetAngle"] = { offsetAngle.x, offsetAngle.y, offsetAngle.z };
             j["offsetScale"] = { offsetScale.x, offsetScale.y, offsetScale.z };
 
-            std::ofstream file("Data/Json/Player/Magic/NormalMagic.json");
+            std::ofstream file("Data/Json/Magic/NormalMagic.json");
             file << j.dump(4);
         }
 
         void Load()
         {
-            std::ifstream file("Data/Json/Player/Magic/NormalMagic.json");
+            std::ifstream file("Data/Json/Magic/NormalMagic.json");
 
             if (file.is_open())
             {

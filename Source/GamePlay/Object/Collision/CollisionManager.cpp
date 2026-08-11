@@ -29,7 +29,7 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 
 	}
 	// aが魔法でbが防御魔法の場合
-	else if (IsMagicTag(a.category) && IsGuardTag(b.category))
+	else if (IsMagicTag(a.category) && IsDefenseTag(b.category))
 	{
 		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
 		Character* guardOwner = static_cast<Character*>(b.owner);
@@ -63,9 +63,9 @@ bool CollisionManager::IsCharacterTag(CollisitionTag tag)
 	return tag == CollisitionTag::PlayerBody || tag == CollisitionTag::EnemyBody;
 }
 
-bool CollisionManager::IsGuardTag(CollisitionTag tag)
+bool CollisionManager::IsDefenseTag(CollisitionTag tag)
 {
-	return tag == CollisitionTag::PlayerGaurdMagic || tag == CollisitionTag::EnemyGaurdMagic;
+	return tag == CollisitionTag::PlayerDefenseMagic || tag == CollisitionTag::EnemyDefenseMagic;
 }
 
 // 1フレーム分のColliderをかき集める
@@ -114,13 +114,13 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 		{
 			playerMagic.category = CollisitionTag::PlayerNomalMagic;
 			playerMagic.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyBody)
-				| static_cast<uint32_t>(CollisitionTag::EnemyGaurdMagic) | static_cast<uint32_t>(CollisitionTag::EnemyNormalMagic);
+				| static_cast<uint32_t>(CollisitionTag::EnemyDefenseMagic) | static_cast<uint32_t>(CollisitionTag::EnemyNormalMagic);
 		}
 		else// MagicKind::Rapid
 		{
 			playerMagic.category = CollisitionTag::PlayerRapidMagic;
 			playerMagic.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyBody)
-				| static_cast<uint32_t>(CollisitionTag::EnemyGaurdMagic) | static_cast<uint32_t>(CollisitionTag::EnemyRapidMagic);
+				| static_cast<uint32_t>(CollisitionTag::EnemyDefenseMagic) | static_cast<uint32_t>(CollisitionTag::EnemyRapidMagic);
 		}
 		playerMagic.shape = pMagic->GetShape();
 		playerMagic.pos = pMagic->GetPosition();
@@ -146,13 +146,13 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 		{
 			enemyMagic.category = CollisitionTag::EnemyNormalMagic;
 			enemyMagic.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerBody)
-				| static_cast<uint32_t>(CollisitionTag::PlayerGaurdMagic) | static_cast<uint32_t>(CollisitionTag::PlayerNomalMagic);
+				| static_cast<uint32_t>(CollisitionTag::PlayerDefenseMagic) | static_cast<uint32_t>(CollisitionTag::PlayerNomalMagic);
 		}
 		else// MagicKind::Rapid
 		{
 			enemyMagic.category = CollisitionTag::EnemyRapidMagic;
 			enemyMagic.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerBody)
-				| static_cast<uint32_t>(CollisitionTag::PlayerGaurdMagic) | static_cast<uint32_t>(CollisitionTag::PlayerRapidMagic);
+				| static_cast<uint32_t>(CollisitionTag::PlayerDefenseMagic) | static_cast<uint32_t>(CollisitionTag::PlayerRapidMagic);
 		}
 		enemyMagic.shape = eMagic->GetShape();
 		enemyMagic.pos = eMagic->GetPosition();
@@ -169,12 +169,12 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 	if (playerDefenseMagic.GetIsActive())
 	{
 		Collider playerGuardCollider;
-		playerGuardCollider.category = CollisitionTag::PlayerGaurdMagic;
+		playerGuardCollider.category = CollisitionTag::PlayerDefenseMagic;
 		playerGuardCollider.targetMask = static_cast<uint32_t>(CollisitionTag::EnemyNormalMagic)
 			| static_cast<uint32_t>(CollisitionTag::EnemyRapidMagic);
 		playerGuardCollider.shape = HitBoxShape::Sphere;
-		playerGuardCollider.pos = playerDefenseMagic.GetGaurdPosition();
-		playerGuardCollider.radius = playerDefenseMagic.GetGaurdRadius();
+		playerGuardCollider.pos = playerDefenseMagic.GetDefensePosition();
+		playerGuardCollider.radius = playerDefenseMagic.GetDefenseRadius();
 		playerGuardCollider.owner = &player;
 		colliders.push_back(playerGuardCollider);
 	}
@@ -184,12 +184,12 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 	if (enemyDefenseMagic.GetIsActive())
 	{
 		Collider enemyGuardCollider;
-		enemyGuardCollider.category = CollisitionTag::EnemyGaurdMagic;
+		enemyGuardCollider.category = CollisitionTag::EnemyDefenseMagic;
 		enemyGuardCollider.targetMask = static_cast<uint32_t>(CollisitionTag::PlayerNomalMagic)
 			| static_cast<uint32_t>(CollisitionTag::PlayerRapidMagic);
 		enemyGuardCollider.shape = HitBoxShape::Sphere;
-		enemyGuardCollider.pos = enemyDefenseMagic.GetGaurdPosition();
-		enemyGuardCollider.radius = enemyDefenseMagic.GetGaurdRadius();
+		enemyGuardCollider.pos = enemyDefenseMagic.GetDefensePosition();
+		enemyGuardCollider.radius = enemyDefenseMagic.GetDefenseRadius();
 		enemyGuardCollider.owner = &enemy;
 		colliders.push_back(enemyGuardCollider);
 	}

@@ -12,8 +12,8 @@
 
 void NormalMagic::Initialize()
 {
-	CustomEffectManager::Instance().LoadEffectConfig(normalMagic, "Data/Json/Player/Effect/" + normalMagic + ".json");
-	CustomEffectManager::Instance().LoadEffectConfig(chargeMagic, "Data/Json/Player/Effect/" + chargeMagic + ".json");
+	CustomEffectManager::Instance().LoadEffectConfig(normalMagic, "Data/Json/Effect/" + normalMagic + ".json");
+	CustomEffectManager::Instance().LoadEffectConfig(chargeMagic, "Data/Json/Effect/" + chargeMagic + ".json");
 }
 
 void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const NormalMagicConfig& config)
@@ -33,28 +33,6 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	centerPos.x = startPos.x + info.direction.x * (range * 0.5f);
 	centerPos.y = startPos.y + info.direction.y * (range * 0.5f);
 	centerPos.z = startPos.z + info.direction.z * (range * 0.5f);
-
-	//if (info.target != nullptr)
-	//{
-	//	DirectX::XMFLOAT3 outA, outB;
-	//	bool isHit = Collision::IntersectCapsuleVsCapsule(
-	//		centerPos,
-	//		info.direction,
-	//		range,
-	//		radius,
-	//		0.0f,
-	//		info.target->GetPosition(),
-	//		info.target->GetCapsuleDirection(),
-	//		info.target->GetHeight(),
-	//		info.target->GetRadius(),
-	//		1.0f,
-	//		outA, outB);
-
-	//	if (isHit)
-	//	{
-	//		info.target->ApplyDamage(damage);
-	//	}
-	//}
 
 	// 位置のオフセット計算
 	DirectX::XMFLOAT3 finalPos =
@@ -109,7 +87,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 void NormalMagic::DrawGUI(NormalMagicConfig& config)
 {
-	if (ImGui::CollapsingHeader(u8"通常魔法エフェクト調整"))
+	if (ImGui::CollapsingHeader(u8"通常魔法エフェクト調整", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::DragFloat3(u8"位置オフセット (X,Y,Z)", &config.offsetPosition.x, 0.05f);
 		ImGui::DragFloat3(u8"角度オフセット (X,Y,Z)", &config.offsetAngle.x, 0.05f);

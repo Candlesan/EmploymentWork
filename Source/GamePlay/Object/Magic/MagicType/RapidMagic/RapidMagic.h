@@ -46,13 +46,13 @@ public:
             };
 
 
-            std::ofstream file("Data/Json/Player/Magic/RapidlMagic.json");
+            std::ofstream file("Data/Json/Magic/RapidlMagic.json");
             file << j.dump(4);
         }
 
         void Load()
         {
-            std::ifstream file("Data/Json/Player/Magic/RapidlMagic.json");
+            std::ifstream file("Data/Json/Magic/RapidlMagic.json");
 
             if (file.is_open())
             {
