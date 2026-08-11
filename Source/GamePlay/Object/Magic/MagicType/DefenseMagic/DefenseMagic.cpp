@@ -20,6 +20,9 @@ void DefenseMagic::Update(Character* owner, float elapsedTime)
 	{
 		// –hŒä–‚–@‚ðo‚µ‚½ˆÊ’u‚É“WŠJ‚·‚é
 		gaurdPosition = owner->GetPosition();
+
+		// –‚—Í‚ðŒ¸‚ç‚·
+		owner->ConsumMagic(0.05f);
 	}
 }
 

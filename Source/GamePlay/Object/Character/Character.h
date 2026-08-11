@@ -24,6 +24,8 @@ struct CharacterStatus
 	float maxMagic = 100.0f;			   // 最大魔力
 	float currentMagic = 100.0f;		   // 現在の魔力量
 	float magicRecoverSpeed = 5.0f;        // 基本の回復速度
+	float guardMagicRecoverTimer = 0.0f;   // 1秒計測用のタイマー
+	float guardMagicRecoverAmount = 3.0f;  // 1秒ごとに回復する量
 	float currentMagicRecoverSpeed = 5.0f; // 自然回復速度
 	float magicRecoverDelayTimer = 0.0f;   // 魔力が回復し始めるまでの遅延
 
@@ -124,6 +126,7 @@ public:
 
 	// 魔力消費
 	void ConsumMagic(float amount, float DelayTime);
+	void ConsumMagic(float amount);
 
 	// ガード耐久値減少
 	void OnGuardHit(float amount);

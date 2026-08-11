@@ -26,7 +26,7 @@ public:
 	void SetIsActive(bool flag) { isActive = flag; }
 	bool GetIsActive() const { return isActive; }
 private:
-	DirectX::XMFLOAT3 gaurdPosition = { 0.0f, 0.0f, 0.0f }; // –hŒä–‚–@‚ÌˆÊ’u
+	DirectX::XMFLOAT3 gaurdPosition = { 0.0f, 1.0f, 0.0f }; // –hŒä–‚–@‚ÌˆÊ’u
 	float gaurdRadius = 2.0f; // –hŒä–‚–@‚Ì”¼Œa
 	bool isActive = false; // –hŒä–‚–@‚ðŽg‚Á‚Ä‚¢‚é‚©‚¢‚È‚¢‚©
 };

@@ -1,12 +1,13 @@
 {
-    "chargeDamage": 10.0,
+    "chargeDamage": 20.0,
     "chargeRadius": 1.0,
     "chargeTimeThreshold": 0.5,
     "damage": 0.009999999776482582,
+    "guardDamage": 0.5,
     "hitHeight": 1.0,
     "hitRadius": 0.25,
     "lifeTimer": 3.0,
-    "normalDamage": 5.0,
+    "normalDamage": 10.0,
     "normalRadius": 0.5,
     "offsetAngle": [
         90.0,

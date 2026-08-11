@@ -63,6 +63,9 @@ public:
 	void SetMagicKind(MagicKind k) { magicKind = k; }
 
 	bool GetIsAlive() const { return isAlive; }
+
+	float GetGuardDamage() const { return guardDamage; }
+	void SetGuardDamage(float d) { guardDamage = d; }
 protected:
 	// s—ñXVˆ— 
 	void UpdateTransform();
@@ -75,6 +78,7 @@ protected:
 	float radius = 1.0f;
 	float height = 1.0f;
 	float damage = 1.0f;
+	float guardDamage = 0.0f;
 	bool isAlive = true;
 
 	MagicManager* manager = nullptr;

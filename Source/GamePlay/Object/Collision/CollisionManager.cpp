@@ -34,7 +34,7 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
 		Character* guardOwner = static_cast<Character*>(b.owner);
 
-		guardOwner->OnGuardHit(magic->GetDamage());  // ガード耐久値を削る
+		guardOwner->OnGuardHit(magic->GetGuardDamage());  // ガード耐久値を削る
 		magic->OnTerminate(); // 魔法は消える
 	}
 	// aもbもキャラクターの場合押し出し処理

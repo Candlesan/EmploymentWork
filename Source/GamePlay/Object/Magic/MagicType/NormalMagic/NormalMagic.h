@@ -8,8 +8,9 @@ class NormalMagic
 public:
     struct NormalMagicConfig : public MagicInfo
     {
-        float normalDamage = 5.0f;  // 通常攻撃のダメージ
-        float chargeDamage = 10.0f; // チャージ時のダメージ
+        float normalDamage = 10.0f;  // 通常攻撃のダメージ
+        float guardDamage = 0.5; // 防御魔法へのダメージ
+        float chargeDamage = 20.0f; // チャージ時のダメージ
         float normalRadius = 0.5f;  // 通常時のレーザーの太さ
         float chargeRadius = 1.0f;  // チャージ時のレーザーの太さ
         float range = 100.0f;		// 射程距離
@@ -25,6 +26,7 @@ public:
             SaveBase(j); // 親(共通部分)を保存
 
             j["normalDamage"] = normalDamage;
+            j["guardDamage"] = guardDamage;
             j["chargeDamage"] = chargeDamage;
             j["normalRadius"] = normalRadius;
             j["chargeRadius"] = chargeRadius;
@@ -49,6 +51,7 @@ public:
 
                 LoadBase(j); // 親を読み込む
                 if (j.find("normalDamage") != j.end()) normalDamage = j["normalDamage"];
+                if (j.find("guardDamage") != j.end()) guardDamage = j["guardDamage"];
                 if (j.find("chargeDamage") != j.end()) chargeDamage = j["chargeDamage"];
                 if (j.find("normalRadius") != j.end()) normalRadius = j["normalRadius"];
                 if (j.find("chargeRadius") != j.end()) chargeRadius = j["chargeRadius"];

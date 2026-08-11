@@ -1,5 +1,7 @@
 #include "Gameplay/Object/Character/Character.h"
 
+
+// 行列更新
 void Character::UpdateTransform()
 {
 	//スケール行列作成
@@ -91,6 +93,7 @@ void Character::UpdateVelocity(float elapsedTime)
 	UpdateVerticalMove(elapsedTime);
 }
 
+// ダメージ処理
 bool Character::ApplyDamage(float damage)
 {
 	// HPを減らす
@@ -111,7 +114,21 @@ void Character::UpdateStatus(float elapsedTime)
 {
 	// 魔力回復
 	// 攻撃していないまたはガードしながら攻撃していないとき
-	if ((!status.isGuarding && !status.isAttack) || status.isGuarding)
+	if (status.isGuarding)
+	{
+		status.guardMagicRecoverTimer += elapsedTime;
+
+		// 1秒経過したら回復して、タイマーをリセット
+		if (status.guardMagicRecoverTimer >= 1.0f)
+		{
+			status.currentMagic += status.guardMagicRecoverAmount;
+			if (status.currentMagic > status.maxMagic)
+				status.currentMagic = status.maxMagic;
+
+			status.guardMagicRecoverTimer -= 1.0f; // 0にリセットせず引き算にすると誤差が溜まりにくい
+		}
+	}
+	else
 	{
 		// ディレイタイマーがあるか
 		if (status.magicRecoverDelayTimer > 0.0f)
@@ -124,7 +141,7 @@ void Character::UpdateStatus(float elapsedTime)
 			{
 				status.magicRecoverDelayTimer = 0;
 			}
-				
+
 		}
 		else if (status.isDown) // ダウン中は急速に回復させる
 		{
@@ -141,15 +158,15 @@ void Character::UpdateStatus(float elapsedTime)
 
 					status.isDown = false; // 最大値まで回復させたらフラグを折る
 				}
-					
+
 			}
 		}
 		else // ディレイタイマーがなくなったら魔力を回復する
 		{
 			if (status.currentMagic < status.maxMagic)
 			{
-				//　ガード中なら魔力の回復量を半分にする
-				status.currentMagicRecoverSpeed = status.isGuarding ? (status.magicRecoverSpeed * 0.5) : status.magicRecoverSpeed;
+				status.guardMagicRecoverTimer = 0.0f; // ガードを解除したらタイマーを0にする
+				status.currentMagicRecoverSpeed = status.magicRecoverSpeed;
 
 				// 魔力を回復させる
 				status.currentMagic += status.currentMagicRecoverSpeed * elapsedTime;
@@ -219,6 +236,19 @@ void Character::ConsumMagic(float amount, float DelayTime)
 	status.magicRecoverDelayTimer = DelayTime;
 }
 
+void Character::ConsumMagic(float amount)
+{
+	// 魔力を減らす
+	status.currentMagic -= amount;
+
+	// 0以下にならないようにする
+	if (status.currentMagic <= 0.0f)
+	{
+		status.currentMagic = 0.0f;
+		status.isDown = true; // 0以下になったらダウンをONにする
+	}
+}
+
 // ガード耐久値減少
 void Character::OnGuardHit(float amount)
 {
@@ -228,6 +258,7 @@ void Character::OnGuardHit(float amount)
 		status.currentGuardDurability = 0.0f;
 }
 
+// ステージのエリア制限
 void Character::AreaRestriction()
 {
 	float areaDisrance = sqrtf(position.x * position.x + position.y * position.y + position.z * position.z);

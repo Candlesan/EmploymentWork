@@ -33,6 +33,8 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetMagicKind(MagicKind::Rapid);
 	magic->SetShape(HitBoxShape::Sphere); // 球体
 	magic->SetRadius(config.hitRadius);    // 当たり判定の半径
+	magic->SetDamage(0.01f); // 生身へのダメージ
+	magic->SetGuardDamage(config.gaurdDamage); // 防御魔法へのダメージ
 	magic->SetSpeed(config.speed);        // 弾速
 	magic->SetLifeTimer(config.lifeTimer);// 射程（生存時間）
 	magic->Launch(info.direction, startPos, 0.0f);

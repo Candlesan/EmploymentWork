@@ -274,6 +274,7 @@ void Player::Update(float elapsedTime)
 
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
+	defenseMagic.Update(this, elapsedTime);
 
 	// シーケンサーとアニメーションの再生を同期させる
 	std::string targetSequenceName = isPreviewMode ? editingState : currentState;
@@ -679,6 +680,11 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 
 	// 魔法の当たり判定描画
 	magicManager.RenderDebugPrimitive(renderer);
+
+	if (defenseMagic.GetIsActive())
+	{
+		renderer->DrawSphere(defenseMagic.GetGaurdPosition(), defenseMagic.GetGaurdRadius(), {0, 0, 1, 1});
+	}
 }
 
 
@@ -691,6 +697,7 @@ void Player::MagicInput(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
+	// 通常魔法
 	if(gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER)
 	{
 		if (magicCoolDownTimer > 0.0f) return;
@@ -715,7 +722,7 @@ void Player::MagicInput(float elapsedTime)
 		magicCoolDownTimer = coolDownValue;
 	}
 
-
+	// 連射魔法
 	if(gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
 	{
 		if (magicCoolDownTimer > 0.0f) return;
@@ -746,6 +753,19 @@ void Player::MagicInput(float elapsedTime)
 	else
 	{
 		status.isRapidFire = false;
+	}
+
+	// 防御魔法
+	if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
+	{
+		// 防御魔法を起動
+		status.isGuarding = true;
+		defenseMagic.SetIsActive(status.isGuarding);
+	}
+	else
+	{
+		status.isGuarding = false;
+		defenseMagic.SetIsActive(status.isGuarding);
 	}
 }
 

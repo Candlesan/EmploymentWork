@@ -34,37 +34,27 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	centerPos.y = startPos.y + info.direction.y * (range * 0.5f);
 	centerPos.z = startPos.z + info.direction.z * (range * 0.5f);
 
-	if (info.target != nullptr)
-	{
-		DirectX::XMFLOAT3 outA, outB;
-		bool isHit = Collision::IntersectCapsuleVsCapsule(
-			centerPos,
-			info.direction,
-			range,
-			radius,
-			0.0f,
-			info.target->GetPosition(),
-			info.target->GetCapsuleDirection(),
-			info.target->GetHeight(),
-			info.target->GetRadius(),
-			1.0f,
-			outA, outB);
+	//if (info.target != nullptr)
+	//{
+	//	DirectX::XMFLOAT3 outA, outB;
+	//	bool isHit = Collision::IntersectCapsuleVsCapsule(
+	//		centerPos,
+	//		info.direction,
+	//		range,
+	//		radius,
+	//		0.0f,
+	//		info.target->GetPosition(),
+	//		info.target->GetCapsuleDirection(),
+	//		info.target->GetHeight(),
+	//		info.target->GetRadius(),
+	//		1.0f,
+	//		outA, outB);
 
-		if (isHit)
-		{
-			info.target->ApplyDamage(damage);
-		}
-	}
-
-	// 魔法のパラメータを設定
-	MagicProjectile* magic = new MagicProjectile(manager, "");
-	magic->SetMagicKind(MagicKind::Normal);
-	magic->SetShape(HitBoxShape::Capsule);
-	magic->SetRadius(radius);
-	magic->SetHeight(range);
-	magic->Launch(info.direction, centerPos, 0.0f);
-	magic->SetWaitTimer(0.01f);
-	magic->SetLifeTimer(0.1f);
+	//	if (isHit)
+	//	{
+	//		info.target->ApplyDamage(damage);
+	//	}
+	//}
 
 	// 位置のオフセット計算
 	DirectX::XMFLOAT3 finalPos =
@@ -92,6 +82,18 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 		config.offsetScale.y,
 		config.offsetScale.z
 	};
+
+	// 魔法のパラメータを設定
+	MagicProjectile* magic = new MagicProjectile(manager, "");
+	magic->SetMagicKind(MagicKind::Normal); // 魔法の種類
+	magic->SetShape(HitBoxShape::Capsule); // 当たり判定の形状
+	magic->SetRadius(radius);
+	magic->SetHeight(range);
+	magic->SetDamage(damage); // 生身へのダメージ
+	magic->SetGuardDamage(config.guardDamage); // 防御魔法へのダメージ
+	magic->SetWaitTimer(0.01f);
+	magic->SetLifeTimer(0.1f);
+	magic->Launch(info.direction, centerPos, 0.0f);
 
 	if (!isCharged)
 	{
