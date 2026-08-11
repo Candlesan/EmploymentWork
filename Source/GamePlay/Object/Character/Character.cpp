@@ -186,8 +186,14 @@ void Character::UpdateStatus(float elapsedTime)
 	// ヒート値回復
 	if (status.isRapidFire)
 	{
+		// 魔力を消費させる
+		ConsumMagic(status.rapidFireMagicCost, status.magicRecoverDelayTimer);
+		//status.currentMagic -= status.rapidFireMagicCost * elapsedTime;
+
+		// ヒート値を回復させる
 		status.currentHeat += status.heatIncreaseSpeed * elapsedTime;
 
+		// 最大値を超えないようにする
 		if (status.currentHeat > status.maxHeat)
 			status.currentHeat = status.maxHeat;
 	}
@@ -208,14 +214,18 @@ void Character::UpdateStatus(float elapsedTime)
 	if (!status.isGuarding) // ガードしてないとき
 	{
 		// 現在の数値が最大値よりも少なかったら
-		if (status.currentGuardDurability < status.maxGuardDurability)
+		if (status.currentDefenseDurability < status.maxDefenseDurability)
 		{
-			status.currentGuardDurability += status.guardRecoverSpeed * elapsedTime;
+			status.currentDefenseDurability += status.defenseRecoverSpeed * elapsedTime;
 		}
 
 		// 現在の値が最大値を超えていたら
-		if (status.currentGuardDurability > status.maxGuardDurability)
-			status.currentGuardDurability = status.maxGuardDurability;
+		if (status.currentDefenseDurability > status.maxDefenseDurability)
+			status.currentDefenseDurability = status.maxDefenseDurability;
+	}
+	else // ガードしてるときは魔力を減らす
+	{
+		ConsumMagic(status.defenseMagicCost);
 	}
 }
 
@@ -252,10 +262,10 @@ void Character::ConsumMagic(float amount)
 // ガード耐久値減少
 void Character::OnGuardHit(float amount)
 {
-	status.currentGuardDurability -= amount;
+	status.currentDefenseDurability -= amount;
 
-	if (status.currentGuardDurability < 0.0f)
-		status.currentGuardDurability = 0.0f;
+	if (status.currentDefenseDurability < 0.0f)
+		status.currentDefenseDurability = 0.0f;
 }
 
 // ステージのエリア制限

@@ -49,6 +49,7 @@ void RapidMagic::Update(float elapsedTime, MagicManager* manager, const MagicSpa
 	if (isTriggered)
 	{
 		rapidTimer -= elapsedTime;
+
 		if (rapidTimer <= 0.0f)
 		{
 			Emit(manager, info, config);

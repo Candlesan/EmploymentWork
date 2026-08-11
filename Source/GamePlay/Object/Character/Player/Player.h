@@ -45,7 +45,7 @@ public:
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void RenderTrail(const RenderContext& rc) { trail.Render(rc); }
 	void DrawGUI();
-	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox = false);
+	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 	// =========================================================================
 	//  外部からのアクション命令（プレイヤーを動かす外からのトリガー）
@@ -82,7 +82,6 @@ public:
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
 	MagicManager& GetMagicManager() { return magicManager; }
 	DefenseMagic GetDefenseMagic() { return defenseMagic; }
-	std::vector<HitBoxInfo> GetActiveHitBoxes() const override;
 
 protected:
 	// =========================================================================

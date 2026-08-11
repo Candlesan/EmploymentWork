@@ -23,11 +23,10 @@ public:
 	~Enemy();
 
 	void Initialize();
-	void InitializeAttackData();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
-	void RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox);
+	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 	// 計算したダメージ
 	void SetLastDamage(float d) { lastDamage = d; }
@@ -56,9 +55,6 @@ public:
 
 	// 旋回速度取得
 	float GetTurnSpeed() const { return turnSpeed; }
-
-	// 今使ってるHitBoxを計算して返す関数
-	std::vector<HitBoxInfo> GetActiveHitBoxes() const;
 
 	// 実行タイマー取得(仮実装)
 	float GetRunTimer() { return runTimer; }

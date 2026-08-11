@@ -38,8 +38,8 @@ void Player::Initialize()
 	status.maxHp = 100.0f;
 	status.currentMagic = 100.0f;
 	status.maxMagic = 100.0f;
-	status.maxGuardDurability = 100.0f;
-	status.currentGuardDurability = 100.0f;
+	status.maxDefenseDurability = 100.0f;
+	status.currentDefenseDurability = 100.0f;
 
 	weight = 0.5f;
 	radius = 0.4f;
@@ -361,7 +361,7 @@ void Player::DrawGUI()
 				ImGui::SameLine();
 				if (ImGui::Button(u8"ガード耐久値全回復"))
 				{
-					status.currentGuardDurability = status.maxGuardDurability;
+					status.currentDefenseDurability = status.maxDefenseDurability;
 				}
 				ImGui::Text(u8"体力 : %f.0", status.currentHp);
 				ImGui::DragFloat(u8"体力", &status.currentHp, 0.1f);
@@ -387,8 +387,8 @@ void Player::DrawGUI()
 				ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
 				ImGui::Separator();
 
-				ImGui::Text(u8"ガード耐久値 : %f.0", status.currentGuardDurability);
-				ImGui::DragFloat(u8"ガード耐久値", &status.currentGuardDurability, 0.1f);
+				ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
+				ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
 				if (ImGui::Button(u8"耐久値減少"))
 				{
 					OnGuardHit(10.0f);
@@ -496,6 +496,7 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"生身へのダメージ", &rapidMagicConfig.damage, 0.1f);
 				ImGui::DragFloat(u8"防御魔法へのダメージ", &rapidMagicConfig.gaurdDamage, 0.1f);
 				ImGui::DragFloat(u8"魔法の速度", &rapidMagicConfig.speed, 0.1f);
+				ImGui::DragFloat(u8"魔力消費量", &status.rapidFireMagicCost, 0.1f);
 
 
 				ImGui::DragFloat3(u8"手元オフセット", &rapidMagicConfig.spawnOffset.x, 0.1f);
@@ -640,7 +641,7 @@ void Player::DrawGUI()
 }
 
 // デバックプリミティブ描画
-void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
+void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
 	// プレイヤーの当たり判定
 	if (!isAvoid)
@@ -651,24 +652,6 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 0, 1, 0, 1 });
-	}
-
-	// 武器の当たり判定
-	if (showWeaponHitBox)
-	{
-		// 新しいGetActiveHitBoxesを使って描画する
-		for (auto& info : GetActiveHitBoxes())
-		{
-			if (info.shape == HitBoxShape::Capsule)
-			{
-				// 位置を反映する簡易的な描画（Enemyと同じ方式）
-				renderer->DrawCapsule(info.hitTransform, info.radius, info.height, { 1, 0, 0, 1 });
-			}
-			else if (info.shape == HitBoxShape::Sphere)
-			{
-				renderer->DrawSphere(info.position, info.radius, { 1, 0, 0, 1 });
-			}
-		}
 	}
 
 	// 魔法の当たり判定描画
@@ -894,94 +877,6 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 	DirectX::XMFLOAT3 Direction;
 	DirectX::XMStoreFloat3(&Direction, dir);
 	return Direction;
-}
-
-// 今使ってるHitBoxを計算して返す関数
-std::vector<Character::HitBoxInfo> Player::GetActiveHitBoxes() const
-{
-	std::vector<HitBoxInfo> result;
-	auto state = GetCurrentState();
-
-	for (auto& data : animSequence.GetAnimations()) {
-		if (data.name != state) continue;
-
-		for (auto& r : data.ranges)
-		{
-			if (r.isHitBox && animSequence.GetRange(r.name)) {
-				HitBoxInfo info;
-				info.shape = r.shapeType;
-				info.radius = r.radius;
-				info.height = r.height;
-				info.damageRate = r.damageRate;
-				info.poiseRate = r.poiseRate;
-				info.invincibleTime = r.invincible;
-
-				DirectX::XMMATRIX finalMatrix = DirectX::XMMatrixIdentity();
-				bool isMatrixFound = false;
-
-				// 名前で追従先を振り分ける！
-				if (r.boneName == "Staff")
-				{
-					// 武器の計算済みワールド行列を読み込む
-					DirectX::XMMATRIX weaponWorld = DirectX::XMLoadFloat4x4(&weapon.transform);
-
-					// 【重要】スケール（縮小）成分を除去する！
-					// これをやらないとシーケンサーのオフセット値まで一緒に縮んでしまう
-					DirectX::XMVECTOR scale, rot, pos;
-					DirectX::XMMatrixDecompose(&scale, &rot, &pos, weaponWorld);
-					finalMatrix = DirectX::XMMatrixRotationQuaternion(rot) * DirectX::XMMatrixTranslationFromVector(pos);
-
-					isMatrixFound = true;
-				}
-				else
-				{
-					// SwordやStaff以外（右手など）は従来通りキャラクターのボーンに追従
-					int nodeIndex = player->GetNodeIndex(r.boneName.c_str());
-					if (nodeIndex >= 0) {
-						auto& node = player->GetNodes()[nodeIndex];
-						DirectX::XMMATRIX local = DirectX::XMLoadFloat4x4(&node.globalTransform);
-						DirectX::XMMATRIX playerWorld = DirectX::XMLoadFloat4x4(&GetTransform());
-						finalMatrix = local * playerWorld;
-						isMatrixFound = true;
-					}
-				}
-
-				// 行列から位置と向きを抽出
-				if (isMatrixFound) {
-					// 1. エディタの回転（度数法）をラジアンに変換して、回転行列(R)を作る
-					DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-						DirectX::XMConvertToRadians(r.angleOffset.x),
-						DirectX::XMConvertToRadians(r.angleOffset.y),
-						DirectX::XMConvertToRadians(r.angleOffset.z)
-					);
-
-					// 2. エディタの位置ズレから、平行移動行列(T)を作る
-					DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(r.offset.x, r.offset.y, r.offset.z);
-
-					// 3. 【最重要】回転 → 移動 → 親行列（剣）の順で掛け合わせて、最終的なヒットボックスの行列を作る！
-					DirectX::XMMATRIX hitBoxMatrix = R * T * finalMatrix;
-
-					DirectX::XMStoreFloat4x4(&info.hitTransform, hitBoxMatrix);
-
-					// 行列の4行目（.r[3]）には、最終的なワールド座標が入っている
-					DirectX::XMVECTOR pos = hitBoxMatrix.r[3];
-					DirectX::XMStoreFloat3(&info.position, pos);
-
-					// 行列の2行目（.r[1]）には、最終的なY軸方向（カプセルの上向き）のベクトルが入っている
-					DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(hitBoxMatrix.r[1]);
-					DirectX::XMStoreFloat3(&info.direction, dir);
-				}
-				else {
-					info.position = position;
-					info.direction = { 0.0f, 1.0f, 0.0f };
-				}
-
-				result.push_back(info);
-			}
-		}
-		break;
-	}
-	return result;
 }
 
 

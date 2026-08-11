@@ -7,12 +7,6 @@
 #include "GamePlay/Object/Flight/FlightController.h"
 
 
-// ダメージの種類（返り値用の構造体）
-struct AttackResult
-{
-	float damage;
-};
-
 // キャラクターの基本情報
 struct CharacterStatus
 {
@@ -27,53 +21,37 @@ struct CharacterStatus
 	float guardMagicRecoverTimer = 0.0f;   // 1秒計測用のタイマー
 	float guardMagicRecoverAmount = 3.0f;  // 1秒ごとに回復する量
 	float currentMagicRecoverSpeed = 5.0f; // 自然回復速度
-	float magicRecoverDelayTimer = 0.0f;   // 魔力が回復し始めるまでの遅延
+	float magicRecoverDelayTimer = 0.5f;   // 魔力が回復し始めるまでの遅延
+
+	float rapidFireMagicCost = 0.1f;	// 連射魔法の魔力消費量
 
 	// --- ヒート値 ---
 	float maxHeat = 100.0f;				// 最大ヒート値
 	float currentHeat = 0.0f;			// 現在のヒート値
-	float heatIncreaseSpeed = 5.0f;		// ヒート値の増加スピード
+	float heatIncreaseSpeed = 20.0f;		// ヒート値の増加スピード
 	float heatRecoverSpeed = 5.0f;		// ヒート値の回復速度
 
 	// --- 防御系 ---
-	float maxGuardDurability = 100.0f;		// 最大ガード耐久値
-	float currentGuardDurability = 100.0f;	// 現在のガード耐久値
-	float guardRecoverSpeed = 5.0f;			// ガード耐久値の回復速度
+	float maxDefenseDurability = 100.0f;		// 防御魔法の最大耐久値
+	float currentDefenseDurability = 100.0f;	// 現在の防御魔法の耐久値
+	float defenseRecoverSpeed = 5.0f;			// 防御魔法の耐久値の回復速度
+	float defenseMagicCost = 0.05f;				// 防御魔法の魔力消費量
 
 	// --- ダウン系 ---
 	float downTimer = 0.0f; // 魔力切れをしたときに使うタイマー
 
 	// --- 状態フラグ ---
-	bool isDown = false; // 魔力切れダウン中か
-	bool isBurst = false; // オーバーヒートしたか
-	bool isGuarding = false; // ガード中か
-	bool isFlying = false; // 飛行中か
-	bool isAttack = false; // 攻撃中か
-	bool isRapidFire = false; // 連射攻撃か
+	bool isDown = false;		// 魔力切れダウン中か
+	bool isBurst = false;		// オーバーヒートしたか
+	bool isNormalMagic = false; // 通常攻撃魔法か
+	bool isRapidFire = false;	// 連射攻撃か
+	bool isGuarding = false;	// ガード中か
+	bool isFlying = false;		// 飛行中か
 };
 
 class Character
 {
 public:
-	// 当たり判定情報
-	struct HitBoxInfo
-	{
-		HitBoxShape shape;
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT3 direction;
-		float radius;
-		float height;
-
-		DirectX::XMFLOAT4X4 hitTransform;
-
-		// ヒット時の係数
-		float damageRate;
-		float poiseRate;
-		float invincibleTime;
-	};
-	// 必要なら書いてもいいよ（デフォルトは空っぽ）っていう書き方
-	virtual std::vector<HitBoxInfo> GetActiveHitBoxes() const { return {}; }
-
 	Character() {}
 	virtual ~Character() = default;
 

@@ -156,10 +156,8 @@ void Enemy::DrawGUI()
 	// 敵のパラメーターの表示/非表示
 	if (showEnemyParameter)
 	{
-		ImGui::Begin("Enemy");
+		ImGui::Begin(u8"エネミー");
 		{
-			AttackResult res;
-
 			ImGui::Checkbox(u8"敵の表示", &showEnemy);
 
 			if (ImGui::Button(u8"HP前回"))
@@ -169,7 +167,7 @@ void Enemy::DrawGUI()
 			ImGui::Text("Health: %f.0", status.currentHp);
 			ImGui::Text("Damage: %f.0", lastDamage);
 			ImGui::Separator();
-			ImGui::Text("currentPoise: %f.0", status.currentGuardDurability);
+			ImGui::Text("currentPoise: %f.0", status.currentDefenseDurability);
 			ImGui::Separator();
 			ImGui::Text("attackCoolTimer: %f.0", attackCoolTimer);
 			ImGui::Separator();
@@ -269,7 +267,7 @@ void Enemy::DrawGUI()
 }
 
 // デバックプリミティブ描画
-void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
+void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
 	// 敵の当たり判定
 	{
@@ -279,23 +277,6 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer, bool showWeaponHitBox)
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
-	}
-
-	for (auto& info : GetActiveHitBoxes())
-	{
-		if (info.shape == HitBoxShape::Capsule)
-		{
-			// 位置だけを反映する簡易的な描画（赤色）
-			DirectX::XMFLOAT4X4 hitTransform;
-			DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(info.position.x, info.position.y, info.position.z);
-			DirectX::XMStoreFloat4x4(&hitTransform, T);
-			renderer->DrawCapsule(hitTransform, info.radius, info.height, { 1, 0, 0, 1 });
-		}
-		else if (info.shape == HitBoxShape::Sphere)
-		{
-			// 球描画（紫色）
-			renderer->DrawSphere(info.position, info.radius, { 1.0f, 0.0f, 1.0f, 1.0f });
-		}
 	}
 
 	// 距離の可視化
@@ -417,57 +398,6 @@ void Enemy::MoveToTarget(float elapsedTime)
 {
 	Player& player = Player::Instance();
 	MoveToTarget(elapsedTime, player.GetPosition());
-}
-
-// 今使ってるHitBoxを計算して返す関数
-std::vector<Character::HitBoxInfo> Enemy::GetActiveHitBoxes() const
-{
-	std::vector<HitBoxInfo> result;
-	auto state = GetCurrentState();
-
-	for (auto& data : animSequence.GetAnimations()) {
-		if (data.name != state) continue;
-
-		for (auto& r : data.ranges)
-		{
-			// isHitBoxが有効で、今のフレームの再生時間がRange内だったら計算する
-			if (r.isHitBox && animSequence.GetRange(r.name)) {
-				HitBoxInfo info;
-				info.shape = r.shapeType;
-				info.radius = r.radius;
-				info.height = r.height;
-				info.damageRate = r.damageRate;
-				info.poiseRate = r.poiseRate;
-				info.invincibleTime = r.invincible;
-
-				// ボーンの位置と向きを計算する処理
-				int nodeIndex = enemy->GetNodeIndex(r.boneName.c_str());
-				if (nodeIndex >= 0) {
-					auto& node = enemy->GetNodes()[nodeIndex];
-					DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&node.worldTransform);
-
-					// 位置（オフセットを加味）
-					DirectX::XMVECTOR pos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&r.offset), world);
-					DirectX::XMStoreFloat3(&info.position, pos);
-
-					// カプセルの場合の向き（ボーンのY軸方向などを基準にする）
-					DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(world.r[1]);
-					DirectX::XMStoreFloat3(&info.direction, dir);
-				}
-				else {
-					// ボーン名が間違っていたり無い場合は、キャラクターの足元などを基準にする安全策
-					info.position = position;
-					info.direction = { 0.0f, 1.0f, 0.0f };
-				}
-
-				// リストに追加
-				result.push_back(info);
-			}
-		}
-		break;
-	}
-
-	return result;
 }
 
 // downしたときに呼ばれる

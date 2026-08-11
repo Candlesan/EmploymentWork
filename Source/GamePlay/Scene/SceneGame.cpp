@@ -298,8 +298,8 @@ void SceneGame::Render()
 			}
 		}
 
-		player.RenderDebugPrimitive(shapeRenderer, showPlayerWeapon);
-		enemy->RenderDebugPrimitive(shapeRenderer, false);
+		player.RenderDebugPrimitive(shapeRenderer);
+		enemy->RenderDebugPrimitive(shapeRenderer);
 
 	}
 

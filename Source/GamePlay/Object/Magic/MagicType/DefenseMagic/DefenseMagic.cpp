@@ -32,9 +32,6 @@ void DefenseMagic::Update(Character* owner, float elapsedTime)
 		defensePosition.x = playerPos.x + defensePositionOffset.x;
 		defensePosition.y = playerPos.y + defensePositionOffset.y;
 		defensePosition.z = playerPos.z + defensePositionOffset.z;
-
-		// –‚—Í‚ðŒ¸‚ç‚·
-		owner->ConsumMagic(0.05f);
 	}
 }
 
