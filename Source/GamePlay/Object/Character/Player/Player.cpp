@@ -60,7 +60,7 @@ void Player::Initialize()
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
 	rapidMagic.Initialize();
 	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
-
+	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);

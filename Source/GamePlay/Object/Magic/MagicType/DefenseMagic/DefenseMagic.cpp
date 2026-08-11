@@ -16,7 +16,7 @@ void DefenseMagic::Initialize(Character* owner)
 	// 所有者を受け取る
 	this->owner = owner;
 
-	// 防御魔法のJSONファイルを読み込む
+	// 防御魔法のJsonファイルを読み込む
 	Load();
 
 	// エフェクトをロードする
