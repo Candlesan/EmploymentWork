@@ -152,6 +152,7 @@
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\CollisionManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Flight\FlightController.h" />
+    <ClInclude Include="Source\GamePlay\Object\Graze\Graze.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicBase.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicInfor.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Collision\CollisionManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Flight\FlightController.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Graze\Graze.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicBase.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.cpp" />

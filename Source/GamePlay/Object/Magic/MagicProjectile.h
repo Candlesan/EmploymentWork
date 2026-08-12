@@ -37,7 +37,6 @@ private:
 
 	Effect* Magic = nullptr;
 	int magicHandle = -1;
-	bool isAlive = false; // ‚Ü‚¾‘¶İ‚µ‚Ä‚¢‚é‚©
 
 	std::unique_ptr<IMagicMove> moveComponent;
 
