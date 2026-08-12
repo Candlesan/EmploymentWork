@@ -39,6 +39,7 @@ void Enemy::Initialize()
 	debugOffset = 0.8;
 
 	position = { 0, 0, 10 };
+	angle = { 0, 3, 0 };
 
 	// パラメータ初期化
 	moveSpeed = 7.0f;
