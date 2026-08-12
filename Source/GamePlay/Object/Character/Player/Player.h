@@ -176,7 +176,8 @@ private:
 	RapidMagic rapidMagic;
 	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
-	float coolDownValue = 0.0f;
+	float coolDownValue = 1.0f;
+	float fullcChargeCoolDownValue = 3.0f;
 	bool isMagicAttack = true;
 	bool rapidInterval = 0.1f;
 

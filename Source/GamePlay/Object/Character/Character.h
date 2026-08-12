@@ -21,9 +21,9 @@ struct CharacterStatus
 	float guardMagicRecoverTimer = 0.0f;   // 1秒計測用のタイマー
 	float guardMagicRecoverAmount = 3.0f;  // 1秒ごとに回復する量
 	float currentMagicRecoverSpeed = 5.0f; // 自然回復速度
-	float magicRecoverDelayTimer = 0.5f;   // 魔力が回復し始めるまでの遅延
+	float magicRecoverDelayTimer = 0.0f;   // 魔力が回復し始めるまでの遅延
 
-	float rapidFireMagicCost = 0.1f;	// 連射魔法の魔力消費量
+	float rapidFireMagicCost = 6.0f;	// 連射魔法の魔力消費量
 
 	// --- ヒート値 ---
 	float maxHeat = 100.0f;				// 最大ヒート値
@@ -35,7 +35,7 @@ struct CharacterStatus
 	float maxDefenseDurability = 100.0f;		// 防御魔法の最大耐久値
 	float currentDefenseDurability = 100.0f;	// 現在の防御魔法の耐久値
 	float defenseRecoverSpeed = 5.0f;			// 防御魔法の耐久値の回復速度
-	float defenseMagicCost = 0.05f;				// 防御魔法の魔力消費量
+	float defenseMagicCost = 3.0f;				// 防御魔法の魔力消費量
 
 	// --- ダウン系 ---
 	float downTimer = 0.0f; // 魔力切れをしたときに使うタイマー

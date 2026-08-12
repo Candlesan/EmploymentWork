@@ -16,12 +16,38 @@ void NormalMagic::Initialize()
 	CustomEffectManager::Instance().LoadEffectConfig(chargeMagic, "Data/Json/Effect/" + chargeMagic + ".json");
 }
 
+// 更新処理
+void NormalMagic::Update(float elapsedTime, Character* owner, const NormalMagicConfig& config, bool isButtonHeld)
+{
+	// 長押し中はチャージ時間を進める
+	if (isButtonHeld)
+	{
+		chargeTimer += elapsedTime;
+		isCharging = true; // チャージ中のフラグを立てる
+	}
+	else
+	{
+		isCharging = false; // チャージ中のフラグを折る
+	}
+
+	// 最大チャージになったか確認
+	if (chargeTimer >= config.chargeTimeThreshold)
+	{
+		isFullCharged = true;
+	}
+
+	// 最大チャージ維持中は魔力を減らす
+	if (isFullCharged)
+	{
+		owner->ConsumMagic(config.chargeHoldMagicCost * elapsedTime);
+		//　Player側で移動速度を低下させる
+	}
+}
+
 void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const NormalMagicConfig& config)
 {
-	bool isCharged = (info.holdTime >= config.chargeTimeThreshold);
-
-	float damage = isCharged ? config.chargeDamage : config.normalDamage;
-	float radius = isCharged ? config.chargeRadius : config.normalRadius;
+	float damage = isFullCharged ? config.chargeDamage : config.normalDamage;
+	float radius = isFullCharged ? config.chargeRadius : config.normalRadius;
 	float range = config.range;
 
 	DirectX::XMFLOAT3 startPos;
@@ -73,7 +99,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	magic->SetLifeTimer(0.1f);
 	magic->Launch(info.direction, centerPos, 0.0f);
 
-	if (!isCharged)
+	if (!isFullCharged)
 	{
 		// 通常攻撃
 		CustomEffectManager::Instance().PlayEffect(normalMagic, finalPos, finalAngle, finalScale);
@@ -87,10 +113,23 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 void NormalMagic::DrawGUI(NormalMagicConfig& config)
 {
+	ImGui::Text(u8"チャージ時間 : %f", chargeTimer);
+	ImGui::Checkbox(u8"チャージ中か", &isCharging);
+	ImGui::Checkbox(u8"フルチャージか", &isFullCharged);
+	ImGui::Separator();
+
 	if (ImGui::CollapsingHeader(u8"通常魔法エフェクト調整", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::DragFloat3(u8"位置オフセット (X,Y,Z)", &config.offsetPosition.x, 0.05f);
 		ImGui::DragFloat3(u8"角度オフセット (X,Y,Z)", &config.offsetAngle.x, 0.05f);
 		ImGui::DragFloat3(u8"拡大率 (X,Y,Z)", &config.offsetScale.x, 0.05f, 0.01f, 10.0f);
 	}
+}
+
+// チャージ状態を解除する
+void NormalMagic::ResetCharge()
+{
+	chargeTimer = 0.0f;
+	isCharging = false;
+	isFullCharged = false;
 }

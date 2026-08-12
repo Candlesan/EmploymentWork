@@ -463,17 +463,21 @@ void Player::DrawGUI()
 				ImGui::Text(u8"--- 通常撃ち ---");
 				ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
 				ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
+				ImGui::DragFloat(u8"通常の魔力消費量", &normalMagicConfig.normalMagicCost, 0.1f);
 				ImGui::Separator();
 
 				ImGui::Text(u8"--- チャージ撃ち  ---");
 				ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
 				ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
+				ImGui::DragFloat(u8"チャージの魔力消費量", &normalMagicConfig.chargeMagicCost, 0.1f);
+				ImGui::DragFloat(u8"フルチャージの維持中の魔力消費量", &normalMagicConfig.chargeHoldMagicCost, 0.1f);
 				ImGui::Separator();
 
 				ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
 				ImGui::Separator();
 
 				ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
+				ImGui::DragFloat(u8"フルチャージのクールダウン", &fullcChargeCoolDownValue, 0.1f);
 				ImGui::Separator();
 
 				normalMagic.DrawGUI(normalMagicConfig);
@@ -673,29 +677,48 @@ void Player::MagicInput(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	// 通常魔法
-	if(gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER)
+	// カメラの前方向を取得する
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	DirectX::XMFLOAT3 dir = camera.GetFront();
+
+	bool isHold = (rbButtonHoldTime > RB_THRESHOLD);
+	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
+
+	// 押した瞬間の判定
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
 	{
-		if (magicCoolDownTimer > 0.0f) return;
+		if (normalMagic.IsFullCharged())
+		{
+			// フルチャージ発射（もう一度押した瞬間）
+			MagicSpawnInfo spawnInfo;
+			spawnInfo.position = position;
+			spawnInfo.direction = dir;
+			spawnInfo.owner = this;
+			spawnInfo.target = enemy;
+			spawnInfo.holdTime = rbButtonHoldTime;
 
-		// カメラの前方向を取得する
-		Camera& camera = CameraManager::Instance().GetMainCamera();
-		DirectX::XMFLOAT3 dir = camera.GetFront();
+			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
+			magicCoolDownTimer = fullcChargeCoolDownValue;
+			normalMagic.ResetCharge();
+		}
+	}
 
-		// 魔法の設定
-		MagicSpawnInfo spawnInfo;
-		spawnInfo.position = position;
-		spawnInfo.direction = dir;
-		spawnInfo.owner = this;
-		spawnInfo.target = enemy;
+	// 離した瞬間の判定（独立させる）
+	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER)
+	{
+		if (!normalMagic.IsFullCharged() && magicCoolDownTimer <= 0.0f) // フルチャージ済みなら上のifで既に処理済みなので除外
+		{
+			MagicSpawnInfo spawnInfo;
+			spawnInfo.position = position;
+			spawnInfo.direction = dir;
+			spawnInfo.owner = this;
+			spawnInfo.target = enemy;
+			spawnInfo.holdTime = rbButtonHoldTime;
 
-		spawnInfo.holdTime = rbButtonHoldTime;
-
-		// 通常魔法を呼び出す
-		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
-
-		// クールダウンをセット
-		magicCoolDownTimer = coolDownValue;
+			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
+			magicCoolDownTimer = coolDownValue;
+			normalMagic.ResetCharge();
+		}
 	}
 
 	// 連射魔法

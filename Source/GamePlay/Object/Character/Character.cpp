@@ -187,8 +187,7 @@ void Character::UpdateStatus(float elapsedTime)
 	if (status.isRapidFire)
 	{
 		// –‚—Í‚ğÁ”ï‚³‚¹‚é
-		ConsumMagic(status.rapidFireMagicCost, status.magicRecoverDelayTimer);
-		//status.currentMagic -= status.rapidFireMagicCost * elapsedTime;
+		ConsumMagic(status.rapidFireMagicCost * elapsedTime);
 
 		// ƒq[ƒg’l‚ğ‰ñ•œ‚³‚¹‚é
 		status.currentHeat += status.heatIncreaseSpeed * elapsedTime;
@@ -225,7 +224,7 @@ void Character::UpdateStatus(float elapsedTime)
 	}
 	else // ƒK[ƒh‚µ‚Ä‚é‚Æ‚«‚Í–‚—Í‚ğŒ¸‚ç‚·
 	{
-		ConsumMagic(status.defenseMagicCost);
+		ConsumMagic(status.defenseMagicCost * elapsedTime); // ‚±‚±‚ÅelapsedTime‚ğŠ|‚¯‚Ä‚é‚Ì‚Í•bŠÔ‚Å‚Ç‚ê‚¾‚¯Œ¸‚ç‚·‚©‚É‚·‚é‚½‚ß
 	}
 }
 
