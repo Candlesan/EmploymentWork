@@ -377,7 +377,7 @@ void Player::DrawGUI()
 				{
 					ConsumMagic(10.0f, magicRecoverDelay);
 				}
-				ImGui::Checkbox(u8"防御魔法展開時", &status.isGuarding);
+				ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding);
 				ImGui::Separator();
 
 				ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);

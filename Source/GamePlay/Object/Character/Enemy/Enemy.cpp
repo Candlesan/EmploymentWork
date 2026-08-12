@@ -26,21 +26,29 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	enemy = std::make_shared<Model>(device, "Data/Model/Enemy/Boss2/SevarogBloodred.gltf");
+	enemy = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 
 	// アニメーター生成
 	animator = std::make_unique<Animator>();
 	animator->Initialize(enemy);
 
 	// 敵モデルの設定
-	position = { 0, 0, 10 };
-	angle = { 0, 3, 0 };
-	scale.x = scale.y = scale.z = 1.3f;
-	weight = 100.0f;
-	radius = 1.0f;
+	weight = 0.5f;
+	radius = 0.4f;
 	height = 1.6f;
-	debugOffset = 1.8;
-	gravity = 0.0f;
+	debugOffset = 0.8;
+
+	position = { 0, 0, 10 };
+
+	// パラメータ初期化
+	moveSpeed = 7.0f;
+	maxMoveSpeed = 7.0f;
+	status.currentHp = 100.0f;
+	status.maxHp = 100.0f;
+	status.currentMagic = 100.0f;
+	status.maxMagic = 100.0f;
+	status.maxDefenseDurability = 100.0f;
+	status.currentDefenseDurability = 100.0f;
 
 
 	// アニメーション設定
@@ -128,6 +136,10 @@ void Enemy::Update(float elapsedTime)
 	// 音の更新
 	UpdateSounds(this->currentState);
 
+	// 魔法更新処理
+	magicManager.Update(elapsedTime);
+	defenseMagic.Update(this, elapsedTime);
+
 	// エリア移動制限
 	AreaRestriction();
 
@@ -160,20 +172,59 @@ void Enemy::DrawGUI()
 		{
 			ImGui::Checkbox(u8"敵の表示", &showEnemy);
 
-			if (ImGui::Button(u8"HP前回"))
+			if (ImGui::Button(u8"HP全回復"))
 			{
 				status.currentHp = status.maxHp;
 			}
-			ImGui::Text("Health: %f.0", status.currentHp);
-			ImGui::Text("Damage: %f.0", lastDamage);
+			ImGui::SameLine();
+			if (ImGui::Button(u8"魔力全回復"))
+			{
+				status.currentMagic = status.maxMagic;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"ガード耐久値全回復"))
+			{
+				status.currentDefenseDurability = status.maxDefenseDurability;
+			}
+			ImGui::Text(u8"体力 : %f.0", status.currentHp);
+			ImGui::DragFloat(u8"体力", &status.currentHp, 0.1f);
 			ImGui::Separator();
-			ImGui::Text("currentPoise: %f.0", status.currentDefenseDurability);
+
+			ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
+			ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
+			ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
+			ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
+			ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
+			ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
+			if (ImGui::Button(u8"魔力消費"))
+			{
+				ConsumMagic(10.0f, magicRecoverDelay);
+			}
+			if(ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
+			{
+				defenseMagic.SetIsActive(status.isGuarding);
+			}
 			ImGui::Separator();
-			ImGui::Text("attackCoolTimer: %f.0", attackCoolTimer);
+
+			ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
+			ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
+			ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
+			ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
+			ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
 			ImGui::Separator();
-			ImGui::Text("runTimer: %f.0", runTimer);
+
+			ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
+			ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
+			if (ImGui::Button(u8"耐久値減少"))
+			{
+				OnGuardHit(10.0f);
+			}
 			ImGui::Separator();
-			ImGui::Text(u8"Behavior　%s", str.c_str());
+
+			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
+			ImGui::Separator();
+
+			ImGui::Text(u8"ステート　%s", str.c_str());
 			std::string animState = GetCurrentState();
 			ImGui::Text(u8"AnimState: %s", animState.c_str());
 
@@ -277,6 +328,11 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
+	}
+
+	if (defenseMagic.GetIsActive())
+	{
+		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), { 0, 0, 1, 1 });
 	}
 
 	// 距離の可視化

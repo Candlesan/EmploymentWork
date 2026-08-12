@@ -6,11 +6,15 @@
 #include "System/Audio/AudioSource.h"
 
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
-#include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorData.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
 #include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
+#include "GamePlay/Object/Magic/MagicManager.h"
+#include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
+#include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
+#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
+
 
 #include <memory>
 #include <unordered_map>
@@ -146,7 +150,18 @@ private:
 
 	// 魔法関係
 	MagicManager magicManager;
+	NormalMagic::NormalMagicConfig normalMagicConfig;
+	NormalMagic normalMagic;
+	RapidMagic::RapidMagicConfig rapidMagicConfig;
+	RapidMagic rapidMagic;
 	DefenseMagic defenseMagic;
+	float magicCoolDownTimer = 0.0f;
+	float coolDownValue = 1.0f;
+	float fullcChargeCoolDownValue = 3.0f;
+	bool isMagicAttack = true;
+	bool rapidInterval = 0.1f;
+
+	float magicRecoverDelay = 0.0f;
 
 	//  --- デバック関係 ---
 	bool showbtEditor = false;
