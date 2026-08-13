@@ -162,12 +162,11 @@ void SceneGame::Update(float elapsedTime)
 		if (gameCamera->IsLockOn())
 		{
 			// ロックオン中は敵の位置を教える
-			DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
-			player.SetLockOnTargetPosition(&enemyPos);
+			player.SetLockOnTargetPosition(&enemy->GetPosition());
 		}
 		else
 		{
-			player.SetLockOnTargetPosition(nullptr);
+			player.ClearLockOnTarget();
 		}
 
 		gameCamera->Update(elapsedTime, stage->GetTriangles(), stage->GetAreas());

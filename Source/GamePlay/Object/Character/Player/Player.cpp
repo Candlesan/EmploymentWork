@@ -832,6 +832,12 @@ void Player::UpdateFly(float elapsedTime)
 void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
 {
 	lockOnTargetPos = pos;
+	hasLockOnTarget = true;
+}
+
+void Player::ClearLockOnTarget()
+{
+	hasLockOnTarget = false;
 }
 
 
@@ -992,7 +998,7 @@ void Player::InputMove(float elapsedTime)
 	}
 
 	// 回転処理
-	if (lockOnTargetPos != nullptr)
+	if (hasLockOnTarget)
 	{
 		float dx = lockOnTargetPos->x - position.x;
 		float dz = lockOnTargetPos->z - position.z;

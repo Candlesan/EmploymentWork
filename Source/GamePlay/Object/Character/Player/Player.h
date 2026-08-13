@@ -60,7 +60,7 @@ public:
 	// =========================================================================
 	void SetEnemy(Enemy* e) { enemy = e; }
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos);
-	//void SetLastDamage(float d) { lastDamage = d; }
+	void ClearLockOnTarget();
 	void SetIsHit(bool hit) { isHit = hit; }
 
 	// =========================================================================
@@ -165,6 +165,7 @@ private:
 
 	// ── ロックオン・敵との距離 ──
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
+	bool hasLockOnTarget = false;
 	float enemyFromDistance = 0.0f;
 	float lockedEnemyDistance = 0.0f;
 
