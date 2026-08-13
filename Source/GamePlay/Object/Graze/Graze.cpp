@@ -1,13 +1,34 @@
 #include "Graze.h"
-#include <DirectXMath.h>
 
 
-// 弾をかすめた時のクラス
-class Graze
+bool Graze::IsGraze(
+	const DirectX::XMFLOAT3& characterPos,
+	float characterYaw,
+	bool isDefense,
+	const DirectX::XMFLOAT3& magicPos,
+	float magicRadius) const 
 {
-public:
+	using namespace DirectX;
 
-private:
-	float grazeRadius = 0.5f; // グレイズの半径
-	DirectX::XMFLOAT3 grazePosition = { 0.0f, 0.0f, 0.0f };
-};
+	// 防御魔法を展開ていたら処理をしない
+	if (isDefense) return false; 
+
+	const XMVECTOR character = XMLoadFloat3(&characterPos);
+	const XMVECTOR magic = XMLoadFloat3(&magicPos);
+
+	// キャラから魔法ベクトル
+	XMVECTOR toMagic = XMVectorSubtract(magic, character);
+
+	// 水平で計算するからYを消す
+	toMagic = XMVectorSetY(toMagic, 0.0f);
+
+	//真上と真下に近い場合
+
+
+
+	// 内積を取る
+
+	// 120°以内か確認する
+
+	return false;
+}

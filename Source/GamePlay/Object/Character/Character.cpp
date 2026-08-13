@@ -114,7 +114,7 @@ void Character::UpdateStatus(float elapsedTime)
 {
 	// 魔力回復
 	// 攻撃していないまたはガードしながら攻撃していないとき
-	if (status.isGuarding)
+	if (status.isDefense)
 	{
 		status.guardMagicRecoverTimer += elapsedTime;
 
@@ -210,7 +210,7 @@ void Character::UpdateStatus(float elapsedTime)
 	}
 
 	// ガード値回復
-	if (!status.isGuarding) // ガードしてないとき
+	if (!status.isDefense) // ガードしてないとき
 	{
 		// 現在の数値が最大値よりも少なかったら
 		if (status.currentDefenseDurability < status.maxDefenseDurability)

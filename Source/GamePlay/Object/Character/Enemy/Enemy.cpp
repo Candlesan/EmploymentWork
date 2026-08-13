@@ -201,9 +201,9 @@ void Enemy::DrawGUI()
 			{
 				ConsumMagic(10.0f, magicRecoverDelay);
 			}
-			if(ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
+			if(ImGui::Checkbox(u8"防御魔法展開", &status.isDefense))
 			{
-				defenseMagic.SetIsActive(status.isGuarding);
+				defenseMagic.SetIsActive(status.isDefense);
 			}
 			ImGui::Separator();
 

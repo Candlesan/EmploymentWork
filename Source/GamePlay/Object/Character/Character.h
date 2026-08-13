@@ -45,7 +45,7 @@ struct CharacterStatus
 	bool isBurst = false;		// オーバーヒートしたか
 	bool isNormalMagic = false; // 通常攻撃魔法か
 	bool isRapidFire = false;	// 連射攻撃か
-	bool isGuarding = false;	// ガード中か
+	bool isDefense = false;	// 防御魔法展開中か
 	bool isFlying = false;		// 飛行中か
 };
 

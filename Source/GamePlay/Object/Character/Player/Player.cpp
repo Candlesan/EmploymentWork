@@ -377,7 +377,7 @@ void Player::DrawGUI()
 				{
 					ConsumMagic(10.0f, magicRecoverDelay);
 				}
-				ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding);
+				ImGui::Checkbox(u8"防御魔法展開", &status.isDefense);
 				ImGui::Separator();
 
 				ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
@@ -758,13 +758,13 @@ void Player::MagicInput(float elapsedTime)
 	if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
 	{
 		// 防御魔法を起動
-		status.isGuarding = true;
-		defenseMagic.SetIsActive(status.isGuarding);
+		status.isDefense = true;
+		defenseMagic.SetIsActive(status.isDefense);
 	}
 	else
 	{
-		status.isGuarding = false;
-		defenseMagic.SetIsActive(status.isGuarding);
+		status.isDefense = false;
+		defenseMagic.SetIsActive(status.isDefense);
 	}
 }
 
