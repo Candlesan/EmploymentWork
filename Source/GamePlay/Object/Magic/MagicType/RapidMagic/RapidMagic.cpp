@@ -1,4 +1,5 @@
 #include "RapidMagic.h"
+#include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Magic/MagicProjectile.h"
 #include "GamePlay/Object/Magic/MagicMove/StraightMagic/StraightMove.h"
 
@@ -28,15 +29,34 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	// 弾を生成
 	MagicProjectile* magic = new MagicProjectile(manager, "");
 
+	magic->SetOwner(info.owner); // 誰が撃ったか
+
+
 	// 直進移動コンポーネントセット
 	magic->SetMoveComponent(std::make_unique<StraightMove>());
-	magic->SetMagicKind(MagicKind::Rapid);
-	magic->SetShape(HitBoxShape::Sphere); // 球体
-	magic->SetRadius(config.hitRadius);    // 当たり判定の半径
-	magic->SetDamage(0.01f); // 生身へのダメージ
-	magic->SetGuardDamage(config.gaurdDamage); // 防御魔法へのダメージ
-	magic->SetSpeed(config.speed);        // 弾速
-	magic->SetLifeTimer(config.lifeTimer);// 射程（生存時間）
+
+	magic->SetMagicKind(MagicKind::Rapid); // 連射魔法
+	magic->SetShape(HitBoxShape::Sphere);  // 当たり判定の形状
+
+	magic->SetRadius(config.hitRadius);			// 当たり判定の半径
+	magic->SetDamage(0.01f);					// 生身へのダメージ
+	magic->SetGuardDamage(config.gaurdDamage);	// 防御魔法へのダメージ
+
+	if (info.owner != nullptr)
+	{
+		const float magicCost =
+			info.owner->GetStatus().rapidFireMagicCost;
+
+		const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
+
+		magic->SetInterceptMagicCost(magicCost);
+		magic->SetMagicmagicRefund(magicCost + interceptBonus);
+	}
+
+	magic->SetSpeed(config.speed);				// 弾速
+	magic->SetLifeTimer(config.lifeTimer);		// 射程(生存時間)
+
+	// 発射
 	magic->Launch(info.direction, startPos, 0.0f);
 
 	// 次に発射のためにインデックスを１つ進める

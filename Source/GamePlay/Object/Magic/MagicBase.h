@@ -8,9 +8,21 @@
 
 // 前方宣言
 class MagicManager;
+class Character;
 
 // 魔法の種類
 enum class MagicKind {Normal, Rapid};
+
+// 通常魔法の状態
+enum class NormalMagicLevel { Normal, Charged };
+
+// 迎撃用の構造体
+struct InterceptProfile
+{
+	NormalMagicLevel normalLevel = NormalMagicLevel::Normal; // 連射魔法の時は当たらない
+	float magicCost = 0.0f;   // 魔力の消費量
+	float magicRefund = 0.0f; // 迎撃成功時の返ってくる魔力量
+};
 
 class MagicBase
 {
@@ -62,8 +74,26 @@ public:
 	MagicKind GetMagicKind() const { return magicKind; }
 	void SetMagicKind(MagicKind k) { magicKind = k; }
 
+	// 通常魔法の状態
+	NormalMagicLevel GetNormalMagicLevel() const { return interceptProfile.normalLevel; }
+	void SetNormalMagicLevel(NormalMagicLevel level) { interceptProfile.normalLevel = level; }
+
+	// 迎撃成功時の魔力回復のゲッター
+	float GetMagicmagicRefund() const { return interceptProfile.magicRefund; }
+	void SetMagicmagicRefund(float regein) { interceptProfile.magicRefund = regein; }
+
+	// 迎撃時の魔力消費量
+	float GetInterceptMagicCost() const { return interceptProfile.magicCost; }
+	void SetInterceptMagicCost(float cost) { interceptProfile.magicCost = cost; }
+
+	// 魔法を撃った人
+	Character* GetOwner() const { return owner; }
+	void SetOwner(Character* o) { owner = o; }
+
+	// 現在生きているか
 	bool GetIsAlive() const { return isAlive; }
 
+	// 防御魔法へのダメージ
 	float GetGuardDamage() const { return guardDamage; }
 	void SetGuardDamage(float d) { guardDamage = d; }
 protected:
@@ -85,4 +115,6 @@ protected:
 
 	HitBoxShape shape = HitBoxShape::Sphere;
 	MagicKind magicKind = MagicKind::Normal;
+	InterceptProfile interceptProfile;
+	Character* owner = nullptr;
 };

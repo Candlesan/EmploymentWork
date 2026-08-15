@@ -89,14 +89,43 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 	// 魔法のパラメータを設定
 	MagicProjectile* magic = new MagicProjectile(manager, "");
+	magic->SetOwner(info.owner); // 誰が撃ったか
+
 	magic->SetMagicKind(MagicKind::Normal); // 魔法の種類
 	magic->SetShape(HitBoxShape::Capsule); // 当たり判定の形状
+
+	// 基本パラメーター
 	magic->SetRadius(radius);
 	magic->SetHeight(range);
 	magic->SetDamage(damage); // 生身へのダメージ
 	magic->SetGuardDamage(config.guardDamage); // 防御魔法へのダメージ
+
+	// 魔力消費
+	if (info.owner != nullptr)
+	{
+		const float normalMagicCost = config.normalMagicCost;
+		const float chargeMagicCost = config.chargeMagicCost;
+
+		const float normalInterceptBonus = 5.0f; // 通常の迎撃成功時のボーナス
+		const float chargeInterceptBonus = 10.0f; // チャージ時の迎撃成功時のボーナス
+
+		if (isCharging)
+		{
+			magic->SetInterceptMagicCost(normalMagicCost);
+			magic->SetMagicmagicRefund(normalMagicCost + normalInterceptBonus);
+		}
+		else
+		{
+			magic->SetInterceptMagicCost(chargeMagicCost);
+			magic->SetMagicmagicRefund(chargeMagicCost + chargeInterceptBonus);
+		}
+	}
+
+	// 発射遅延/寿命
 	magic->SetWaitTimer(0.01f);
 	magic->SetLifeTimer(0.1f);
+
+	// 発射
 	magic->Launch(info.direction, centerPos, 0.0f);
 
 	if (!isFullCharged)
