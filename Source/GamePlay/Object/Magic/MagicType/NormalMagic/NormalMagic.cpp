@@ -111,13 +111,15 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 		if (isCharging)
 		{
-			magic->SetInterceptMagicCost(normalMagicCost);
-			magic->SetMagicmagicRefund(normalMagicCost + normalInterceptBonus);
+			magic->SetNormalMagicLevel(NormalMagicLevel::Charged);
+			magic->SetInterceptMagicCost(chargeMagicCost);
+			magic->SetMagicmagicRefund(chargeMagicCost + chargeInterceptBonus);
 		}
 		else
 		{
-			magic->SetInterceptMagicCost(chargeMagicCost);
-			magic->SetMagicmagicRefund(chargeMagicCost + chargeInterceptBonus);
+			magic->SetNormalMagicLevel(NormalMagicLevel::Normal);
+			magic->SetInterceptMagicCost(normalMagicCost);
+			magic->SetMagicmagicRefund(normalMagicCost + normalInterceptBonus);
 		}
 	}
 

@@ -3,6 +3,8 @@
 #include <vector>
 #include <set>
 
+// 前方宣言
+class Character;
 
 //　マジックマネージャー
 class MagicManager
@@ -35,6 +37,14 @@ public:
 	//弾丸削除
 	void Remove(MagicBase* projectile);
 
+	// 迎撃範囲内にある魔法を近い順で返す関数
+	std::vector<MagicBase*> FindNearProjectiles(
+		Character* owner,					// 所有者
+		const DirectX::XMFLOAT3& centerPos,	// 迎撃判定中心位置
+		float searchRadius);				// 迎撃判定範囲(半径)
+
+	// 現在リストに入っている魔法を取得する
+	const std::vector<MagicBase*>& GetProjectiles() const { return projectiles; }
 private:
 	std::vector<MagicBase*> projectiles;
 	std::set<MagicBase*> removes;
