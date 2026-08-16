@@ -105,6 +105,7 @@ private:
 
 	// ── 専用技 ──
 
+
 	// ── ステートマシン・先行入力 ──
 	void UpdateStateTransitions(float elapsedTime);
 	void UpdateUpperBodyTransitions(float elapsedTime);
@@ -177,12 +178,13 @@ private:
 	RapidMagic rapidMagic;
 	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
-	float coolDownValue = 1.0f;
-	float fullcChargeCoolDownValue = 3.0f;
-	bool isMagicAttack = true;
-	bool rapidInterval = 0.1f;
-
-	float magicRecoverDelay = 0.0f;
+	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
+	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン
+	bool rapidInterval = 0.1f;				// 連射魔法の発射感覚
+	float magicRecoverDelay = 0.0f;			// 魔力を回復するまでの遅延
+	float interceptRadius = 10.0f;			// 迎撃用の半径
+	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
+	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
 
 	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
 	float previousAngleY = 0.0f;

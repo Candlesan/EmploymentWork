@@ -258,6 +258,12 @@ void Character::ConsumMagic(float amount)
 	}
 }
 
+// –‚—Í‰ñ•œ
+void Character::RecoverMagic(float amount)
+{
+	status.currentMagic += amount;
+}
+
 // ƒK[ƒh‘Ï‹v’lŒ¸­
 void Character::OnGuardHit(float amount)
 {

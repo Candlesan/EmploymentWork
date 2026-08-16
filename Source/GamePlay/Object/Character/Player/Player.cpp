@@ -665,6 +665,18 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	{
 		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), {0, 0, 1, 1});
 	}
+
+	DirectX::XMFLOAT3 centerPos = {
+		position.x + interceptCenterOffset.x,
+		position.y + interceptCenterOffset.y,
+		position.z + interceptCenterOffset.z
+	};
+
+	// 迎撃範囲の球
+	if (status.isIntercept)
+	{
+		renderer->DrawSphere(centerPos, interceptRadius, { 0.0f, 1.0f, 1.0f, 0.5f });
+	}
 }
 
 
@@ -679,11 +691,40 @@ void Player::MagicInput(float elapsedTime)
 
 	// カメラの前方向を取得する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
-	DirectX::XMFLOAT3 dir = camera.GetFront();
+	DirectX::XMFLOAT3 defultDir = camera.GetFront();
+
+	MagicBase* targetMagic = nullptr;
+	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
+
+	// 迎撃
+	if (status.isIntercept)
+	{
+		// 迎撃の中心位置
+		DirectX::XMFLOAT3 centerPos = {
+			position.x + interceptCenterOffset.x,
+			position.y + interceptCenterOffset.y,
+			position.z + interceptCenterOffset.z
+		};
+
+		// 一番近い魔法を取得する
+		auto targets = magicManager.FindNearProjectiles(this, centerPos, interceptRadius);
+
+		if (!targets.empty())
+		{
+			MagicBase* targetMagic = targets[0]; // 一番近い敵の魔法
+
+			// 迎撃する方向を計算する
+			DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&targetMagic->GetPosition());
+			DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
+			DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(magicPos, playerPos);
+			DirectX::XMStoreFloat3(&interceptDir, DirectX::XMVector3Normalize(dir));
+		}
+	}
 
 	bool isHold = (rbButtonHoldTime > RB_THRESHOLD);
 	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
+	// 通常攻撃魔法
 	// 押した瞬間の判定
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
 	{
@@ -692,7 +733,7 @@ void Player::MagicInput(float elapsedTime)
 			// フルチャージ発射（もう一度押した瞬間）
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = dir;
+			spawnInfo.direction = status.isIntercept ? interceptDir : defultDir;
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
@@ -700,6 +741,14 @@ void Player::MagicInput(float elapsedTime)
 			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 			magicCoolDownTimer = fullcChargeCoolDownValue;
 			normalMagic.ResetCharge();
+
+			// 敵がチャージ魔法なら撃ち落とす
+			if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Normal &&
+				targetMagic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
+			{
+				RecoverMagic(targetMagic->GetMagicmagicRefund());
+				targetMagic->OnTerminate();
+			}
 		}
 	}
 
@@ -710,7 +759,7 @@ void Player::MagicInput(float elapsedTime)
 		{
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = dir;
+			spawnInfo.direction = status.isIntercept ? interceptDir : defultDir;
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
@@ -718,6 +767,14 @@ void Player::MagicInput(float elapsedTime)
 			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 			magicCoolDownTimer = coolDownValue;
 			normalMagic.ResetCharge();
+
+			// 敵が通常攻撃魔法なら撃ち落とす
+			if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Normal &&
+				targetMagic->GetNormalMagicLevel() == NormalMagicLevel::Normal)
+			{
+				RecoverMagic(targetMagic->GetMagicmagicRefund());
+				targetMagic->OnTerminate();
+			}
 		}
 	}
 
@@ -728,14 +785,10 @@ void Player::MagicInput(float elapsedTime)
 
 		status.isRapidFire = true;
 
-		// カメラの前方向を取得する
-		Camera& camera = CameraManager::Instance().GetMainCamera();
-		DirectX::XMFLOAT3 dir = camera.GetFront();
-
 		// 魔法の設定
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
-		spawnInfo.direction = dir;
+		spawnInfo.direction = status.isIntercept ? interceptDir : defultDir;
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
 
@@ -748,6 +801,14 @@ void Player::MagicInput(float elapsedTime)
 
 		// 連射魔法を呼び出す
 		rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, status.isRapidFire);
+
+		// 敵が連射魔法なら撃ち落とす
+		if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Rapid)
+		{
+			RecoverMagic(targetMagic->GetMagicmagicRefund());
+			targetMagic->OnTerminate();
+		}
+
 	}
 	else
 	{

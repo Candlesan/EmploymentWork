@@ -47,6 +47,7 @@ struct CharacterStatus
 	bool isRapidFire = false;	// ˜AËUŒ‚‚©
 	bool isGuarding = false;	// ƒK[ƒh’†‚©
 	bool isFlying = false;		// ”òs’†‚©
+	bool isIntercept = false;   // Œ}Œ‚’†‚©
 };
 
 class Character
@@ -105,6 +106,9 @@ public:
 	// –‚—ÍÁ”ï
 	void ConsumMagic(float amount, float DelayTime);
 	void ConsumMagic(float amount);
+
+	// –‚—Í‰ñ•œ
+	void RecoverMagic(float amount);
 
 	// ƒK[ƒh‘Ï‹v’lŒ¸­
 	void OnGuardHit(float amount);

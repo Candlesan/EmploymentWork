@@ -99,7 +99,8 @@ public:
     // GUI•`‰æ (config ‚ğQÆ‚Åó‚¯æ‚éI)
     void DrawGUI(NormalMagicConfig& config);
 
-    bool NormalMagic::IsFullCharged() const { return isFullCharged; }
+    bool IsFullCharged() const { return isFullCharged; }
+    bool IsChargeing() const { return isCharging; }
 
     void ResetCharge();
 
