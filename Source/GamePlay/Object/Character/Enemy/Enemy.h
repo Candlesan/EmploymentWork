@@ -1,20 +1,21 @@
 #pragma once
+
+// システム
 #include "System/Renderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence/AnimationSequence.h"
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/UI/BehaviorTreeEditor/BehaviorTreeEditor.h"
 #include "System/Audio/AudioSource.h"
 
+// ゲームオブジェクト
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorData.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
-#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
 #include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
-
 
 #include <memory>
 #include <unordered_map>
@@ -23,15 +24,24 @@
 class Enemy : public AnimationCharacter
 {
 public:
+	// =========================================================================
+	//  コンストラクタ・デストラクタ
+	// =========================================================================
 	Enemy() {};
 	~Enemy();
 
+	// =========================================================================
+	//  ライフサイクル（ゲームの根幹の流れ）
+	// =========================================================================
 	void Initialize();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
+	// =========================================================================
+	//  外部アクション・AI制御
+	// =========================================================================
 	// 計算したダメージ
 	void SetLastDamage(float d) { lastDamage = d; }
 
@@ -47,84 +57,97 @@ public:
 	void MoveToTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
 	void MoveToTarget(float elapsedTime);
 
-	// 移動速度セッター・ゲッター
+	// =========================================================================
+	//  セッター
+	// =========================================================================
+	// ── 基本パラメータ ──
 	void SetMoveSpeed(float s) { moveSpeed = s; }
-	float GetMoveSpeed() const { return moveSpeed; }
 
-	// 体力
+	// ── ステータス ──
 	void SetHealth(float h) { status.currentHp = h; }
-	float GetHealth() { return status.currentHp; }
 	void SetMaxHealth(float h) { status.maxHp = h; }
-	float GetMaxHealth() { return status.maxHp; }
 
-	// 旋回速度取得
+	// ── タイマー・AI制御 ──
+	void SetRunTimer(float timer) { runTimer = timer; }
+	void SetAttackCoolTimer(float timer) { attackCoolTimer = timer; }
+
+	// =========================================================================
+	//  ゲッター
+	// =========================================================================
+	// ── 基本パラメータ ──
+	float GetMoveSpeed() const { return moveSpeed; }
 	float GetTurnSpeed() const { return turnSpeed; }
 
-	// 実行タイマー取得(仮実装)
-	float GetRunTimer() { return runTimer; }
-	// 実行タイマー設定(仮実装)
-	void SetRunTimer(float timer) { runTimer = timer; }
+	// ── ステータス ──
+	float GetHealth() { return status.currentHp; }
+	float GetMaxHealth() { return status.maxHp; }
 
-	// 攻撃のクールダウン
-	void SetAttackCoolTimer(float timer) { attackCoolTimer = timer; }
+	// ── タイマー・戦闘 ──
+	float GetRunTimer() { return runTimer; }
 	float GetAttackCoolTimer() const { return attackCoolTimer; }
 
-	// シーケンサーを取得
+	// ── シーケンサー・マネージャー ──
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
+	MagicManager& GetMagicManager() { return magicManager; }
+	DefenseMagic& GetDefenseMagic() { return defenseMagic; }
 
-	void ClearActiveNode() { 
+	// ── ビヘイビアツリー ──
+	void ClearActiveNode() {
 		activeNode = nullptr;
 		lastInferredNode = nullptr;
 	}
 	NodeBase* GetActiveNode() const { return activeNode; }
 	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
 
-	MagicManager& GetMagicManager()  { return magicManager; }
-	DefenseMagic& GetDefenseMagic() { return defenseMagic; } // データを渡すときは値渡しにする
-
-private:
+protected:
+	// =========================================================================
+	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
+	// =========================================================================
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
 
-private:
-	// ダウン状態
 	void OnDown() override;
-
-	// アニメーションのコールバック関数
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
-	// サウンドを流す
+private:
+	// =========================================================================
+	//  内部ヘルパー関数
+	// =========================================================================
+	// ── サウンド ──
 	void UpdateSounds(const std::string& state);
-
-	// 音を取得（無ければ自動ロード）する関数
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
-	// GUIの表示/非表示
+	// ── デバッグ ──
 	void ShowDebugSwitch();
+	void debugShot(float elapsedTime);
+
 private:
+	// =========================================================================
+	//  メンバ変数（ジャンルごとにグループ化）
+	// =========================================================================
+	// ── 3Dモデル ──
 	std::shared_ptr<Model> enemy;
 
+	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
-	// アニメーション関係
+	// ── アニメーション関係 ──
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
 
-	// 当たり判定関係
+	// ── 当たり判定・距離設定 ──
 	float debugOffset = 0.5;
+	float Short_Distance = 4.0f;   // 近距離
+	float Middle_Distance = 12.0f; // 中距離
+	float Long_Distance = 20.0f;   // 遠距離
 
-	// ダメージ関係
+	// ── ダメージ・戦闘ステータス ──
 	float lastDamage = 0.0f;
 	bool Ondown = false;
 	float attackCoolTimer = 0.0f;
 
-	// 距離
-	float Short_Distance = 4.0f; // 近距離
-	float Middle_Distance = 12.0; // 中距離
-	float Long_Distance = 20.0; // 遠距離
-
-	// ビヘイビアツリー関係
+	// ── ビヘイビアツリー ──
 	BehaviorTree* aiTree = nullptr;
 	BehaviorData* behaviorData = nullptr;
 	NodeBase* activeNode = nullptr;
@@ -132,23 +155,17 @@ private:
 	float runTimer = 0.0f;
 	bool AISwitch = false;
 
-	// SE関係
-	// 音の名前と実体を紐づけるマップ
-	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
-
-	// シーケンサー関係
-	AnimationSequencer animSequence;
-	AnimationSequencerEditor sequencerEditor;
-
-	// --- プレビューモード用 ---
-	bool isPreviewMode = false;
-	std::string editingState = "";
-
-	// ビヘイビアツリーノードエディター
+	// ── ビヘイビアツリーエディタ ──
 	BehaviorTreeGraph btGraph;
 	BehaviorTreeEditor btEditor;
 
-	// 魔法関係
+	// ── シーケンサー・プレビュー ──
+	AnimationSequencer animSequence;
+	AnimationSequencerEditor sequencerEditor;
+	bool isPreviewMode = false;
+	std::string editingState = "";
+
+	// ── 魔法関係 ──
 	MagicManager magicManager;
 	NormalMagic::NormalMagicConfig normalMagicConfig;
 	NormalMagic normalMagic;
@@ -156,14 +173,23 @@ private:
 	RapidMagic rapidMagic;
 	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
-	float coolDownValue = 1.0f;
-	float fullcChargeCoolDownValue = 3.0f;
-	bool isMagicAttack = true;
-	bool rapidInterval = 0.1f;
+	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
+	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン
+	bool rapidInterval = 0.1f;				// 連射魔法の発射間隔
+	float magicRecoverDelay = 0.0f;			// 魔力を回復するまでの遅延
+	float interceptRadius = 10.0f;			// 迎撃用の半径
+	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
+	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
 
-	float magicRecoverDelay = 0.0f;
+	// ── デバッグ発射用フラグ ──
+	bool onNormalMagic = false;
+	bool onChargeMagic = false;
+	bool onRapidMagic = false;
 
-	//  --- デバック関係 ---
+	// ── サウンド ──
+	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
+
+	// ── デバッグGUI表示フラグ ──
 	bool showbtEditor = false;
 	bool showEnemyParameter = true;
 	bool showEnemy = true;

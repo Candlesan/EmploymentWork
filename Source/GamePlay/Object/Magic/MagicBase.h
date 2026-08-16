@@ -92,6 +92,7 @@ public:
 
 	// 現在生きているか
 	bool GetIsAlive() const { return isAlive; }
+	void SetIsAlive(bool flag) { isAlive = flag; }
 
 	// 防御魔法へのダメージ
 	float GetGuardDamage() const { return guardDamage; }

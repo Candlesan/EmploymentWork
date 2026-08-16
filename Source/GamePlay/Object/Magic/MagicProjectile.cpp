@@ -18,7 +18,7 @@ MagicProjectile::~MagicProjectile()
 // 更新処理
 void MagicProjectile::Update(float elapsedTime)
 {
-	if (isAlive) return;
+	if (!isAlive) return;
 
 	switch (state)
 	{
@@ -82,14 +82,24 @@ void MagicProjectile::RenderDebugPrimitive(ShapeRenderer* renderer)
 		// 中心座標・向き・長さからカプセル描画用の行列を作成
 		DirectX::XMVECTOR cPos = DirectX::XMLoadFloat3(&position); // 中心座標
 		DirectX::XMVECTOR dir = DirectX::XMLoadFloat3(&direction);
-		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
+		// 方向ベクトルの長さが0なら、デフォルトの前方向 (0, 0, 1) に差し替える
+		if (DirectX::XMVector3Equal(dir, DirectX::XMVectorZero()))
+		{
+			dir = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		}
+		else
+		{
+			dir = DirectX::XMVector3Normalize(dir);
+		}
+
+		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		if (fabsf(direction.y) > 0.999f)
 		{
 			up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		}
 
-		DirectX::XMMATRIX view = DirectX::XMMatrixLookToLH(cPos, dir, up);
+		DirectX::XMMATRIX view = DirectX::XMMatrixLookToLH(cPos, dir, up); // ここでエラーが起きてる
 		DirectX::XMMATRIX world = DirectX::XMMatrixInverse(nullptr, view);
 
 		// Y軸方向へ伸ばすために90度回転
@@ -108,6 +118,9 @@ void MagicProjectile::RenderDebugPrimitive(ShapeRenderer* renderer)
 // エフェクトを消す関数
 void MagicProjectile::OnTerminate()
 {
+	if (!GetIsAlive())
+		return; // 二度消さない
+
 	isAlive = false;
 
 	if (magicHandle != -1)

@@ -55,7 +55,9 @@ void Player::Initialize()
 	// 各種システムの初期化（
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
+
 	trail.Initialize(); // トレイルの初期化
+
 	normalMagic.Initialize();
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
 	rapidMagic.Initialize();
@@ -231,13 +233,11 @@ void Player::Update(float elapsedTime)
 	// プレイヤーの状態を計算する関数
 	CalculateStatusParameters();
 
-	// 魔法入力
+	// 魔法を撃つ
 	MagicInput(elapsedTime);
 
 	if (!isTyping && !isPreviewMode)
 	{
-		// 魔法を撃つ
-		MagicInput(elapsedTime);
 
 		// 移動処理
 		InputMove(elapsedTime);
@@ -707,11 +707,12 @@ void Player::MagicInput(float elapsedTime)
 		};
 
 		// 一番近い魔法を取得する
-		auto targets = magicManager.FindNearProjectiles(this, centerPos, interceptRadius);
+		MagicManager& manager = enemy->GetMagicManager();
+		auto targets = manager.FindNearProjectiles(this, centerPos, interceptRadius);
 
 		if (!targets.empty())
 		{
-			MagicBase* targetMagic = targets[0]; // 一番近い敵の魔法
+			targetMagic = targets[0]; // 一番近い敵の魔法
 
 			// 迎撃する方向を計算する
 			DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&targetMagic->GetPosition());
@@ -724,8 +725,7 @@ void Player::MagicInput(float elapsedTime)
 	bool isHold = (rbButtonHoldTime > RB_THRESHOLD);
 	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
-	// 通常攻撃魔法
-	// 押した瞬間の判定
+	// チャージ魔法
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
 	{
 		if (normalMagic.IsFullCharged())
@@ -733,7 +733,7 @@ void Player::MagicInput(float elapsedTime)
 			// フルチャージ発射（もう一度押した瞬間）
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = status.isIntercept ? interceptDir : defultDir;
+			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : defultDir;
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
@@ -752,14 +752,14 @@ void Player::MagicInput(float elapsedTime)
 		}
 	}
 
-	// 離した瞬間の判定（独立させる）
+	// 通常攻撃魔法
 	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER)
 	{
 		if (!normalMagic.IsFullCharged() && magicCoolDownTimer <= 0.0f) // フルチャージ済みなら上のifで既に処理済みなので除外
 		{
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = status.isIntercept ? interceptDir : defultDir;
+			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : defultDir;
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
@@ -781,14 +781,12 @@ void Player::MagicInput(float elapsedTime)
 	// 連射魔法
 	if(gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
 	{
-		if (magicCoolDownTimer > 0.0f) return;
-
 		status.isRapidFire = true;
 
 		// 魔法の設定
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
-		spawnInfo.direction = status.isIntercept ? interceptDir : defultDir;
+		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : defultDir;
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
 

@@ -124,6 +124,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	}
 
 	// ”­ŽË’x‰„/Žõ–½
+	magic->SetIsAlive(true);
 	magic->SetWaitTimer(0.01f);
 	magic->SetLifeTimer(0.1f);
 

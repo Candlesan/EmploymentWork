@@ -14,6 +14,10 @@
 #include <imgui.h>
 
 
+// =========================================================================
+//  ライフサイクル・初期化
+// =========================================================================
+
 // デストラクタ
 Enemy::~Enemy()
 {
@@ -26,13 +30,14 @@ void Enemy::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
+	// モデルの読み込み
 	enemy = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 
 	// アニメーター生成
 	animator = std::make_unique<Animator>();
 	animator->Initialize(enemy);
 
-	// 敵モデルの設定
+	// 敵モデル・コライダー設定
 	weight = 0.5f;
 	radius = 0.4f;
 	height = 1.6f;
@@ -51,12 +56,13 @@ void Enemy::Initialize()
 	status.maxDefenseDurability = 100.0f;
 	status.currentDefenseDurability = 100.0f;
 
-
 	// アニメーション設定
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "pelvis";
+
+	// ビヘイビアツリー初期化
 	behaviorData = new BehaviorData();
 	aiTree = new BehaviorTree();
 	AISwitch = false;
@@ -64,14 +70,16 @@ void Enemy::Initialize()
 	// モデルからアニメーション名一覧を取得してエディターに渡す
 	std::vector<std::string> animNames;
 	for (auto& anim : enemy->GetAnimations())
+	{
 		animNames.push_back(anim.name);
+	}
 	btEditor.SetAnimationList(animNames);
 
 	btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 	btEditor.ApplyToTree(aiTree, this, btGraph);
 
-	// シーケンサーのセーブデータ用パスを設定して読み込む
+	// シーケンサーの初期化
 	std::string seqPath = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
 	sequencerEditor.SetJsonPath(seqPath);
 	sequencerEditor.SetWindowName("Enemy Sequencer");
@@ -79,7 +87,17 @@ void Enemy::Initialize()
 
 	ChangeAnimationState("Idle");
 
+	normalMagic.Initialize();
+	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
+	rapidMagic.Initialize();
+	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
+	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 }
+
+
+// =========================================================================
+//  毎フレームのメイン処理・描画
+// =========================================================================
 
 // 更新処理
 void Enemy::Update(float elapsedTime)
@@ -87,20 +105,19 @@ void Enemy::Update(float elapsedTime)
 	// プレビュー中はAIを止める
 	if (!isPreviewMode && AISwitch)
 	{
-		//現在実行されているノードが無ければ
+		// 現在実行されているノードが無ければ推論
 		if (activeNode == nullptr)
 		{
-			//次に実行するノードを推論する。
 			activeNode = aiTree->ActiveNodeInference(behaviorData);
 			if (activeNode != nullptr)
 			{
 				lastInferredNode = activeNode;
 			}
 		}
-		//現在実行するノードがあれば
+
+		// 現在実行するノードがあれば実行
 		if (activeNode != nullptr)
 		{
-			//ビヘイビアツリーからノードを実行。
 			activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
 		}
 	}
@@ -116,10 +133,11 @@ void Enemy::Update(float elapsedTime)
 	// GUIの表示/非表示
 	ShowDebugSwitch();
 
-	// 魔法の更新処理
-	magicManager.Update(elapsedTime);
-
-	if (attackCoolTimer > 0.0f) attackCoolTimer -= elapsedTime;
+	// タイマー更新
+	if (attackCoolTimer > 0.0f)
+	{
+		attackCoolTimer -= elapsedTime;
+	}
 
 	// ステータス更新
 	UpdateStatus(elapsedTime);
@@ -134,12 +152,13 @@ void Enemy::Update(float elapsedTime)
 	animSequence.Update(currentState, GetCurrentAnimationSeconds());
 	SetBaseSpeed(animSequence.GetSpeed());
 
-	// 音の更新
+	// サウンド再生
 	UpdateSounds(this->currentState);
 
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
 	defenseMagic.Update(this, elapsedTime);
+	debugShot(elapsedTime);
 
 	// エリア移動制限
 	AreaRestriction();
@@ -152,27 +171,30 @@ void Enemy::Update(float elapsedTime)
 // 描画処理
 void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 {
-	if(showEnemy)
-	renderer->Draw(ShaderId::PBR, enemy);
+	if (showEnemy)
+	{
+		renderer->Draw(ShaderId::PBR, enemy);
+	}
 }
 
 // GUI描画
 void Enemy::DrawGUI()
 {
-	// 実行中のAIのステートを表示する
+	// 実行中のAIのステート名
 	std::string str = "";
 	if (activeNode != nullptr)
 	{
 		str = activeNode->GetName();
 	}
 
-	// 敵のパラメーターの表示/非表示
+	// 敵のパラメーター表示
 	if (showEnemyParameter)
 	{
 		ImGui::Begin(u8"エネミー");
 		{
 			ImGui::Checkbox(u8"敵の表示", &showEnemy);
 
+			// パラメーター全回復ボタン
 			if (ImGui::Button(u8"HP全回復"))
 			{
 				status.currentHp = status.maxHp;
@@ -187,10 +209,36 @@ void Enemy::DrawGUI()
 			{
 				status.currentDefenseDurability = status.maxDefenseDurability;
 			}
+			ImGui::Separator();
+
+			// 射撃テスト
+			if (ImGui::Button(u8"通常攻撃魔法"))
+			{
+				onNormalMagic = true;
+			}
+			else
+			{
+				onNormalMagic = false;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"チャージ魔法"))
+			{
+				onChargeMagic = !onChargeMagic;
+			}
+			else
+			{
+				onChargeMagic = false;
+			}
+			ImGui::SameLine();
+			ImGui::Checkbox(u8"連射魔法", &onRapidMagic);
+			ImGui::Separator();
+
+			// 体力
 			ImGui::Text(u8"体力 : %f.0", status.currentHp);
 			ImGui::DragFloat(u8"体力", &status.currentHp, 0.1f);
 			ImGui::Separator();
 
+			// 魔力
 			ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
 			ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
 			ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
@@ -201,12 +249,13 @@ void Enemy::DrawGUI()
 			{
 				ConsumMagic(10.0f, magicRecoverDelay);
 			}
-			if(ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
+			if (ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
 			{
 				defenseMagic.SetIsActive(status.isGuarding);
 			}
 			ImGui::Separator();
 
+			// ヒート値
 			ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
 			ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
 			ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
@@ -214,6 +263,7 @@ void Enemy::DrawGUI()
 			ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
 			ImGui::Separator();
 
+			// 防御魔法
 			ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
 			ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
 			if (ImGui::Button(u8"耐久値減少"))
@@ -222,10 +272,11 @@ void Enemy::DrawGUI()
 			}
 			ImGui::Separator();
 
+			// クールダウン・ステート情報
 			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 			ImGui::Separator();
 
-			ImGui::Text(u8"ステート　%s", str.c_str());
+			ImGui::Text(u8"ステート %s", str.c_str());
 			std::string animState = GetCurrentState();
 			ImGui::Text(u8"AnimState: %s", animState.c_str());
 
@@ -238,8 +289,8 @@ void Enemy::DrawGUI()
 				a.x = DirectX::XMConvertToDegrees(angle.x);
 				a.y = DirectX::XMConvertToDegrees(angle.y);
 				a.z = DirectX::XMConvertToDegrees(angle.z);
-				ImGui::DragFloat3("Angle", &angle.x);
-				// 表示用に度数法に変換した後、再度ラジアンで戻す処理
+				ImGui::DragFloat3("Angle", &a.x);
+
 				angle.x = DirectX::XMConvertToRadians(a.x);
 				angle.y = DirectX::XMConvertToRadians(a.y);
 				angle.z = DirectX::XMConvertToRadians(a.z);
@@ -250,8 +301,8 @@ void Enemy::DrawGUI()
 			// 当たり判定情報
 			if (ImGui::CollapsingHeader("Collision", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::DragFloat("Radius:", &radius, 0.1f); // 当たり判定の半径
-				ImGui::DragFloat("Height:", &height, 0.1f); // 当たり判定の高さ
+				ImGui::DragFloat("Radius:", &radius, 0.1f);
+				ImGui::DragFloat("Height:", &height, 0.1f);
 				ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
 			}
 		}
@@ -262,11 +313,13 @@ void Enemy::DrawGUI()
 	if (showbtEditor)
 	{
 		ImGui::Begin("BTEditor");
-		if (ImGui::Button("AI:ON/OFF"))
 		{
-			AISwitch = !AISwitch;
+			if (ImGui::Button("AI:ON/OFF"))
+			{
+				AISwitch = !AISwitch;
+			}
+			btEditor.Draw(btGraph, aiTree, this);
 		}
-		btEditor.Draw(btGraph, aiTree, this);
 		ImGui::End();
 
 		if (btEditor.requestOpenSequencer)
@@ -280,7 +333,7 @@ void Enemy::DrawGUI()
 			btEditor.requestOpenSequencer = false; // フラグを戻す
 		}
 
-		// プレビューモード用の小さな操作ウィンドウ
+		// プレビューモード用の操作ウィンドウ
 		if (isPreviewMode)
 		{
 			ImGui::Begin("Preview Timeline");
@@ -301,7 +354,7 @@ void Enemy::DrawGUI()
 			ImGui::SetNextItemWidth(-1);
 			if (ImGui::SliderFloat("##animTime", &animationSeconds, 0.0f, length))
 			{
-				isBlending = false; // スライダー操作中はブレンドを切る
+				isBlending = false;
 			}
 
 			ImGui::End();
@@ -318,10 +371,10 @@ void Enemy::DrawGUI()
 	}
 }
 
-// デバックプリミティブ描画
+// デバッグプリミティブ描画
 void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
-	// 敵の当たり判定
+	// 敵の当たり判定カプセル
 	{
 		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
@@ -331,54 +384,68 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
 	}
 
-	if (defenseMagic.GetIsActive())
-	{
-		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), { 0, 0, 1, 1 });
-	}
-
 	// 距離の可視化
 	{
-		// 円の高さ（地面から少し浮かせてチラつきを防止する）
 		float circleY = position.y + 0.05f;
-		// 円の厚み（極限まで薄くして「円」に見せる）
 		float thickness = 0.01f;
+
+		// 近距離 - 赤色
 		renderer->DrawCylinder(
 			{ position.x, circleY, position.z },
 			Short_Distance, thickness, { 1.0f, 0.0f, 0.0f, 1.0f }
 		);
 
-		// 中距離 (例: 10.0m) - 黄色
+		// 中距離 - 黄色
 		renderer->DrawCylinder(
 			{ position.x, circleY, position.z },
 			Middle_Distance, thickness, { 1.0f, 1.0f, 0.0f, 1.0f }
 		);
 
-		// 遠距離 (例: 15.0m) - 緑色
+		// 遠距離 - 緑色
 		renderer->DrawCylinder(
 			{ position.x, circleY, position.z },
 			Long_Distance, thickness, { 0.0f, 1.0f, 0.0f, 1.0f }
 		);
 	}
 
+	// 防御魔法の当たり判定
+	if (defenseMagic.GetIsActive())
+	{
+		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), { 0, 0, 1, 1 });
+	}
+
 	// 魔法の当たり判定描画
 	magicManager.RenderDebugPrimitive(renderer);
+
+	// 迎撃範囲の球
+	if (status.isIntercept)
+	{
+		DirectX::XMFLOAT3 centerPos = {
+			position.x + interceptCenterOffset.x,
+			position.y + interceptCenterOffset.y,
+			position.z + interceptCenterOffset.z
+		};
+
+		renderer->DrawSphere(centerPos, interceptRadius, { 0.0f, 1.0f, 1.0f, 0.5f });
+	}
 }
+
+
+// =========================================================================
+//  外部アクション・AI制御
+// =========================================================================
 
 // プレイヤーとの距離を取得
 float Enemy::GetDistanceToPlayer() const
 {
-	// プレイヤーを取得
 	Player& player = Player::Instance();
 
-	// プレイヤーと敵の位置を取得する
 	DirectX::XMVECTOR ePos = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR pPos = DirectX::XMLoadFloat3(&player.GetPosition());
 
-	// 今の位置とプレイヤーの位置の差を計算する
 	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(pPos, ePos);
 	DirectX::XMVECTOR Length = DirectX::XMVector3Length(Vec);
 
-	// 計算結果を保存する
 	float distance = 0.0f;
 	DirectX::XMStoreFloat(&distance, Length);
 
@@ -390,19 +457,15 @@ void Enemy::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos
 {
 	DirectX::XMFLOAT3 myPos = GetPosition();
 
-	// プレイヤーへの方向ベクトルを計算
 	float vx = targetPos.x - myPos.x;
 	float vz = targetPos.z - myPos.z;
 	float len = sqrtf(vx * vx + vz * vz);
 
-	// 距離が極端に近くない場合のみ回転
 	if (len > 0.001f)
 	{
 		vx /= len;
 		vz /= len;
 
-		// すでに持っている Turn 関数を呼び出す
-		// 第4引数は Enemy が持っている旋回速度
 		this->Turn(elapsedTime, vx, vz, turnSpeed);
 	}
 }
@@ -413,41 +476,38 @@ void Enemy::TurnToPosition(float elapsedTime)
 	TurnToPosition(elapsedTime, player.GetPosition());
 }
 
+// 指定角度内にターゲットがいるか判定
 bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree)
 {
 	// 1. ターゲットへの方向ベクトル
 	float vx = targetPos.x - GetPosition().x;
 	float vz = targetPos.z - GetPosition().z;
-	float targetAngle = atan2f(vx, vz); // 目標の角度
+	float targetAngle = atan2f(vx, vz);
 
-	// 2. 現在の自分の角度（Rotation.y）
+	// 2. 現在の角度
 	float currentAngle = GetAngle().y;
 
-	// 3. 角度の差を計算（-PI 〜 PI の範囲に補正するのが理想）
+	// 3. 角度差の計算（-PI 〜 PI 補正）
 	float diff = targetAngle - currentAngle;
 	while (diff > DirectX::XM_PI) diff -= DirectX::XM_2PI;
 	while (diff < -DirectX::XM_PI) diff += DirectX::XM_2PI;
 
-	// 4. 差分が指定した角度（epsilonDegree）以内なら true
+	// 4. 差分が指定角度以内か判定
 	return fabsf(diff) < DirectX::XMConvertToRadians(epsilonDegree);
 }
 
 // ターゲットの座標に向かって進む
 void Enemy::MoveToTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
 {
-	// 位置を取得する
 	DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&targetPos);
 	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
-	Vec = DirectX::XMVector3Normalize(Vec); // 正規化
+	Vec = DirectX::XMVector3Normalize(Vec);
 
 	DirectX::XMFLOAT3 moveVec;
 	DirectX::XMStoreFloat3(&moveVec, Vec);
 
-	// ターゲットの方向を向く
 	Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-
-	//　その方向へ進む
 	Move(moveVec.x, moveVec.z, moveSpeed);
 }
 
@@ -457,18 +517,28 @@ void Enemy::MoveToTarget(float elapsedTime)
 	MoveToTarget(elapsedTime, player.GetPosition());
 }
 
-// downしたときに呼ばれる
+
+// =========================================================================
+//  親子関係のオーバーライド
+// =========================================================================
+
+// ダウン時の処理
 void Enemy::OnDown()
 {
 	Ondown = true;
 }
 
-// アニメーションのコールバック関数
+// アニメーションステート変化時のコールバック
 void Enemy::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
 }
 
-// サウンドを流す
+
+// =========================================================================
+//  内部ヘルパー（サウンド・デバッグ）
+// =========================================================================
+
+// サウンド再生の更新
 void Enemy::UpdateSounds(const std::string& state)
 {
 	for (auto& data : animSequence.GetAnimations())
@@ -479,11 +549,12 @@ void Enemy::UpdateSounds(const std::string& state)
 		{
 			if (e.type != EventType::Sound) continue;
 
-			// 今フレームで発火したか？
+			// 今フレームで発火したかをチェック
 			if (animSequence.GetEvent(e.name))
 			{
 				AudioSource* se = GetOrLoadSound(e.soundName);
-				if (se) {
+				if (se)
+				{
 					se->Play(false);
 				}
 			}
@@ -495,52 +566,117 @@ void Enemy::UpdateSounds(const std::string& state)
 // 音を取得（無ければ自動ロード）する関数
 AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 {
-	// 空文字なら何もしない
 	if (soundName.empty()) return nullptr;
 
-	// 既にmapにあるかを確認（読み込み失敗したものも含めてキャッシュ）
-	if (sounds.count(soundName)) {
+	if (sounds.count(soundName))
+	{
 		return sounds[soundName].get();
 	}
 
-	// パスを組み立てる
 	std::string fileName = soundName;
-	// もし入力に.wavが含まれていなければ足す
-	if (fileName.find(".wav") == std::string::npos) {
+	if (fileName.find(".wav") == std::string::npos)
+	{
 		fileName += ".wav";
 	}
 	std::string path = "Data/Sound/" + fileName;
 
-	// ロード試行
 	auto source = Audio::Instance().LoadAudioSource(path.c_str());
 
-	if (source) {
+	if (source)
+	{
 		sounds[soundName] = std::unique_ptr<AudioSource>(source);
 		return sounds[soundName].get();
 	}
-	else {
-		// 見つからなかった場合、次は探さないようにnullptrを保持（または警告を出すようにする）
+	else
+	{
 		sounds[soundName] = nullptr;
 		return nullptr;
 	}
 }
 
-// GUIの表示/非表示
+// GUI表示切り替えキー入力
 void Enemy::ShowDebugSwitch()
 {
 	// F3でビヘイビアツリーエディターの表示をON/OFF
 	static bool wasF3DownLastFrame = false;
 	bool f3Down = (GetAsyncKeyState(VK_F3) & 0x8000) != 0;
-	if (f3Down && !wasF3DownLastFrame) {
+	if (f3Down && !wasF3DownLastFrame)
+	{
 		showbtEditor = !showbtEditor;
 	}
 	wasF3DownLastFrame = f3Down;
 
-	// F8で敵のパラメーターの表示をON/OFF
+	// F8で敵パラメーターの表示をON/OFF
 	static bool wasF8DownLastFrame = false;
 	bool f8Down = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
-	if (f8Down && !wasF8DownLastFrame) {
+	if (f8Down && !wasF8DownLastFrame)
+	{
 		showEnemyParameter = !showEnemyParameter;
 	}
 	wasF8DownLastFrame = f8Down;
+}
+
+// 魔法を撃つデバック
+void Enemy::debugShot(float elapsedTime)
+{
+	Player& player = Player::Instance();
+
+	// 魔法を撃つ方向を計算する
+	DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&player.GetPosition());
+	DirectX::XMVECTOR diff = DirectX::XMVectorSubtract(playerPos, enemyPos);
+	DirectX::XMFLOAT3 dir;
+	DirectX::XMStoreFloat3(&dir, DirectX::XMVector3Normalize(diff));
+
+	// 通常攻撃魔法
+	if(onNormalMagic)
+	{
+
+		MagicSpawnInfo spawnInfo;
+		spawnInfo.position = position;
+		spawnInfo.direction = dir;
+		spawnInfo.owner = this;
+		spawnInfo.target = &player;
+		spawnInfo.holdTime = 3.0f;
+
+		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
+		magicCoolDownTimer = coolDownValue;
+		normalMagic.ResetCharge();
+	}
+	// チャージ魔法
+	else if (onChargeMagic)
+	{
+		MagicSpawnInfo spawnInfo;
+		spawnInfo.position = position;
+		spawnInfo.direction = dir;
+		spawnInfo.owner = this;
+		spawnInfo.target = &player;
+		spawnInfo.holdTime = 3.0f;
+
+		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
+		magicCoolDownTimer = fullcChargeCoolDownValue;
+		normalMagic.ResetCharge();
+	}
+
+	// 連射魔法
+	if (onRapidMagic)
+	{
+		status.isRapidFire = true;
+
+		MagicSpawnInfo spawnInfo;
+		spawnInfo.position = position;
+		spawnInfo.direction = dir;
+		spawnInfo.owner = this;
+		spawnInfo.target = &player;
+
+		spawnInfo.holdTime = 0.05f;
+
+		rapidMagicConfig.damage = 0.01f;
+		rapidMagicConfig.gaurdDamage = 2.0f;
+		rapidMagicConfig.hitRadius = 0.25f;
+		rapidMagicConfig.speed = 150.0f;
+
+		// 連射魔法を呼び出す
+		rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, status.isRapidFire);
+	}
 }

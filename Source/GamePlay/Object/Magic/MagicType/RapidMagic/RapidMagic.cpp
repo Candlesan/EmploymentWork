@@ -55,6 +55,8 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 
 	magic->SetSpeed(config.speed);				// ’e‘¬
 	magic->SetLifeTimer(config.lifeTimer);		// ŽË’ö(¶‘¶ŽžŠÔ)
+	magic->SetWaitTimer(0.0f);
+	magic->SetIsAlive(true);
 
 	// ”­ŽË
 	magic->Launch(info.direction, startPos, 0.0f);

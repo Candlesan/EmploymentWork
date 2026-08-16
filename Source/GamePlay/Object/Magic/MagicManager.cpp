@@ -36,10 +36,11 @@ void MagicManager::Update(float elapsedTime)
 		if (it != projectiles.end())
 		{
 			projectiles.erase(it);
+
+			//’eŠÛ‚Ì”jŠüˆ—
+			delete projectile;
 		}
 
-		//’eŠÛ‚Ì”jŠüˆ—
-		delete projectile;
 	}
 	//”jŠüƒŠƒXƒg‚ğƒNƒŠƒA
 	removes.clear();
@@ -72,6 +73,8 @@ void MagicManager::Register(MagicBase* projectile)
 // ’e‚ğÁ‹‚·‚é
 void MagicManager::Clear()
 {
+	removes.clear();
+
 	for (MagicBase* projectile : projectiles)
 	{
 		delete projectile;
@@ -103,7 +106,8 @@ std::vector<MagicBase*> MagicManager::FindNearProjectiles(
 
 	// ”ÍˆÍ“à‚É“ü‚Á‚½‹…‚ğæ“¾‚·‚é
 	for (MagicBase* p : projectiles) {
-		if (p->GetOwner() == owner || !p->GetIsAlive()) continue; // ’e‚ª¶‚«‚Ä–³‚©‚Á‚½‚çÄ‘{¸
+		if (p->GetOwner() == owner || !p->GetIsAlive())
+			continue; // ’e‚ª¶‚«‚Ä–³‚©‚Á‚½‚çÄ‘{¸
 
 		// ‹——£‚ğŒvZ‚·‚é
 		XMVECTOR magicPos = XMLoadFloat3(&p->GetPosition());
