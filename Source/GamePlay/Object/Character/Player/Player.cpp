@@ -773,6 +773,7 @@ void Player::MagicInput(float elapsedTime)
 				targetMagic->GetNormalMagicLevel() == NormalMagicLevel::Normal)
 			{
 				RecoverMagic(targetMagic->GetMagicmagicRefund());
+				if (targetMagic->GetIsAlive())
 				targetMagic->OnTerminate();
 			}
 		}
@@ -804,6 +805,7 @@ void Player::MagicInput(float elapsedTime)
 		if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Rapid)
 		{
 			RecoverMagic(targetMagic->GetMagicmagicRefund());
+			if(targetMagic->GetIsAlive())
 			targetMagic->OnTerminate();
 		}
 

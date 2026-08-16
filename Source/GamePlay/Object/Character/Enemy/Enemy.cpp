@@ -679,4 +679,8 @@ void Enemy::debugShot(float elapsedTime)
 		// 連射魔法を呼び出す
 		rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, status.isRapidFire);
 	}
+	else
+	{
+		status.isRapidFire = false;
+	}
 }
