@@ -1,10 +1,17 @@
 #include "CustomEffectManager.h"
+#include "System/Graphic/Graphics.h"
+#include "System/Renderer/Shader/meshVFX/meshVFX.h"
+
 
 // 初期化
 void CustomEffectManager::Initialize(ID3D11Device* device)
 {
 	// デバイスを保持する
 	this->device = device;
+
+	// パーティクルを読み込む
+	particleManager = std::make_unique<Compute_Particle>(device);
+
 }
 
 // Jsonファイルの読み込み/キャッシュ
@@ -53,7 +60,7 @@ void CustomEffectManager::Update(float elapsedTime)
 	// 全エフェクトを更新する
 	for (auto& effect : activeEffects)
 	{
-		effect->Update(elapsedTime);
+		effect->Update(elapsedTime, particleManager);
 
 		// 終了しているエフェクトが無いか確認する
 		if (effect->IsFinished())
@@ -61,6 +68,10 @@ void CustomEffectManager::Update(float elapsedTime)
 			removes.push_back(effect); // 破棄リストに追加
 		}
 	}
+
+	// パーティクルを更新する
+	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+	particleManager->Update(dc, elapsedTime);
 
 	// 更新が終わった後に削除処理をする
 	for (auto& effect : removes)
@@ -83,16 +94,34 @@ void CustomEffectManager::Render(RenderContext& rc)
 	{
 		effect->Render(rc);
 	}
+
+	particleManager->Render(rc);
 }
 
 // メッシュVFXの描画
 void CustomEffectManager::RenderMeshVFX(ModelRenderer* modelRenderer)
 {
+	auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
+
+	if (!shader) return;
+
+	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+	// モデル内の各メッシュを即時描画
+	RenderContext rc;
+	rc.deviceContext = dc;
+	rc.renderState = Graphics::Instance().GetRenderState();
+	rc.camera = &CameraManager::Instance().GetMainCamera(); // カメラ参照
+
+	shader->Begin(rc);
+
 	// 全再生中のメッシュVFXを描画する
 	for (auto effect : activeEffects)
 	{
-		effect->RenderMeshVFX(modelRenderer);
+		effect->RenderMeshVFX(shader, rc);
 	}
+
+	shader->End(rc);
 }
 
 // 全クリア

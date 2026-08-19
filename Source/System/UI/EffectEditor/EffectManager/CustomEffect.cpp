@@ -2,6 +2,7 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Core/Mathf.h"
 #include "System/Renderer/Shader/meshVFX/meshVFX.h"
+#include "System/Resource/ModelResourceManager/ModelResourceManager.h"
 
 
 // 初期化
@@ -9,9 +10,6 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
 {
     // エフェクトの設定を読み込む
     this->config = config;
-
-    // パーティクルを読み込む
-    particleManager = std::make_unique<Compute_Particle>(device);
 
     for (const auto& nodeConfig : config.nodes)
     {
@@ -21,7 +19,7 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
         // メッシュノードなら、そのノードのパスでモデルを生成
         if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
         {
-            rNode.meshModel = std::make_unique<Model>(device, nodeConfig.meshPath.c_str());
+            rNode.meshModel = ModelResourceManager::Instance().GetOrLoad(device, nodeConfig.meshPath);
 
             if (!nodeConfig.texturePath.empty())
             {
@@ -65,15 +63,9 @@ void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, Dir
 }
 
 // エフェクト更新
-void CustomEffect::Update(float elapsedTime)
+void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& manager)
 {
     if (!isPlaying) return;
-
-    // パーティクルの更新
-    if (particleManager)
-    {
-        particleManager->Update(Graphics::Instance().GetDeviceContext(), elapsedTime);
-    }
 
     // タイマー更新
     effectTimer += elapsedTime;
@@ -144,7 +136,7 @@ void CustomEffect::Update(float elapsedTime)
                 DirectX::XMFLOAT4X4 worldTransform;
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
 
-                node.meshModel->UpdateTransform(worldTransform);
+                //node.meshModel->UpdateTransform(worldTransform);
 
                 if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
             }
@@ -176,7 +168,7 @@ void CustomEffect::Update(float elapsedTime)
         }
     } 
 
-    EmitParticles(elapsedTime);
+    EmitParticles(elapsedTime, manager);
 
     // 寿命を進める
     if (maxDuration > 0.0f && effectTimer >= maxDuration)
@@ -218,17 +210,15 @@ void CustomEffect::Render(RenderContext& rc)
             }
         }
     }
-
-    // パーティクルの描画
-    if (particleManager)
-    {
-        particleManager->Render(rc);
-    }
 }
 
-void CustomEffect::RenderMeshVFX(ModelRenderer* modelRenderer)
+void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
 {
     if (!isPlaying) return;
+    if (!shader) return;
+
+    ID3D11DeviceContext* dc = rc.deviceContext;
+
 
     for (auto& rNode : runTimeNodes)
     {
@@ -241,55 +231,33 @@ void CustomEffect::RenderMeshVFX(ModelRenderer* modelRenderer)
                 float activeTime = effectTimer - rNode.config.delayTime;
                 if (effectTimer >= rNode.config.delayTime && activeTime <= rNode.config.lifeTime)
                 {
-                    // ModelRendererから meshVFX シェーダーを取得
-                    // ModelRenderer に GetShader 関数などを渡すか、直接セットする形を用意
-                    auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
+                    // テクスチャをセット
+                    shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
+                    shader->SetDistortionPower(rNode.config.distortionPower);
 
-                    ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+                    DirectX::XMFLOAT2 noiseUvOffset = {
+                        rNode.config.noiseUvOffset.x * effectTimer,
+                        rNode.config.noiseUvOffset.y * effectTimer
+                    };
+                    shader->SetNoiseUvOffset(noiseUvOffset);
+                    shader->SetBlendMode(rNode.config.blendMode);
+                    shader->SetColor(rNode.config.color);
+                    shader->SetUvOffset(rNode.currentUvOffset);
 
-                    if (shader)
+
+                    for (const auto& mesh : rNode.meshModel->GetMeshes())
                     {
-                        // テクスチャをセット
-                        shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
-                        shader->SetDistortionPower(rNode.config.distortionPower);
+                        // 頂点バッファ・インデックスバッファをセット
+                        UINT stride = sizeof(Model::Vertex);
+                        UINT offset = 0;
+                        dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+                        dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+                        dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-                        DirectX::XMFLOAT2 noiseUvOffset = {
-                            rNode.config.noiseUvOffset.x * effectTimer,
-                            rNode.config.noiseUvOffset.y * effectTimer
-                        };
-                        shader->SetNoiseUvOffset(noiseUvOffset);
-                        shader->SetBlendMode(rNode.config.blendMode);
-                        shader->SetColor(rNode.config.color);
-                        shader->SetUvOffset(rNode.currentUvOffset);
-
-                        // モデル内の各メッシュを即時描画
-                        RenderContext rc;
-                        rc.deviceContext = dc;
-                        rc.renderState = Graphics::Instance().GetRenderState();
-                        rc.camera = &CameraManager::Instance().GetMainCamera(); // カメラ参照
-
-                        shader->Begin(rc);
-
-                        for (const auto& mesh : rNode.meshModel->GetMeshes())
-                        {
-                            // 頂点バッファ・インデックスバッファをセット
-                            UINT stride = sizeof(Model::Vertex);
-                            UINT offset = 0;
-                            dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-                            dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-                            dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-                            // 行列とパラメータを定数バッファに更新して描画コール
-                            shader->Update(rc, mesh);
-                            dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
-                        }
-
-                        shader->End(rc);
+                        // 行列とパラメータを定数バッファに更新して描画コール
+                        shader->Update(rc, mesh);
+                        dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
                     }
-
-                    // シーンとここで2重でmodelRendererのRenderを呼んでるから重くなっている！
-                    // MeshVFX シェーダーを指定して描画登録！
-                    //modelRenderer->Draw(ShaderId::MeshVFX, rNode.meshModel);
                 }
             }
         }
@@ -309,7 +277,7 @@ bool CustomEffect::IsFinished()
 }
 
 // パーティクル放出
-void CustomEffect::EmitParticles(float elapsedTime)
+void CustomEffect::EmitParticles(float elapsedTime, std::unique_ptr<Compute_Particle>& manager)
 {
     // 全ノードを順番にチェックして発生させる
     for (auto& node : runTimeNodes)
@@ -335,9 +303,9 @@ void CustomEffect::EmitParticles(float elapsedTime)
            pConfig.spawnTimer -=pConfig.spawnInterval;
 
             // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
-            if (particleManager && !pConfig.texturePath.empty())
+            if (manager && !pConfig.texturePath.empty())
             {
-                particleManager->SetTexture(pConfig.texturePath, { (UINT)pConfig.splitCount[0], (UINT)pConfig.splitCount[1] });
+                manager->SetTexture(pConfig.texturePath, { (UINT)pConfig.splitCount[0], (UINT)pConfig.splitCount[1] });
             }
 
             // 生成数分 for 文で回す
@@ -414,7 +382,7 @@ void CustomEffect::EmitParticles(float elapsedTime)
 
                 data.color = pConfig.color;
 
-                particleManager->Emit(data);
+                manager->Emit(data);
             }
         }
     }

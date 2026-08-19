@@ -6,6 +6,8 @@
 #include <memory>
 #include <algorithm>
 
+class meshVFX;
+
 class CustomEffect
 {
 public:
@@ -19,11 +21,11 @@ public:
 		DirectX::XMFLOAT3 scale);
 
 	// エフェクト更新
-	void Update(float elapsedTime);
+	void Update(float elapsedTime, std::unique_ptr<Compute_Particle>& manager);
 
 	// エフェクト描画
 	void Render(RenderContext& rc);
-	void RenderMeshVFX(ModelRenderer* modelRenderer);
+	void RenderMeshVFX(meshVFX* shader, RenderContext& rc);
 
 
 	// エフェクト終了関数
@@ -33,7 +35,7 @@ public:
 	void DrawGUI();
 
 private:
-	void EmitParticles(float elapsedTime);
+	void EmitParticles(float elapsedTime, std::unique_ptr<Compute_Particle>& manager);
 
 private:
 	// 実行時（再生中）の1ノード分のインスタンス
@@ -56,6 +58,5 @@ private:
 	float effectTimer = 0.0f; // 経過時間
 	bool isPlaying = false; // エフェクト再生中か
 	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列！
-	std::unique_ptr<Compute_Particle> particleManager; // パーティクル用
 };
 

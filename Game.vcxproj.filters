@@ -217,6 +217,9 @@
     <Filter Include="Source\GamepPlay\Object\Flight">
       <UniqueIdentifier>{3874ac6d-4799-4580-a9e1-ded72546897e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Resource\ModelResource">
+      <UniqueIdentifier>{e2b305a1-4c0f-43bd-8d9c-168eecc1c2a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -525,6 +528,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.h">
+      <Filter>Source\System\Resource\ModelResource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -790,6 +796,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.cpp">
+      <Filter>Source\System\Resource\ModelResource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -199,6 +199,7 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, flo
 		immediate_context->UpdateSubresource(common_constant_buffer.Get(), 0, nullptr, &constant, 0, 0);
 	}
 
+
 	//	SRV/UAVê›íË
 	{
 		//	

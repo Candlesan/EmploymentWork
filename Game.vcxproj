@@ -200,6 +200,7 @@
     <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h" />
     <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h" />
     <ClInclude Include="Source\System\Renderer\ShapeRenderer.h" />
+    <ClInclude Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.h" />
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
     <ClInclude Include="Source\System\Resource\Model\Model.h" />
     <ClInclude Include="Source\System\Resource\Sprite\Sprite.h" />
@@ -291,6 +292,7 @@
     <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp" />
     <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp" />
     <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp" />
+    <ClCompile Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.cpp" />
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
     <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
