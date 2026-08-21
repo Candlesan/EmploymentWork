@@ -136,7 +136,7 @@ void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& 
                 DirectX::XMFLOAT4X4 worldTransform;
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
 
-                //node.meshModel->UpdateTransform(worldTransform);
+                node.meshModel->UpdateTransform(worldTransform);
 
                 if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
             }
