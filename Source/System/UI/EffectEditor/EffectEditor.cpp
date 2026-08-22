@@ -29,6 +29,9 @@ void EffectEditor::DrawGUI()
     DrawFileToolbar();
     ImGui::Separator();
 
+    DrawStateRangeTimeline();
+    ImGui::Separator();
+
     DrawNodeList();
     ImGui::Separator();
 
@@ -54,6 +57,8 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
 {
     testSpawnPos = spawnPosition;
     isPlaying = true;
+    isStop = false;
+    globalAlpha = 1.0f;
 
     // 各種タイマーをリセット！
     effectTimer = 0.0f;
@@ -63,12 +68,12 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
     {
         if (node.type == RenderType::Particle)
         {
-            node.spawnTimer = node.spawnInterval;
+            node.spawnTimer = 0.0f;
         }
     }
 
     // 最初の1回目の発生！
-    EmitParticles(0.0f);
+    //EmitParticles(0.0f);
 }
 
 // 更新処理
@@ -86,6 +91,55 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
     // エフェクト全体の時間を進める
     effectTimer += elapsedTime;
     SyncRuntimeNodes();
+
+    // 各rangeを取得
+    const StateRange* startRange = nullptr;
+    const StateRange* loopRange = nullptr;
+    const StateRange* endRange = nullptr;
+    for (const auto& r : currentConfig.ranges)
+    {
+        if (r.name == "Start") startRange = &r;
+        if (r.name == "Loop") loopRange = &r;
+        if (r.name == "End")   endRange = &r;
+    }
+
+    // スタート範囲内だったらフェードインさせる
+    if (startRange && effectTimer <= startRange->end)
+    {
+        float duration = startRange->end - startRange->start;
+        if (duration > 0.0001f)
+        {
+            float rate = (effectTimer - startRange->start) / duration;
+            globalAlpha = std::clamp(rate, 0.0f, 1.0f);
+        }
+    }
+    else if (endRange && effectTimer >= endRange->start)    // エンド範囲内だったらフェードアウトさせる
+    {
+        float duration = endRange->end - endRange->start;
+        if (duration > 0.0001f)
+        {
+            float rate = (effectTimer - endRange->start) / duration;
+            globalAlpha = std::clamp(1.0f - rate, 0.0f, 1.0f);
+        }
+        else
+        {
+            globalAlpha = 0.0f;
+        }
+    }
+
+    if (loopRange && !isStop)
+    {
+        // stopが呼ばれてなくて、ループの終端に達したらループ開始地点に巻き戻す
+        if (effectTimer >= loopRange->end)
+        {
+            // 超えた時間分も合わせて巻き戻す
+            float loopDuration = loopRange->end - loopRange->start; // ループの長さを求める
+            if (loopDuration > 0.0001f)
+            {
+                effectTimer = loopRange->start + fmodf(effectTimer - loopRange->start, loopDuration);
+            }
+        }
+    }
 
     //　ノードごとに走査する
     bool anyNodeActive = false; // まだ再生しているノードがあるか
@@ -105,6 +159,10 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
         rNode.currentUvOffset.x = fmodf(rNode.currentUvOffset.x, 1.0f);
         rNode.currentUvOffset.y = fmodf(rNode.currentUvOffset.y, 1.0f);
 
+        // ノード個別の色×全ターのフェード率
+        DirectX::XMFLOAT4 finalColor = node.color;
+        finalColor.w *= globalAlpha;
+
         // パーティクルノードの処理
         if (node.type == RenderType::Particle)
         {
@@ -113,6 +171,8 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
             {
                 maxDuration = node.duration;
             }
+
+
         }
         // メッシュの処理
         else if (node.type == RenderType::Mesh)
@@ -202,14 +262,19 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
             if (node.lifeTime > maxDuration) maxDuration = node.lifeTime;
         }
 
-        if (node.lifeTime > maxDuration)
-        {
-            maxDuration = node.lifeTime;
-        }
+        // 最大値を超えないようにする
+        if (node.duration > maxDuration) maxDuration = node.duration;
+        if (node.lifeTime > maxDuration) maxDuration = node.lifeTime;
     }
 
     // EmitParticle内で全ノードを回して生成する
-        EmitParticles(elapsedTime);
+    EmitParticles(elapsedTime);
+
+    // EndRange が設定されている場合は End の終端をエフェクトの寿命とする
+    if (endRange)
+    {
+        maxDuration = (std::max)(maxDuration, endRange->end);
+    }
 
     if (maxDuration > 0.0f && effectTimer >= maxDuration)
     {
@@ -224,7 +289,7 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
             }
         }
 
-        if (isLoop)
+        if (isLoop && !loopRange && !isStop)
         {
             effectTimer = 0.0f; // ループリセット
         }
@@ -262,6 +327,7 @@ void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
     }
 }
 
+// メッシュVFXの描画
 void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 {
     if (!isPlaying) return;
@@ -292,7 +358,10 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
             };
             shader->SetNoiseUvOffset(noiseUvOffset);
             shader->SetBlendMode(node.blendMode);
-            shader->SetColor(node.color); // このノード固有の色
+
+            DirectX::XMFLOAT4 meshColor = node.color;
+            meshColor.w *= globalAlpha;
+            shader->SetColor(meshColor); // このノード固有の色
             shader->SetUvOffset(rNode.currentUvOffset);
 
             // モデル内の各メッシュを即時描画
@@ -322,7 +391,138 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
     }
 }
 
+
 // UIの描画パーツ
+void EffectEditor::DrawStateRangeTimeline()
+{
+    ImGui::Text(u8"ステートタイムライン");
+
+    // 全体の時間を計算
+    float totalTime = 0.0f;
+    for (auto& node : currentConfig.nodes)
+    {
+        totalTime = node.duration;
+    }
+
+    for (const auto& r : currentConfig.ranges)
+    {
+        totalTime = (std::max)(totalTime, r.end);
+    }
+    for (const auto& node : currentConfig.nodes)
+    {
+        float nodeEnd = node.delayTime + (std::max)(node.duration, node.lifeTime);
+        totalTime = (std::max)(totalTime, nodeEnd);
+    }
+
+    const float trackHeight = 24.0f; // シーケンサーの高さ
+    const float labelWidth = 60.0f; // ラベルの幅
+    const float handleWidth = 6.0f; // Rangeの取っ手の大きさ
+
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImVec2      cursor = ImGui::GetCursorScreenPos();
+    float       width = ImGui::GetContentRegionAvail().x - labelWidth;
+    if (width <= 0.0f)
+    {
+        width = 1.0f;
+    }
+
+    // 時刻をX座標に変換
+    auto timeToX = [&](float t) -> float{
+            return cursor.x + labelWidth + (t / totalTime) * width;
+    };
+
+    for (int i = 0; i < (int)currentConfig.ranges.size(); i++)
+    {
+        auto& r = currentConfig.ranges[i];
+        bool  isSel = (selectedRangeIndex == i);
+
+        ImGui::PushID(100 + i);
+
+        ImVec2 rowPos = ImGui::GetCursorScreenPos();
+        ImVec2 rTrackMin = { rowPos.x + labelWidth, rowPos.y };
+        ImVec2 rTrackMax = { rTrackMin.x + width, rTrackMin.y + trackHeight };
+
+        // ラベル
+        ImGui::Text(r.name.c_str());
+        ImGui::SameLine(labelWidth);
+
+        // トラック背景
+        dl->AddRectFilled(rTrackMin, rTrackMax, IM_COL32(40, 40, 40, 80), 4.0f);
+
+        float sx = timeToX(r.start);
+        float ex = timeToX(r.end);
+
+        // 名前ごとに色を変える
+        ImU32 col = IM_COL32(80, 150, 220, 180);
+        if (r.name == "Start") col = IM_COL32(50, 180, 80, 180);
+        else if (r.name == "Loop")  col = IM_COL32(200, 160, 40, 180);
+        else if (r.name == "End")   col = IM_COL32(220, 60, 60, 180);
+
+        // Range本体
+        dl->AddRectFilled({ sx, rTrackMin.y + 2 }, { ex, rTrackMax.y - 2 }, col, 3.0f);
+        if (isSel)
+        {
+            dl->AddRect({ sx, rTrackMin.y + 2 }, { ex, rTrackMax.y - 2 }, col, 3.0f);
+        }
+
+        // 左端ハンドル描画
+        dl->AddRectFilled({ sx, rTrackMin.y + 2 }, { sx + handleWidth, rTrackMax.y - 2 }, IM_COL32(255, 255, 255, 200));
+        // 右端ハンドル描画
+        dl->AddRectFilled({ ex - handleWidth, rTrackMin.y + 2 }, { ex, rTrackMax.y - 2 }, IM_COL32(255, 255, 255, 200));
+
+        // 中央ドラッグ（Range全体移動）
+        float centerW = std::max(0.0f, (ex - sx) - handleWidth * 2);
+        if (centerW > 0.0f)
+        {
+            ImGui::SetCursorScreenPos({ sx + handleWidth, rTrackMin.y });
+            ImGui::InvisibleButton("##move", { centerW, trackHeight });
+            if (ImGui::IsItemClicked()) { selectedRangeIndex = i; }
+            if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+            {
+                float dt = ImGui::GetIO().MouseDelta.x / width * totalTime;
+                float len = r.end - r.start;
+                r.start = std::clamp(r.start + dt, 0.0f, totalTime - len);
+                r.end = r.start + len;
+                selectedRangeIndex = i;
+            }
+        }
+
+        // 左端ハンドル（start移動）
+        ImGui::SetCursorScreenPos({ sx, rTrackMin.y });
+        ImGui::InvisibleButton("##start", { handleWidth, trackHeight });
+        if (ImGui::IsItemClicked()) { selectedRangeIndex = i; }
+        if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+        {
+            float dt = ImGui::GetIO().MouseDelta.x / width * totalTime;
+            r.start = std::clamp(r.start + dt, 0.0f, std::max(0.0f, r.end - 0.01f));
+            selectedRangeIndex = i;
+        }
+
+        // 右端ハンドル（end移動）
+        ImGui::SetCursorScreenPos({ ex - handleWidth, rTrackMin.y });
+        ImGui::InvisibleButton("##end", { handleWidth, trackHeight });
+        if (ImGui::IsItemClicked()) { selectedRangeIndex = i; }
+        if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+        {
+            float dt = ImGui::GetIO().MouseDelta.x / width * totalTime;
+            r.end = std::clamp(r.end + dt, r.start + 0.01f, totalTime);
+            selectedRangeIndex = i;
+        }
+
+        ImGui::SetCursorScreenPos({ rowPos.x, rowPos.y + trackHeight + 4 });
+        ImGui::Dummy({ width + labelWidth, 0 });
+        ImGui::PopID();
+    }
+
+    // 再生ヘッドの縦線（現在の effectTimer の位置）
+    if (isPlaying)
+    {
+        float playX = timeToX(effectTimer);
+        dl->AddLine({ playX, cursor.y }, { playX, cursor.y + (trackHeight + 4) * currentConfig.ranges.size() }, IM_COL32(255, 50, 50, 255), 2.0f);
+    }
+
+    ImGui::Spacing();
+}
 void EffectEditor::DrawNodeInspector(NodeConfig& node)
 {
     ImGui::Checkbox(u8"このノードを表示する##VisibleCheck", &node.visible);
@@ -592,7 +792,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 void EffectEditor::DrawFileToolbar()
 {
     // Save ボタン
-    if (ImGui::Button(u8"Save"))
+    if (ImGui::Button(u8"保存"))
     {
         char filepath[MAX_PATH] = { 0 };
         HWND hwnd = Graphics::Instance().GetWindowHandle();
@@ -608,7 +808,7 @@ void EffectEditor::DrawFileToolbar()
     ImGui::SameLine();
 
     // Load ボタン
-    if (ImGui::Button(u8"Load"))
+    if (ImGui::Button(u8"読み込み"))
     {
         char filepath[MAX_PATH] = { 0 };
         HWND hwnd = Graphics::Instance().GetWindowHandle();
@@ -642,6 +842,33 @@ void EffectEditor::DrawFileToolbar()
     if (ImGui::Button(u8"再生"))
     {
         PlayTestEffect(testSpawnPos);
+    }
+
+    // プリセット Range追加ボタン
+    if (ImGui::Button(u8"+ Start"))
+    {
+        if (!HasRange("Start")) currentConfig.ranges.push_back({ "Start", 0.0f, 0.5f }); 
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(u8"+ Loop"))
+    {
+        if (!HasRange("Loop")) currentConfig.ranges.push_back({ "Loop", 0.5f, 2.0f });
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(u8"+ End"))
+    {
+        if (!HasRange("End")) currentConfig.ranges.push_back({ "End", 2.0f, 2.5f });
+    }
+
+    // 選択されている Range があれば削除ボタンを有効化
+    if (selectedRangeIndex >= 0 && selectedRangeIndex < (int)currentConfig.ranges.size())
+    {
+        ImGui::SameLine();
+        if (ImGui::Button(u8"選択Range削除"))
+        {
+            currentConfig.ranges.erase(currentConfig.ranges.begin() + selectedRangeIndex);
+                selectedRangeIndex = -1;
+        }
     }
 }
 void EffectEditor::DrawNodeList()
@@ -824,6 +1051,7 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 };
 
                 data.color = pConfig.color;
+                data.color.w *= globalAlpha; // 全体のフェード率を反映
 
                 particleManager->Emit(data);
             }
@@ -878,4 +1106,17 @@ void EffectEditor::SyncRuntimeNodes()
             }
         }
     }
+}
+
+// そのラベルがあるかを調べる関数
+bool EffectEditor::HasRange(std::string name)
+{
+    for (auto& r : currentConfig.ranges)
+    {
+        if (r.name == name)
+        {
+            return true;
+        }
+    }
+    return false;
 }

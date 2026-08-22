@@ -7,43 +7,7 @@ RWStructuredBuffer<particle_header> particle_header_buffer : register(u3); //  ƒ
 
 [numthreads(NumParticleThread, 1, 1)]
 void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
-{
-    //uint index = dispatch_thread_id.x;
-
-    ////  —LŒøƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚é‚à‚Ì‚¾‚¯ˆ—
-    //if (particle_data_buffer[index].parameter.z < 0.0f)
-    //    return;
-
-    ////  Œo‰ßŠÔ•ªŒ¸­‚³‚¹‚é
-    //particle_data_buffer[index].parameter.y -= elapsed_time;
-    //if (particle_data_buffer[index].parameter.y < 0)
-    //{
-    //    //  õ–½‚ª•t‚«‚½‚ç–¢g—pƒŠƒXƒg‚É’Ç‰Á
-    //    particle_data_buffer[index].parameter.z = -1.0f; //  ¶‘¶ƒtƒ‰ƒO‚ğ‰Šú‰»‚µ‚Ä‚¨‚­
-    //    particle_unused_buffer.Append(index);
-        
-    //    //  €–S”‚ğƒJƒEƒ“ƒg‚·‚é
-    //    indirect_data_buffer.InterlockedAdd(IndirectArgumentsNumDeadParticle, 1);
-    //    return;
-    //}
-
-    ////  ‘¬“xXV
-    //particle_data_buffer[index].velocity.xyz += particle_data_buffer[index].acceleration.xyz * elapsed_time;
-
-    ////  ˆÊ’uXV
-    //particle_data_buffer[index].position.xyz += particle_data_buffer[index].velocity.xyz * elapsed_time;
-
-    ////  Ø‚èæ‚èÀ•W‚ğZo
-    //uint type = (uint) (particle_data_buffer[index].parameter.x + 0.5f);
-    //float w = 1.0 / texture_split_count.x;
-    //float h = 1.0 / texture_split_count.y;
-    //float2 uv = float2((type % texture_split_count.x) * w, (type / texture_split_count.x) * h);
-    //particle_data_buffer[index].texcoord.xy = uv;
-    //particle_data_buffer[index].texcoord.zw = float2(w, h);
-        
-    ////  ™X‚É“§–¾‚É‚µ‚Ä‚¢‚­
-    //particle_data_buffer[index].color.a = saturate(particle_data_buffer[index].parameter.y);
-    
+{    
     uint header_index = dispatch_thread_id.x;
 
     particle_header header = particle_header_buffer[header_index];
@@ -94,18 +58,11 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     data.scale.xyz += data.scaleVelocity.xyz * elapsed_time;
 
 
-    ////  Ø‚èæ‚èÀ•W‚ğZo
-    //uint type = (uint) (data.parameter.x + 0.5f);
-    //float w = 1.0 / texture_split_count.x;
-    //float h = 1.0 / texture_split_count.y;
-    //float2 uv = float2((type % texture_split_count.x) * w, (type / texture_split_count.x) * h);
-    //data.texcoord.xy = uv;
-    //data.texcoord.zw = float2(w, h);
-    
+    ////  Ø‚èæ‚èÀ•W‚ğZo    
     data.texcoord.xy += data.parameter.zw * elapsed_time;
         
     //  ™X‚É“§–¾‚É‚µ‚Ä‚¢‚­
-    data.color.a = saturate(data.parameter.y);
+    //data.color.a = saturate(data.parameter.y);
     
     //  [“xƒ\[ƒg’lZo
     header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;

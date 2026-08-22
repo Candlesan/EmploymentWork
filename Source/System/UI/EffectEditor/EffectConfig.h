@@ -28,6 +28,13 @@ enum class RenderType
 	None = 3
 };
 
+struct StateRange
+{
+	std::string name; // タグ(start/loop/end)
+	float start = 0.0f; // 始め
+	float end = 0.0f; // 終わり
+};
+
 // ノード設定
 struct NodeConfig 
 {
@@ -97,6 +104,7 @@ struct EffectConfig
 	std::string effectName = "NewEffect";
 
 	std::vector<NodeConfig> nodes;
+	std::vector<StateRange> ranges;
 
 	EffectConfig()
 	{

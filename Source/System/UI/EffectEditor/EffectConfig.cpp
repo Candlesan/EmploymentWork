@@ -10,6 +10,7 @@ void EffectConfig::Save(const std::string& filePath)
     json j;
     j["effectName"] = effectName;
     j["nodes"] = json::array();
+    j["stateRanges"] = json::array();
 
     for (auto& node : nodes)
     {
@@ -75,6 +76,17 @@ void EffectConfig::Save(const std::string& filePath)
         j["nodes"].push_back(n);
     }
 
+    for (auto& s : ranges)
+    {
+        json r;
+        r["name"] = s.name;
+        r["start"] = s.start;
+        r["end"] = s.end;
+
+        j["stateRanges"].push_back(r);
+    }
+
+
     std::ofstream file(filePath);
     if (file.is_open())
     {
@@ -98,6 +110,8 @@ void EffectConfig::Load(const std::string& filePath)
 
         // 既存のノードを一度全部消してリセット！
         nodes.clear();
+        ranges.clear();
+
 
         // nodes 配列が存在する場合、全ノードを読み込む
         if (j.find("nodes") != j.end() && j["nodes"].is_array())
@@ -168,9 +182,22 @@ void EffectConfig::Load(const std::string& filePath)
                 node.widthMiddle = nodeJson.value("widthMiddle", 1.0f);
                 node.widthEnd = nodeJson.value("widthEnd", 0.0f);
 
-
                 // 読み込んだノードを追加
                 nodes.push_back(node);
+            }
+        }
+
+        if (j.find("stateRanges") != j.end() && j["stateRanges"].is_array())
+        {
+            for (const auto& rj : j["stateRanges"])
+            {
+                StateRange s;
+
+                s.name = rj.value("name", "Start");
+                s.start = rj.value("start", 0.0f);
+                s.end = rj.value("end", 0.0f);
+
+                ranges.push_back(s);
             }
         }
     }
