@@ -2,6 +2,8 @@
 #include "System/UI/Dialog.h"
 #include "System/Graphic/Graphics.h"
 #include "System/Renderer/Shader/meshVFX/meshVFX.h"
+#include "System/Core/Mathf.h"
+
 #include <imgui.h>
 #include <ctime>
 #include <cstdlib>
@@ -262,6 +264,7 @@ void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
     }
 }
 
+// メッシュVFX描画
 void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 {
     if (!isPlaying) return;
@@ -272,6 +275,7 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 
+    float alpha = 1.0f;
     for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
         auto& node = currentConfig.nodes[i];
@@ -280,19 +284,46 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 
         if (!node.visible || node.type != RenderType::Mesh) continue;
 
+        if (effectTimer < node.delayTime) continue;
+        float meshActiveTime = effectTimer - node.delayTime;
+
         if (rNode.meshModel && currentMeshTime <= node.lifeTime)
         {
             // このノード専用のパラメータをシェーダーにセット
             shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
             shader->SetDistortionPower(node.distortionPower);
 
+            // フェードスピードを計算する
+            if (node.IsFadeIn && node.fadeInTime > 0.0001f && meshActiveTime <= node.fadeInTime)
+            {
+                // 現在の進行度を求める
+                float t = meshActiveTime / node.fadeInTime;
+                alpha = Mathf::EaseCurve(t, node.fadeInStartSpeed, node.fadeInEndSpeed);
+            }
+            else if (node.IsFadeOut && node.fadeOutTime > 0.0001f)
+            {
+                float fadeStartTime = node.lifeTime - node.fadeOutTime;
+
+                if (meshActiveTime >= fadeStartTime)
+                {
+                    float t = (meshActiveTime - fadeStartTime) / node.fadeOutTime; // 0.0 ~ 1.0 に正規化
+                    alpha = 1.0f - Mathf::EaseCurve(t, node.fadeOutStartSpeed, node.fadeOutEndSpeed);
+                }
+            }
+
+            alpha = Mathf::Clamp(alpha);
+
             DirectX::XMFLOAT2 noiseUvOffset = {
-                node.noiseUvOffset.x * currentMeshTime,
-                node.noiseUvOffset.y * currentMeshTime
+                node.noiseUvOffset.x * meshActiveTime,
+                node.noiseUvOffset.y * meshActiveTime
             };
             shader->SetNoiseUvOffset(noiseUvOffset);
             shader->SetBlendMode(node.blendMode);
-            shader->SetColor(node.color); // このノード固有の色
+
+            DirectX::XMFLOAT4 finalColor = node.color;
+            finalColor.w *= alpha;
+            shader->SetColor(finalColor); // このノード固有の色
+
             shader->SetUvOffset(rNode.currentUvOffset);
 
             // モデル内の各メッシュを即時描画
@@ -434,6 +465,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
             ImGui::Text(u8": % s", node.texturePath.c_str());
 
+            // テクスチャ解除
             if (!node.texturePath.empty())
             {
                 if (ImGui::Button(u8"テクスチャ解除##TextuerClear"))
@@ -456,6 +488,33 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             const char* blendItems[] = { u8"通常半透明 (Alpha)", u8"加算 (Additive)" };
             ImGui::Combo(u8"ブレンドモード##Mesh", &node.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
             ImGui::Separator();
+
+            const char* speedItem[] = { u8"低速3", u8"低速2",  u8"低速1",  u8"等速",  u8"高速1",  u8"高速2",  u8"高速3" };
+            ImGui::Checkbox(u8"フェードイン", &node.IsFadeIn);
+            if (node.IsFadeIn)
+            {
+                ImGui::DragFloat(u8"終了時間##FadeIn", &node.fadeInTime, 0.1f);
+                ImGui::Separator();
+
+                ImGui::Combo(u8"始点速度##FadeIn", &node.fadeInStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+
+                ImGui::Combo(u8"終点速度##FadeIn", &node.fadeInEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+            }
+
+            ImGui::Checkbox(u8"フェードアウト", &node.IsFadeOut);
+            if (node.IsFadeOut)
+            {
+                ImGui::DragFloat(u8"終了時間##FadeOut", &node.fadeOutTime, 0.1f);
+                ImGui::Separator();
+
+                ImGui::Combo(u8"始点速度##FadeOut", &node.fadeOutStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+
+                ImGui::Combo(u8"終点速度##FadeOut", &node.fadeOutEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+            }
 
 
             if (ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", node.splitCount))
@@ -738,6 +797,21 @@ void EffectEditor::EmitParticles(float elapsedTime)
         float activeTime = effectTimer - node.delayTime;
         if (node.duration > 0.0f && activeTime >= node.duration) continue;
 
+        float alpha = 1.0f;
+        // フェードスピードを計算する
+        if (node.IsFadeIn && node.fadeInTime > 0.0001f && activeTime <= node.fadeInTime)
+        {
+            // 現在の進行度を求める
+            float t = activeTime / node.fadeInTime;
+            alpha = Mathf::EaseCurve(t, node.fadeInStartSpeed, node.fadeInEndSpeed);
+        }
+        else if (node.IsFadeOut && node.fadeOutTime > 0.0001f && activeTime >= (node.duration - node.fadeOutTime))
+        {
+            float fadeStartTime = node.duration - node.fadeOutTime;
+            float t = (activeTime - fadeStartTime) / node.fadeOutTime; // 0.0 ~ 1.0 に正規化
+            alpha = 1.0f - Mathf::EaseCurve(t, node.fadeOutStartSpeed, node.fadeOutEndSpeed);
+        }
+
         // ノード個別のタイマーを進める
         pConfig.spawnTimer += elapsedTime;
 
@@ -824,6 +898,7 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 };
 
                 data.color = pConfig.color;
+                data.color.w *= alpha;
 
                 particleManager->Emit(data);
             }

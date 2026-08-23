@@ -28,6 +28,18 @@ enum class RenderType
 	None = 3
 };
 
+// フェードの速度
+enum class FadeSpeed
+{
+	Slow3 = 0,	// 低速3
+	Slow2,		// 低速2
+	Slow1,		// 低速1
+	Linear,		// 等速
+	Fast1,		// 高速1
+	Fast2,		// 高速2
+	Fast3,		// 高速3
+};
+
 // ノード設定
 struct NodeConfig 
 {
@@ -44,6 +56,18 @@ struct NodeConfig
 	float spawnTimer = 0.0f;											// 毎フレーム進める発生計算用タイマー
 	int blendMode = 0;													// 0: Alpha, 1: Add
 	bool isLoop = true;													// ループするか
+
+	// --- フェードイン ---
+	bool IsFadeIn = false;												// フェードインするか
+	float fadeInTime = 0.0f;												// フェードインが終わる時間
+	int fadeInStartSpeed = static_cast<int>(FadeSpeed::Linear);			// 生成されてからの速度
+	int fadeInEndSpeed = static_cast<int>(FadeSpeed::Linear);			// 生存時間が終わるにつれての速度
+
+	// --- フェードアウト ---
+	bool IsFadeOut = false;												// フェードインするか
+	float fadeOutTime = 0.0f;											// フェードインが終わる時間
+	int fadeOutStartSpeed = static_cast<int>(FadeSpeed::Linear);		// 生成されてからの速度
+	int fadeOutEndSpeed = static_cast<int>(FadeSpeed::Linear);			// 生存時間が終わるにつれての速度
 
 	DirectX::XMFLOAT2 uvScrollSpeed = { 0.0f, 0.0f };					// テクスチャのUVスクロール
 	DirectX::XMFLOAT2 noiseUvOffset = { 0.0f, 0.0f };					// ノイズテクスチャのUVスクロール

@@ -29,6 +29,18 @@ void EffectConfig::Save(const std::string& filePath)
         n["spawnTimer"] = node.spawnTimer;
         n["isLoop"] = node.isLoop;
 
+        // フェードイン
+        n["isFadeIn"] = node.IsFadeIn;
+        n["fadeInTime"] = node.fadeInTime;
+        n["fadeInStartSpeed"] = node.fadeInStartSpeed;
+        n["fadeInEndSpeed"] = node.fadeInEndSpeed;
+
+        // フェードアウト
+        n["isFadeOut"] = node.IsFadeOut;
+        n["fadeOutTime"] = node.fadeOutTime;
+        n["fadeOutStartSpeed"] = node.fadeOutStartSpeed;
+        n["fadeOutEndSpeed"] = node.fadeOutEndSpeed;
+
         // UV
         n["uvScrollSpeed"] = { node.uvScrollSpeed.x, node.uvScrollSpeed.y };
         n["noiseUvOffset"] = { node.noiseUvOffset.x, node.noiseUvOffset.y };
@@ -129,6 +141,18 @@ void EffectConfig::Load(const std::string& filePath)
                 node.delayTime = nodeJson.value("delayTime", 0.0f);
                 node.spawnTimer = 0.0f;
                 node.blendMode = nodeJson.value("blendMode", 0.0f);
+
+                // フェードイン
+                node.IsFadeIn = nodeJson.value("IsFadeIn", false);
+                node.fadeInTime = nodeJson.value("fadeInTime", 0.0f);
+                node.fadeInStartSpeed = nodeJson.value("fadeInStartSpeed", 0.0f);
+                node.fadeInEndSpeed = nodeJson.value("fadeInEndSpeed", 0.0f);
+
+                // フェードアウト
+                node.IsFadeOut = nodeJson.value("IsFadeOut", false);
+                node.fadeOutTime = nodeJson.value("fadeOutTime", 0.0f);
+                node.fadeOutStartSpeed = nodeJson.value("fadeOutStartSpeed", 0.0f);
+                node.fadeInStartSpeed = nodeJson.value("fadeInStartSpeed", 0.0f);
 
                 if (nodeJson.find("uvScrollSpeed") != nodeJson.end()) node.uvScrollSpeed = { nodeJson["uvScrollSpeed"][0], nodeJson["uvScrollSpeed"][1] };
                 if (nodeJson.find("noiseUvOffset") != nodeJson.end()) node.noiseUvOffset = { nodeJson["noiseUvOffset"][0], nodeJson["noiseUvOffset"][1] };

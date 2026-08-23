@@ -105,7 +105,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     data.texcoord.xy += data.parameter.zw * elapsed_time;
         
     //  徐々に透明にしていく
-    data.color.a = saturate(data.parameter.y);
+    data.color.a = data.parameter.y;
     
     //  深度ソート値算出
     header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;
