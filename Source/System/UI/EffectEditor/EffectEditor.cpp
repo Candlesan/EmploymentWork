@@ -836,6 +836,16 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 data.parameter.z = pConfig.uvScrollSpeed.x;
                 data.parameter.w = pConfig.uvScrollSpeed.y;
 
+                int packedSpeed = (node.fadeInStartSpeed)
+                    | (node.fadeInEndSpeed << 4)
+                    | (node.fadeOutStartSpeed << 8)
+                    | (node.fadeOutEndSpeed << 12);
+
+                data.fade_param.x = node.IsFadeIn ? node.fadeInTime : 0.0f;
+                data.fade_param.y = node.IsFadeOut ? node.fadeOutTime : 0.0f;
+                data.fade_param.z = pConfig.lifeTime;
+                data.fade_param.w = static_cast<float>(packedSpeed);
+
                 // ˆÊ’u
                 data.position = {
                    pConfig.position.x + (pConfig.positionRange.x * RandFloat()),
@@ -898,7 +908,6 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 };
 
                 data.color = pConfig.color;
-                data.color.w *= alpha;
 
                 particleManager->Emit(data);
             }

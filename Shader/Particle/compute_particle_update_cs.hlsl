@@ -5,45 +5,49 @@ AppendStructuredBuffer<uint> particle_unused_buffer : register(u1); //  パーティ
 RWByteAddressBuffer indirect_data_buffer : register(u2); //  インダイレクト用バッファ
 RWStructuredBuffer<particle_header> particle_header_buffer : register(u3); //  パーティクルヘッダー管理バッファ
 
+// 速度ID (0:低速3 ～ 3:等速 ～ 6:高速3) を曲線の傾きウェイトに変換
+float SpeedToWeight(uint speed)
+{
+    switch (speed)
+    {
+        case 0: return 0.0f; // 低速3
+        case 1: return 0.25f; // 低速2
+        case 2: return 0.5f; // 低速1
+        case 3: return 1.0f; // 等速
+        case 4: return 1.5f; // 高速1
+        case 5: return 2.0f; // 高速2
+        case 6: return 3.0f; // 高速3
+        default: return 1.0f;
+    }
+}
+
+// 3次エルミート補間
+float EaseCurve(float t, uint startSpeed, uint endSpeed)
+{
+    t = saturate(t); // 0.0 ~ 1.0 にクランプ
+
+    if (startSpeed == 3 && endSpeed == 3)
+    {
+        return t; // 等速なら直線
+    }
+
+    float v0 = SpeedToWeight(startSpeed);
+    float v1 = SpeedToWeight(endSpeed);
+
+    float t2 = t * t;
+    float t3 = t2 * t;
+
+    // 公式: (-2t^3 + 3t^2) + v0*(t^3 - 2t^2 + t) + v1*(t^3 - t^2)
+    float result = (-2.0f * t3 + 3.0f * t2)
+                 + v0 * (t3 - 2.0f * t2 + t)
+                 + v1 * (t3 - t2);
+
+    return saturate(result);
+}
+
 [numthreads(NumParticleThread, 1, 1)]
 void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 {
-    //uint index = dispatch_thread_id.x;
-
-    ////  有効フラグが立っているものだけ処理
-    //if (particle_data_buffer[index].parameter.z < 0.0f)
-    //    return;
-
-    ////  経過時間分減少させる
-    //particle_data_buffer[index].parameter.y -= elapsed_time;
-    //if (particle_data_buffer[index].parameter.y < 0)
-    //{
-    //    //  寿命が付きたら未使用リストに追加
-    //    particle_data_buffer[index].parameter.z = -1.0f; //  生存フラグを初期化しておく
-    //    particle_unused_buffer.Append(index);
-        
-    //    //  死亡数をカウントする
-    //    indirect_data_buffer.InterlockedAdd(IndirectArgumentsNumDeadParticle, 1);
-    //    return;
-    //}
-
-    ////  速度更新
-    //particle_data_buffer[index].velocity.xyz += particle_data_buffer[index].acceleration.xyz * elapsed_time;
-
-    ////  位置更新
-    //particle_data_buffer[index].position.xyz += particle_data_buffer[index].velocity.xyz * elapsed_time;
-
-    ////  切り取り座標を算出
-    //uint type = (uint) (particle_data_buffer[index].parameter.x + 0.5f);
-    //float w = 1.0 / texture_split_count.x;
-    //float h = 1.0 / texture_split_count.y;
-    //float2 uv = float2((type % texture_split_count.x) * w, (type / texture_split_count.x) * h);
-    //particle_data_buffer[index].texcoord.xy = uv;
-    //particle_data_buffer[index].texcoord.zw = float2(w, h);
-        
-    ////  徐々に透明にしていく
-    //particle_data_buffer[index].color.a = saturate(particle_data_buffer[index].parameter.y);
-    
     uint header_index = dispatch_thread_id.x;
 
     particle_header header = particle_header_buffer[header_index];
@@ -93,19 +97,39 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     // 拡大更新
     data.scale.xyz += data.scaleVelocity.xyz * elapsed_time;
 
-
-    ////  切り取り座標を算出
-    //uint type = (uint) (data.parameter.x + 0.5f);
-    //float w = 1.0 / texture_split_count.x;
-    //float h = 1.0 / texture_split_count.y;
-    //float2 uv = float2((type % texture_split_count.x) * w, (type / texture_split_count.x) * h);
-    //data.texcoord.xy = uv;
-    //data.texcoord.zw = float2(w, h);
-    
+    // UVスクロール    
     data.texcoord.xy += data.parameter.zw * elapsed_time;
         
+    // フェードの計算
+    uint packed = (uint) data.fade_param.w;
+    uint inStartSpeed = (packed) & 0xF;      // フェードインの始点速度
+    uint inEndSpeed =   (packed >> 4) & 0xF; // フェードインの終点速度
+    uint outStartSpeed = (packed >> 8) & 0xF; // フェードアウトの終点速度
+    uint outEndSpeed =   (packed >> 12) & 0xF; // フェードアウトの終点速度
+    
+    float maxLifeTime = data.fade_param.z; // 初期寿命
+    float currentlife = data.parameter.y; // 残り寿命
+    float activeTime = maxLifeTime - currentlife; // 経過時間
+    
+    float fadeInTime = data.fade_param.x;
+    float fadeOutTime = data.fade_param.y;
+    
+    float alpha = 1.0f;
+    
+    if (fadeInTime > 0.0001f && activeTime <= fadeInTime)
+    {
+        float t = activeTime / fadeInTime;
+        alpha = EaseCurve(t, inStartSpeed, inEndSpeed);
+    }
+    else if (fadeOutTime > 0.0001f && activeTime >= (maxLifeTime - fadeOutTime))
+    {
+        float fadeStartTime = maxLifeTime - fadeOutTime;
+        float t = (activeTime - fadeStartTime) / fadeOutTime;
+        alpha = 1.0f - EaseCurve(t, outStartSpeed, outEndSpeed);
+    }
+    
     //  徐々に透明にしていく
-    data.color.a = data.parameter.y;
+    data.color.a = saturate(alpha);
     
     //  深度ソート値算出
     header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;

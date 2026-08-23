@@ -35,6 +35,8 @@ public:
 
         DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // 色情報
 
+        // x:フェードイン秒数, y:フェードアウト秒数, z:フェードインの速度設定（始点・終点速度）, w:フェードアウトの速度設定（始点・終点速度）
+        DirectX::XMFLOAT4 fade_param;
 	};
 
     // パーティクル構造体
@@ -58,6 +60,8 @@ public:
 
         DirectX::XMFLOAT4 texcoord; // UV座標
         DirectX::XMFLOAT4 color; // 色情報
+
+        DirectX::XMFLOAT4 fade_param;
     };
 
     //	パーティクルヘッダー構造体

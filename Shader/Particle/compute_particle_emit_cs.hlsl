@@ -35,10 +35,15 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     particle_header_buffer[header_index].dummy = 0; //  空き
 
     //  パーティクル生成処理
-    particle_data_buffer[particle_index].parameter.x = emit_particle_butter[emit_index].parameter.x;
-    particle_data_buffer[particle_index].parameter.y = emit_particle_butter[emit_index].parameter.y;
-    particle_data_buffer[particle_index].parameter.z = emit_particle_butter[emit_index].parameter.z;
-    particle_data_buffer[particle_index].parameter.w = emit_particle_butter[emit_index].parameter.w;
+    particle_data_buffer[particle_index].parameter.x = emit_particle_butter[emit_index].parameter.x; // コマ数
+    particle_data_buffer[particle_index].parameter.y = emit_particle_butter[emit_index].parameter.y; // 生存時間
+    particle_data_buffer[particle_index].parameter.z = emit_particle_butter[emit_index].parameter.z; // UVスクロール
+    particle_data_buffer[particle_index].parameter.w = emit_particle_butter[emit_index].parameter.w; // UVスクロール
+    
+    particle_data_buffer[particle_index].fade_param.x = emit_particle_butter[emit_index].fade_param.x; // フェードイン秒数
+    particle_data_buffer[particle_index].fade_param.y = emit_particle_butter[emit_index].fade_param.y; // フェードアウト秒数
+    particle_data_buffer[particle_index].fade_param.z = emit_particle_butter[emit_index].fade_param.z; // 初期最大寿命
+    particle_data_buffer[particle_index].fade_param.w = emit_particle_butter[emit_index].fade_param.w; // 速度設定
     
     particle_data_buffer[particle_index].position = emit_particle_butter[emit_index].position;
     particle_data_buffer[particle_index].rotation = emit_particle_butter[emit_index].rotation;

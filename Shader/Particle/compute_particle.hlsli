@@ -22,12 +22,15 @@ struct emit_particle_data
     float4 scaleAcceleration; // 拡大の加速度
     
     float4 color; // 色情報
+    
+    // フェード
+    float4 fade_param; // x: fadeInTime, y: fadeOutTime, z:(fadeInStartSpeed << 4) | fadeInEndSpeed, w: (fadeOutStartSpeed << 4) | fadeOutEndSpeed
 };
 
 //  パーティクル構造体
 struct particle_data
 {
-    float4 parameter; // x : パーティクル処理タイプ, y : 生存時間, z : 生存フラグ, w : 空き
+    float4 parameter; // x : パーティクル処理タイプ, y : 生存時間, z : UVスクロールX, w : UVスクロールY
 
     float4 position; // 生成座標
     float4 rotation; // 回転情報
@@ -44,6 +47,8 @@ struct particle_data
 
     float4 texcoord; // UV座標
     float4 color; // 色情報
+    
+    float4 fade_param;
 };
 
 //	パーティクルヘッダー構造体
