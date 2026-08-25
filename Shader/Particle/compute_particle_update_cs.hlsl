@@ -128,8 +128,28 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         alpha = 1.0f - EaseCurve(t, outStartSpeed, outEndSpeed);
     }
     
+    // 色の計算
+    float4 finalColor = data.start_color;
+    if (data.color_param.x >= 0.0f)
+    {
+        // パックの取り出し
+        uint colorPacked = (uint) data.color_param.x;
+        uint colorStartSpeed = (colorPacked) & 0xF;
+        uint colorEndSpeed = (colorPacked >> 4) & 0xF;
+        float colorMaxLifeTime = data.color_param.y;
+        
+        // 進行度計算する
+        float t = activeTime / colorMaxLifeTime;
+        float easeT = EaseCurve(t, colorStartSpeed, colorEndSpeed);
+
+        // 始点色から終点色へ補間
+        finalColor = lerp(data.start_color, data.end_color, easeT);
+    }
+    
+    
     //  徐々に透明にしていく
-    data.color.a = saturate(alpha);
+    finalColor.a *= saturate(alpha);
+    data.renderColor = finalColor;
     
     //  深度ソート値算出
     header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;

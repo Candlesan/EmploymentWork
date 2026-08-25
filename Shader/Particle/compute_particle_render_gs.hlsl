@@ -132,7 +132,7 @@ void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
 
     //  Šeíî•ñæ“¾
     float4 texcoord = particle_data_buffer[vertex_id].texcoord;
-    float4 color = particle_data_buffer[vertex_id].color;
+    float4 color = particle_data_buffer[vertex_id].renderColor;
 
     //  ’¸“_¶¬
     static const float4 vertex_positions[4] =

@@ -20,11 +20,15 @@ struct emit_particle_data
     
     float4 scaleVelocity;     // 拡大の初速
     float4 scaleAcceleration; // 拡大の加速度
-    
-    float4 color; // 色情報
+        
+    float4 color; // 色
+    float4 start_color; // 始点の色
+    float4 end_color; // 終点の色
+    float4 color_param; // x: 始点と終点の速度, y: 寿命 , z: 空き, w: 空き
     
     // フェード
-    float4 fade_param; // x: fadeInTime, y: fadeOutTime, z:(fadeInStartSpeed << 4) | fadeInEndSpeed, w: (fadeOutStartSpeed << 4) | fadeOutEndSpeed
+    // x: フェードインの時間時間, y: フェードアウトの時間, z:寿命, w: フェードイン・フェードアウトの始点と終点の速度
+    float4 fade_param; 
 };
 
 //  パーティクル構造体
@@ -46,10 +50,15 @@ struct particle_data
     float4 scaleAcceleration; // 拡大の加速度
 
     float4 texcoord; // UV座標
-    float4 color; // 色情報
+    
+    float4 color; // 色
+    float4 renderColor; // 色(描画用)
+    float4 start_color; // 始点の色
+    float4 end_color; // 終点の色
+    float4 color_param; // x: 始点と終点の速度, y: 寿命, z: 空き, w: 空き
     
     float4 fade_param;
-};
+ };
 
 //	パーティクルヘッダー構造体
 struct particle_header

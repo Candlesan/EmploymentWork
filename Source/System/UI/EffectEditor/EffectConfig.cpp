@@ -68,6 +68,13 @@ void EffectConfig::Save(const std::string& filePath)
         n["scaleAccelerationRange"] = { node.scaleAccelerationRange.x, node.scaleAccelerationRange.y, node.scaleAccelerationRange.z };
 
         n["color"] = { node.color.x, node.color.y, node.color.z, node.color.w };
+        n["colorMode"] = static_cast<int>(node.colorMode);
+        n["colorStartMin"] = { node.colorStartMin.x, node.colorStartMin.y, node.colorStartMin.z, node.colorStartMin.w };
+        n["colorStartMax"] = { node.colorStartMax.x, node.colorStartMax.y, node.colorStartMax.z, node.colorStartMax.w };
+        n["colorEndMin"] = { node.colorEndMin.x, node.colorEndMin.y, node.colorEndMin.z, node.colorEndMin.w };
+        n["colorEndMax"] = { node.colorEndMax.x, node.colorEndMax.y, node.colorEndMax.z, node.colorEndMax.w };
+        n["colorStartSpeed"] = node.colorStartSpeed;
+        n["colorEndSpeed"] = node.colorEndSpeed;
 
         // 固有パラメータ
         n["texturePath"] = node.texturePath;
@@ -145,17 +152,19 @@ void EffectConfig::Load(const std::string& filePath)
                 // フェードイン
                 node.IsFadeIn = nodeJson.value("IsFadeIn", false);
                 node.fadeInTime = nodeJson.value("fadeInTime", 0.0f);
-                node.fadeInStartSpeed = nodeJson.value("fadeInStartSpeed", 0.0f);
-                node.fadeInEndSpeed = nodeJson.value("fadeInEndSpeed", 0.0f);
+                node.fadeInStartSpeed = nodeJson.value("fadeInStartSpeed", 3);
+                node.fadeInEndSpeed = nodeJson.value("fadeInEndSpeed", 3);
 
                 // フェードアウト
                 node.IsFadeOut = nodeJson.value("IsFadeOut", false);
                 node.fadeOutTime = nodeJson.value("fadeOutTime", 0.0f);
-                node.fadeOutStartSpeed = nodeJson.value("fadeOutStartSpeed", 0.0f);
-                node.fadeInStartSpeed = nodeJson.value("fadeInStartSpeed", 0.0f);
+                node.fadeOutStartSpeed = nodeJson.value("fadeOutStartSpeed", 3);
+                node.fadeOutEndSpeed = nodeJson.value("fadeOutEndSpeed", 3);
 
                 if (nodeJson.find("uvScrollSpeed") != nodeJson.end()) node.uvScrollSpeed = { nodeJson["uvScrollSpeed"][0], nodeJson["uvScrollSpeed"][1] };
                 if (nodeJson.find("noiseUvOffset") != nodeJson.end()) node.noiseUvOffset = { nodeJson["noiseUvOffset"][0], nodeJson["noiseUvOffset"][1] };
+
+                // カラー
 
                 // 位置
                 if (nodeJson.find("position") != nodeJson.end()) node.position = { nodeJson["position"][0], nodeJson["position"][1], nodeJson["position"][2] };
@@ -183,6 +192,13 @@ void EffectConfig::Load(const std::string& filePath)
 
                 // 色
                 if (nodeJson.find("color") != nodeJson.end()) node.color = { nodeJson["color"][0], nodeJson["color"][1], nodeJson["color"][2], nodeJson["color"][3] };
+                node.colorMode = static_cast<ColorMode>(nodeJson.value("colorMode", static_cast<int>(ColorMode::Fixed)));
+                if (nodeJson.find("colorStartMin") != nodeJson.end()) node.colorStartMin = { nodeJson["colorStartMin"][0], nodeJson["colorStartMin"][1], nodeJson["colorStartMin"][2], nodeJson["colorStartMin"][3] };
+                if (nodeJson.find("colorStartMax") != nodeJson.end()) node.colorStartMax = { nodeJson["colorStartMax"][0], nodeJson["colorStartMax"][1], nodeJson["colorStartMax"][2], nodeJson["colorStartMax"][3] };
+                if (nodeJson.find("colorEndMin") != nodeJson.end()) node.colorEndMin = { nodeJson["colorEndMin"][0], nodeJson["colorEndMin"][1], nodeJson["colorEndMin"][2], nodeJson["colorEndMin"][3] };
+                if (nodeJson.find("colorEndMax") != nodeJson.end()) node.colorEndMax = { nodeJson["colorEndMax"][0], nodeJson["colorEndMax"][1], nodeJson["colorEndMax"][2], nodeJson["colorEndMax"][3] };
+                node.colorStartSpeed = nodeJson.value("colorStartSpeed", 0.0f);
+                node.colorEndSpeed = nodeJson.value("colorEndSpeed", 0.0f);
 
                 node.meshPath = nodeJson.value("meshPath", "");
                 node.distortionPower = nodeJson.value("distortionPower", 0.0f);

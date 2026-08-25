@@ -29,7 +29,7 @@ enum class RenderType
 };
 
 // フェードの速度
-enum class FadeSpeed
+enum class SpeedType
 {
 	Slow3 = 0,	// 低速3
 	Slow2,		// 低速2
@@ -38,6 +38,14 @@ enum class FadeSpeed
 	Fast1,		// 高速1
 	Fast2,		// 高速2
 	Fast3,		// 高速3
+};
+
+// 色のモード
+enum class ColorMode
+{
+	Fixed = 0,	// 固定色
+	Random,		// ランダム(最小～最大の間で生成時に決定)
+	Easing		// イージング(始点色から終点色へ寿命で変化)
 };
 
 // ノード設定
@@ -59,15 +67,15 @@ struct NodeConfig
 
 	// --- フェードイン ---
 	bool IsFadeIn = false;												// フェードインするか
-	float fadeInTime = 0.0f;												// フェードインが終わる時間
-	int fadeInStartSpeed = static_cast<int>(FadeSpeed::Linear);			// 生成されてからの速度
-	int fadeInEndSpeed = static_cast<int>(FadeSpeed::Linear);			// 生存時間が終わるにつれての速度
+	float fadeInTime = 0.0f;											// フェードインが終わる時間
+	int fadeInStartSpeed = static_cast<int>(SpeedType::Linear);			// 生成されてからの速度
+	int fadeInEndSpeed = static_cast<int>(SpeedType::Linear);			// 生存時間が終わるにつれての速度
 
 	// --- フェードアウト ---
 	bool IsFadeOut = false;												// フェードインするか
 	float fadeOutTime = 0.0f;											// フェードインが終わる時間
-	int fadeOutStartSpeed = static_cast<int>(FadeSpeed::Linear);		// 生成されてからの速度
-	int fadeOutEndSpeed = static_cast<int>(FadeSpeed::Linear);			// 生存時間が終わるにつれての速度
+	int fadeOutStartSpeed = static_cast<int>(SpeedType::Linear);		// 生成されてからの速度
+	int fadeOutEndSpeed = static_cast<int>(SpeedType::Linear);			// 生存時間が終わるにつれての速度
 
 	DirectX::XMFLOAT2 uvScrollSpeed = { 0.0f, 0.0f };					// テクスチャのUVスクロール
 	DirectX::XMFLOAT2 noiseUvOffset = { 0.0f, 0.0f };					// ノイズテクスチャのUVスクロール
@@ -94,7 +102,17 @@ struct NodeConfig
 	DirectX::XMFLOAT3 scaleAcceleration = { 0.0f, 0.0f, 0.0f };			// 拡大速度の加速度
 	DirectX::XMFLOAT3 scaleAccelerationRange = { 0.0f, 0.0f, 0.0f };	// 拡大速度の加速度のバラつき
 
-	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };				// RGBA
+	// --- カラー --- 
+	ColorMode colorMode = ColorMode::Fixed;
+	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };				// 基本色
+	DirectX::XMFLOAT4 colorMin = { 1.0f, 1.0f, 1.0f, 1.0f };			// カラーの最小値（ランダム用）
+	DirectX::XMFLOAT4 colorMax = { 1.0f, 1.0f, 1.0f, 1.0f };			// カラーの最大値（ランダム用）
+	DirectX::XMFLOAT4 colorStartMin = { 1.0f, 1.0f, 1.0f, 1.0f };		// 始点のカラー最小値
+	DirectX::XMFLOAT4 colorStartMax = { 1.0f, 1.0f, 1.0f, 1.0f };		// 始点のカラー最小値
+	DirectX::XMFLOAT4 colorEndMin = { 1.0f, 1.0f, 1.0f, 1.0f };			// 始点のカラー最小値
+	DirectX::XMFLOAT4 colorEndMax = { 1.0f, 1.0f, 1.0f, 1.0f };			// 始点のカラー最小値
+	int colorStartSpeed = static_cast<int>(SpeedType::Linear);			// 生成されてからの速度
+	int colorEndSpeed = static_cast<int>(SpeedType::Linear);			// 生存時間が終わるにつれての速度
 
 	// --- 描画タイプごとの固有パラメータ ---
 	// [Particle用]

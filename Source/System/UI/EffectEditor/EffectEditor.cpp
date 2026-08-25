@@ -548,8 +548,55 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             }
             ImGui::Separator();
 
-            ImGui::ColorEdit4(u8"色##Color", &node.color.x);
-            ImGui::Separator();
+            const char* colortype[] = { u8"固定", u8"ランダム", u8"イージング" };
+            int colorMode = static_cast<int>(node.colorMode);
+            if (ImGui::Combo(u8"##Color", &colorMode, colortype, IM_ARRAYSIZE(colortype)))
+            {
+                node.colorMode = static_cast<ColorMode>(colorMode);
+            }
+            switch (node.colorMode)
+            {
+            case ColorMode::Fixed:
+                ImGui::ColorEdit4(u8"", &node.color.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+
+                break;
+            case ColorMode::Random:
+                ImGui::ColorEdit4(u8"最小##ColorRandom", &node.colorMin.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+                ImGui::ColorEdit4(u8"最大##ColorRandom", &node.colorMax.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+
+                break;
+            case ColorMode::Easing:
+            {
+                ImGui::Text(u8"始点");
+                ImGui::ColorEdit4(u8"最小##ColorStartEaseing", &node.colorStartMin.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+                ImGui::ColorEdit4(u8"最大##ColorStartEaseing", &node.colorStartMax.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+
+                ImGui::Text(u8"終点");
+                ImGui::ColorEdit4(u8"最小##ColorEndEaseing", &node.colorEndMin.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+                ImGui::ColorEdit4(u8"最大##ColorEndEaseing", &node.colorEndMax.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+
+                const char* speedItem[] = { u8"低速3", u8"低速2",  u8"低速1",  u8"等速",  u8"高速1",  u8"高速2",  u8"高速3" };
+                ImGui::Combo(u8"始点速度##ColorSpeed", &node.colorStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+
+                ImGui::Combo(u8"終点速度##ColorSpeed", &node.colorEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+
+                break;
+            }
+            default:
+                ImGui::ColorEdit4(u8"", &node.color.x, ImGuiColorEditFlags_Uint8);
+                ImGui::Separator();
+
+                break;
+            }
 
             if (node.type == RenderType::Mesh)
             {
@@ -774,13 +821,6 @@ void EffectEditor::DrawNodeList()
     ImGui::Separator();
 }
 
-
-// -1.0f～1.0fの間をランダムで返す関数
-float EffectEditor::RandFloat()
-{
-    return (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 2.0f - 1.0f;
-}
-
 // エフェクトを出す
 void EffectEditor::EmitParticles(float elapsedTime)
 {
@@ -805,7 +845,7 @@ void EffectEditor::EmitParticles(float elapsedTime)
             float t = activeTime / node.fadeInTime;
             alpha = Mathf::EaseCurve(t, node.fadeInStartSpeed, node.fadeInEndSpeed);
         }
-        else if (node.IsFadeOut && node.fadeOutTime > 0.0001f && activeTime >= (node.duration - node.fadeOutTime))
+        else if (node.IsFadeOut && node.fadeOutTime > 0.0001f && activeTime >= (node.lifeTime - node.fadeOutTime))
         {
             float fadeStartTime = node.duration - node.fadeOutTime;
             float t = (activeTime - fadeStartTime) / node.fadeOutTime; // 0.0 ~ 1.0 に正規化
@@ -831,12 +871,15 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 compute_particle_system::emit_particle_data data;
                 data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-                data.parameter.x = static_cast<float>(pConfig.spriteType);
-                data.parameter.y = pConfig.lifeTime;
-                data.parameter.z = pConfig.uvScrollSpeed.x;
-                data.parameter.w = pConfig.uvScrollSpeed.y;
+                // パーティクルのデータを送る
+                data.parameter.x = static_cast<float>(pConfig.spriteType); // コマ番号
+                data.parameter.y = pConfig.lifeTime; // 寿命
+                data.parameter.z = pConfig.uvScrollSpeed.x; // x軸のUVスクロール
+                data.parameter.w = pConfig.uvScrollSpeed.y; // y軸のUVスクロール
 
-                int packedSpeed = (node.fadeInStartSpeed)
+                // フェードのスピードを設定する
+                int packedSpeed = 
+                      (node.fadeInStartSpeed)
                     | (node.fadeInEndSpeed << 4)
                     | (node.fadeOutStartSpeed << 8)
                     | (node.fadeOutEndSpeed << 12);
@@ -846,68 +889,121 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 data.fade_param.z = pConfig.lifeTime;
                 data.fade_param.w = static_cast<float>(packedSpeed);
 
+                
                 // 位置
                 data.position = {
-                   pConfig.position.x + (pConfig.positionRange.x * RandFloat()),
-                   pConfig.position.y + (pConfig.positionRange.y * RandFloat()),
-                   pConfig.position.z + (pConfig.positionRange.z * RandFloat()),
+                   pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
+                   pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
+                   pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
                    1.0f
                 };
                 // 初速度
                 data.posVelocity = {
-                    pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * RandFloat()),
-                    pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * RandFloat()),
-                    pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * RandFloat()),
+                    pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
+                    pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
+                    pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
                     0.0f
                 };
                 // 加速度
                 data.posAcceleration = {
-                    pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * RandFloat()),
-                    pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * RandFloat()),
-                    pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * RandFloat()),
+                    pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * Mathf::RandFloat()),
+                    pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * Mathf::RandFloat()),
+                    pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * Mathf::RandFloat()),
                     0.0f
                 };
 
                 // 回転
                 data.rotation = {
-                    DirectX::XMConvertToRadians(pConfig.rotation.x + (pConfig.rotationRange.x * RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotation.y + (pConfig.rotationRange.y * RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotation.z + (pConfig.rotationRange.z * RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat())),
                     pConfig.isBillboard ? 1.0f : 0.0f
                 };
                 data.rotVelocity = {
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.x + (pConfig.rotationVelocityRange.x * RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.y + (pConfig.rotationVelocityRange.y * RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.z + (pConfig.rotationVelocityRange.z * RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.x + (pConfig.rotationVelocityRange.x * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.y + (pConfig.rotationVelocityRange.y * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.z + (pConfig.rotationVelocityRange.z * Mathf::RandFloat())),
                     0.0f
                 };
                 data.rotAcceleration = {
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.x + (pConfig.rotationAccelerationRange.x * RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.y + (pConfig.rotationAccelerationRange.y * RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.z + (pConfig.rotationAccelerationRange.z * RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.x + (pConfig.rotationAccelerationRange.x * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.y + (pConfig.rotationAccelerationRange.y * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.z + (pConfig.rotationAccelerationRange.z * Mathf::RandFloat())),
                     0.0f
                 };
 
                 // 拡大
                 data.scale = {
-                    std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * RandFloat())),
-                    std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * RandFloat())),
+                    std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
+                    std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
                     1.0f, 0.0f
                 };
                 data.scaleVelocity = {
-                    pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * RandFloat()),
-                    pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * RandFloat()),
-                    pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * RandFloat()),
+                    pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
+                    pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
+                    pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
                     0.0f
                 };
                 data.scaleAcceleration = {
-                    pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * RandFloat()),
-                    pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * RandFloat()),
-                    pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * RandFloat()),
+                    pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
+                    pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
+                    pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
                     0.0f
                 };
 
-                data.color = pConfig.color;
+                int colorEasingSpeed =
+                    (node.colorStartSpeed)
+                    | (node.colorEndSpeed << 4);
+
+                // 色イージングとランダムの計算
+                switch (pConfig.colorMode)
+                {
+                case ColorMode::Fixed:
+                    data.color = pConfig.color;
+                    data.start_color = pConfig.color;
+                    data.end_color = pConfig.color;
+                    data.color_param.x = -1.0f; // イージング無しのフラグ
+                    //data.color_param.x = colorEasingSpeed;
+                    data.color_param.y = pConfig.lifeTime;
+
+                    break;
+
+                case ColorMode::Easing:
+                {
+
+                    // 始点の色を指定した範囲でランダムに取得
+                    data.start_color.x = Mathf::RandomRange(pConfig.colorStartMin.x, pConfig.colorStartMax.x);
+                    data.start_color.y = Mathf::RandomRange(pConfig.colorStartMin.y, pConfig.colorStartMax.y);
+                    data.start_color.z = Mathf::RandomRange(pConfig.colorStartMin.z, pConfig.colorStartMax.z);
+                    data.start_color.w = Mathf::RandomRange(pConfig.colorStartMin.w, pConfig.colorStartMax.w);
+
+                    // 終点の色を指定した範囲でランダムに取得
+                    data.end_color.x = Mathf::RandomRange(pConfig.colorEndMin.x, pConfig.colorEndMax.x);
+                    data.end_color.y = Mathf::RandomRange(pConfig.colorEndMin.y, pConfig.colorEndMax.y);
+                    data.end_color.z = Mathf::RandomRange(pConfig.colorEndMin.z, pConfig.colorEndMax.z);
+                    data.end_color.w = Mathf::RandomRange(pConfig.colorEndMin.w, pConfig.colorEndMax.w);
+
+                    data.color_param.x = colorEasingSpeed;
+                    data.color_param.y = pConfig.lifeTime;
+
+                    break;
+                }
+                case ColorMode::Random:
+                    // 色をランダムで取得してcolorに入れる
+                    data.color.x = Mathf::RandomRange(pConfig.colorMin.x, pConfig.colorMax.x);
+                    data.color.y = Mathf::RandomRange(pConfig.colorMin.y, pConfig.colorMax.y);
+                    data.color.z = Mathf::RandomRange(pConfig.colorMin.z, pConfig.colorMax.z);
+                    data.color.w = Mathf::RandomRange(pConfig.colorMin.w, pConfig.colorMax.w);
+
+                    data.start_color = data.color;
+                    data.end_color = data.color;
+                    data.color_param.x = -1.0f;
+                    data.color_param.y = pConfig.lifeTime;
+
+
+                    break;
+                }
+
 
                 particleManager->Emit(data);
             }

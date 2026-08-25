@@ -33,10 +33,14 @@ public:
         DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // 拡大の初速
         DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
 
-        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // 色情報
+        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // 色
+        DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // 始点の色
+        DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // 終点の色
+        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:色イージングの始点速度, y:色イージングの終点速度, z:空き, w:空き
 
         // x:フェードイン秒数, y:フェードアウト秒数, z:フェードインの速度設定（始点・終点速度）, w:フェードアウトの速度設定（始点・終点速度）
         DirectX::XMFLOAT4 fade_param;
+
 	};
 
     // パーティクル構造体
@@ -59,8 +63,14 @@ public:
         DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
 
         DirectX::XMFLOAT4 texcoord; // UV座標
-        DirectX::XMFLOAT4 color; // 色情報
 
+        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // 色
+        DirectX::XMFLOAT4 renderColor = { 1, 1, 1, 1 }; // 色
+        DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // 始点の色
+        DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // 終点の色
+        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:色イージングの始点速度, y:色イージングの終点速度, z:空き, w:空き
+
+        // x:フェードイン秒数, y:フェードアウト秒数, z:フェードインの速度設定（始点・終点速度）, w:フェードアウトの速度設定（始点・終点速度）
         DirectX::XMFLOAT4 fade_param;
     };
 

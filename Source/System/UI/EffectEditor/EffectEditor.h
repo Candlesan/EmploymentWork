@@ -41,7 +41,6 @@ private:
 	void DrawNodeList();
 
 	// ƒwƒ‹ƒp[ŠÖ”
-	float RandFloat();
 	void EmitParticles(float elapsedTime);
 	void SyncRuntimeNodes();
 private:

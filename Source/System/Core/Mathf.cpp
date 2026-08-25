@@ -85,7 +85,4 @@ float Mathf::EaseCurve(float t, int startSpeed, int endSpeed)
 	float result = (3.0f * t2 - 2.0f * t3) + v0 * (t3 - 2.0f * t2 + t) + (v1 - 1.0f) * (t3 - t2);
 
 	return Clamp(result);
-
-
 }
-

@@ -56,7 +56,11 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
     particle_data_buffer[particle_index].scaleVelocity = emit_particle_butter[emit_index].scaleVelocity;
     particle_data_buffer[particle_index].scaleAcceleration = emit_particle_butter[emit_index].scaleAcceleration;
+    
     particle_data_buffer[particle_index].color = emit_particle_butter[emit_index].color;
+    particle_data_buffer[particle_index].start_color = emit_particle_butter[emit_index].start_color;
+    particle_data_buffer[particle_index].end_color = emit_particle_butter[emit_index].end_color;
+    particle_data_buffer[particle_index].color_param = emit_particle_butter[emit_index].color_param;
     
     uint type = (uint) (emit_particle_butter[emit_index].parameter.x + 0.5f);
     float w = 1.0f / texture_split_count.x;
