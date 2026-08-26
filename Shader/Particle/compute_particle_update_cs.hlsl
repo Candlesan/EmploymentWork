@@ -128,6 +128,31 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         alpha = 1.0f - EaseCurve(t, outStartSpeed, outEndSpeed);
     }
     
+    // 単一イージングの計算
+    if (data.scale_param.x >= 0.0f)
+    {
+        // パックの取り出し
+        uint scalePacked = (uint) data.scale_param.x;
+        uint scaleStartSpeed = (scalePacked) & 0xF;
+        uint scaleEndSpeed = (scalePacked >> 4) & 0xF;
+        float scaleMaxLifeTime = data.parameter.y;
+        
+        // 進行度を計算する
+        float t = activeTime / scaleMaxLifeTime;
+        float easeT = EaseCurve(t, scaleStartSpeed, scaleEndSpeed);
+        
+        // 始点色から終点色へ補間
+        float scaleT = lerp(data.scaleUniformStart, data.scaleUniformEnd, easeT); // スカラーで補間
+        data.renderScale.x = data.scale.x * scaleT;
+        data.renderScale.y = data.scale.y * scaleT;
+        data.renderScale.z = data.scale.z * scaleT;
+    }
+    else
+    {
+        data.renderScale = data.scale;
+
+    }
+    
     // 色の計算
     float4 finalColor = data.start_color;
     if (data.color_param.x >= 0.0f)
@@ -138,12 +163,10 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         uint colorEndSpeed = (colorPacked >> 4) & 0xF;
         float colorMaxLifeTime = data.color_param.y;
         
-        // 進行度計算する
+        // 進行度を計算する
         float t = activeTime / colorMaxLifeTime;
         float easeT = EaseCurve(t, colorStartSpeed, colorEndSpeed);
 
-        // 始点色から終点色へ補間
-        finalColor = lerp(data.start_color, data.end_color, easeT);
     }
     
     

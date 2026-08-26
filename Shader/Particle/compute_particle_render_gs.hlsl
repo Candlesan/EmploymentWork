@@ -101,7 +101,7 @@ void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
     vertex_id = particle_header_buffer[vertex_id].particle_index;
 
     //  ¶‘¶‚µ‚Ä‚¢‚È‚¢ê‡‚ÍƒXƒP[ƒ‹‚ğ0‚É‚µ‚Ä‚¨‚­
-    float3 scale = !is_alive ? float3(0, 0, 0) : particle_data_buffer[vertex_id].scale.xyz;
+    float3 scale = !is_alive ? float3(0, 0, 0) : particle_data_buffer[vertex_id].renderScale.xyz;
     
     float4x4 base_matrix;
     

@@ -48,6 +48,8 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     particle_data_buffer[particle_index].position = emit_particle_butter[emit_index].position;
     particle_data_buffer[particle_index].rotation = emit_particle_butter[emit_index].rotation;
     particle_data_buffer[particle_index].scale = emit_particle_butter[emit_index].scale;
+    
+    // 各速度・加速度
     particle_data_buffer[particle_index].posVelocity = emit_particle_butter[emit_index].posVelocity;
     particle_data_buffer[particle_index].posAcceleration = emit_particle_butter[emit_index].posAcceleration;
 
@@ -57,6 +59,16 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     particle_data_buffer[particle_index].scaleVelocity = emit_particle_butter[emit_index].scaleVelocity;
     particle_data_buffer[particle_index].scaleAcceleration = emit_particle_butter[emit_index].scaleAcceleration;
     
+    // 単一イージング（拡大縮小）
+    particle_data_buffer[particle_index].scaleUniformStart = emit_particle_butter[emit_index].scaleUniformStart;
+    particle_data_buffer[particle_index].scaleUniformStartRandom = emit_particle_butter[emit_index].scaleUniformStartRandom;
+    particle_data_buffer[particle_index].scaleUniformEnd = emit_particle_butter[emit_index].scaleUniformEnd;
+    particle_data_buffer[particle_index].scaleUniformEndRandom = emit_particle_butter[emit_index].scaleUniformEndRandom;
+    particle_data_buffer[particle_index].scale_param = emit_particle_butter[emit_index].scale_param;
+
+    
+    
+    //色パラメーター
     particle_data_buffer[particle_index].color = emit_particle_butter[emit_index].color;
     particle_data_buffer[particle_index].start_color = emit_particle_butter[emit_index].start_color;
     particle_data_buffer[particle_index].end_color = emit_particle_butter[emit_index].end_color;

@@ -415,14 +415,54 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
         // 拡大（スケール）タブ
         if (ImGui::BeginTabItem(u8"拡大"))
         {
-            ImGui::DragFloat3(u8"初期拡大##Scale", &node.scale.x, 0.01f);
-            ImGui::DragFloat3(u8"拡大ばらつき##Scale", &node.scaleRange.x, 0.01f);
+            const char* scaleModeItems[] = { u8"拡大率・速度・加速度", u8"単一イージング"};
+            int scaleMode = static_cast<int>(node.scaleMode);
+            if (ImGui::Combo(u8"##Scale", &scaleMode, scaleModeItems, IM_ARRAYSIZE(scaleModeItems)))
+            {
+                node.scaleMode = static_cast<ScaleMode>(scaleMode);
+            }
             ImGui::Separator();
-            ImGui::DragFloat3(u8"拡大速度##Scale", &node.scaleVelocity.x, 0.01f);
-            ImGui::DragFloat3(u8"拡大速度ばらつき##Scale", &node.scaleVelocityRange.x, 0.01f);
-            ImGui::Separator();
-            ImGui::DragFloat3(u8"拡大加速度##Scale", &node.scaleAcceleration.x, 0.01f);
-            ImGui::DragFloat3(u8"拡大加速度ばらつき##Scale", &node.scaleAccelerationRange.x, 0.01f);
+
+            switch (node.scaleMode)
+            {
+            case ScaleMode::Fixed:
+                ImGui::Text(u8"拡大率");
+                ImGui::DragFloat3(u8"中心##scale", &node.scale.x, 0.01f);
+                ImGui::DragFloat3(u8"振幅##scale", &node.scaleRange.x, 0.01f);
+                ImGui::Separator();
+
+                ImGui::Text(u8"拡大速度");
+                ImGui::DragFloat3(u8"中心##scaleVelocity", &node.scaleVelocity.x, 0.01f);
+                ImGui::DragFloat3(u8"振幅##scaleVelocity", &node.scaleVelocityRange.x, 0.01f);
+                ImGui::Separator();
+
+                ImGui::Text(u8"拡大加速度");
+                ImGui::DragFloat3(u8"拡大加速度##scaleAcceleration", &node.scaleAcceleration.x, 0.01f);
+                ImGui::DragFloat3(u8"拡大加速度ばらつき##scaleAcceleration", &node.scaleAccelerationRange.x, 0.01f);
+                ImGui::Separator();
+
+                break;
+
+            case ScaleMode::UniformEasing:
+                ImGui::Text(u8"始点");
+                ImGui::DragFloat(u8"中心##scaleUniformStart", &node.scaleUniformStart, 0.01f);
+                ImGui::DragFloat(u8"振幅##scaleUniformStart", &node.scaleUniformStartRandom, 0.01f);
+                ImGui::Separator();
+
+                ImGui::Text(u8"終点");
+                ImGui::DragFloat(u8"中心##scaleUniformEnd", &node.scaleUniformEnd, 0.01f);
+                ImGui::DragFloat(u8"振幅##scaleUniformEnd", &node.scaleUniformEndRandom, 0.01f);
+                ImGui::Separator();
+
+                const char* speedItem[] = { u8"低速3", u8"低速2",  u8"低速1",  u8"等速",  u8"高速1",  u8"高速2",  u8"高速3" };
+                ImGui::Combo(u8"始点速度##ColorSpeed", &node.scaleUniformStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+
+                ImGui::Combo(u8"終点速度##ColorSpeed", &node.scaleUniformEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+                ImGui::Separator();
+
+                break;
+            }
 
             ImGui::EndTabItem();
         }
@@ -591,11 +631,6 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
                 break;
             }
-            default:
-                ImGui::ColorEdit4(u8"", &node.color.x, ImGuiColorEditFlags_Uint8);
-                ImGui::Separator();
-
-                break;
             }
 
             if (node.type == RenderType::Mesh)
@@ -932,43 +967,67 @@ void EffectEditor::EmitParticles(float elapsedTime)
                     0.0f
                 };
 
+                int scaleEasingSpeed =
+                    (node.scaleUniformStartSpeed)
+                    | (node.scaleUniformEndSpeed << 4);
+
                 // 拡大
-                data.scale = {
-                    std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
-                    std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
-                    1.0f, 0.0f
-                };
-                data.scaleVelocity = {
-                    pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
-                    pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
-                    pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
-                data.scaleAcceleration = {
-                    pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
-                    pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
-                    pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
+                switch (node.scaleMode)
+                {
+                case ScaleMode::Fixed: // 固定
+                    data.scale = {
+                        std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
+                        std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
+                        1.0f, 0.0f
+                    };
+                    data.scaleVelocity = {
+                        pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
+                        pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
+                        pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
+                        0.0f
+                    };
+                    data.scaleAcceleration = {
+                        pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
+                        pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
+                        pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
+                        0.0f
+                    };
+
+                    data.scale_param.x = -1.0f; // イージング無しのフラグ
+
+                    break;
+                case ScaleMode::UniformEasing: // 単一イージング
+
+                    // 中心 ± 振れ幅の範囲でランダムに実際の値を決める
+                    float actualStart = pConfig.scaleUniformStart
+                        + Mathf::RandomRange(-pConfig.scaleUniformStartRandom, pConfig.scaleUniformStartRandom);
+                    float actualEnd = pConfig.scaleUniformEnd
+                        + Mathf::RandomRange(-pConfig.scaleUniformEndRandom, pConfig.scaleUniformEndRandom);
+
+                    data.scaleUniformStart = actualStart;
+                    data.scaleUniformEnd = actualEnd;
+                    data.scale_param.x = scaleEasingSpeed;
+                    data.scale_param.y = pConfig.lifeTime;
+                    break;
+                }
 
                 int colorEasingSpeed =
                     (node.colorStartSpeed)
                     | (node.colorEndSpeed << 4);
 
-                // 色イージングとランダムの計算
+                // 色
                 switch (pConfig.colorMode)
                 {
-                case ColorMode::Fixed:
+                case ColorMode::Fixed: // 固定
                     data.color = pConfig.color;
                     data.start_color = pConfig.color;
                     data.end_color = pConfig.color;
                     data.color_param.x = -1.0f; // イージング無しのフラグ
-                    //data.color_param.x = colorEasingSpeed;
                     data.color_param.y = pConfig.lifeTime;
 
                     break;
 
-                case ColorMode::Easing:
+                case ColorMode::Easing: // イージング
                 {
 
                     // 始点の色を指定した範囲でランダムに取得
@@ -988,7 +1047,7 @@ void EffectEditor::EmitParticles(float elapsedTime)
 
                     break;
                 }
-                case ColorMode::Random:
+                case ColorMode::Random: // ランダム
                     // 色をランダムで取得してcolorに入れる
                     data.color.x = Mathf::RandomRange(pConfig.colorMin.x, pConfig.colorMax.x);
                     data.color.y = Mathf::RandomRange(pConfig.colorMin.y, pConfig.colorMax.y);

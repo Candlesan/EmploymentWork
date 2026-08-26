@@ -33,10 +33,20 @@ public:
         DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // 拡大の初速
         DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
 
+        // 単一イージング
+        DirectX::XMFLOAT4 renderScale = { 1.0f, 1.0f, 1.0f, 1.0f };				// スケール(描画)
+        float scaleUniformStart = 1.0f;	// 始点：中心
+        float scaleUniformStartRandom = 0.0f; // 始点：振れ幅
+
+        float scaleUniformEnd = 1.0f; // 終点：中心
+        float scaleUniformEndRandom = 0.0f;	// 終点：振れ幅
+        DirectX::XMFLOAT4 scale_param = { -1, 0, 0, 0 }; // x:イージングの速度, y: 寿命, z:空き, w:空き
+
+
         DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // 色
         DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // 始点の色
         DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // 終点の色
-        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:色イージングの始点速度, y:色イージングの終点速度, z:空き, w:空き
+        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:色イージングの始点・終点の速度, y:寿命, z:空き, w:空き
 
         // x:フェードイン秒数, y:フェードアウト秒数, z:フェードインの速度設定（始点・終点速度）, w:フェードアウトの速度設定（始点・終点速度）
         DirectX::XMFLOAT4 fade_param;
@@ -61,6 +71,15 @@ public:
 
         DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // 拡大の初速
         DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
+
+        // 単一イージング
+        DirectX::XMFLOAT3 renderScale = { 1.0f, 1.0f, 1.0f };				// スケール(描画)
+        float scaleUniformStart = 1.0f;										// 始点：中心
+        float scaleUniformStartRandom = 0.0f;								// 始点：振れ幅
+
+        float scaleUniformEnd = 1.0f;										// 終点：中心
+        float scaleUniformEndRandom = 0.0f;									// 終点：振れ幅
+        DirectX::XMFLOAT4 scale_param; // x:イージングの速度, y: 空き, z:空き, w:空き
 
         DirectX::XMFLOAT4 texcoord; // UV座標
 

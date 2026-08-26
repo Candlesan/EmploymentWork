@@ -28,6 +28,13 @@ enum class RenderType
 	None = 3
 };
 
+// 拡大縮小のモード
+enum class ScaleMode
+{
+	Fixed,			// 固定
+	UniformEasing,	// 単一イージング
+};
+
 // フェードの速度
 enum class SpeedType
 {
@@ -96,11 +103,23 @@ struct NodeConfig
 	DirectX::XMFLOAT3 rotationAccelerationRange = { 0.0f, 0.0f, 0.0f }; // 回転の加速度のバラつき
 
 	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };						// スケール
-	DirectX::XMFLOAT3 scaleRange = { 0.0f, 0.0f, 0.0f };						// 大きさのバラつき
+	DirectX::XMFLOAT3 renderScale = { 1.0f, 1.0f, 1.0f };				// スケール(描画)
+	DirectX::XMFLOAT3 scaleRange = { 0.0f, 0.0f, 0.0f };				// 大きさのバラつき
 	DirectX::XMFLOAT3 scaleVelocity = { 0.0f, 0.0f, 0.0f };				// 拡大速度
 	DirectX::XMFLOAT3 scaleVelocityRange = { 0.0f, 0.0f, 0.0f };		// 拡大速度のばらつき
 	DirectX::XMFLOAT3 scaleAcceleration = { 0.0f, 0.0f, 0.0f };			// 拡大速度の加速度
 	DirectX::XMFLOAT3 scaleAccelerationRange = { 0.0f, 0.0f, 0.0f };	// 拡大速度の加速度のバラつき
+
+	// 単一イージング（拡大縮小）
+	ScaleMode scaleMode = ScaleMode::Fixed;
+	float scaleUniformStart = 1.0f;										// 始点：中心
+	float scaleUniformStartRandom = 0.0f;								// 始点：振れ幅
+
+	float scaleUniformEnd = 1.0f;										// 終点：中心
+	float scaleUniformEndRandom = 0.0f;									// 終点：振れ幅
+
+	int scaleUniformStartSpeed = static_cast<int>(SpeedType::Linear);	// 生成されてからの速度
+	int scaleUniformEndSpeed = static_cast<int>(SpeedType::Linear);		// 生存時間が終わるにつれての速度
 
 	// --- カラー --- 
 	ColorMode colorMode = ColorMode::Fixed;

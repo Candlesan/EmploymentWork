@@ -20,6 +20,16 @@ struct emit_particle_data
     
     float4 scaleVelocity;     // 拡大の初速
     float4 scaleAcceleration; // 拡大の加速度
+    
+    // 単一イージング
+    float4 renderScale;
+    float scaleUniformStart;
+    float scaleUniformStartRandom;
+    
+    float scaleUniformEnd;
+    float scaleUniformEndRandom;
+    
+    float4 scale_param; // x: 始点と終点の速度, y: 寿命 , z: 空き, w: 空き
         
     float4 color; // 色
     float4 start_color; // 始点の色
@@ -48,6 +58,18 @@ struct particle_data
 
     float4 scaleVelocity; // 拡大の初速
     float4 scaleAcceleration; // 拡大の加速度
+    
+    // 単一イージング
+    float4 renderScale;
+
+    float scaleUniformStart;
+    float scaleUniformStartRandom;
+    
+    float scaleUniformEnd;
+    float scaleUniformEndRandom;
+    
+    float4 scale_param; // x: 始点と終点の速度, y: 寿命 , z: 空き, w: 空き
+
 
     float4 texcoord; // UV座標
     

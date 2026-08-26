@@ -67,6 +67,16 @@ void EffectConfig::Save(const std::string& filePath)
         n["scaleAcceleration"] = { node.scaleAcceleration.x, node.scaleAcceleration.y, node.scaleAcceleration.z };
         n["scaleAccelerationRange"] = { node.scaleAccelerationRange.x, node.scaleAccelerationRange.y, node.scaleAccelerationRange.z };
 
+        // 単一イージング（拡大縮小）
+        n["scaleMode"] = static_cast<int>(node.scaleMode);
+        n["scaleUniformStart"] = node.scaleUniformStart;
+        n["scaleUniformStartRandom"] = node.scaleUniformStartRandom;
+        n["scaleUniformEnd"] = node.scaleUniformEnd;
+        n["scaleUniformEndRandom"] = node.scaleUniformEndRandom;
+        n["scaleUniformStartSpeed"] = node.scaleUniformStartSpeed;
+        n["scaleUniformEndSpeed"] = node.scaleUniformEndSpeed;
+
+
         n["color"] = { node.color.x, node.color.y, node.color.z, node.color.w };
         n["colorMode"] = static_cast<int>(node.colorMode);
         n["colorStartMin"] = { node.colorStartMin.x, node.colorStartMin.y, node.colorStartMin.z, node.colorStartMin.w };
@@ -182,13 +192,22 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("rotationAcceleration") != nodeJson.end()) node.rotationAcceleration = { nodeJson["rotationAcceleration"][0], nodeJson["rotationAcceleration"][1], nodeJson["rotationAcceleration"][2] };
                 if (nodeJson.find("rotationAccelerationRange") != nodeJson.end()) node.rotationAccelerationRange = { nodeJson["rotationAccelerationRange"][0], nodeJson["rotationAccelerationRange"][1], nodeJson["rotationAccelerationRange"][2] };
 
-                // 拡大
+                // 拡大率
                 if (nodeJson.find("scale") != nodeJson.end()) node.scale = { nodeJson["scale"][0], nodeJson["scale"][1], nodeJson["scale"][2] };
                 if (nodeJson.find("scaleRange") != nodeJson.end()) node.scaleRange = { nodeJson["scaleRange"][0], nodeJson["scaleRange"][1], nodeJson["scaleRange"][2] };
                 if (nodeJson.find("scaleVelocity") != nodeJson.end()) node.scaleVelocity = { nodeJson["scaleVelocity"][0], nodeJson["scaleVelocity"][1], nodeJson["scaleVelocity"][2] };
                 if (nodeJson.find("scaleVelocityRange") != nodeJson.end()) node.scaleVelocityRange = { nodeJson["scaleVelocityRange"][0], nodeJson["scaleVelocityRange"][1], nodeJson["scaleVelocityRange"][2] };
                 if (nodeJson.find("scaleAcceleration") != nodeJson.end()) node.scaleAcceleration = { nodeJson["scaleAcceleration"][0], nodeJson["scaleAcceleration"][1], nodeJson["scaleAcceleration"][2] };
                 if (nodeJson.find("scaleAccelerationRange") != nodeJson.end()) node.scaleAccelerationRange = { nodeJson["scaleAccelerationRange"][0], nodeJson["scaleAccelerationRange"][1], nodeJson["scaleAccelerationRange"][2] };
+
+                // 単一イージング
+                node.scaleMode = static_cast<ScaleMode>(nodeJson.value("sacleMode", static_cast<int>(ScaleMode::Fixed)));
+                node.scaleUniformStart = nodeJson.value("scaleUniformStart", 1.0f);
+                node.scaleUniformStartRandom = nodeJson.value("scaleUniformStartRandom", 1.0f);
+                node.scaleUniformEnd = nodeJson.value("scaleUniformEnd", 1.0f);
+                node.scaleUniformEndRandom = nodeJson.value("scaleUniformEndRandom", 1.0f);
+                node.scaleUniformStartSpeed = nodeJson.value("scaleUniformStartSpeed", 1.0f);
+                node.scaleUniformEndSpeed = nodeJson.value("scaleUniformEndSpeed", 1.0f);
 
                 // 色
                 if (nodeJson.find("color") != nodeJson.end()) node.color = { nodeJson["color"][0], nodeJson["color"][1], nodeJson["color"][2], nodeJson["color"][3] };
