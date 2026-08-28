@@ -30,13 +30,13 @@ void EffectConfig::Save(const std::string& filePath)
         n["isLoop"] = node.isLoop;
 
         // フェードイン
-        n["isFadeIn"] = node.IsFadeIn;
+        n["IsFadeIn"] = node.IsFadeIn;
         n["fadeInTime"] = node.fadeInTime;
         n["fadeInStartSpeed"] = node.fadeInStartSpeed;
         n["fadeInEndSpeed"] = node.fadeInEndSpeed;
 
         // フェードアウト
-        n["isFadeOut"] = node.IsFadeOut;
+        n["IsFadeOut"] = node.IsFadeOut;
         n["fadeOutTime"] = node.fadeOutTime;
         n["fadeOutStartSpeed"] = node.fadeOutStartSpeed;
         n["fadeOutEndSpeed"] = node.fadeOutEndSpeed;
@@ -79,6 +79,8 @@ void EffectConfig::Save(const std::string& filePath)
 
         n["color"] = { node.color.x, node.color.y, node.color.z, node.color.w };
         n["colorMode"] = static_cast<int>(node.colorMode);
+        n["colorMin"] = { node.colorMin.x, node.colorMin.y, node.colorMin.z, node.colorMin.w };
+        n["colorMax"] = { node.colorMax.x, node.colorMax.y, node.colorMax.z, node.colorMax.w };
         n["colorStartMin"] = { node.colorStartMin.x, node.colorStartMin.y, node.colorStartMin.z, node.colorStartMin.w };
         n["colorStartMax"] = { node.colorStartMax.x, node.colorStartMax.y, node.colorStartMax.z, node.colorStartMax.w };
         n["colorEndMin"] = { node.colorEndMin.x, node.colorEndMin.y, node.colorEndMin.z, node.colorEndMin.w };
@@ -201,7 +203,7 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("scaleAccelerationRange") != nodeJson.end()) node.scaleAccelerationRange = { nodeJson["scaleAccelerationRange"][0], nodeJson["scaleAccelerationRange"][1], nodeJson["scaleAccelerationRange"][2] };
 
                 // 単一イージング
-                node.scaleMode = static_cast<ScaleMode>(nodeJson.value("sacleMode", static_cast<int>(ScaleMode::Fixed)));
+                node.scaleMode = static_cast<ScaleMode>(nodeJson.value("scaleMode", static_cast<int>(ScaleMode::Fixed)));
                 node.scaleUniformStart = nodeJson.value("scaleUniformStart", 1.0f);
                 node.scaleUniformStartRandom = nodeJson.value("scaleUniformStartRandom", 1.0f);
                 node.scaleUniformEnd = nodeJson.value("scaleUniformEnd", 1.0f);
@@ -212,6 +214,8 @@ void EffectConfig::Load(const std::string& filePath)
                 // 色
                 if (nodeJson.find("color") != nodeJson.end()) node.color = { nodeJson["color"][0], nodeJson["color"][1], nodeJson["color"][2], nodeJson["color"][3] };
                 node.colorMode = static_cast<ColorMode>(nodeJson.value("colorMode", static_cast<int>(ColorMode::Fixed)));
+                if (nodeJson.find("colorMin") != nodeJson.end()) node.colorMin = { nodeJson["colorMin"][0], nodeJson["colorMin"][1], nodeJson["colorMin"][2], nodeJson["colorMin"][3] };
+                if (nodeJson.find("colorMax") != nodeJson.end()) node.colorMax = { nodeJson["colorMax"][0], nodeJson["colorMax"][1], nodeJson["colorMax"][2], nodeJson["colorMax"][3] };
                 if (nodeJson.find("colorStartMin") != nodeJson.end()) node.colorStartMin = { nodeJson["colorStartMin"][0], nodeJson["colorStartMin"][1], nodeJson["colorStartMin"][2], nodeJson["colorStartMin"][3] };
                 if (nodeJson.find("colorStartMax") != nodeJson.end()) node.colorStartMax = { nodeJson["colorStartMax"][0], nodeJson["colorStartMax"][1], nodeJson["colorStartMax"][2], nodeJson["colorStartMax"][3] };
                 if (nodeJson.find("colorEndMin") != nodeJson.end()) node.colorEndMin = { nodeJson["colorEndMin"][0], nodeJson["colorEndMin"][1], nodeJson["colorEndMin"][2], nodeJson["colorEndMin"][3] };

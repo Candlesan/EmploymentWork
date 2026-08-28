@@ -46,7 +46,7 @@
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": true,
+            "isBillboard": false,
             "isFadeIn": false,
             "isFadeOut": false,
             "isLoop": true,
@@ -111,7 +111,7 @@
             "rotationVelocity": [
                 0.0,
                 0.0,
-                0.0
+                90.0
             ],
             "rotationVelocityRange": [
                 0.0,
@@ -133,7 +133,7 @@
                 0.0,
                 0.0
             ],
-            "scaleMode": 1,
+            "scaleMode": 0,
             "scaleRange": [
                 0.0,
                 0.0,
@@ -144,7 +144,7 @@
             "scaleUniformEndSpeed": 6,
             "scaleUniformStart": 0.0,
             "scaleUniformStartRandom": 0.0,
-            "scaleUniformStartSpeed": 0,
+            "scaleUniformStartSpeed": 2,
             "scaleVelocity": [
                 0.0,
                 0.0,
@@ -156,7 +156,7 @@
                 0.0
             ],
             "spawnInterval": 1.0,
-            "spawnTimer": 0.8238992094993591,
+            "spawnTimer": 0.802593469619751,
             "splitCount": [
                 1,
                 1
@@ -292,9 +292,9 @@
                 0.0
             ],
             "scale": [
-                1.0,
-                1.0,
-                1.0
+                3.0,
+                3.0,
+                3.0
             ],
             "scaleAcceleration": [
                 0.0,
@@ -306,7 +306,7 @@
                 0.0,
                 0.0
             ],
-            "scaleMode": 1,
+            "scaleMode": 0,
             "scaleRange": [
                 0.0,
                 0.0,
@@ -329,7 +329,7 @@
                 0.0
             ],
             "spawnInterval": 1.0,
-            "spawnTimer": 0.8238992094993591,
+            "spawnTimer": 0.7997807264328003,
             "splitCount": [
                 1,
                 1

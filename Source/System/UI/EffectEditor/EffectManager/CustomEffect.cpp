@@ -4,6 +4,9 @@
 #include "System/Renderer/Shader/meshVFX/meshVFX.h"
 #include "System/Resource/ModelResourceManager/ModelResourceManager.h"
 
+#include <ctime>
+#include <cstdlib>
+
 
 // 初期化
 void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
@@ -49,6 +52,8 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
 
         runTimeNodes.push_back(rNode);
     }
+
+    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 // エフェクト再生
@@ -60,6 +65,44 @@ void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, Dir
 
 	effectTimer = 0.0f; // タイマーを0にする
 	isPlaying = true; // 再生中にする
+
+    for (auto& node : runTimeNodes)
+    {
+        if (node.config.type == RenderType::Particle)
+        {
+            node.config.spawnTimer = node.config.spawnInterval;
+        }
+
+        if (node.config.type == RenderType::Mesh && node.config.scaleMode == ScaleMode::UniformEasing)
+        {
+            // 始点の拡大率を計算する
+            node.config.meshUniformStartScale = node.config.scaleUniformStart + Mathf::RandomRange(-node.config.scaleUniformStartRandom, node.config.scaleUniformStartRandom); // 始点の中心 + 振れ幅
+            node.config.meshUniformEndScale = node.config.scaleUniformEnd + Mathf::RandomRange(-node.config.scaleUniformEndRandom, node.config.scaleUniformEndRandom); // 終点の中心 + 振れ幅
+        }
+
+        if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Random)
+        {
+            // 色をランダムで取得する
+            node.config.meshRandomColor.x = Mathf::RandomRange(node.config.colorMin.x, node.config.colorMax.x);
+            node.config.meshRandomColor.y = Mathf::RandomRange(node.config.colorMin.y, node.config.colorMax.y);
+            node.config.meshRandomColor.z = Mathf::RandomRange(node.config.colorMin.z, node.config.colorMax.z);
+            node.config.meshRandomColor.w = Mathf::RandomRange(node.config.colorMin.w, node.config.colorMax.w);
+        }
+        else if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Easing)
+        {
+            // 始点の色を指定した範囲でランダムに取得
+            node.config.meshStartColor.x = Mathf::RandomRange(node.config.colorStartMin.x, node.config.colorStartMax.x);
+            node.config.meshStartColor.y = Mathf::RandomRange(node.config.colorStartMin.y, node.config.colorStartMax.y);
+            node.config.meshStartColor.z = Mathf::RandomRange(node.config.colorStartMin.z, node.config.colorStartMax.z);
+            node.config.meshStartColor.w = Mathf::RandomRange(node.config.colorStartMin.w, node.config.colorStartMax.w);
+
+            // 終点の色を指定した範囲でランダムに取得
+            node.config.meshEndColor.x = Mathf::RandomRange(node.config.colorEndMin.x, node.config.colorEndMax.x);
+            node.config.meshEndColor.y = Mathf::RandomRange(node.config.colorEndMin.y, node.config.colorEndMax.y);
+            node.config.meshEndColor.z = Mathf::RandomRange(node.config.colorEndMin.z, node.config.colorEndMax.z);
+            node.config.meshEndColor.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
+        }
+    }
 }
 
 // エフェクト更新
@@ -99,18 +142,35 @@ void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& 
 
             if (node.meshModel)
             {
-                // 拡大（時間経過でのスケール変化 ＋ 拡大速度 ＋ 拡大加速度）
-                DirectX::XMFLOAT3 currentScale = {
-                    node.config.scale.x + (node.config.scaleVelocity.x * t) + (0.5f * node.config.scaleAcceleration.x * t * t),
-                    node.config.scale.y + (node.config.scaleVelocity.y * t) + (0.5f * node.config.scaleAcceleration.y * t * t),
-                    node.config.scale.z + (node.config.scaleVelocity.z * t) + (0.5f * node.config.scaleAcceleration.z * t * t)
-                };
-                // マイナス値にならないようにガード
-                currentScale.x = (std::max)(0.0f, currentScale.x);
-                currentScale.y = (std::max)(0.0f, currentScale.y);
-                currentScale.z = (std::max)(0.0f, currentScale.z);
+                DirectX::XMFLOAT3 finalScale = { 1, 1, 1 };
+                switch (node.config.scaleMode)
+                {
+                case ScaleMode::Fixed:
+                    // 拡大時間経過で大きく/小さくする
+                    // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
+                    finalScale.x = node.config.scale.x + (node.config.scaleVelocity.x * activeTime) + (0.5f * node.config.scaleAcceleration.x * activeTime * activeTime);
+                    finalScale.y = node.config.scale.y + (node.config.scaleVelocity.y * activeTime) + (0.5f * node.config.scaleAcceleration.y * activeTime * activeTime);
+                    finalScale.z = node.config.scale.z + (node.config.scaleVelocity.z * activeTime) + (0.5f * node.config.scaleAcceleration.z * activeTime * activeTime);
 
-                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(currentScale.x, currentScale.y, currentScale.z);
+                    break;
+                case ScaleMode::UniformEasing:
+                {
+                    float t = activeTime / node.config.lifeTime;
+                    float easeT = Mathf::EaseCurve(t, node.config.scaleUniformStartSpeed, node.config.scaleUniformEndSpeed);
+
+                    finalScale.x = Mathf::Lerp(node.config.meshUniformStartScale, node.config.meshUniformEndScale, easeT);
+                    finalScale.y = Mathf::Lerp(node.config.meshUniformStartScale, node.config.meshUniformEndScale, easeT);
+                    finalScale.z = Mathf::Lerp(node.config.meshUniformStartScale, node.config.meshUniformEndScale, easeT);
+                }
+                break;
+                }
+
+                // マイナスにならないようにガード
+                finalScale.x = (std::max)(0.0f, finalScale.x);
+                finalScale.y = (std::max)(0.0f, finalScale.y);
+                finalScale.z = (std::max)(0.0f, finalScale.z);
+
+                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(finalScale.x, finalScale.y, finalScale.z);
 
                 // 回転（初期回転 ＋ 初期角度 ＋ 自転・回転速度 ＋ 回転加速度）
                 DirectX::XMFLOAT3 currentRot = {
@@ -212,6 +272,7 @@ void CustomEffect::Render(RenderContext& rc)
     }
 }
 
+// メッシュVFX描画
 void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
 {
     if (!isPlaying) return;
@@ -235,13 +296,69 @@ void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
                     shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
                     shader->SetDistortionPower(rNode.config.distortionPower);
 
+                    // フェードインの計算
+                    float alpha = 1.0f;
+                    if (rNode.config.IsFadeIn && rNode.config.fadeInTime > 0.0001f && activeTime <= rNode.config.fadeInTime)
+                    {
+                        // 現在の進行度を求める
+                        float t = activeTime / rNode.config.fadeInTime;
+                        alpha = Mathf::EaseCurve(t, rNode.config.fadeInStartSpeed, rNode.config.fadeInEndSpeed);
+                    }
+                    // フェードアウトの計算
+                    else if (rNode.config.IsFadeOut && rNode.config.fadeOutTime > 0.0001f)
+                    {
+                        // 進行度を求める
+                        float fadeStartTime = rNode.config.lifeTime - rNode.config.fadeOutTime;
+
+                        if (activeTime >= fadeStartTime)
+                        {
+                            float t = (activeTime - fadeStartTime) / rNode.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
+                            alpha = 1.0f - Mathf::EaseCurve(t, rNode.config.fadeOutStartSpeed, rNode.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
+                        }
+                    }
+
+                    // 0.0～1.0の範囲に収める
+                    alpha = Mathf::Clamp(alpha);
+
                     DirectX::XMFLOAT2 noiseUvOffset = {
                         rNode.config.noiseUvOffset.x * effectTimer,
                         rNode.config.noiseUvOffset.y * effectTimer
                     };
                     shader->SetNoiseUvOffset(noiseUvOffset);
                     shader->SetBlendMode(rNode.config.blendMode);
-                    shader->SetColor(rNode.config.color);
+
+                    // タイプごとに色の計算をする
+                    DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+                    switch (rNode.config.colorMode)
+                    {
+                    case ColorMode::Fixed: // 固定色
+                        finalColor = rNode.config.color;
+
+                        break;
+                    case ColorMode::Random: // ランダム
+                        finalColor = rNode.config.meshRandomColor;
+
+                        break;
+                    case ColorMode::Easing: // イージング
+                    {
+                        // 進行度を求める
+                        float t = activeTime / rNode.config.lifeTime;
+
+                        // イージング速度を求める
+                        float easeT = Mathf::EaseCurve(t, rNode.config.colorStartSpeed, rNode.config.colorEndSpeed);
+
+                        // Lerpを掛けて進行度にあ和得て色を変化させる
+                        finalColor.x = Mathf::Lerp(rNode.config.meshStartColor.x, rNode.config.meshEndColor.x, easeT);
+                        finalColor.y = Mathf::Lerp(rNode.config.meshStartColor.y, rNode.config.meshEndColor.y, easeT);
+                        finalColor.z = Mathf::Lerp(rNode.config.meshStartColor.z, rNode.config.meshEndColor.z, easeT);
+                        finalColor.w = Mathf::Lerp(rNode.config.meshStartColor.w, rNode.config.meshEndColor.w, easeT);
+
+                        break;
+                    }
+                    }
+
+                    finalColor.w *= alpha;
+                    shader->SetColor(finalColor); // このノード固有の色
                     shader->SetUvOffset(rNode.currentUvOffset);
 
 
@@ -319,6 +436,19 @@ void CustomEffect::EmitParticles(float elapsedTime, std::unique_ptr<Compute_Part
                 data.parameter.z =pConfig.uvScrollSpeed.x;
                 data.parameter.w =pConfig.uvScrollSpeed.y;
 
+                // フェードのスピードを設定する
+                int packedSpeed =
+                    (pConfig.fadeInStartSpeed)
+                    | (pConfig.fadeInEndSpeed << 4)
+                    | (pConfig.fadeOutStartSpeed << 8)
+                    | (pConfig.fadeOutEndSpeed << 12);
+
+                data.fade_param.x = pConfig.IsFadeIn  ? pConfig.fadeInTime : 0.0f;
+                data.fade_param.y = pConfig.IsFadeOut ? pConfig.fadeOutTime : 0.0f;
+                data.fade_param.z = pConfig.lifeTime;
+                data.fade_param.w = static_cast<float>(packedSpeed);
+
+
                 // 位置
                 data.position = {
                   pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
@@ -361,26 +491,101 @@ void CustomEffect::EmitParticles(float elapsedTime, std::unique_ptr<Compute_Part
                     0.0f
                 };
 
-                // 拡大
-                data.scale = {
-                    std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
-                    std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
-                    1.0f, 0.0f
-                };
-                data.scaleVelocity = {
-                    pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
-                    pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
-                    pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
-                data.scaleAcceleration = {
-                    pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
-                    pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
-                    pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
+                int scaleEasingSpeed =
+                    (pConfig.scaleUniformStartSpeed)
+                    | (pConfig.scaleUniformEndSpeed << 4);
 
-                data.color = pConfig.color;
+                // 拡大
+                switch (pConfig.scaleMode)
+                {
+                case ScaleMode::Fixed: // 固定
+                    data.scale = {
+                        std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
+                        std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
+                        1.0f, 0.0f
+                    };
+                    data.scaleVelocity = {
+                        pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
+                        pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
+                        pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
+                        0.0f
+                    };
+                    data.scaleAcceleration = {
+                        pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
+                        pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
+                        pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
+                        0.0f
+                    };
+
+                    data.scale_param.x = -1.0f; // イージング無しのフラグ
+
+                    break;
+                case ScaleMode::UniformEasing: // 単一イージング
+
+                    // 中心 ± 振れ幅の範囲でランダムに実際の値を決める
+                    float actualStart = pConfig.scaleUniformStart
+                        + Mathf::RandomRange(-pConfig.scaleUniformStartRandom, pConfig.scaleUniformStartRandom);
+                    float actualEnd = pConfig.scaleUniformEnd
+                        + Mathf::RandomRange(-pConfig.scaleUniformEndRandom, pConfig.scaleUniformEndRandom);
+
+                    data.scaleUniformStart = actualStart;
+                    data.scaleUniformEnd = actualEnd;
+                    data.scale_param.x = scaleEasingSpeed;
+                    data.scale_param.y = pConfig.lifeTime;
+                    break;
+                }
+
+                int colorEasingSpeed =
+                    (pConfig.colorStartSpeed)
+                    | (pConfig.colorEndSpeed << 4);
+
+                // 色
+                switch (pConfig.colorMode)
+                {
+                case ColorMode::Fixed: // 固定
+                    data.color = pConfig.color;
+                    data.start_color = pConfig.color;
+                    data.end_color = pConfig.color;
+                    data.color_param.x = -1.0f; // イージング無しのフラグ
+                    data.color_param.y = pConfig.lifeTime;
+
+                    break;
+
+                case ColorMode::Random: // ランダム
+                    // 色をランダムで取得してcolorに入れる
+                    data.color.x = Mathf::RandomRange(pConfig.colorMin.x, pConfig.colorMax.x);
+                    data.color.y = Mathf::RandomRange(pConfig.colorMin.y, pConfig.colorMax.y);
+                    data.color.z = Mathf::RandomRange(pConfig.colorMin.z, pConfig.colorMax.z);
+                    data.color.w = Mathf::RandomRange(pConfig.colorMin.w, pConfig.colorMax.w);
+
+                    data.start_color = data.color;
+                    data.end_color = data.color;
+                    data.color_param.x = -1.0f;
+                    data.color_param.y = pConfig.lifeTime;
+
+
+                    break;
+
+                case ColorMode::Easing: // イージング
+                {
+                    // 始点の色を指定した範囲でランダムに取得
+                    data.start_color.x = Mathf::RandomRange(pConfig.colorStartMin.x, pConfig.colorStartMax.x);
+                    data.start_color.y = Mathf::RandomRange(pConfig.colorStartMin.y, pConfig.colorStartMax.y);
+                    data.start_color.z = Mathf::RandomRange(pConfig.colorStartMin.z, pConfig.colorStartMax.z);
+                    data.start_color.w = Mathf::RandomRange(pConfig.colorStartMin.w, pConfig.colorStartMax.w);
+
+                    // 終点の色を指定した範囲でランダムに取得
+                    data.end_color.x = Mathf::RandomRange(pConfig.colorEndMin.x, pConfig.colorEndMax.x);
+                    data.end_color.y = Mathf::RandomRange(pConfig.colorEndMin.y, pConfig.colorEndMax.y);
+                    data.end_color.z = Mathf::RandomRange(pConfig.colorEndMin.z, pConfig.colorEndMax.z);
+                    data.end_color.w = Mathf::RandomRange(pConfig.colorEndMin.w, pConfig.colorEndMax.w);
+
+                    data.color_param.x = colorEasingSpeed;
+                    data.color_param.y = pConfig.lifeTime;
+
+                    break;
+                }
+                }
 
                 manager->Emit(data);
             }

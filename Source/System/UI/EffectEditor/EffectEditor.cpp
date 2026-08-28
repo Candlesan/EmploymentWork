@@ -73,13 +73,15 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
         {
             node.spawnTimer = node.spawnInterval;
         }
-        else if (node.type == RenderType::Mesh && node.scaleMode == ScaleMode::UniformEasing)
+
+        if (node.type == RenderType::Mesh && node.scaleMode == ScaleMode::UniformEasing)
         {
             // 始点の拡大率を計算する
             node.meshUniformStartScale = node.scaleUniformStart + Mathf::RandomRange(-node.scaleUniformStartRandom, node.scaleUniformStartRandom); // 始点の中心 + 振れ幅
             node.meshUniformEndScale = node.scaleUniformEnd + Mathf::RandomRange(-node.scaleUniformEndRandom, node.scaleUniformEndRandom); // 終点の中心 + 振れ幅
         }
-        else if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Random)
+
+        if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Random)
         {
             // 色をランダムで取得する
             node.meshRandomColor.x = Mathf::RandomRange(node.colorMin.x, node.colorMax.x);
@@ -621,6 +623,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::Checkbox(u8"フェードイン", &node.IsFadeIn);
             if (node.IsFadeIn)
             {
+                node.IsFadeIn = true;
                 ImGui::DragFloat(u8"終了時間##FadeIn", &node.fadeInTime, 0.1f);
                 ImGui::Separator();
 
@@ -630,10 +633,15 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 ImGui::Combo(u8"終点速度##FadeIn", &node.fadeInEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
                 ImGui::Separator();
             }
+            else
+            {
+                node.IsFadeIn = false;
+            }
 
             ImGui::Checkbox(u8"フェードアウト", &node.IsFadeOut);
             if (node.IsFadeOut)
             {
+                node.IsFadeOut = true;
                 ImGui::DragFloat(u8"終了時間##FadeOut", &node.fadeOutTime, 0.1f);
                 ImGui::Separator();
 
@@ -642,6 +650,10 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
                 ImGui::Combo(u8"終点速度##FadeOut", &node.fadeOutEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
                 ImGui::Separator();
+            }
+            else
+            {
+                node.IsFadeOut = false;
             }
 
 
@@ -962,21 +974,6 @@ void EffectEditor::EmitParticles(float elapsedTime)
 
         float activeTime = effectTimer - cNode.delayTime;
         if (cNode.duration > 0.0f && activeTime >= cNode.duration) continue;
-
-        float alpha = 1.0f;
-        // フェードスピードを計算する
-        if (cNode.IsFadeIn && cNode.fadeInTime > 0.0001f && activeTime <= cNode.fadeInTime)
-        {
-            // 現在の進行度を求める
-            float t = activeTime / cNode.fadeInTime;
-            alpha = Mathf::EaseCurve(t, cNode.fadeInStartSpeed, cNode.fadeInEndSpeed);
-        }
-        else if (cNode.IsFadeOut && cNode.fadeOutTime > 0.0001f && activeTime >= (cNode.lifeTime - cNode.fadeOutTime))
-        {
-            float fadeStartTime = cNode.duration - cNode.fadeOutTime;
-            float t = (activeTime - fadeStartTime) / cNode.fadeOutTime; // 0.0 ~ 1.0 に正規化
-            alpha = 1.0f - Mathf::EaseCurve(t, cNode.fadeOutStartSpeed, cNode.fadeOutEndSpeed);
-        }
 
         // ノード個別のタイマーを進める
         cNode.spawnTimer += elapsedTime;
