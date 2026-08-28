@@ -144,6 +144,9 @@ struct NodeConfig
 	std::string meshPath = "";											// モデルパス
 	std::string noisePath = "";											// ノイズテクスチャパス
 	float distortionPower = 0.0f;										// 歪みの強さ
+	DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };					// 色のランダム(計算用)
+	DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };					// 始点の色(計算用)
+	DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };					// 終点の色(計算用)
 
 	// [Trail用]
 	float width = 1.0f;													
