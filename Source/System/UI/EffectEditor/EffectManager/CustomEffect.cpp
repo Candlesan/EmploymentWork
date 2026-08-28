@@ -14,10 +14,16 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
     // エフェクトの設定を読み込む
     this->config = config;
 
-    for (const auto& nodeConfig : config.nodes)
+    // ノードの数だけ配列の枠を確保する
+    runTimeNodes.resize(config.nodes.size());
+
+    for (size_t i = 0; i < config.nodes.size(); ++i)
     {
-        RuntimeNode rNode;
+        auto& nodeConfig = config.nodes[i];
+        auto& rNode = runTimeNodes[i];
+
         rNode.config = nodeConfig;
+        rNode.particleManager = std::make_unique<Compute_Particle>(device);
 
         // メッシュノードなら、そのノードのパスでモデルを生成
         if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
@@ -49,8 +55,6 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
             rNode.trail = std::make_shared<Trail>();
             rNode.trail->Initialize();
         }
-
-        runTimeNodes.push_back(rNode);
     }
 
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -106,7 +110,7 @@ void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, Dir
 }
 
 // エフェクト更新
-void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& manager)
+void CustomEffect::Update(float elapsedTime)
 {
     if (!isPlaying) return;
 
@@ -114,6 +118,8 @@ void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& 
     effectTimer += elapsedTime;
 
     float maxDuration = 0.0f;
+
+    ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 
     for (auto& node : runTimeNodes)
     {
@@ -125,6 +131,13 @@ void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& 
 
         node.currentUvOffset.x = fmodf(node.currentUvOffset.x, 1.0f);
         node.currentUvOffset.y = fmodf(node.currentUvOffset.y, 1.0f);
+
+        // パーティクルの計算を進める
+        if (node.particleManager)
+        {
+
+            node.particleManager->Update(dc, elapsedTime);
+        }
 
         // パーティクル
         if (node.config.type == RenderType::Particle)
@@ -228,7 +241,7 @@ void CustomEffect::Update(float elapsedTime, std::unique_ptr<Compute_Particle>& 
         }
     } 
 
-    EmitParticles(elapsedTime, manager);
+    EmitParticles(elapsedTime);
 
     // 寿命を進める
     if (maxDuration > 0.0f && effectTimer >= maxDuration)
@@ -263,6 +276,12 @@ void CustomEffect::Render(RenderContext& rc)
         for (const auto& node : runTimeNodes)
         {
             if (!node.config.visible) continue;
+
+            // パーティクルの描画
+            if (node.particleManager)
+            {
+                node.particleManager->Render(rc);
+            }
 
             if (node.config.type == RenderType::Trail && node.trail)
             {
@@ -394,7 +413,7 @@ bool CustomEffect::IsFinished()
 }
 
 // パーティクル放出
-void CustomEffect::EmitParticles(float elapsedTime, std::unique_ptr<Compute_Particle>& manager)
+void CustomEffect::EmitParticles(float elapsedTime)
 {
     // 全ノードを順番にチェックして発生させる
     for (auto& node : runTimeNodes)
@@ -420,9 +439,9 @@ void CustomEffect::EmitParticles(float elapsedTime, std::unique_ptr<Compute_Part
            pConfig.spawnTimer -=pConfig.spawnInterval;
 
             // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
-            if (manager && !pConfig.texturePath.empty())
+            if (node.particleManager && !pConfig.texturePath.empty())
             {
-                manager->SetTexture(pConfig.texturePath, { (UINT)pConfig.splitCount[0], (UINT)pConfig.splitCount[1] });
+                node.particleManager->SetTexture(pConfig.texturePath, { (UINT)pConfig.splitCount[0], (UINT)pConfig.splitCount[1] });
             }
 
             // 生成数分 for 文で回す
@@ -587,7 +606,7 @@ void CustomEffect::EmitParticles(float elapsedTime, std::unique_ptr<Compute_Part
                 }
                 }
 
-                manager->Emit(data);
+                node.particleManager->Emit(data);
             }
         }
     }

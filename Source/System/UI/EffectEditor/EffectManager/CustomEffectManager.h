@@ -48,5 +48,4 @@ private:
 	ID3D11Device* device;
 	std::unordered_map<std::string, EffectConfig> effectConfigs; // キャッシュ用の箱
 	std::vector<CustomEffect*> activeEffects; // 現在再生中のエフェクト一覧
-	std::unique_ptr<Compute_Particle> particleManager; // パーティクル用
 };

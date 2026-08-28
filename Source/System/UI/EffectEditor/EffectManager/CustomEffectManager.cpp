@@ -9,9 +9,6 @@ void CustomEffectManager::Initialize(ID3D11Device* device)
 	// デバイスを保持する
 	this->device = device;
 
-	// パーティクルを読み込む
-	particleManager = std::make_unique<Compute_Particle>(device);
-
 }
 
 // Jsonファイルの読み込み/キャッシュ
@@ -60,7 +57,7 @@ void CustomEffectManager::Update(float elapsedTime)
 	// 全エフェクトを更新する
 	for (auto& effect : activeEffects)
 	{
-		effect->Update(elapsedTime, particleManager);
+		effect->Update(elapsedTime);
 
 		// 終了しているエフェクトが無いか確認する
 		if (effect->IsFinished())
@@ -71,7 +68,6 @@ void CustomEffectManager::Update(float elapsedTime)
 
 	// パーティクルを更新する
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
-	particleManager->Update(dc, elapsedTime);
 
 	// 更新が終わった後に削除処理をする
 	for (auto& effect : removes)
@@ -94,8 +90,6 @@ void CustomEffectManager::Render(RenderContext& rc)
 	{
 		effect->Render(rc);
 	}
-
-	particleManager->Render(rc);
 }
 
 // メッシュVFXの描画

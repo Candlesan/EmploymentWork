@@ -2,6 +2,8 @@
     "effectName": "NewEffect",
     "nodes": [
         {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
             "blendMode": 0,
             "color": [
                 1.0,
@@ -22,6 +24,18 @@
                 1.0
             ],
             "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
             "colorMode": 0,
             "colorStartMax": [
                 1.0,
@@ -38,7 +52,7 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 1.0,
+            "duration": 5.0,
             "emitCount": 1,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
@@ -47,10 +61,8 @@
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
             "isBillboard": false,
-            "isFadeIn": false,
-            "isFadeOut": false,
             "isLoop": true,
-            "lifeTime": 1.0,
+            "lifeTime": 5.0,
             "meshPath": "",
             "name": "Node",
             "noisePath": "",
@@ -155,8 +167,8 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 1.0,
-            "spawnTimer": 0.802593469619751,
+            "spawnInterval": 5.0,
+            "spawnTimer": 1.8726214170455933,
             "splitCount": [
                 1,
                 1
@@ -175,6 +187,8 @@
             "widthStart": 1.0
         },
         {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
             "blendMode": 0,
             "color": [
                 0.0,
@@ -195,6 +209,18 @@
                 1.0
             ],
             "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
             "colorMode": 0,
             "colorStartMax": [
                 1.0,
@@ -211,7 +237,7 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 1.0,
+            "duration": 5.0,
             "emitCount": 1,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
@@ -220,10 +246,8 @@
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
             "isBillboard": true,
-            "isFadeIn": false,
-            "isFadeOut": false,
             "isLoop": true,
-            "lifeTime": 1.0,
+            "lifeTime": 5.0,
             "meshPath": "",
             "name": "Node 2",
             "noisePath": "",
@@ -328,8 +352,8 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 1.0,
-            "spawnTimer": 0.7997807264328003,
+            "spawnInterval": 5.0,
+            "spawnTimer": 1.8726214170455933,
             "splitCount": [
                 1,
                 1

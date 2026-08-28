@@ -1,5 +1,8 @@
 #pragma once
 #define NOMINMAX
+
+#include "GamePlay/Object/Particle/Compute_Particle.h"
+
 #include "System/UI/EffectEditor/EffectConfig.h"
 #include "System/UI/EffectEditor/EffectEditor.h"
 
@@ -21,7 +24,7 @@ public:
 		DirectX::XMFLOAT3 scale);
 
 	// エフェクト更新
-	void Update(float elapsedTime, std::unique_ptr<Compute_Particle>& manager);
+	void Update(float elapsedTime);
 
 	// エフェクト描画
 	void Render(RenderContext& rc);
@@ -35,7 +38,7 @@ public:
 	void DrawGUI();
 
 private:
-	void EmitParticles(float elapsedTime, std::unique_ptr<Compute_Particle>& manager);
+	void EmitParticles(float elapsedTime);
 
 private:
 	// 実行時（再生中）の1ノード分のインスタンス
@@ -44,6 +47,7 @@ private:
 		NodeConfig config; // 設定データ
 		std::shared_ptr<Model> meshModel = nullptr;
 		std::shared_ptr<Trail> trail = nullptr;
+		std::unique_ptr<Compute_Particle> particleManager;	// パーティクル制御
 		DirectX::XMFLOAT2 currentUvOffset = { 0.0f, 0.0f };	// 毎フレーム加算していくUV位置
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
