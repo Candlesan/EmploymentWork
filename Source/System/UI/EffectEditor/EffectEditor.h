@@ -49,16 +49,14 @@ private:
 	{
 		std::shared_ptr<Model> meshModel = nullptr;  // そのノード専用の3Dモデル
 		std::shared_ptr<Trail> trail = nullptr;      // そのノード専用のトレイル
+		std::unique_ptr<Compute_Particle> particleManager;	// パーティクル制御
 		DirectX::XMFLOAT2 currentUvOffset = { 0.0f, 0.0f }; // UV加算用
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
 	};
 
 	EffectConfig currentConfig; // 現在調整中の設定データ
-
-	// テスト用の描画用のリソース
-
-	std::unique_ptr<Compute_Particle> particleManager;	// パーティクル制御
+	
 	std::vector<RuntimeNode> runtimeNodes;        // 各ノード専用のリソース配列！
 
 	// 再生状態

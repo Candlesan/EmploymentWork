@@ -1,0 +1,351 @@
+{
+    "effectName": "NewEffect",
+    "nodes": [
+        {
+            "blendMode": 0,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                0.0,
+                0.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 6,
+            "colorMode": 0,
+            "colorStartMax": [
+                0.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.9607843160629272
+            ],
+            "colorStartSpeed": 6,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 0.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 6,
+            "fadeInStartSpeed": 6,
+            "fadeInTime": 1.0,
+            "fadeOutEndSpeed": 6,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.5,
+            "isBillboard": true,
+            "isFadeIn": false,
+            "isFadeOut": false,
+            "isLoop": true,
+            "lifeTime": 5.0,
+            "meshPath": "",
+            "name": "Node",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.20000000298023224,
+                0.20000000298023224,
+                0.20000000298023224
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 5.0,
+            "spawnTimer": 3.9956393241882324,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\Particle_Soft.png",
+            "type": 0,
+            "uvScrollSpeed": [
+                0.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "blendMode": 1,
+            "color": [
+                0.9111968874931335,
+                0.909200131893158,
+                0.3940311372280121,
+                1.0
+            ],
+            "colorEndMax": [
+                0.07335907220840454,
+                0.9034090042114258,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.75,
+            "duration": 5.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 1.0,
+            "isBillboard": true,
+            "isFadeIn": false,
+            "isFadeOut": false,
+            "isLoop": true,
+            "lifeTime": 5.0,
+            "meshPath": "Data\\Sprite\\Particle\\model\\Sphere.gltf",
+            "name": "Node 2",
+            "noisePath": "Data\\Sprite\\Particle\\texture\\T_NoiseNormal_69.png",
+            "noiseUvOffset": [
+                -0.1899999976158142,
+                0.10000000149011612
+            ],
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.10000000149011612,
+                0.10000000149011612,
+                0.10000000149011612
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 5.0,
+            "spawnTimer": 0.998855471611023,
+            "splitCount": [
+                4,
+                4
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\aurora01.png",
+            "type": 1,
+            "uvScrollSpeed": [
+                -1.0,
+                1.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        }
+    ]
+}

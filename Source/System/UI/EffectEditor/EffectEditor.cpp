@@ -11,8 +11,15 @@
 // 初期化
 void EffectEditor::Initialize(ID3D11Device* device)
 {
-	 // パーティクルマネージャーの初期化
-	particleManager = std::make_unique<Compute_Particle>(device);
+    SyncRuntimeNodes();
+
+    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
+    {
+        auto& rNode = runtimeNodes[i];
+
+        // パーティクルマネージャーの初期化
+        rNode.particleManager = std::make_unique<Compute_Particle>(device);
+    }
 
     srand(static_cast<unsigned int>(time(nullptr)));
 }
@@ -68,36 +75,33 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
             node.spawnTimer = node.spawnInterval;
         }
     }
-
-    // 最初の1回目の発生！
-    EmitParticles(0.0f);
 }
 
 // 更新処理
 void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 {
-    // パーティクルの計算を進める
-    if (particleManager)
-    {
-        particleManager->Update(dc, elapsedTime);
-    }
-
-    // 再生中じゃなければここで終了
-    if (!isPlaying) return;
-
-    // エフェクト全体の時間を進める
-    effectTimer += elapsedTime;
-    SyncRuntimeNodes();
 
     //　ノードごとに走査する
     bool anyNodeActive = false; // まだ再生しているノードがあるか
 
     float maxDuration = 0.0f;
 
+    // エフェクト全体の時間を進める
+    effectTimer += elapsedTime;
+
     for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
         auto& node = currentConfig.nodes[i];
         auto& rNode = runtimeNodes[i];
+
+        // パーティクルの計算を進める
+        if (rNode.particleManager)
+        {
+            rNode.particleManager->Update(dc, elapsedTime);
+        }
+
+        // 再生中じゃなければここで終了
+        if (!isPlaying) return;
 
         if (!node.visible) continue;
 
@@ -107,14 +111,27 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
         rNode.currentUvOffset.x = fmodf(rNode.currentUvOffset.x, 1.0f);
         rNode.currentUvOffset.y = fmodf(rNode.currentUvOffset.y, 1.0f);
 
+        float nodeTotalTime = 0.0f;
+        if (node.type == RenderType::Particle)
+        {
+            // パーティクルの場合：発生遅延 ＋ 存続時間 ＋ 寿命
+            nodeTotalTime = node.delayTime + node.duration + node.lifeTime;
+        }
+        else
+        {
+            // メッシュ・トレイルの場合：発生遅延 ＋ 寿命
+            nodeTotalTime = node.delayTime + node.lifeTime;
+        }
+
+        // ここで全ノード共通で maxDuration を更新する！
+        if (nodeTotalTime > maxDuration)
+        {
+            maxDuration = nodeTotalTime;
+        }
+
         // パーティクルノードの処理
         if (node.type == RenderType::Particle)
         {
-            // ノードの生存時間をチェック
-            if (node.duration > maxDuration)
-            {
-                maxDuration = node.duration;
-            }
         }
         // メッシュの処理
         else if (node.type == RenderType::Mesh)
@@ -200,18 +217,12 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
                 rNode.trail->SetWidthScales(node.widthStart, node.widthMiddle, node.widthEnd);
                 rNode.trail->Update(root, tip);
             }
-
-            if (node.lifeTime > maxDuration) maxDuration = node.lifeTime;
         }
 
-        if (node.lifeTime > maxDuration)
-        {
-            maxDuration = node.lifeTime;
-        }
     }
 
     // EmitParticle内で全ノードを回して生成する
-        EmitParticles(elapsedTime);
+    EmitParticles(elapsedTime);
 
     if (maxDuration > 0.0f && effectTimer >= maxDuration)
     {
@@ -235,6 +246,7 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
             isPlaying = false;  // 再生終了
         }
     }
+
 }
 
 // 描画処理
@@ -250,17 +262,17 @@ void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
 
             if (!node.visible) continue;
 
+            // パーティクルの描画
+            if (rNode.particleManager)
+            {
+                rNode.particleManager->Render(rc);
+            }
+
             if (node.type == RenderType::Trail && rNode.trail)
             {
                 rNode.trail->Render(rc);
             }
         }
-    }
-
-    // パーティクルの描画
-    if (particleManager)
-    {
-        particleManager->Render(rc);
     }
 }
 
@@ -287,7 +299,7 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
         if (effectTimer < node.delayTime) continue;
         float meshActiveTime = effectTimer - node.delayTime;
 
-        if (rNode.meshModel && currentMeshTime <= node.lifeTime)
+        if (rNode.meshModel && meshActiveTime <= node.lifeTime)
         {
             // このノード専用のパラメータをシェーダーにセット
             shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
@@ -492,13 +504,15 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
                     currentConfig.nodes[selectedNodeIndex].texturePath = pathStr;
 
-                    if (particleManager)
+                    if (runtimeNodes[selectedNodeIndex].particleManager)
                     {
-                        particleManager->SetTexture(
+                        runtimeNodes[selectedNodeIndex].particleManager->SetTexture(
                             pathStr,
                             { (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[1] }
                         );
                     }
+
+                    SyncRuntimeNodes();
                 }
             }
             ImGui::SameLine();
@@ -512,9 +526,9 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 {
                     node.texturePath = "";
 
-                    if (particleManager)
+                    if (runtimeNodes[selectedNodeIndex].particleManager)
                     {
-                        particleManager->SetTexture("", { 1, 1 });
+                        runtimeNodes[selectedNodeIndex].particleManager->SetTexture("", { 1, 1 });
                     }
                 }
             }
@@ -560,8 +574,8 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             if (ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", node.splitCount))
             {
                 // 分割数の数値をいじった瞬間にGPU側の設定も更新する
-                if (particleManager && !node.texturePath.empty()) {
-                    particleManager->SetTexture(node.texturePath, { (UINT)node.splitCount[0], (UINT)node.splitCount[1] });
+                if (runtimeNodes[selectedNodeIndex].particleManager && !node.texturePath.empty()) {
+                    runtimeNodes[selectedNodeIndex].particleManager->SetTexture(node.texturePath, { (UINT)node.splitCount[0], (UINT)node.splitCount[1] });
                 }
             }
 
@@ -762,9 +776,9 @@ void EffectEditor::DrawFileToolbar()
 
             SyncRuntimeNodes();
 
-            if (particleManager && !currentConfig.nodes[selectedNodeIndex].texturePath.empty())
+            if (runtimeNodes[selectedNodeIndex].particleManager && !currentConfig.nodes[selectedNodeIndex].texturePath.empty())
             {
-                particleManager->SetTexture(
+                runtimeNodes[selectedNodeIndex].particleManager->SetTexture(
                     currentConfig.nodes[selectedNodeIndex].texturePath,
                     { (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[1] }
                 );
@@ -796,6 +810,8 @@ void EffectEditor::DrawNodeList()
         newNode.type = RenderType::Particle;
         currentConfig.nodes.push_back(newNode);
         selectedNodeIndex = static_cast<int>(currentConfig.nodes.size() - 1);
+
+        SyncRuntimeNodes();
     }
     ImGui::SameLine();
 
@@ -809,6 +825,7 @@ void EffectEditor::DrawNodeList()
             {
                 selectedNodeIndex = static_cast<int>(currentConfig.nodes.size()) - 1;
             }
+            SyncRuntimeNodes();
         }
     }
     ImGui::Separator();
@@ -860,136 +877,136 @@ void EffectEditor::DrawNodeList()
 void EffectEditor::EmitParticles(float elapsedTime)
 {
     // 全ノードを順番にチェックして発生させる
-    for (auto& node : currentConfig.nodes)
+    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
+        auto& cNode = currentConfig.nodes[i];
+        auto& rNode = runtimeNodes[i];
+
         // パーティクルノード以外、または非表示ノードはスキップ
-        if (node.type != RenderType::Particle || !node.visible) continue;
+        if (cNode.type != RenderType::Particle || !cNode.visible) continue;
+        if (effectTimer < cNode.delayTime) continue;
 
-        auto& pConfig = node;
-
-        if (effectTimer < node.delayTime) continue;
-
-        float activeTime = effectTimer - node.delayTime;
-        if (node.duration > 0.0f && activeTime >= node.duration) continue;
+        float activeTime = effectTimer - cNode.delayTime;
+        if (cNode.duration > 0.0f && activeTime >= cNode.duration) continue;
 
         float alpha = 1.0f;
         // フェードスピードを計算する
-        if (node.IsFadeIn && node.fadeInTime > 0.0001f && activeTime <= node.fadeInTime)
+        if (cNode.IsFadeIn && cNode.fadeInTime > 0.0001f && activeTime <= cNode.fadeInTime)
         {
             // 現在の進行度を求める
-            float t = activeTime / node.fadeInTime;
-            alpha = Mathf::EaseCurve(t, node.fadeInStartSpeed, node.fadeInEndSpeed);
+            float t = activeTime / cNode.fadeInTime;
+            alpha = Mathf::EaseCurve(t, cNode.fadeInStartSpeed, cNode.fadeInEndSpeed);
         }
-        else if (node.IsFadeOut && node.fadeOutTime > 0.0001f && activeTime >= (node.lifeTime - node.fadeOutTime))
+        else if (cNode.IsFadeOut && cNode.fadeOutTime > 0.0001f && activeTime >= (cNode.lifeTime - cNode.fadeOutTime))
         {
-            float fadeStartTime = node.duration - node.fadeOutTime;
-            float t = (activeTime - fadeStartTime) / node.fadeOutTime; // 0.0 ~ 1.0 に正規化
-            alpha = 1.0f - Mathf::EaseCurve(t, node.fadeOutStartSpeed, node.fadeOutEndSpeed);
+            float fadeStartTime = cNode.duration - cNode.fadeOutTime;
+            float t = (activeTime - fadeStartTime) / cNode.fadeOutTime; // 0.0 ~ 1.0 に正規化
+            alpha = 1.0f - Mathf::EaseCurve(t, cNode.fadeOutStartSpeed, cNode.fadeOutEndSpeed);
         }
 
         // ノード個別のタイマーを進める
-        pConfig.spawnTimer += elapsedTime;
+        cNode.spawnTimer += elapsedTime;
 
-        if (pConfig.spawnTimer >= pConfig.spawnInterval)
+        if (cNode.spawnTimer >= cNode.spawnInterval)
         {
-            pConfig.spawnTimer -= pConfig.spawnInterval;
+            cNode.spawnTimer -= cNode.spawnInterval;
 
             // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
-            if (particleManager && !pConfig.texturePath.empty())
+            if (rNode.particleManager && !cNode.texturePath.empty())
             {
-                particleManager->SetTexture(pConfig.texturePath, { (UINT)pConfig.splitCount[0], (UINT)pConfig.splitCount[1] });
+                rNode.particleManager->SetTexture(cNode.texturePath, { (UINT)cNode.splitCount[0], (UINT)cNode.splitCount[1] });
             }
 
             // 生成数分 for 文で回す
-            for (int i = 0; i < pConfig.emitCount; i++)
+            for (int emitIdx = 0; emitIdx < cNode.emitCount; emitIdx++)
             {
                 compute_particle_system::emit_particle_data data;
                 data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
 
                 // パーティクルのデータを送る
-                data.parameter.x = static_cast<float>(pConfig.spriteType); // コマ番号
-                data.parameter.y = pConfig.lifeTime; // 寿命
-                data.parameter.z = pConfig.uvScrollSpeed.x; // x軸のUVスクロール
-                data.parameter.w = pConfig.uvScrollSpeed.y; // y軸のUVスクロール
+                data.parameter.x = static_cast<float>(cNode.spriteType); // コマ番号
+                data.parameter.y = cNode.lifeTime; // 寿命
+                data.parameter.z = cNode.uvScrollSpeed.x; // x軸のUVスクロール
+                data.parameter.w = cNode.uvScrollSpeed.y; // y軸のUVスクロール
 
                 // フェードのスピードを設定する
-                int packedSpeed = 
-                      (node.fadeInStartSpeed)
-                    | (node.fadeInEndSpeed << 4)
-                    | (node.fadeOutStartSpeed << 8)
-                    | (node.fadeOutEndSpeed << 12);
+                int packedSpeed =
+                    (cNode.fadeInStartSpeed)
+                    | (cNode.fadeInEndSpeed << 4)
+                    | (cNode.fadeOutStartSpeed << 8)
+                    | (cNode.fadeOutEndSpeed << 12);
 
-                data.fade_param.x = node.IsFadeIn ? node.fadeInTime : 0.0f;
-                data.fade_param.y = node.IsFadeOut ? node.fadeOutTime : 0.0f;
-                data.fade_param.z = pConfig.lifeTime;
+                data.fade_param.x = cNode.IsFadeIn ? cNode.fadeInTime : 0.0f;
+                data.fade_param.y = cNode.IsFadeOut ? cNode.fadeOutTime : 0.0f;
+                data.fade_param.z = cNode.lifeTime;
                 data.fade_param.w = static_cast<float>(packedSpeed);
 
-                
+
                 // 位置
                 data.position = {
-                   pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
-                   pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
-                   pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
+                   cNode.position.x + (cNode.positionRange.x * Mathf::RandFloat()),
+                   cNode.position.y + (cNode.positionRange.y * Mathf::RandFloat()),
+                   cNode.position.z + (cNode.positionRange.z * Mathf::RandFloat()),
                    1.0f
                 };
                 // 初速度
                 data.posVelocity = {
-                    pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
-                    pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
-                    pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
+                    cNode.positionVelocity.x + (cNode.positionVelocityRange.x * Mathf::RandFloat()),
+                    cNode.positionVelocity.y + (cNode.positionVelocityRange.y * Mathf::RandFloat()),
+                    cNode.positionVelocity.z + (cNode.positionVelocityRange.z * Mathf::RandFloat()),
                     0.0f
                 };
                 // 加速度
                 data.posAcceleration = {
-                    pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * Mathf::RandFloat()),
-                    pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * Mathf::RandFloat()),
-                    pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * Mathf::RandFloat()),
+                    cNode.positionAcceleration.x + (cNode.positionAccelerationRange.x * Mathf::RandFloat()),
+                    cNode.positionAcceleration.y + (cNode.positionAccelerationRange.y * Mathf::RandFloat()),
+                    cNode.positionAcceleration.z + (cNode.positionAccelerationRange.z * Mathf::RandFloat()),
                     0.0f
                 };
 
                 // 回転
                 data.rotation = {
-                    DirectX::XMConvertToRadians(pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat())),
-                    pConfig.isBillboard ? 1.0f : 0.0f
+                    DirectX::XMConvertToRadians(cNode.rotation.x + (cNode.rotationRange.x * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotation.y + (cNode.rotationRange.y * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotation.z + (cNode.rotationRange.z * Mathf::RandFloat())),
+                    cNode.isBillboard ? 1.0f : 0.0f
                 };
                 data.rotVelocity = {
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.x + (pConfig.rotationVelocityRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.y + (pConfig.rotationVelocityRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.z + (pConfig.rotationVelocityRange.z * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotationVelocity.x + (cNode.rotationVelocityRange.x * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotationVelocity.y + (cNode.rotationVelocityRange.y * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotationVelocity.z + (cNode.rotationVelocityRange.z * Mathf::RandFloat())),
                     0.0f
                 };
                 data.rotAcceleration = {
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.x + (pConfig.rotationAccelerationRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.y + (pConfig.rotationAccelerationRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.z + (pConfig.rotationAccelerationRange.z * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotationAcceleration.x + (cNode.rotationAccelerationRange.x * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotationAcceleration.y + (cNode.rotationAccelerationRange.y * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(cNode.rotationAcceleration.z + (cNode.rotationAccelerationRange.z * Mathf::RandFloat())),
                     0.0f
                 };
 
                 int scaleEasingSpeed =
-                    (node.scaleUniformStartSpeed)
-                    | (node.scaleUniformEndSpeed << 4);
+                    (cNode.scaleUniformStartSpeed)
+                    | (cNode.scaleUniformEndSpeed << 4);
 
                 // 拡大
-                switch (node.scaleMode)
+                switch (cNode.scaleMode)
                 {
                 case ScaleMode::Fixed: // 固定
                     data.scale = {
-                        std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
-                        std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
+                        std::max(0.0f, cNode.scale.x + (cNode.scaleRange.x * Mathf::RandFloat())),
+                        std::max(0.0f, cNode.scale.y + (cNode.scaleRange.y * Mathf::RandFloat())),
                         1.0f, 0.0f
                     };
                     data.scaleVelocity = {
-                        pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
-                        pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
-                        pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
+                        cNode.scaleVelocity.x + (cNode.scaleVelocityRange.x * Mathf::RandFloat()),
+                        cNode.scaleVelocity.y + (cNode.scaleVelocityRange.y * Mathf::RandFloat()),
+                        cNode.scaleVelocity.z + (cNode.scaleVelocityRange.z * Mathf::RandFloat()),
                         0.0f
                     };
                     data.scaleAcceleration = {
-                        pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
-                        pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
-                        pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
+                        cNode.scaleAcceleration.x + (cNode.scaleAccelerationRange.x * Mathf::RandFloat()),
+                        cNode.scaleAcceleration.y + (cNode.scaleAccelerationRange.y * Mathf::RandFloat()),
+                        cNode.scaleAcceleration.z + (cNode.scaleAccelerationRange.z * Mathf::RandFloat()),
                         0.0f
                     };
 
@@ -999,31 +1016,31 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 case ScaleMode::UniformEasing: // 単一イージング
 
                     // 中心 ± 振れ幅の範囲でランダムに実際の値を決める
-                    float actualStart = pConfig.scaleUniformStart
-                        + Mathf::RandomRange(-pConfig.scaleUniformStartRandom, pConfig.scaleUniformStartRandom);
-                    float actualEnd = pConfig.scaleUniformEnd
-                        + Mathf::RandomRange(-pConfig.scaleUniformEndRandom, pConfig.scaleUniformEndRandom);
+                    float actualStart = cNode.scaleUniformStart
+                        + Mathf::RandomRange(-cNode.scaleUniformStartRandom, cNode.scaleUniformStartRandom);
+                    float actualEnd = cNode.scaleUniformEnd
+                        + Mathf::RandomRange(-cNode.scaleUniformEndRandom, cNode.scaleUniformEndRandom);
 
                     data.scaleUniformStart = actualStart;
                     data.scaleUniformEnd = actualEnd;
                     data.scale_param.x = scaleEasingSpeed;
-                    data.scale_param.y = pConfig.lifeTime;
+                    data.scale_param.y = cNode.lifeTime;
                     break;
                 }
 
                 int colorEasingSpeed =
-                    (node.colorStartSpeed)
-                    | (node.colorEndSpeed << 4);
+                    (cNode.colorStartSpeed)
+                    | (cNode.colorEndSpeed << 4);
 
                 // 色
-                switch (pConfig.colorMode)
+                switch (cNode.colorMode)
                 {
                 case ColorMode::Fixed: // 固定
-                    data.color = pConfig.color;
-                    data.start_color = pConfig.color;
-                    data.end_color = pConfig.color;
+                    data.color = cNode.color;
+                    data.start_color = cNode.color;
+                    data.end_color = cNode.color;
                     data.color_param.x = -1.0f; // イージング無しのフラグ
-                    data.color_param.y = pConfig.lifeTime;
+                    data.color_param.y = cNode.lifeTime;
 
                     break;
 
@@ -1031,41 +1048,42 @@ void EffectEditor::EmitParticles(float elapsedTime)
                 {
 
                     // 始点の色を指定した範囲でランダムに取得
-                    data.start_color.x = Mathf::RandomRange(pConfig.colorStartMin.x, pConfig.colorStartMax.x);
-                    data.start_color.y = Mathf::RandomRange(pConfig.colorStartMin.y, pConfig.colorStartMax.y);
-                    data.start_color.z = Mathf::RandomRange(pConfig.colorStartMin.z, pConfig.colorStartMax.z);
-                    data.start_color.w = Mathf::RandomRange(pConfig.colorStartMin.w, pConfig.colorStartMax.w);
+                    data.start_color.x = Mathf::RandomRange(cNode.colorStartMin.x, cNode.colorStartMax.x);
+                    data.start_color.y = Mathf::RandomRange(cNode.colorStartMin.y, cNode.colorStartMax.y);
+                    data.start_color.z = Mathf::RandomRange(cNode.colorStartMin.z, cNode.colorStartMax.z);
+                    data.start_color.w = Mathf::RandomRange(cNode.colorStartMin.w, cNode.colorStartMax.w);
 
                     // 終点の色を指定した範囲でランダムに取得
-                    data.end_color.x = Mathf::RandomRange(pConfig.colorEndMin.x, pConfig.colorEndMax.x);
-                    data.end_color.y = Mathf::RandomRange(pConfig.colorEndMin.y, pConfig.colorEndMax.y);
-                    data.end_color.z = Mathf::RandomRange(pConfig.colorEndMin.z, pConfig.colorEndMax.z);
-                    data.end_color.w = Mathf::RandomRange(pConfig.colorEndMin.w, pConfig.colorEndMax.w);
+                    data.end_color.x = Mathf::RandomRange(cNode.colorEndMin.x, cNode.colorEndMax.x);
+                    data.end_color.y = Mathf::RandomRange(cNode.colorEndMin.y, cNode.colorEndMax.y);
+                    data.end_color.z = Mathf::RandomRange(cNode.colorEndMin.z, cNode.colorEndMax.z);
+                    data.end_color.w = Mathf::RandomRange(cNode.colorEndMin.w, cNode.colorEndMax.w);
 
                     data.color_param.x = colorEasingSpeed;
-                    data.color_param.y = pConfig.lifeTime;
+                    data.color_param.y = cNode.lifeTime;
 
                     break;
                 }
                 case ColorMode::Random: // ランダム
                     // 色をランダムで取得してcolorに入れる
-                    data.color.x = Mathf::RandomRange(pConfig.colorMin.x, pConfig.colorMax.x);
-                    data.color.y = Mathf::RandomRange(pConfig.colorMin.y, pConfig.colorMax.y);
-                    data.color.z = Mathf::RandomRange(pConfig.colorMin.z, pConfig.colorMax.z);
-                    data.color.w = Mathf::RandomRange(pConfig.colorMin.w, pConfig.colorMax.w);
+                    data.color.x = Mathf::RandomRange(cNode.colorMin.x, cNode.colorMax.x);
+                    data.color.y = Mathf::RandomRange(cNode.colorMin.y, cNode.colorMax.y);
+                    data.color.z = Mathf::RandomRange(cNode.colorMin.z, cNode.colorMax.z);
+                    data.color.w = Mathf::RandomRange(cNode.colorMin.w, cNode.colorMax.w);
 
                     data.start_color = data.color;
                     data.end_color = data.color;
                     data.color_param.x = -1.0f;
-                    data.color_param.y = pConfig.lifeTime;
+                    data.color_param.y = cNode.lifeTime;
 
 
                     break;
                 }
 
 
-                particleManager->Emit(data);
+                rNode.particleManager->Emit(data);
             }
+
         }
     }
 }
@@ -1081,6 +1099,19 @@ void EffectEditor::SyncRuntimeNodes()
         auto& node = currentConfig.nodes[i];
         auto& rNode = runtimeNodes[i];
 
+        if (node.type == RenderType::Particle && !rNode.particleManager)
+        {
+            rNode.particleManager = std::make_unique<Compute_Particle>(device);
+
+            if (!node.texturePath.empty())
+            {
+                D3D11_TEXTURE2D_DESC texture2d_desc;
+                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+                HRESULT hr = GpuResourceUtils::LoadTexture(device, node.texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
+
+                rNode.shaderResourceView = srv;
+            }
+        }
         // メッシュの場合、モデルが未ロード or パスが変わっていたらロード
         if (node.type == RenderType::Mesh && !node.meshPath.empty())
         {

@@ -92,12 +92,14 @@ StructuredBuffer<particle_header> particle_header_buffer : register(t1);
 void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
 {
     uint vertex_id = gin[0].vertex_id;
-
-    ////  生存していない場合はスケールを0にしておく
-    //float3 scale = particle_data_buffer[vertex_id].parameter.z < 0.0f ? float3(0, 0, 0) : particle_data_buffer[vertex_id].scale.xyz;
     
-    //  ヘッダーの particle_index がそのままパーティクルデータバッファのインデックスになる。
     bool is_alive = particle_header_buffer[vertex_id].alive != 0;
+    if (!is_alive)
+    {
+        return; // 死んでいるものは4頂点の生成(Append)を行わない
+    }
+        
+    //  ヘッダーの particle_index がそのままパーティクルデータバッファのインデックスになる。
     vertex_id = particle_header_buffer[vertex_id].particle_index;
 
     //  生存していない場合はスケールを0にしておく

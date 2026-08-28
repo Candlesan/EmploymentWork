@@ -73,6 +73,12 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
         //  死亡数をカウントする
         indirect_data_buffer.InterlockedAdd(IndirectArgumentsNumDeadParticle, 1);
+        
+        // 描画データ側もサイズとアルファを完全に0にして更新する
+        data.renderScale = float4(0, 0, 0, 0);
+        data.renderColor = float4(0, 0, 0, 0);
+        particle_data_buffer[data_index] = data;
+        
         return;
     }
 
@@ -96,6 +102,8 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
     // 拡大更新
     data.scale.xyz += data.scaleVelocity.xyz * elapsed_time;
+    
+    data.scale.xyz = max(0.0f, data.scale.xyz);
 
     // UVスクロール    
     data.texcoord.xy += data.parameter.zw * elapsed_time;
@@ -135,7 +143,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         uint scalePacked = (uint) data.scale_param.x;
         uint scaleStartSpeed = (scalePacked) & 0xF;
         uint scaleEndSpeed = (scalePacked >> 4) & 0xF;
-        float scaleMaxLifeTime = data.parameter.y;
+        float scaleMaxLifeTime = data.scale_param.y;
         
         // 進行度を計算する
         float t = activeTime / scaleMaxLifeTime;
@@ -167,6 +175,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         float t = activeTime / colorMaxLifeTime;
         float easeT = EaseCurve(t, colorStartSpeed, colorEndSpeed);
 
+        finalColor = lerp(data.start_color, data.end_color, easeT);
     }
     
     
