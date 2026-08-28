@@ -73,8 +73,15 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
         {
             node.spawnTimer = node.spawnInterval;
         }
+        else if (node.type == RenderType::Mesh && node.scaleMode == ScaleMode::UniformEasing)
+        {
+            // 始点の拡大率を計算する
+            node.meshUniformStartScale = node.scaleUniformStart + Mathf::RandomRange(-node.scaleUniformStartRandom, node.scaleUniformStartRandom); // 始点の中心 + 振れ幅
+            node.meshUniformEndScale = node.scaleUniformEnd + Mathf::RandomRange(-node.scaleUniformEndRandom, node.scaleUniformEndRandom); // 終点の中心 + 振れ幅
+        }
         else if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Random)
         {
+            // 色をランダムで取得する
             node.meshRandomColor.x = Mathf::RandomRange(node.colorMin.x, node.colorMax.x);
             node.meshRandomColor.y = Mathf::RandomRange(node.colorMin.y, node.colorMax.y);
             node.meshRandomColor.z = Mathf::RandomRange(node.colorMin.z, node.colorMax.z);
@@ -149,39 +156,51 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
             maxDuration = nodeTotalTime;
         }
 
-        // パーティクルノードの処理
-        if (node.type == RenderType::Particle)
-        {
-        }
         // メッシュの処理
-        else if (node.type == RenderType::Mesh)
+        if (node.type == RenderType::Mesh)
         {
             if (effectTimer < node.delayTime) continue;
 
             if (rNode.meshModel)
             {
-                float t = effectTimer - node.delayTime;
+                float activeTime = effectTimer - node.delayTime;
 
-                // 拡大時間経過で大きく/小さくする
-                // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
-                DirectX::XMFLOAT3 currentScale = {
-                    node.scale.x + (node.scaleVelocity.x * t) + (0.5f * node.scaleAcceleration.x * t * t),
-                    node.scale.y + (node.scaleVelocity.y * t) + (0.5f * node.scaleAcceleration.y * t * t),
-                    node.scale.z + (node.scaleVelocity.z * t) + (0.5f * node.scaleAcceleration.z * t * t)
-                };
+                DirectX::XMFLOAT3 finalScale = { 1, 1, 1 };
+                switch (node.scaleMode)
+                {
+                case ScaleMode::Fixed:
+                    // 拡大時間経過で大きく/小さくする
+                    // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
+                    finalScale.x = node.scale.x + (node.scaleVelocity.x * activeTime) + (0.5f * node.scaleAcceleration.x * activeTime * activeTime);
+                    finalScale.y = node.scale.y + (node.scaleVelocity.y * activeTime) + (0.5f * node.scaleAcceleration.y * activeTime * activeTime);
+                    finalScale.z = node.scale.z + (node.scaleVelocity.z * activeTime) + (0.5f * node.scaleAcceleration.z * activeTime * activeTime);
+
+                    break;
+                case ScaleMode::UniformEasing:
+                {
+                    float t = activeTime / node.lifeTime;
+                    float easeT = Mathf::EaseCurve(t, node.scaleUniformStartSpeed, node.scaleUniformEndSpeed);
+
+                    finalScale.x = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                    finalScale.y = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                    finalScale.z = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                }
+                    break;
+                }
+
 
                 // マイナスにならないようにガード
-                currentScale.x = (std::max)(0.0f, currentScale.x);
-                currentScale.y = (std::max)(0.0f, currentScale.y);
-                currentScale.z = (std::max)(0.0f, currentScale.z);
+                finalScale.x = (std::max)(0.0f, finalScale.x);
+                finalScale.y = (std::max)(0.0f, finalScale.y);
+                finalScale.z = (std::max)(0.0f, finalScale.z);
 
-                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(currentScale.x, currentScale.y, currentScale.z);
+                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(finalScale.x, finalScale.y, finalScale.z);
 
                 // 回転
                 DirectX::XMFLOAT3 currentRot = {
-                            node.rotation.x + (node.rotationVelocity.x * t) + (0.5f * node.rotationAcceleration.x * t * t),
-                            node.rotation.y + (node.rotationVelocity.y * t) + (0.5f * node.rotationAcceleration.y * t * t),
-                            node.rotation.z + (node.rotationVelocity.z * t) + (0.5f * node.rotationAcceleration.z * t * t)
+                            node.rotation.x + (node.rotationVelocity.x * activeTime) + (0.5f * node.rotationAcceleration.x * activeTime * activeTime),
+                            node.rotation.y + (node.rotationVelocity.y * activeTime) + (0.5f * node.rotationAcceleration.y * activeTime * activeTime),
+                            node.rotation.z + (node.rotationVelocity.z * activeTime) + (0.5f * node.rotationAcceleration.z * activeTime * activeTime)
                 };
                 DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
                     DirectX::XMConvertToRadians(currentRot.x),
@@ -191,9 +210,9 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 
                 // 位置
                 DirectX::XMFLOAT3 currentPos = {
-                            node.position.x + (node.positionVelocity.x * t) + (0.5f * node.positionAcceleration.x * t * t),
-                            node.position.y + (node.positionVelocity.y * t) + (0.5f * node.positionAcceleration.y * t * t),
-                            node.position.z + (node.positionVelocity.z * t) + (0.5f * node.positionAcceleration.z * t * t)
+                            node.position.x + (node.positionVelocity.x * activeTime) + (0.5f * node.positionAcceleration.x * activeTime * activeTime),
+                            node.position.y + (node.positionVelocity.y * activeTime) + (0.5f * node.positionAcceleration.y * activeTime * activeTime),
+                            node.position.z + (node.positionVelocity.z * activeTime) + (0.5f * node.positionAcceleration.z * activeTime * activeTime)
                 };
 
                 DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(

@@ -147,6 +147,8 @@ struct NodeConfig
 	DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };					// 色のランダム(計算用)
 	DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };					// 始点の色(計算用)
 	DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };					// 終点の色(計算用)
+	float meshUniformStartScale = 0.0f;									// 始点の拡大率(計算用)
+	float meshUniformEndScale = 0.0f;									// 終点の拡大率(計算用)
 
 	// [Trail用]
 	float width = 1.0f;													
