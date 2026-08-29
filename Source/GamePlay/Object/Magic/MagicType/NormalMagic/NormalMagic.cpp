@@ -14,6 +14,8 @@ void NormalMagic::Initialize()
 {
 	CustomEffectManager::Instance().LoadEffectConfig(normalMagic, "Data/Json/Effect/" + normalMagic + ".json");
 	CustomEffectManager::Instance().LoadEffectConfig(chargeMagic, "Data/Json/Effect/" + chargeMagic + ".json");
+	CustomEffectManager::Instance().LoadEffectConfig(magicCircleFast, "Data/Json/Effect/MagicCircle_Fast.json");
+	CustomEffectManager::Instance().LoadEffectConfig(magicCircleLong, "Data/Json/Effect/MagicCircle_Long.json");
 }
 
 // 更新処理
@@ -60,31 +62,96 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	centerPos.y = startPos.y + info.direction.y * (range * 0.5f);
 	centerPos.z = startPos.z + info.direction.z * (range * 0.5f);
 
-	// 位置のオフセット計算
-	DirectX::XMFLOAT3 finalPos =
+	// 水平方向の前方向
+	float len = (info.direction.x * info.direction.x + info.direction.z * info.direction.z);
+	DirectX::XMFLOAT3 forward = { 0.0f, 0.0f, 0.0f };
+	if (len > 0.0001f)
 	{
-		startPos.x + config.offsetPosition.x,
-		startPos.y + config.offsetPosition.y,
-		startPos.z + config.offsetPosition.z
+		// 正規化する
+		forward.x = info.direction.x / len;
+		forward.z = info.direction.z / len;
+	}
+
+	// 前方向から右方向ベクトルを作る
+	DirectX::XMFLOAT3 right = { forward.x, 0.0f, -forward.x };
+
+	// ================ 通常レーザーの計算 =================
+
+	// レーザー位置のオフセット計算
+	DirectX::XMFLOAT3 laserFinalPos =
+	{
+		startPos.x + (right.x * config.laserOffsetPosition.x) + (forward.x * config.laserOffsetPosition.z),
+		startPos.y + config.laserOffsetPosition.y,
+		startPos.z + (right.z * config.laserOffsetPosition.x) + (forward.z * config.laserOffsetPosition.z) 
 	};
 
 	// 方向ベクトル
 	float yaw = atan2f(info.direction.x, info.direction.z);
 	float pitch = -asinf(info.direction.y);
 
-	// 計算した回転角度
-	DirectX::XMFLOAT3 finalAngle = {
-		DirectX::XMConvertToDegrees(pitch) + config.offsetAngle.x,
-		DirectX::XMConvertToDegrees(yaw) + config.offsetAngle.y,
-		0.0f + config.offsetAngle.z
+	// レーザーの計算した回転角度
+	DirectX::XMFLOAT3 laserFinalAngle = {
+		DirectX::XMConvertToDegrees(pitch) + config.laserOffsetAngle.x,
+		DirectX::XMConvertToDegrees(yaw) + config.laserOffsetAngle.y,
+		0.0f + config.laserOffsetAngle.z
 	};
 
-	// スケール計算
-	DirectX::XMFLOAT3 finalScale =
+	// レーザーのスケール計算
+	DirectX::XMFLOAT3 laserFinalScale =
 	{
-		config.offsetScale.x,
-		config.offsetScale.y,
-		config.offsetScale.z
+		config.laserOffsetScale.x,
+		config.laserOffsetScale.y,
+		config.laserOffsetScale.z
+	};
+
+	// ================ チャージ魔法の計算 =================
+
+	// チャージ魔法位置のオフセット計算
+	DirectX::XMFLOAT3 laserChargeFinalPos =
+	{
+		startPos.x + (right.x * config.laserChargeOffsetPosition.x) + (forward.x * config.laserChargeOffsetPosition.z),
+		startPos.y + config.laserChargeOffsetPosition.y,
+		startPos.z + (right.z * config.laserChargeOffsetPosition.x) + (forward.z * config.laserChargeOffsetPosition.z)
+	};
+
+	// チャージ魔法の計算した回転角度
+	DirectX::XMFLOAT3 laserChargeFinalAngle = {
+		DirectX::XMConvertToDegrees(pitch) + config.laserChargeOffsetAngle.x,
+		DirectX::XMConvertToDegrees(yaw) + config.laserChargeOffsetAngle.y,
+		0.0f + config.laserChargeOffsetAngle.z
+	};
+
+	// チャージ魔法のスケール計算
+	DirectX::XMFLOAT3 laserChargeFinalScale =
+	{
+		config.laserChargeOffsetScale.x,
+		config.laserChargeOffsetScale.y,
+		config.laserChargeOffsetScale.z
+	};
+
+	// ================ 魔法陣の計算 =================
+
+	// 魔法陣の位置オフセット
+	DirectX::XMFLOAT3 circleFinalPos =
+	{
+		info.position.x + (right.x * config.circleOffsetPosition.x) + (forward.x * config.circleOffsetPosition.z),
+		info.position.y + config.circleOffsetPosition.y,
+		info.position.z + (right.z * config.circleOffsetPosition.x) + (forward.z * config.circleOffsetPosition.z)
+	};
+
+	// 魔法陣の計算した回転角度
+	DirectX::XMFLOAT3 circleFinalAngle = {
+		DirectX::XMConvertToDegrees(pitch) + config.circleOffsetAngle.x,
+		DirectX::XMConvertToDegrees(yaw) + config.circleOffsetAngle.y,
+		0.0f + config.circleOffsetAngle.z
+	};
+
+	// 魔法陣のスケール計算
+	DirectX::XMFLOAT3 circleFinalScale =
+	{
+		config.circleOffsetScale.x,
+		config.circleOffsetScale.y,
+		config.circleOffsetScale.z
 	};
 
 	// 魔法のパラメータを設定
@@ -134,13 +201,22 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	if (!isFullCharged)
 	{
 		// 通常攻撃
-		CustomEffectManager::Instance().PlayEffect(normalMagic, finalPos, finalAngle, finalScale);
+		CustomEffectManager::Instance().PlayEffect(normalMagic, laserFinalPos, laserFinalAngle, laserFinalScale);
+		CustomEffectManager::Instance().PlayEffect(magicCircleFast, circleFinalPos, circleFinalAngle, circleFinalScale);
 	}
 	else
 	{
 		// チャージ攻撃
-		CustomEffectManager::Instance().PlayEffect(chargeMagic, finalPos, finalAngle, finalScale);
+		CustomEffectManager::Instance().PlayEffect(chargeMagic, laserChargeFinalPos, laserChargeFinalAngle, laserChargeFinalScale);
+
+		circleFinalScale.x *= 2.0f;
+		circleFinalScale.y *= 2.0f;
+		circleFinalScale.z *= 2.0f;
+
+		CustomEffectManager::Instance().PlayEffect(magicCircleLong, circleFinalPos, circleFinalAngle, circleFinalScale);
+
 	}
+
 }
 
 void NormalMagic::DrawGUI(NormalMagicConfig& config)
@@ -150,11 +226,27 @@ void NormalMagic::DrawGUI(NormalMagicConfig& config)
 	ImGui::Checkbox(u8"フルチャージか", &isFullCharged);
 	ImGui::Separator();
 
-	if (ImGui::CollapsingHeader(u8"通常魔法エフェクト調整", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(u8"通常魔法エフェクト", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::DragFloat3(u8"位置オフセット (X,Y,Z)", &config.offsetPosition.x, 0.05f);
-		ImGui::DragFloat3(u8"角度オフセット (X,Y,Z)", &config.offsetAngle.x, 0.05f);
-		ImGui::DragFloat3(u8"拡大率 (X,Y,Z)", &config.offsetScale.x, 0.05f, 0.01f, 10.0f);
+		ImGui::DragFloat3(u8"位置##Normal", &config.laserOffsetPosition.x, 0.05f);
+		ImGui::DragFloat3(u8"角度##Normal", &config.laserOffsetAngle.x, 0.05f);
+		ImGui::DragFloat3(u8"拡大率##Normal", &config.laserOffsetScale.x, 0.05f, 0.01f, 10.0f);
+	}
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader(u8"チャージ魔法エフェクト", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat3(u8"位置##Charge", &config.laserChargeOffsetPosition.x, 0.05f);
+		ImGui::DragFloat3(u8"角度##Charge", &config.laserChargeOffsetAngle.x, 0.05f);
+		ImGui::DragFloat3(u8"拡大率##Charge", &config.laserChargeOffsetScale.x, 0.05f, 0.01f, 10.0f);
+	}
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader(u8"魔法陣エフェクト", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat3(u8"位置オフセット##Circle", &config.circleOffsetPosition.x, 0.05f);
+		ImGui::DragFloat3(u8"角度オフセット##Circle", &config.circleOffsetAngle.x, 0.05f);
+		ImGui::DragFloat3(u8"拡大率##Circle", &config.circleOffsetScale.x, 0.05f, 0.01f, 10.0f);
 	}
 }
 

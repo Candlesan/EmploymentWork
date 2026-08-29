@@ -23,9 +23,17 @@ public:
 
         float chargeTimeThreshold = 3.0;   // レーザーへ変化する長押し時間
 
-        DirectX::XMFLOAT3 offsetPosition = { 0.0f, 0.0f, 0.0f }; // 発生位置のズレ
-        DirectX::XMFLOAT3 offsetAngle = { 0.0f, 0.0f, 0.0f };    // 回転のズレ
-        DirectX::XMFLOAT3 offsetScale = { 1.0f, 1.0f, 1.0f };    // スケール倍率
+        DirectX::XMFLOAT3 laserOffsetPosition = { 0.0f, 0.0f, 0.0f }; // 発生位置のズレ
+        DirectX::XMFLOAT3 laserOffsetAngle = { 0.0f, 0.0f, 0.0f };    // 回転のズレ
+        DirectX::XMFLOAT3 laserOffsetScale = { 1.0f, 1.0f, 1.0f };    // スケール倍率
+
+        DirectX::XMFLOAT3 laserChargeOffsetPosition = { 0.0f, 0.0f, 0.0f }; // 発生位置のズレ
+        DirectX::XMFLOAT3 laserChargeOffsetAngle = { 0.0f, 0.0f, 0.0f };    // 回転のズレ
+        DirectX::XMFLOAT3 laserChargeOffsetScale = { 1.0f, 1.0f, 1.0f };    // スケール倍率
+
+        DirectX::XMFLOAT3 circleOffsetPosition = { 0.0f, 0.0f, 0.0f }; // 発生位置のズレ
+        DirectX::XMFLOAT3 circleOffsetAngle = { 0.0f, 0.0f, 0.0f };    // 回転のズレ
+        DirectX::XMFLOAT3 circleOffsetScale = { 1.0f, 1.0f, 1.0f };    // スケール倍率
 
         void Save() const
         {
@@ -47,9 +55,17 @@ public:
 
             j["chargeTimeThreshold"] = chargeTimeThreshold;
 
-            j["offsetPosition"] = { offsetPosition.x, offsetPosition.y, offsetPosition.z };
-            j["offsetAngle"] = { offsetAngle.x, offsetAngle.y, offsetAngle.z };
-            j["offsetScale"] = { offsetScale.x, offsetScale.y, offsetScale.z };
+            j["laserOffsetPosition"] = { laserOffsetPosition.x, laserOffsetPosition.y, laserOffsetPosition.z };
+            j["laserOffsetAngle"] = { laserOffsetAngle.x, laserOffsetAngle.y, laserOffsetAngle.z };
+            j["laserOffsetScale"] = { laserOffsetScale.x, laserOffsetScale.y, laserOffsetScale.z };
+
+            j["laserChargeOffsetPosition"] = { laserChargeOffsetPosition.x, laserChargeOffsetPosition.y, laserChargeOffsetPosition.z };
+            j["laserChargeOffsetAngle"] = { laserChargeOffsetAngle.x, laserChargeOffsetAngle.y, laserChargeOffsetAngle.z };
+            j["laserChargeOffsetScale"] = { laserChargeOffsetScale.x, laserChargeOffsetScale.y, laserChargeOffsetScale.z };
+
+            j["circleOffsetPosition"] = { circleOffsetPosition.x, circleOffsetPosition.y, circleOffsetPosition.z };
+            j["circleOffsetAngle"] = { circleOffsetAngle.x, circleOffsetAngle.y, circleOffsetAngle.z };
+            j["circleOffsetScale"] = { circleOffsetScale.x, circleOffsetScale.y, circleOffsetScale.z };
 
             std::ofstream file("Data/Json/Magic/NormalMagic.json");
             file << j.dump(4);
@@ -80,9 +96,17 @@ public:
 
                 if (j.find("chargeTimeThreshold") != j.end()) chargeTimeThreshold = j["chargeTimeThreshold"];
 
-                if (j.find("offsetPosition") != j.end()) offsetPosition = { j["offsetPosition"][0], j["offsetPosition"][1], j["offsetPosition"][2] };
-                if (j.find("offsetAngle") != j.end()) offsetAngle = { j["offsetAngle"][0], j["offsetAngle"][1], j["offsetAngle"][2] };
-                if (j.find("offsetScale") != j.end()) offsetScale = { j["offsetScale"][0], j["offsetScale"][1], j["offsetScale"][2] };
+                if (j.find("laserOffsetPosition") != j.end()) laserOffsetPosition = { j["laserOffsetPosition"][0], j["laserOffsetPosition"][1], j["laserOffsetPosition"][2] };
+                if (j.find("laserOffsetAngle") != j.end()) laserOffsetAngle = { j["laserOffsetAngle"][0], j["laserOffsetAngle"][1], j["laserOffsetAngle"][2] };
+                if (j.find("laserOffsetScale") != j.end()) laserOffsetScale = { j["laserOffsetScale"][0], j["laserOffsetScale"][1], j["laserOffsetScale"][2] };
+
+                if (j.find("laserChargeOffsetPosition") != j.end()) laserChargeOffsetPosition = { j["laserChargeOffsetPosition"][0], j["laserChargeOffsetPosition"][1], j["laserChargeOffsetPosition"][2] };
+                if (j.find("laserChargeOffsetAngle") != j.end()) laserChargeOffsetAngle = { j["laserChargeOffsetAngle"][0], j["laserChargeOffsetAngle"][1], j["laserChargeOffsetAngle"][2] };
+                if (j.find("laserChargeOffsetScale") != j.end()) laserChargeOffsetScale = { j["laserChargeOffsetScale"][0], j["laserChargeOffsetScale"][1], j["laserChargeOffsetScale"][2] };
+
+                if (j.find("circleOffsetPosition") != j.end()) circleOffsetPosition = { j["circleOffsetPosition"][0], j["circleOffsetPosition"][1], j["circleOffsetPosition"][2] };
+                if (j.find("circleOffsetAngle") != j.end()) circleOffsetAngle = { j["circleOffsetAngle"][0], j["circleOffsetAngle"][1], j["circleOffsetAngle"][2] };
+                if (j.find("circleOffsetScale") != j.end()) circleOffsetScale = { j["circleOffsetScale"][0], j["circleOffsetScale"][1], j["circleOffsetScale"][2] };
             }
         }
     };
@@ -107,6 +131,8 @@ public:
 private:
     std::string normalMagic = "Laser"; // 読み込むエフェクト名
     std::string chargeMagic = "Charge_Laser"; // 読み込むエフェクト名
+    std::string magicCircleFast = "magicCircleFast";
+    std::string magicCircleLong = "magicCircleLong";
 
     float chargeTimer = 0.0f; // 現在のチャージした時間
     bool isCharging = false; // チャージ中か

@@ -52,7 +52,7 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 3.0,
+            "duration": 1.5,
             "emitCount": 1,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
@@ -61,8 +61,8 @@
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
             "isBillboard": false,
-            "isLoop": true,
-            "lifeTime": 3.0,
+            "isLoop": false,
+            "lifeTime": 1.5,
             "meshPath": "",
             "name": "Node",
             "noisePath": "",
@@ -167,8 +167,8 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 3.0,
-            "spawnTimer": 0.5103591680526733,
+            "spawnInterval": 1.5,
+            "spawnTimer": 0.0,
             "splitCount": [
                 1,
                 1
@@ -237,7 +237,7 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 3.0,
+            "duration": 1.5,
             "emitCount": 1,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
@@ -246,8 +246,8 @@
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
             "isBillboard": true,
-            "isLoop": true,
-            "lifeTime": 3.0,
+            "isLoop": false,
+            "lifeTime": 1.5,
             "meshPath": "",
             "name": "Node 2",
             "noisePath": "",
@@ -352,8 +352,8 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 3.0,
-            "spawnTimer": 0.5103591680526733,
+            "spawnInterval": 1.5,
+            "spawnTimer": 0.0,
             "splitCount": [
                 1,
                 1

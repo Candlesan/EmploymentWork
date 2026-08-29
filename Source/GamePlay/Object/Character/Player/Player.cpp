@@ -737,6 +737,7 @@ void Player::MagicInput(float elapsedTime)
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
+			spawnInfo.angleY = angle.y;
 
 			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 			magicCoolDownTimer = fullcChargeCoolDownValue;
@@ -763,6 +764,7 @@ void Player::MagicInput(float elapsedTime)
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
+			spawnInfo.angleY = angle.y;
 
 			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 			magicCoolDownTimer = coolDownValue;

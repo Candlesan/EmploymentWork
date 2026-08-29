@@ -61,7 +61,7 @@
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
             "isBillboard": false,
-            "isLoop": true,
+            "isLoop": false,
             "lifeTime": 0.5,
             "meshPath": "",
             "name": "Node",
@@ -168,7 +168,7 @@
                 0.0
             ],
             "spawnInterval": 0.5,
-            "spawnTimer": 0.3305959105491638,
+            "spawnTimer": 0.0,
             "splitCount": [
                 1,
                 1
@@ -246,7 +246,7 @@
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
             "isBillboard": true,
-            "isLoop": true,
+            "isLoop": false,
             "lifeTime": 0.5,
             "meshPath": "",
             "name": "Node 2",
@@ -353,7 +353,7 @@
                 0.0
             ],
             "spawnInterval": 0.5,
-            "spawnTimer": 0.3305959105491638,
+            "spawnTimer": 0.0,
             "splitCount": [
                 1,
                 1

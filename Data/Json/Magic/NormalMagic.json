@@ -4,29 +4,59 @@
     "chargeMagicCost": 20.0,
     "chargeRadius": 1.0,
     "chargeTimeThreshold": 3.0,
-    "damage": 0.009999999776482582,
-    "guardDamage": 0.5,
-    "hitHeight": 1.0,
-    "hitRadius": 0.25,
-    "lifeTimer": 3.0,
-    "normalDamage": 10.0,
-    "normalMagicCost": 10.0,
-    "normalRadius": 0.5,
-    "offsetAngle": [
-        90.0,
-        0.0,
-        0.0
-    ],
-    "offsetPosition": [
+    "circleOffsetAngle": [
         0.0,
         0.0,
         0.0
     ],
-    "offsetScale": [
+    "circleOffsetPosition": [
+        0.0,
+        0.10000000149011612,
+        0.8999999761581421
+    ],
+    "circleOffsetScale": [
         1.0,
         1.0,
         1.0
     ],
+    "damage": 0.009999999776482582,
+    "guardDamage": 0.5,
+    "hitHeight": 1.0,
+    "hitRadius": 0.25,
+    "laserChargeOffsetAngle": [
+        90.0,
+        0.0,
+        0.0
+    ],
+    "laserChargeOffsetPosition": [
+        0.0,
+        0.0,
+        0.8999999761581421
+    ],
+    "laserChargeOffsetScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "laserOffsetAngle": [
+        90.0,
+        0.0,
+        0.0
+    ],
+    "laserOffsetPosition": [
+        0.0,
+        1.100000023841858,
+        0.8999999761581421
+    ],
+    "laserOffsetScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "lifeTimer": 3.0,
+    "normalDamage": 10.0,
+    "normalMagicCost": 10.0,
+    "normalRadius": 0.5,
     "range": 300.0,
     "scale": 1.0,
     "spawnOffsetX": 0.0,
