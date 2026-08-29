@@ -862,6 +862,12 @@ void EffectEditor::DrawFileToolbar()
 
             SyncRuntimeNodes();
 
+            // “Ç‚Ýž‚ñ‚¾ƒm[ƒh”‚ð’´‚¦‚Ä‚¢‚½‚çˆÀ‘S‚È”ÍˆÍ‚É–ß‚·
+            if (selectedNodeIndex >= static_cast<int>(currentConfig.nodes.size()))
+            {
+                selectedNodeIndex = 0;
+            }
+
             if (runtimeNodes[selectedNodeIndex].particleManager && !currentConfig.nodes[selectedNodeIndex].texturePath.empty())
             {
                 runtimeNodes[selectedNodeIndex].particleManager->SetTexture(

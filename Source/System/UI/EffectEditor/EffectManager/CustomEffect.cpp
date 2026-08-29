@@ -161,9 +161,9 @@ void CustomEffect::Update(float elapsedTime)
                 case ScaleMode::Fixed:
                     // 拡大時間経過で大きく/小さくする
                     // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
-                    finalScale.x = node.config.scale.x + (node.config.scaleVelocity.x * activeTime) + (0.5f * node.config.scaleAcceleration.x * activeTime * activeTime);
-                    finalScale.y = node.config.scale.y + (node.config.scaleVelocity.y * activeTime) + (0.5f * node.config.scaleAcceleration.y * activeTime * activeTime);
-                    finalScale.z = node.config.scale.z + (node.config.scaleVelocity.z * activeTime) + (0.5f * node.config.scaleAcceleration.z * activeTime * activeTime);
+                    finalScale.x = this->scale.x * (node.config.scale.x + (node.config.scaleVelocity.x * activeTime) + (0.5f * node.config.scaleAcceleration.x * activeTime * activeTime));
+                    finalScale.y = this->scale.y * (node.config.scale.y + (node.config.scaleVelocity.y * activeTime) + (0.5f * node.config.scaleAcceleration.y * activeTime * activeTime));
+                    finalScale.z = this->scale.z * (node.config.scale.z + (node.config.scaleVelocity.z * activeTime) + (0.5f * node.config.scaleAcceleration.z * activeTime * activeTime));
 
                     break;
                 case ScaleMode::UniformEasing:
@@ -470,9 +470,9 @@ void CustomEffect::EmitParticles(float elapsedTime)
 
                 // 位置
                 data.position = {
-                  pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
-                  pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
-                  pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
+                  this->position.x + pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
+                  this->position.y + pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
+                  this->position.z + pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
                    1.0f
                 };
                 // 初速度
@@ -492,9 +492,9 @@ void CustomEffect::EmitParticles(float elapsedTime)
 
                 // 回転
                 data.rotation = {
-                    DirectX::XMConvertToRadians(pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat())),
+                    DirectX::XMConvertToRadians(this->angle.x + (pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat()))),
+                    DirectX::XMConvertToRadians(this->angle.y + (pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat()))),
+                    DirectX::XMConvertToRadians(this->angle.z + (pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat()))),
                     pConfig.isBillboard ? 1.0f : 0.0f
                 };
                 data.rotVelocity = {
@@ -519,8 +519,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
                 {
                 case ScaleMode::Fixed: // 固定
                     data.scale = {
-                        std::max(0.0f, pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat())),
-                        std::max(0.0f, pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat())),
+                        std::max(0.0f, this->scale.x * (pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat()))),
+                        std::max(0.0f, this->scale.y * (pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat()))),
                         1.0f, 0.0f
                     };
                     data.scaleVelocity = {
