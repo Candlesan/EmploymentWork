@@ -22,6 +22,8 @@ public:
 		if (system) system->emit(data);
 	}
 
+	void Clear(ID3D11DeviceContext* dc);
+
 	// ゲッターセッター
 	bool SetTexture(const std::string& texturePath, DirectX::XMUINT2 splitCount = { 1, 1 });
 private:

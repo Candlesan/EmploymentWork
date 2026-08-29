@@ -63,7 +63,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	centerPos.z = startPos.z + info.direction.z * (range * 0.5f);
 
 	// 水平方向の前方向
-	float len = (info.direction.x * info.direction.x + info.direction.z * info.direction.z);
+	float len = sqrtf(info.direction.x * info.direction.x + info.direction.z * info.direction.z);
 	DirectX::XMFLOAT3 forward = { 0.0f, 0.0f, 0.0f };
 	if (len > 0.0001f)
 	{
@@ -73,7 +73,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	}
 
 	// 前方向から右方向ベクトルを作る
-	DirectX::XMFLOAT3 right = { forward.x, 0.0f, -forward.x };
+	DirectX::XMFLOAT3 right = { forward.x, 0.0f, -forward.z };
 
 	// ================ 通常レーザーの計算 =================
 

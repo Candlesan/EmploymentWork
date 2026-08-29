@@ -179,6 +179,8 @@ public:
     void update(ID3D11DeviceContext* immdiate_context, float elapsedtime);
     void render(ID3D11DeviceContext* immdiate_context);
 
+    void clear(ID3D11DeviceContext* immediate_context);
+
     // ゲッターセッター
     void set_texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, DirectX::XMUINT2 split_count = { 1, 1 })
     {

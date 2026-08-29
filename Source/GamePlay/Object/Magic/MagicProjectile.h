@@ -1,9 +1,15 @@
 #pragma once
 #include "GamePlay/Object/Magic/MagicBase.h"
-#include "System/Effect/Effect.h"
 #include "GamePlay/Object/Magic/IMagicMove.h"
 #include "GamePlay/Object/Magic/MagicInfor.h"
+
+#include "System/Effect/Effect.h"
+
 #include <memory>
+#include <string>
+
+// ëOï˚êÈåæ
+class CustomEffect;
 
 class MagicProjectile : public MagicBase
 {
@@ -41,4 +47,7 @@ private:
 	std::unique_ptr<IMagicMove> moveComponent;
 
 	MagicInfo config;
+
+	CustomEffect* customEffect = nullptr;
+	std::string effectName = "";
 };

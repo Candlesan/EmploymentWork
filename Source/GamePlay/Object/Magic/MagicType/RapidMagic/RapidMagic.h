@@ -92,6 +92,8 @@ public:
     void DrawGUI(RapidMagicConfig& config);
 
 private:
+    std::string rapidMagic = "RapidFireMagic"; 
+    std::string magicCircle = "MagicCircleFast";
     int currentSpawnIndex = 0;
     float rapidTimer = 0.0f;
 };

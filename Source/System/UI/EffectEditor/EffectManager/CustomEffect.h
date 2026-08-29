@@ -34,8 +34,17 @@ public:
 	// エフェクト終了関数
 	bool IsFinished();
 
+	// 停止
+	void Stop();
+
 	// 設置位置調整用にGUI
 	void DrawGUI();
+
+	// ゲッター・セッター
+	void SetPosition(const DirectX::XMFLOAT3& pos) { this->position = pos; }
+	void SetAngle(const DirectX::XMFLOAT3& rot) { this->angle = rot; }
+	void SetScale(const DirectX::XMFLOAT3& scl) { this->scale = scl; }
+
 
 private:
 	void EmitParticles(float elapsedTime);

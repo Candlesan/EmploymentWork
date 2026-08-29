@@ -358,3 +358,30 @@ void compute_particle_system::render(ID3D11DeviceContext* immediate_context)
 	immediate_context->PSSetShaderResources(0, 1, clear_shader_resource_views);
 	immediate_context->GSSetShaderResources(0, 1, clear_shader_resource_views);
 }
+
+void compute_particle_system::clear(ID3D11DeviceContext* immediate_context)
+{
+	// CPU側の生成町キューを空にする
+	emit_particles.clear();
+
+	// Append/Consumeバッファのカウンタを0にリセット
+	UINT clear_parameter = 0;
+	immediate_context->CSSetUnorderedAccessViews(0, 1, particle_append_consume_unordered_access_view.GetAddressOf(), &clear_parameter);
+
+	ID3D11UnorderedAccessView* uavs[] =
+	{
+		particle_data_unordered_access_view.Get(),
+		particle_append_consume_unordered_access_view.Get(),
+		indirect_data_unordered_access_view.Get(),
+		particle_header_unordered_access_view.Get()
+	};
+	immediate_context->CSSetUnorderedAccessViews(0, ARRAYSIZE(uavs), uavs, nullptr);
+
+	// 全パーティクルを初期状態にするシェーダーを実行する
+	immediate_context->CSSetShader(init_shader.Get(), nullptr, 0);
+	immediate_context->Dispatch(num_particles / NumParticleThread, 1, 1);
+
+	// UAVのアンバインド
+	ID3D11UnorderedAccessView* null_uavs[] = { nullptr, nullptr, nullptr, nullptr };
+	immediate_context->CSSetUnorderedAccessViews(0, ARRAYSIZE(null_uavs), null_uavs, nullptr);
+}

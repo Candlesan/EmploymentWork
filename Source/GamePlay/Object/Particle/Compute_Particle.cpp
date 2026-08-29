@@ -85,6 +85,11 @@ void Compute_Particle::Render(const RenderContext& rc)
 
 }
 
+void Compute_Particle::Clear(ID3D11DeviceContext* dc)
+{
+    if (system) system->clear(dc);
+}
+
 bool Compute_Particle::SetTexture(const std::string& texturePath, DirectX::XMUINT2 splitCount)
 {
     if (!device || texturePath.empty()) return false;

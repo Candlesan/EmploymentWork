@@ -1,10 +1,10 @@
 #include "MagicProjectile.h"
 #include "System/Effect/EffectManager.h"
-
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 
 // コンストラクタ
 MagicProjectile::MagicProjectile(MagicManager* manager, const std::string& effectPath)
-	: MagicBase(manager)
+	: MagicBase(manager), effectName(effectPath)
 {
 	Magic = EffectManager::Instance().GetOrLoadEffect(effectPath);
 	magicHandle = -1;
@@ -26,6 +26,21 @@ void MagicProjectile::Update(float elapsedTime)
 		waitTimer -= elapsedTime;
 		if (waitTimer <= 0.0f)
 		{
+			if (!effectName.empty())
+			{
+				float yaw = atan2f(direction.x, direction.z);
+				float pitch = -asinf(direction.y);
+				DirectX::XMFLOAT3 angle = {
+					DirectX::XMConvertToDegrees(pitch),
+					DirectX::XMConvertToDegrees(yaw),
+					0.0f
+				};
+
+				{
+					customEffect = CustomEffectManager::Instance().PlayEffect(effectName, position, angle, { 1.0, 1.0f, 1.0f });
+				}
+			}
+
 			if (Magic != nullptr)
 			{
 				magicHandle = Magic->Play(position, config.scale);
@@ -42,6 +57,12 @@ void MagicProjectile::Update(float elapsedTime)
 		}
 
 		// エフェクトの位置を更新
+
+		if (customEffect)
+		{
+			customEffect->SetPosition(position);
+		}
+
 		if (Magic != nullptr && magicHandle != -1)
 		{
 			Magic->SetPosition(magicHandle, position);
@@ -127,6 +148,12 @@ void MagicProjectile::OnTerminate()
 	{
 		Magic->Stop(magicHandle);
 		magicHandle = -1;
+	}
+
+	if (customEffect)
+	{
+		customEffect->Stop();
+		customEffect = nullptr;
 	}
 
 	// 自分を削除

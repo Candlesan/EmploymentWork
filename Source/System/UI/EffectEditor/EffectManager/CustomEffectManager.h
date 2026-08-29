@@ -25,7 +25,7 @@ public:
 	void LoadEffectConfig(const std::string& effectName, const std::string& filePath);
 
 	// エフェクト再生
-	void PlayEffect(
+	CustomEffect* PlayEffect(
 		const std::string& effectName,
 		DirectX::XMFLOAT3 position,
 		DirectX::XMFLOAT3 angle = {0.0f, 0.0f, 0.0f},
@@ -40,6 +40,10 @@ public:
 
 	// 全部クリア
 	void Clear();
+
+	// 設定済みにのエフェクトをインスタンス化してポインタを返す関数
+	std::unique_ptr<CustomEffect> CreateEffect(const std::string& effectName);
+
 private:
 	CustomEffectManager() = default;
 	~CustomEffectManager() { Clear(); }

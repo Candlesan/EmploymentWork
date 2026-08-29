@@ -28,7 +28,7 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
         // メッシュノードなら、そのノードのパスでモデルを生成
         if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
         {
-            rNode.meshModel = ModelResourceManager::Instance().GetOrLoad(device, nodeConfig.meshPath);
+            rNode.meshModel = std::make_shared<Model>(device, nodeConfig.meshPath.c_str());
 
             if (!nodeConfig.texturePath.empty())
             {
@@ -406,12 +406,28 @@ void CustomEffect::DrawGUI()
 
 }
 
+
 // エフェクト終了関数
 bool CustomEffect::IsFinished()
 {
 	return !isPlaying;
 }
 
+void CustomEffect::Stop()
+{
+    isPlaying = false;
+
+    ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+    for (auto& node : runTimeNodes)
+    {
+        if (node.particleManager)
+        {
+            node.particleManager->Clear(dc);
+        }
+    }
+
+}
 // パーティクル放出
 void CustomEffect::EmitParticles(float elapsedTime)
 {

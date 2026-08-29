@@ -27,13 +27,13 @@ void CustomEffectManager::LoadEffectConfig(const std::string& effectName, const 
 }
 
 // エフェクト再生
-void CustomEffectManager::PlayEffect(const std::string& effectName, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
+CustomEffect* CustomEffectManager::PlayEffect(const std::string& effectName, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
 {
 	// エフェクト名で検索する
 	auto it = effectConfigs.find(effectName);
 
 	// 見つからなかったら処理をしない
-	if (it == effectConfigs.end()) return;
+	if (it == effectConfigs.end()) return nullptr;
 
 	// 新しくエフェクトを作る
 	auto effect = new CustomEffect();
@@ -46,6 +46,8 @@ void CustomEffectManager::PlayEffect(const std::string& effectName, DirectX::XMF
 
 	// 再生中のエフェクトをリストに追加する
 	activeEffects.push_back(effect);
+
+	return effect;
 }
 
 // 更新処理
@@ -127,4 +129,16 @@ void CustomEffectManager::Clear()
 	}
 	activeEffects.clear();
 	effectConfigs.clear();
+}
+
+std::unique_ptr<CustomEffect> CustomEffectManager::CreateEffect(const std::string& effectName)
+{
+	// 名前を検索する
+	auto it = effectConfigs.find(effectName);
+	if (it == effectConfigs.end()) return nullptr;
+
+	auto effect = std::make_unique<CustomEffect>();
+	effect->Initialize(device, it->second);
+
+	return effect;
 }
