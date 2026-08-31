@@ -1,5 +1,6 @@
 #include "Compute_Particle.h"
 #include "System/Graphic/Graphics.h"
+#include "System/Resource/TextureResourceManager/TextureResourceManager.h"
 
 Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
 {
@@ -10,10 +11,7 @@ Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view;
 
     // デフォルトテクスチャの読み込み
-    GpuResourceUtils::LoadTexture(device,
-        "Data/Sprite/Particle/texture/particle256x256.png",
-        shader_resource_view.GetAddressOf(),
-        &texture2d_desc);
+    shader_resource_view = TextureResourceManager::Instance().GetOrLoad(device, "Data/Sprite/Particle/texture/particle256x256.png");
 
     //	コンピュートパーティクルシステム生成
     system = std::make_unique<compute_particle_system>(device,

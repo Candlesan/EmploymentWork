@@ -3,6 +3,7 @@
 #include "System/Core/Mathf.h"
 #include "System/Renderer/Shader/meshVFX/meshVFX.h"
 #include "System/Resource/ModelResourceManager/ModelResourceManager.h"
+#include "System/Resource/TextureResourceManager/TextureResourceManager.h"
 
 #include <ctime>
 #include <cstdlib>
@@ -32,20 +33,12 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
 
             if (!nodeConfig.texturePath.empty())
             {
-                D3D11_TEXTURE2D_DESC texture2d_desc;
-                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
-                HRESULT hr = GpuResourceUtils::LoadTexture(device, nodeConfig.texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
-
-                rNode.shaderResourceView = srv;
+                rNode.shaderResourceView = TextureResourceManager::Instance().GetOrLoad(device, nodeConfig.texturePath);
             }
 
             if (!nodeConfig.noisePath.empty())
             {
-                D3D11_TEXTURE2D_DESC texture2d_desc;
-                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
-                HRESULT hr = GpuResourceUtils::LoadTexture(device, nodeConfig.noisePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
-
-                rNode.noiseShaderResourceView = srv;
+                rNode.shaderResourceView = TextureResourceManager::Instance().GetOrLoad(device, nodeConfig.texturePath);
             }
 
         }

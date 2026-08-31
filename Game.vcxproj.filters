@@ -217,7 +217,10 @@
     <Filter Include="Source\GamepPlay\Object\Flight">
       <UniqueIdentifier>{3874ac6d-4799-4580-a9e1-ded72546897e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\System\Resource\ModelResource">
+    <Filter Include="Source\System\Resource\TextureResourceManager">
+      <UniqueIdentifier>{dae78c26-68c1-4266-bbbd-872db38a302b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Resource\ModelResourceManager">
       <UniqueIdentifier>{e2b305a1-4c0f-43bd-8d9c-168eecc1c2a1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -529,7 +532,10 @@
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.h">
-      <Filter>Source\System\Resource\ModelResource</Filter>
+      <Filter>Source\System\Resource\ModelResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Resource\TextureResourceManager\TextureResourceManager.h">
+      <Filter>Source\System\Resource\TextureResourceManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -798,7 +804,10 @@
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.cpp">
-      <Filter>Source\System\Resource\ModelResource</Filter>
+      <Filter>Source\System\Resource\ModelResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Resource\TextureResourceManager\TextureResourceManager.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
