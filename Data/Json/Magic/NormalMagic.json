@@ -30,7 +30,7 @@
     ],
     "laserChargeOffsetPosition": [
         0.0,
-        0.0,
+        1.0,
         0.8999999761581421
     ],
     "laserChargeOffsetScale": [

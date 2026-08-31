@@ -384,4 +384,12 @@ void compute_particle_system::clear(ID3D11DeviceContext* immediate_context)
 	// UAVのアンバインド
 	ID3D11UnorderedAccessView* null_uavs[] = { nullptr, nullptr, nullptr, nullptr };
 	immediate_context->CSSetUnorderedAccessViews(0, ARRAYSIZE(null_uavs), null_uavs, nullptr);
+
+	// GPU状の「生存パーティクル数」を強制的に0にする
+	UINT zeros[3] = { 0, 0, 0 };
+	D3D11_BOX box = {};
+	box.right = sizeof(zeros);
+	box.bottom = 1;
+	box.back = 1;
+	immediate_context->UpdateSubresource(indirect_data_buffer.Get(), 0, &box, zeros, 0, 0);
 }

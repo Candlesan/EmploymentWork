@@ -168,7 +168,7 @@
                 0.0
             ],
             "spawnInterval": 5.0,
-            "spawnTimer": 4.938587188720703,
+            "spawnTimer": 0.0,
             "splitCount": [
                 1,
                 1
@@ -180,7 +180,7 @@
                 0.0,
                 0.0
             ],
-            "visible": true,
+            "visible": false,
             "width": 1.0,
             "widthEnd": 0.0,
             "widthMiddle": 1.0,
@@ -257,7 +257,7 @@
             ],
             "position": [
                 0.0,
-                1.0,
+                0.0,
                 0.0
             ],
             "positionAcceleration": [

@@ -428,6 +428,7 @@ void CustomEffect::Stop()
     }
 
 }
+
 // パーティクル放出
 void CustomEffect::EmitParticles(float elapsedTime)
 {
