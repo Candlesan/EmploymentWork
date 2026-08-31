@@ -17,13 +17,15 @@ public:
 	// 終了処理
 	void End(const RenderContext& rc) override;
 
-	void SetBlendMode(int mode) { blendMode = mode; }
 
 	// ゲッターセッター
 	void SetColor(DirectX::XMFLOAT4 c) { vfxColor = c; }
+	void SetBlendMode(int mode) { blendMode = mode; }
 	void SetUvOffset(DirectX::XMFLOAT2 offset) { uvOffset = offset; }
 	void SetNoiseUvOffset(DirectX::XMFLOAT2 offset) { noiseUvOffset = offset; } 
 	void SetDistortionPower(float power) { distortionPower = power; } 
+
+	void SetWorldTransForm(DirectX::XMFLOAT4X4& transform) { worldTransform = transform; }
 
 	void SetCurrentTextures(ID3D11ShaderResourceView* srv, ID3D11ShaderResourceView* noiseSrv)
 	{
@@ -60,6 +62,13 @@ private:
 	D3D11_TEXTURE2D_DESC trail_texture2d_desc;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView;
+
+	DirectX::XMFLOAT4X4 worldTransform = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
 
 	DirectX::XMFLOAT4 vfxColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	DirectX::XMFLOAT2 uvOffset = { 0.0f, 0.0f };

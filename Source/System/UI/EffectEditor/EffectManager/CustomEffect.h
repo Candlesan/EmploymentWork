@@ -60,6 +60,13 @@ private:
 		DirectX::XMFLOAT2 currentUvOffset = { 0.0f, 0.0f };	// 毎フレーム加算していくUV位置
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
+
+		DirectX::XMFLOAT4X4 worldTransform = {
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		};
 	};
 
 

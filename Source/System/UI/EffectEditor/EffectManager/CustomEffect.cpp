@@ -28,7 +28,7 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
         // メッシュノードなら、そのノードのパスでモデルを生成
         if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
         {
-            rNode.meshModel = std::make_shared<Model>(device, nodeConfig.meshPath.c_str());
+            rNode.meshModel = ModelResourceManager::Instance().GetOrLoad(device, nodeConfig.meshPath);
 
             if (!nodeConfig.texturePath.empty())
             {
@@ -197,9 +197,9 @@ void CustomEffect::Update(float elapsedTime)
 
                 // 回転（初期回転 ＋ 初期角度 ＋ 自転・回転速度 ＋ 回転加速度）
                 DirectX::XMFLOAT3 currentRot = {
-                    this->angle.x + DirectX::XMConvertToRadians(node.config.rotation.x + (node.config.rotationVelocity.x * t) + (0.5f * node.config.rotationAcceleration.x * t * t)),
-                    this->angle.y + DirectX::XMConvertToRadians(node.config.rotation.y + (node.config.rotationVelocity.y * t) + (0.5f * node.config.rotationAcceleration.y * t * t)),
-                    this->angle.z + DirectX::XMConvertToRadians(node.config.rotation.z + (node.config.rotationVelocity.z * t) + (0.5f * node.config.rotationAcceleration.z * t * t))
+                    this->angle.x + (node.config.rotation.x + (node.config.rotationVelocity.x * t) + (0.5f * node.config.rotationAcceleration.x * t * t)),
+                    this->angle.y + (node.config.rotation.y + (node.config.rotationVelocity.y * t) + (0.5f * node.config.rotationAcceleration.y * t * t)),
+                    this->angle.z + (node.config.rotation.z + (node.config.rotationVelocity.z * t) + (0.5f * node.config.rotationAcceleration.z * t * t))
                 };
                 DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
                     DirectX::XMConvertToRadians(currentRot.x),
@@ -219,7 +219,7 @@ void CustomEffect::Update(float elapsedTime)
                 DirectX::XMFLOAT4X4 worldTransform;
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
 
-                node.meshModel->UpdateTransform(worldTransform);
+                node.worldTransform = worldTransform;
 
                 if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
             }
@@ -401,6 +401,7 @@ void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
                         dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
                         // 行列とパラメータを定数バッファに更新して描画コール
+                        shader->SetWorldTransForm(rNode.worldTransform);
                         shader->Update(rc, mesh);
                         dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
                     }
@@ -416,13 +417,13 @@ void CustomEffect::DrawGUI()
 
 }
 
-
 // エフェクト終了関数
 bool CustomEffect::IsFinished()
 {
 	return !isPlaying;
 }
 
+// 停止関数
 void CustomEffect::Stop()
 {
     isPlaying = false;

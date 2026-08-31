@@ -75,7 +75,7 @@ void meshVFX::Update(const RenderContext& rc, const Model::Mesh& mesh)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
 
-	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&mesh.node->worldTransform);
+	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&worldTransform); // 自身のワールド座標を使う
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.camera->GetProjection());
 	DirectX::XMMATRIX WVP = W * V * P;
