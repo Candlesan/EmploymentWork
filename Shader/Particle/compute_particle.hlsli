@@ -118,7 +118,8 @@ cbuffer COMPUTE_PARTICLE_COMMON_CONSTANT_BUFFER : register(b10)
     uint system_num_particles;
     
     uint total_emit_count; // 生成予定のパーティクル数
-    uint common_dummy[3];
+    
+    float3 parent_delta; // 親の位置
 };
 
 //=========================================================================================

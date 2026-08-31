@@ -110,11 +110,12 @@ public:
     // 汎用情報定義
     struct common_constants
     {
-        float elapsed_time; // 経過時間
-        DirectX::XMUINT2 texture_split_count; // テクスチャの分割数
-        UINT system_num_particles; // パーティクル総数
-        UINT				total_emit_count;		//	現在のフレームでのパーティクル総生成数
-        UINT				common_dummy[3];
+        float elapsed_time;                     // 経過時間
+        DirectX::XMUINT2 texture_split_count;   // テクスチャの分割数
+        UINT system_num_particles;              // パーティクル総数
+        UINT total_emit_count;		            //	現在のフレームでのパーティクル総生成数
+
+        DirectX::XMFLOAT3 parent_delta;      // 親の位置
     };
 
     //	DispatchIndirect用構造体
@@ -176,7 +177,7 @@ public:
     ~compute_particle_system();
 
     void emit(const emit_particle_data& data);
-    void update(ID3D11DeviceContext* immdiate_context, float elapsedtime);
+    void update(ID3D11DeviceContext* immdiate_context, DirectX::XMFLOAT3 parent_delta, float elapsedtime);
     void render(ID3D11DeviceContext* immdiate_context);
 
     void clear(ID3D11DeviceContext* immediate_context);

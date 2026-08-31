@@ -89,6 +89,9 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     // 位置更新
     data.position.xyz += data.posVelocity.xyz * elapsed_time;
     
+    // 差分値を足す
+    data.position.xyz += parent_delta;
+    
     // --- 回転 ---
     // 角速度更新
     data.rotVelocity.xyz += data.rotAcceleration.xyz * elapsed_time;

@@ -67,6 +67,9 @@ void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, Dir
 	this->scale = scale;
 	this->angle = angle;
 
+    // 初回の計算で暴発しないようにする
+    prevPosition = position;
+
 	effectTimer = 0.0f; // タイマーを0にする
 	isPlaying = true; // 再生中にする
 
@@ -121,6 +124,14 @@ void CustomEffect::Update(float elapsedTime)
 
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 
+    // 移動した差分値を求める
+    delta.x = this->position.x - prevPosition.x;
+    delta.y = this->position.y - prevPosition.y;
+    delta.z = this->position.z - prevPosition.z;
+
+    // 前回の位置を保存する
+    prevPosition = this->position;
+
     for (auto& node : runTimeNodes)
     {
         if (!node.config.visible) continue;
@@ -135,8 +146,7 @@ void CustomEffect::Update(float elapsedTime)
         // パーティクルの計算を進める
         if (node.particleManager)
         {
-
-            node.particleManager->Update(dc, elapsedTime);
+            node.particleManager->Update(dc, delta, elapsedTime);
         }
 
         // パーティクル

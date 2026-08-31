@@ -183,7 +183,7 @@ void compute_particle_system::emit(const emit_particle_data& data)
 	emit_particles.emplace_back(data);
 }
 
-void compute_particle_system::update(ID3D11DeviceContext* immediate_context, float elapsed_time)
+void compute_particle_system::update(ID3D11DeviceContext* immediate_context, DirectX::XMFLOAT3 parent_delta, float elapsed_time)
 {
 	//	定数バッファ設定
 	{
@@ -196,6 +196,7 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, flo
 		constant.texture_split_count = texture_split_count;
 		constant.system_num_particles = num_particles;
 		constant.total_emit_count = static_cast<UINT>(emit_particles.size());
+		constant.parent_delta = parent_delta;
 		immediate_context->UpdateSubresource(common_constant_buffer.Get(), 0, nullptr, &constant, 0, 0);
 	}
 

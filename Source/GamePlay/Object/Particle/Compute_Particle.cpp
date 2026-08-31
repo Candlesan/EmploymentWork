@@ -28,9 +28,9 @@ Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
         sceneConstantBuffer.GetAddressOf());
 }
 
-void Compute_Particle::Update(ID3D11DeviceContext* dc, float elapsedTime) 
+void Compute_Particle::Update(ID3D11DeviceContext* dc, DirectX::XMFLOAT3 parent_delta, float elapsedTime)
 {
-    system->update(dc, elapsedTime);
+    system->update(dc, parent_delta, elapsedTime);
 }
 
 void Compute_Particle::Render(const RenderContext& rc)

@@ -72,7 +72,7 @@
             ],
             "position": [
                 0.0,
-                1.0,
+                0.0,
                 0.0
             ],
             "positionAcceleration": [
@@ -180,7 +180,7 @@
                 0.0,
                 0.0
             ],
-            "visible": false,
+            "visible": true,
             "width": 1.0,
             "widthEnd": 0.0,
             "widthMiddle": 1.0,

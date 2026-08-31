@@ -29,6 +29,7 @@ void EffectEditor::DrawGUI()
 {
 	ImGui::Begin(u8"エフェクトエディター");
 
+
     if (selectedNodeIndex >= currentConfig.nodes.size())
     {
         selectedNodeIndex = 0;
@@ -41,6 +42,11 @@ void EffectEditor::DrawGUI()
     DrawNodeList();
     ImGui::Separator();
 
+    // テスト再生ボタン
+    if (ImGui::Button(u8"再生"))
+    {
+        PlayTestEffect(testSpawnPos);
+    }
 
     // 選択中のノードを参照で受け取る
     auto& selectedNode = currentConfig.nodes[selectedNodeIndex];
@@ -118,15 +124,23 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
     // エフェクト全体の時間を進める
     effectTimer += elapsedTime;
 
+    delta.x = testSpawnPos.x - prevSpawnPos.x;
+    delta.y = testSpawnPos.y - prevSpawnPos.y;
+    delta.z = testSpawnPos.z - prevSpawnPos.z;
+
+    prevSpawnPos = testSpawnPos;
+
+
     for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
         auto& node = currentConfig.nodes[i];
         auto& rNode = runtimeNodes[i];
 
+
         // パーティクルの計算を進める
         if (rNode.particleManager)
         {
-            rNode.particleManager->Update(dc, elapsedTime);
+            rNode.particleManager->Update(dc, delta, elapsedTime);
         }
 
         // 再生中じゃなければここで終了

@@ -62,6 +62,8 @@ private:
 	// 再生状態
 	bool isPlaying = false;
 	DirectX::XMFLOAT3 testSpawnPos = { 0.0f, 1.0f, 0.0f };
+	DirectX::XMFLOAT3 prevSpawnPos = { 0.0f, 1.0f, 0.0f }; // 前フレームの位置
+	DirectX::XMFLOAT3 delta = { 0.0f, 0.0f, 0.0f };
 	float effectTimer = 0.0f;	// エフェクト開始からの経過時間
 	int selectedNodeIndex = 0; // 選択中のノード
 };

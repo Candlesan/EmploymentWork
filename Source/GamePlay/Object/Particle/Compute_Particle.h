@@ -13,7 +13,7 @@ public:
 
 	void Initialize(ID3D11Device* device);
 	void Finalize();
-	void Update(ID3D11DeviceContext* dc, float elapsedTime);
+	void Update(ID3D11DeviceContext* dc, DirectX::XMFLOAT3 parent_delta, float elapsedTime);
 	void Render(const RenderContext& rc);
 	void DrawGUI();
 
