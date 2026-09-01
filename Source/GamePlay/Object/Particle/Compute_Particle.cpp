@@ -5,7 +5,7 @@
 Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
 {
     //	総パーティクル数
-    int num_particle = 5000;
+    int num_particle = 256;
 
     D3D11_TEXTURE2D_DESC texture2d_desc;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view;

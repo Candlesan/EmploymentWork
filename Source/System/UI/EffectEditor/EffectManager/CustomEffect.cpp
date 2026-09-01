@@ -24,10 +24,13 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
         auto& rNode = runTimeNodes[i];
 
         rNode.config = nodeConfig;
-        rNode.particleManager = std::make_unique<Compute_Particle>(device);
 
+        if (nodeConfig.type == RenderType::Particle)
+        {
+            rNode.particleManager = std::make_unique<Compute_Particle>(device);
+        }
         // メッシュノードなら、そのノードのパスでモデルを生成
-        if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
+        else if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
         {
             rNode.meshModel = ModelResourceManager::Instance().GetOrLoad(device, nodeConfig.meshPath);
 
