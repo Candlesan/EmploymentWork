@@ -41,7 +41,7 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
 
             if (!nodeConfig.noisePath.empty())
             {
-                rNode.shaderResourceView = TextureResourceManager::Instance().GetOrLoad(device, nodeConfig.texturePath);
+                rNode.noiseShaderResourceView = TextureResourceManager::Instance().GetOrLoad(device, nodeConfig.noisePath);
             }
 
         }
