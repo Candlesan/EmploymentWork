@@ -194,6 +194,9 @@ void Enemy::DrawGUI()
 		{
 			ImGui::Checkbox(u8"敵の表示", &showEnemy);
 
+			float distans = GetDistanceToPlayer();
+			ImGui::Text(u8"プレイヤーとの距離: %f", distans);
+
 			// パラメーター全回復ボタン
 			if (ImGui::Button(u8"HP全回復"))
 			{
@@ -384,30 +387,6 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });
 	}
 
-	// 距離の可視化
-	{
-		float circleY = position.y + 0.05f;
-		float thickness = 0.01f;
-
-		// 近距離 - 赤色
-		renderer->DrawCylinder(
-			{ position.x, circleY, position.z },
-			Short_Distance, thickness, { 1.0f, 0.0f, 0.0f, 1.0f }
-		);
-
-		// 中距離 - 黄色
-		renderer->DrawCylinder(
-			{ position.x, circleY, position.z },
-			Middle_Distance, thickness, { 1.0f, 1.0f, 0.0f, 1.0f }
-		);
-
-		// 遠距離 - 緑色
-		renderer->DrawCylinder(
-			{ position.x, circleY, position.z },
-			Long_Distance, thickness, { 0.0f, 1.0f, 0.0f, 1.0f }
-		);
-	}
-
 	// 防御魔法の当たり判定
 	if (defenseMagic.GetIsActive())
 	{
@@ -453,70 +432,21 @@ float Enemy::GetDistanceToPlayer() const
 }
 
 // ターゲットの座標に向かって旋回する
-void Enemy::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
-{
-	DirectX::XMFLOAT3 myPos = GetPosition();
-
-	float vx = targetPos.x - myPos.x;
-	float vz = targetPos.z - myPos.z;
-	float len = sqrtf(vx * vx + vz * vz);
-
-	if (len > 0.001f)
-	{
-		vx /= len;
-		vz /= len;
-
-		this->Turn(elapsedTime, vx, vz, turnSpeed);
-	}
-}
-
-void Enemy::TurnToPosition(float elapsedTime)
-{
-	Player& player = Player::Instance();
-	TurnToPosition(elapsedTime, player.GetPosition());
-}
-
-// 指定角度内にターゲットがいるか判定
-bool Enemy::IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree)
-{
-	// 1. ターゲットへの方向ベクトル
-	float vx = targetPos.x - GetPosition().x;
-	float vz = targetPos.z - GetPosition().z;
-	float targetAngle = atan2f(vx, vz);
-
-	// 2. 現在の角度
-	float currentAngle = GetAngle().y;
-
-	// 3. 角度差の計算（-PI 〜 PI 補正）
-	float diff = targetAngle - currentAngle;
-	while (diff > DirectX::XM_PI) diff -= DirectX::XM_2PI;
-	while (diff < -DirectX::XM_PI) diff += DirectX::XM_2PI;
-
-	// 4. 差分が指定角度以内か判定
-	return fabsf(diff) < DirectX::XMConvertToRadians(epsilonDegree);
-}
-
-// ターゲットの座標に向かって進む
-void Enemy::MoveToTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
+void Enemy::LockAtTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
 {
 	DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&targetPos);
-	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
-	Vec = DirectX::XMVector3Normalize(Vec);
+	DirectX::XMVECTOR Dir = DirectX::XMVectorSubtract(PPos, EPos);
 
-	DirectX::XMFLOAT3 moveVec;
-	DirectX::XMStoreFloat3(&moveVec, Vec);
+	// 水面でのみ向きを計算
+	Dir = DirectX::XMVectorSetY(Dir, 0.0f);
+	Dir = DirectX::XMVector3Normalize(Dir);
 
-	Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-	Move(moveVec.x, moveVec.z, moveSpeed);
+	DirectX::XMFLOAT3 lookDir;
+	DirectX::XMStoreFloat3(&lookDir, Dir);
+
+	Turn(elapsedTime, lookDir.x, lookDir.z, turnSpeed);
 }
-
-void Enemy::MoveToTarget(float elapsedTime)
-{
-	Player& player = Player::Instance();
-	MoveToTarget(elapsedTime, player.GetPosition());
-}
-
 
 // =========================================================================
 //  親子関係のオーバーライド

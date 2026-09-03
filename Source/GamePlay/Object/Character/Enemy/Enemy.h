@@ -42,20 +42,18 @@ public:
 	// =========================================================================
 	//  外部アクション・AI制御
 	// =========================================================================
-	// 計算したダメージ
-	void SetLastDamage(float d) { lastDamage = d; }
+	float GetCurrentMagic() const { return status.currentMagic; } // 現在の魔力量を返す
+	float GetCurrentHeat() const { return status.currentHeat; } // 現在のヒート値を返す
+	float GetCurrentDefense() const { return status.currentDefenseDurability; } // 現在の防御魔法の耐久値を返す
 
 	// プレイヤーとの距離を取得
 	float GetDistanceToPlayer() const;
 
 	// ターゲットの座標に向かって旋回する
-	void TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
-	void TurnToPosition(float elapsedTime);
-	bool IsFacingTarget(const DirectX::XMFLOAT3& targetPos, float epsilonDegree);
+	void LockAtTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
 
 	// ターゲットの座標に向かって進む
-	void MoveToTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
-	void MoveToTarget(float elapsedTime);
+	void MoveDirection(const DirectX::XMFLOAT3& movePos);
 
 	// =========================================================================
 	//  セッター
@@ -138,12 +136,8 @@ private:
 
 	// ── 当たり判定・距離設定 ──
 	float debugOffset = 0.5;
-	float Short_Distance = 4.0f;   // 近距離
-	float Middle_Distance = 12.0f; // 中距離
-	float Long_Distance = 20.0f;   // 遠距離
 
 	// ── ダメージ・戦闘ステータス ──
-	float lastDamage = 0.0f;
 	bool Ondown = false;
 	float attackCoolTimer = 0.0f;
 
@@ -190,7 +184,7 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 
 	// ── デバッグGUI表示フラグ ──
-	bool showbtEditor = false;
+	bool showbtEditor = true;
 	bool showEnemyParameter = true;
 	bool showEnemy = true;
 };

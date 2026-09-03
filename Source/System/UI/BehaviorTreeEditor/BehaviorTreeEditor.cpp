@@ -288,11 +288,12 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
 		if (node.selectRule == BehaviorTree::SelectRule::Non)
 		{
-			if (node.name == "Attack" || node.name == "Swing") { finalAction = new AttackAction(enemy, node.name); }
-			else if (node.name == "Pursuit") { finalAction = new PursuitAction(enemy, node.name); }
-			else if (node.name == "Wander") { finalAction = new WanderAction(enemy); }
-			else if (node.name == "Idle") { finalAction = new IdleAction(enemy, node.name); }
-			else if (node.name == "BloodSpear") { finalAction = new BloodSpearAction(enemy, node.name); }
+			if (node.name == "Idle")
+				finalAction = new IdleAction(enemy, node.name);
+			else if (node.name == "Pursuit")
+				finalAction = new PursuitAction(enemy, node.name);
+			else if (node.name == "Attack")
+				finalAction = new AttackAction(enemy, node.name);
 		}
 
 		// ツリーに登録（条件とアクションをセットで渡す！）

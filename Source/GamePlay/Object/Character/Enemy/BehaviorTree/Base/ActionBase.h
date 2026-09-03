@@ -7,8 +7,11 @@ class Enemy;
 class ActionBase
 {
 public:
-	ActionBase(Enemy* enemy, std::string animName = "")
-		:owner(enemy), animName(animName) {}
+	ActionBase(Enemy* enemy, std::string stateName = "")
+		:owner(enemy), stateName(stateName) {}
+
+	virtual ~ActionBase() = default;
+
 	// Àsˆ—
 	enum class State
 	{
@@ -23,5 +26,5 @@ public:
 protected:
 	Enemy* owner;
 	int step = 0;
-	std::string animName;
+	std::string stateName;
 };

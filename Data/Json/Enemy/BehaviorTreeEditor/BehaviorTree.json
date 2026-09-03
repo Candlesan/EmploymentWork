@@ -6,15 +6,11 @@
         },
         {
             "from": "Root",
-            "to": "Attack"
-        },
-        {
-            "from": "Root",
             "to": "Pursuit"
         },
         {
             "from": "Root",
-            "to": "BloodSpear"
+            "to": "Attack"
         }
     ],
     "nodes": [
@@ -24,14 +20,14 @@
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
-                "loop": false,
+                "loop": true,
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
             "name": "Root",
             "parentName": "",
             "position": [
-                -86.0,
+                -38.0,
                 66.0
             ],
             "priority": 1,
@@ -47,7 +43,7 @@
                 }
             ],
             "config": {
-                "animationName": "Idle",
+                "animationName": "AS_Idle_Combat_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "useRootMotion": false,
@@ -66,22 +62,22 @@
             "StateName": "Pursuit",
             "conditions": [
                 {
-                    "compareType": 0,
+                    "compareType": 2,
                     "conditionType": 0,
-                    "judgmentValue": 4.0
+                    "judgmentValue": 10.0
                 }
             ],
             "config": {
-                "animationName": "Run_Fwd",
+                "animationName": "AS_Run_Combat_F_0_Loop_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
-                "useRootMotion": false,
+                "useRootMotion": true,
                 "useRootMotionEx": false
             },
             "name": "Pursuit",
             "parentName": "Root",
             "position": [
-                -86.0,
+                -38.0,
                 196.0
             ],
             "priority": 2,
@@ -93,16 +89,11 @@
                 {
                     "compareType": 3,
                     "conditionType": 0,
-                    "judgmentValue": 4.0
-                },
-                {
-                    "compareType": 3,
-                    "conditionType": 3,
-                    "judgmentValue": 0.0
+                    "judgmentValue": 5.0
                 }
             ],
             "config": {
-                "animationName": "Swing3_Medium",
+                "animationName": "AS_Attack_01_01_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "useRootMotion": false,
@@ -111,40 +102,10 @@
             "name": "Attack",
             "parentName": "Root",
             "position": [
-                10.0,
-                196.0
-            ],
-            "priority": 5,
-            "selectRule": 0
-        },
-        {
-            "StateName": "BloodSpear",
-            "conditions": [
-                {
-                    "compareType": 2,
-                    "conditionType": 0,
-                    "judgmentValue": 10.0
-                },
-                {
-                    "compareType": 3,
-                    "conditionType": 3,
-                    "judgmentValue": 0.0
-                }
-            ],
-            "config": {
-                "animationName": "FrontEndPose",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "useRootMotion": false,
-                "useRootMotionEx": true
-            },
-            "name": "BloodSpear",
-            "parentName": "Root",
-            "position": [
                 106.0,
                 196.0
             ],
-            "priority": 0,
+            "priority": 1,
             "selectRule": 0
         }
     ]

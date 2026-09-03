@@ -807,7 +807,7 @@
       <Filter>Source\System\Resource\ModelResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Resource\TextureResourceManager\TextureResourceManager.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System\Resource\TextureResourceManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

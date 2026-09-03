@@ -10,123 +10,68 @@
 ActionBase::State IdleAction::Run(float elapsedTime)
 {
     float runTimer = owner->GetRunTimer();
-    switch (step)
-    {
-    case 0:
-        owner->SetRunTimer(Mathf::RandomRange(1.0f, 1.5f));
+    DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
 
-        // 待機アニメーションを再生
-        owner->ChangeAnimationState(animName);
-        step++;
-        break;
-    case 1:
-        runTimer -= elapsedTime;
-        // タイマー更新
-        owner->SetRunTimer(runTimer);
-
-        // プレイヤーの方をじっと見つめる
-        owner->TurnToPosition(elapsedTime);
-
-        // 待機時間が過ぎた時
-        if (runTimer <= 0.0f)
-        {
-            step = 0;
-            return ActionBase::State::Complete;
-        }
-        break;
-    }
-    
-    return ActionBase::State::Run;
-}
-
-// 徘徊行動
-ActionBase::State WanderAction::Run(float elapsedTime)
-{
-    return ActionBase::State::Complete;
-}
-
-// 攻撃行動
-ActionBase::State AttackAction::Run(float elapsedTime)
-{
-    // アニメーションを設定する
-    owner->ChangeAnimationState(animName);
+    // 待機アニメーションを再生
+    owner->ChangeAnimationState(stateName);
 
     // プレイヤーの方をじっと見つめる
-    owner->TurnToPosition(elapsedTime);
+    owner->LockAtTarget(elapsedTime, playerPos);
 
-    if (owner->IsAnimationFinished())
-    {
-        // クールダウンを設定する
-        owner->SetAttackCoolTimer(0.5f);
-
-        return ActionBase::State::Complete;
-    }
-
-    return ActionBase::State::Run;
+    return ActionBase::State::Complete;
 }
 
 // 追跡行動
 ActionBase::State PursuitAction::Run(float elapsedTime)
 {
-	owner->ChangeAnimationState(animName);
+    // プレイヤーの位置を取得する
+    DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
 
-    float dist = owner->GetDistanceToPlayer();
+    owner->ChangeAnimationState(stateName);
+    owner->LockAtTarget(elapsedTime, playerPosition);
 
-    // パラメーターを設定する
-    owner->SetMoveSpeed(5.0f);
-    
-    // ターゲットに向かって進む
-    owner->MoveToTarget(elapsedTime);
+    // 進行方向を計算する
+    DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
+    DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&playerPosition);
+    DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
+    Vec = DirectX::XMVector3Normalize(Vec);
 
-    if (dist <= Short_Distance) {
+    DirectX::XMFLOAT3 moveVec;
+    DirectX::XMStoreFloat3(&moveVec, Vec);
+    // その方向へ進む
+    owner->Move(moveVec.x, moveVec.z, owner->GetMoveSpeed());
+
+    if (owner->GetDistanceToPlayer() <= 5.0f)
+    {
         return ActionBase::State::Complete;
     }
 
     return ActionBase::State::Run;
 }
 
-void BloodSpearAction::OnEnter()
+ActionBase::State AttackAction::Run(float elapsedTime)
 {
-    isAttacking = true;
-    owner->ChangeAnimationState(animName);
+    const auto playerPos = Player::Instance().GetPosition();
+    owner->LockAtTarget(elapsedTime, playerPos);
 
-    // 血の槍を４本生成
-    // ボスの位置を基準にして、位置をずらして座標を計算する
-    DirectX::XMFLOAT3 bossPos = owner->GetPosition();
-
-    for (int i = 0; i < 4; ++i)
+    switch (phase)
     {
-        DirectX::XMFLOAT3 spawnPos = bossPos;
-        // 偶数(0, 2)は右、奇数(1, 3)は左に 10 離す
-        spawnPos.x += (i % 2 == 0) ? 10.0f : -10.0f;
+    case Phase::Start:
+        owner->ChangeAnimationState(stateName);
+        phase = Phase::Attacking;
+        return State::Run;
 
-        spawnPos.z += 0;
+    case Phase::Attacking:
+        if (owner->GetCurrentAnimationSeconds()
+            >= owner->GetCurrentAnimationLength())
+        {
+            owner->SetAttackCoolTimer(2.0f);
+            phase = Phase::Start;
+            return State::Complete;
+        }
 
-        // 高さを i に合わせて少しずつ高くする（確実に重ならないようにする）
-        spawnPos.y = bossPos.y + 2.0f + (i * 1.0f);
-
-        // 生成時間をずらす
-        float waitTime = 1.0f + (i * Mathf::RandomRange(0.1f, 0.5f));
-
-        // 槍を生成する
-        //BloodSpearMagic* spear = new BloodSpearMagic(&owner->GetMagicManager());
-        //spear->Launch(spawnPos, waitTime);
-    }
-}
-
-ActionBase::State BloodSpearAction::Run(float elapsedTime)
-{
-    // まだこのアクションに入ったばかりなら初期化を呼ぶ
-    if (!isAttacking) {
-        OnEnter();
+        return State::Run;
     }
 
-    if (owner->IsAnimationFinished())
-    {
-        isAttacking = false;
-        owner->SetAttackCoolTimer(Mathf::RandomRange(1.0f, 1.2));
-        return ActionBase::State::Complete;
-    }
-
-    return ActionBase::State::Run;
+    return State::Failed;
 }

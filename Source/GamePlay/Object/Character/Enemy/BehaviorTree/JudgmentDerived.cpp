@@ -5,36 +5,6 @@
 #include <cmath>
 
 
-// 攻撃に遷移できるか判定
-bool AttackJudgment::Judgment()
-{
-    // プレイヤーの距離を取得
-    float dist = owner->GetDistanceToPlayer();
-
-    // Short_Distanceより離れているかつクールダウンが無いときに遷移
-    if (dist <= Short_Distance && owner->GetAttackCoolTimer() <= 0.0f)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-// 追跡に遷移できるか判定
-bool PursuitJudgment::Judgment()
-{
-    // プレイヤーの距離を取得
-    float dist = owner->GetDistanceToPlayer();
-
-    // Short_Distanceより離れていたら遷移
-    if (dist > Short_Distance)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 // 徘徊に遷移できるか判定
 bool WanderJudgment::Judgment()
 {
@@ -46,6 +16,9 @@ bool FloatConditionJudgment::Judgment()
 {
     BTConditionType conditionType = static_cast<BTConditionType>(ConditionType);
     float currentValue = 0.0f;
+
+    // プレイヤーを取得する
+    Player& player = Player::Instance();
 
     // 条件なしの場合はThreshold・CompareTypeを見ずに即true
     if (conditionType == BTConditionType::None)
@@ -67,8 +40,32 @@ bool FloatConditionJudgment::Judgment()
     case BTConditionType::AttackCoolDown:        // タイマー
         currentValue = owner->GetAttackCoolTimer();
         break;
+    case BTConditionType::EnemyCurrentMagic: // 敵の魔力残量
+        currentValue = owner->GetCurrentMagic();
+        break;
+    case BTConditionType::EnemyCurrentHeat: // 敵の現在のヒート値の上昇量
+        currentValue = owner->GetCurrentHeat();
+        break;
+    case BTConditionType::EnemyCurrentDefense: // 敵の現在の防御魔法の耐久値
+        currentValue = owner->GetCurrentDefense();
+        break;
+    case BTConditionType::PlayerCurrentMagic: // プレイヤーの現在の魔力残量
+        currentValue = player.GetCurrentMagic();
+        break;
+    case BTConditionType::PlayerCurrentHeat: // プレイヤーの現在のヒート値
+        currentValue = player.GetCurrentHeat();
+        break;
+    case BTConditionType::PlayerCurrentDefense: // プレイヤーの魔力残量
+        currentValue = player.GetCurrentDefense();
+        break;
+    case BTConditionType::IsPlayerDefending: // プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)
+        currentValue = player.GetIsGuarding() ? 1.0f : 0.0f;
+        break;
+    case BTConditionType::IncomingMagicCount: // 自身に向かって飛んできている魔法の数 (迎撃判断用)
+        break;
     }
 
+    // BTCompareTypeに応じてcurrentValueとThresholdを比較する
     BTCompareType compareType = static_cast<BTCompareType>(CompareType);
     switch (compareType)
     {
@@ -76,8 +73,8 @@ bool FloatConditionJudgment::Judgment()
     case BTCompareType::Less:         return currentValue < Threshold;
     case BTCompareType::GreaterEqual: return currentValue >= Threshold;
     case BTCompareType::LessEqual:    return currentValue <= Threshold;
-    case BTCompareType::Equal:        return fabsf(currentValue == Threshold) <= 0.0001f;
-    case BTCompareType::NotEqual:     return fabsf(currentValue != Threshold) >= 0.0001f;
+    case BTCompareType::Equal:        return fabsf(currentValue <= Threshold) <= 0.0001f; // floatは誤差があるから「==」じゃなくて差の絶対値で判定する
+    case BTCompareType::NotEqual:     return fabsf(currentValue != Threshold) > 0.0001f; // 上のと同じで誤差を含めて判定した不一致の判定
     default: return false;
     }
 }

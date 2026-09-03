@@ -13,12 +13,20 @@ namespace ed = ax::NodeEditor;
 // 中間ノードの判断条件の種類
 enum class BTConditionType
 {
-	Distance,		// プレイヤーとの距離
-	BossHpRate,		// ボスのHPの割合
-	timer,			// タイマー
-	AttackCoolDown,	//
-	None,			//	条件なし
-	Count,			// enumの総数
+	Distance,				// プレイヤーとの距離
+	BossHpRate,				// ボスのHPの割合
+	timer,					// タイマー
+	AttackCoolDown,			// 攻撃のクールダウン
+	EnemyCurrentMagic,		// 敵の現在の魔力残量
+	EnemyCurrentHeat,		// 敵の源蔵のヒート値
+	EnemyCurrentDefense,	// 敵の現在の防御魔法の耐久値
+	PlayerCurrentMagic,		// プレイヤーの現在の魔力残量
+	PlayerCurrentHeat,		// プレイヤーの現在のヒート値
+	PlayerCurrentDefense,	// プレイヤーの現在の防御魔法の耐久値
+	IsPlayerDefending,		// プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)
+	IncomingMagicCount,		// 自身に向かって飛んできている魔法の数 (迎撃判断用)
+	None,					// 条件なし
+	Count,					// enumの総数
 };
 
 // 比較演算子

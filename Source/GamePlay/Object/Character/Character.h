@@ -44,9 +44,10 @@ struct CharacterStatus
 	bool isDown = false;		// 魔力切れダウン中か
 	bool isBurst = false;		// オーバーヒートしたか
 	bool isRapidFire = false;	// 連射攻撃か
+	bool isIntercept = false;   // 迎撃中か
 	bool isGuarding = false;	// ガード中か
 	bool isFlying = false;		// 飛行中か
-	bool isIntercept = false;   // 迎撃中か
+	bool isHovering = false;	// 滞空中か
 };
 
 class Character
