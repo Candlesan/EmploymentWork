@@ -121,6 +121,7 @@ void BehaviorTreeGraph::Save(const std::string& path)
 		   {"priority", node.priority},
 		   {"StateName", node.name},
 		   {"position", {node.position.x, node.position.y}},
+		   {"actionType", (int)node.actionType},
 
 		   {"config", {
 		   {"animationName", node.config.animationName},
@@ -198,6 +199,7 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.parentName = nodeJson.value("parentName", "");
 			newNode.selectRule = (BehaviorTree::SelectRule)nodeJson.value("selectRule", 0);
 			newNode.priority = nodeJson.value("priority", 1);
+			newNode.actionType = (BTActionType)nodeJson.value("actionType", BTActionType::None);
 
 			// conditionsƒf[ƒ^‚ª‘¶Ý‚·‚ê‚Î“Ç‚Ýž‚Þ
 			if (nodeJson.count("conditions") > 0)

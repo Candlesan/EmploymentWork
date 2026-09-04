@@ -57,7 +57,7 @@ public:
 	float GetCurrentAnimationLength() const;
 
 	// JSONからアニメーション設定を読み込む
-	void LoadAnimationData(const std::string& jsonPath);
+	void LoadAnimationData(const std::string& jsonPath, bool clearBefore = false);
 
 	// 指定ステートの設定を取得（読み取り専用）
 	const AnimationConfig* GetAnimationConfig(const std::string& stateName) const;

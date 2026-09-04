@@ -1,6 +1,8 @@
 #include "System/UI/BehaviorTreeEditor/BehaviorTreeEditor.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionFactory.h"
+
 #include <algorithm>
 
 void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy)
@@ -8,7 +10,7 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 	DrawToolbar(graph, tree, enemy);
 
 	ed::SetCurrentEditor(context);
-	ed::Begin("BehaviorTreeEditor",ImVec2(0,0));
+	ed::Begin(u8"ビヘイビアツリーエディター",ImVec2(0,0));
 	{
 		// 描画を始める前にノードの位置を伝える
 		if (graph.justLoad > 0)
@@ -288,12 +290,7 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
 		if (node.selectRule == BehaviorTree::SelectRule::Non)
 		{
-			if (node.name == "Idle")
-				finalAction = new IdleAction(enemy, node.name);
-			else if (node.name == "Pursuit")
-				finalAction = new PursuitAction(enemy, node.name);
-			else if (node.name == "Attack")
-				finalAction = new AttackAction(enemy, node.name);
+			finalAction = ActionFactory::Creat(node.actionType, enemy, node.name);
 		}
 
 		// ツリーに登録（条件とアクションをセットで渡す！）
@@ -303,19 +300,19 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 
 void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy)
 {
-	if (ImGui::Button("Add Node"))
+	if (ImGui::Button(u8"ノードを追加"))
 	{
 		graph.AddNode("NewNode", { 100, 100 });
 	}
 	ImGui::SameLine();
 
-	if (ImGui::Button("Save"))
+	if (ImGui::Button(u8"保存"))
 	{
 		graph.Save("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
 	}
 	ImGui::SameLine();
 
-	if (ImGui::Button("Load"))
+	if (ImGui::Button(u8"読込"))
 	{
 		// 重複防止のためにグラフをクリア
 		graph.nodes.clear();
@@ -342,13 +339,13 @@ void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tr
 		ApplyToTree(tree, enemy, graph);
 
 		// アニメーションデータも最新の数値で読み直す
-		enemy->LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+		enemy->LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json", true);
 	}
 }
 
 void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 {
-	ImGui::Begin("BT Inspector");
+	ImGui::Begin(u8"ノード詳細");
 
 
 	if (selectedNodeIndex >= 0 && selectedNodeIndex < (int)graph.nodes.size())
@@ -358,16 +355,34 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 		// ノード名を変える
 		char nameBuf[128];
 		strcpy_s(nameBuf, node.name.c_str()); // サイズを見ながら安全に文字列をコピーする
-		if (ImGui::InputText("Name", nameBuf, sizeof(nameBuf)))
+		if (ImGui::InputText(u8"ノード名", nameBuf, sizeof(nameBuf)))
 			node.name = nameBuf;
 
+		// ActionTypeの編集
+		const char* actionTypes[] = {
+			"None",
+			"Idle",
+			"Pursuit",
+			"NormalMagicAttack"
+		};
+		int currentActionType = (int)(node.actionType);
+		if (ImGui::Combo(u8"アクションの種類", &currentActionType, actionTypes, IM_ARRAYSIZE(actionTypes)))
+			node.actionType = (BTActionType)currentActionType;
+
 		// SelectRuleの編集
-		const char* ruleNames[] = { "Non", "priority", "Sequence", "SequentialLooping", "Random" };
+		const char* ruleNames[] = {
+			u8"末端##selectRule",
+			u8"優先度順##selectRule",
+			u8"順番に実行(シーケンス)##selectRule",
+			u8"順繰り(ループシーケンス)##selectRule",
+			u8"ランダム##selectRule"
+		};
+
 		int rule = (int)node.selectRule;
-		if (ImGui::Combo("SelectRule", &rule, ruleNames, IM_ARRAYSIZE(ruleNames)))
+		if (ImGui::Combo(u8"実行ルール", &rule, ruleNames, IM_ARRAYSIZE(ruleNames)))
 			node.selectRule = (BehaviorTree::SelectRule)rule;
 
-		ImGui::InputInt("Priority", &node.priority);
+		ImGui::InputInt(u8"優先順位", &node.priority);
 
 		if (!animationNames.empty())
 		{
@@ -421,7 +436,7 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), u8"※アニメーションリストが読み込まれていません。");
 		}
 
-		// AnimStateの編集
+		// 遷移条件の編集
 		{
 			ImGui::Separator();
 			ImGui::Text(u8"--- 中間ノードの遷移条件 (Judgment) ---");
@@ -483,7 +498,7 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 	}
 	else
 	{
-		ImGui::Text("No node selected");
+		ImGui::Text(u8"ノードが選択されていません");
 	}
 
 	ImGui::End();

@@ -50,7 +50,8 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
     return ActionBase::State::Run;
 }
 
-ActionBase::State AttackAction::Run(float elapsedTime)
+// ’ÊíUŒ‚–‚–@
+ActionBase::State NormalMagicAttackAction::Run(float elapsedTime)
 {
     const auto playerPos = Player::Instance().GetPosition();
     owner->LockAtTarget(elapsedTime, playerPos);

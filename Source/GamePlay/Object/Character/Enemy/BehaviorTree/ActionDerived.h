@@ -20,11 +20,11 @@ public:
 	ActionBase::State Run(float elapsedTime);
 };
 
-// UŒ‚s“®
-class AttackAction : public ActionBase
+// ’ÊíUŒ‚–‚–@
+class NormalMagicAttackAction : public ActionBase
 {
 public:
-	AttackAction(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	NormalMagicAttackAction(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
 	ActionBase::State Run(float elapsedTime);
 
 private:

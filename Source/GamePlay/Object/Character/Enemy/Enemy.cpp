@@ -76,7 +76,7 @@ void Enemy::Initialize()
 	btEditor.SetAnimationList(animNames);
 
 	btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json", true);
 	btEditor.ApplyToTree(aiTree, this, btGraph);
 
 	// シーケンサーの初期化

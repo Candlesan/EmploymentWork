@@ -209,7 +209,7 @@ float AnimationCharacter::GetCurrentAnimationLength() const
 }
 
 // JSONファイルパスを渡して、中のノード設定を読み込む関数
-void AnimationCharacter::LoadAnimationData(const std::string& jsonPath)
+void AnimationCharacter::LoadAnimationData(const std::string& jsonPath, bool clearBefore)
 {
 	std::ifstream file(jsonPath);
 	if (!file.is_open()) return;
@@ -217,7 +217,7 @@ void AnimationCharacter::LoadAnimationData(const std::string& jsonPath)
 	nlohmann::json root;
 	file >> root;
 
-	stateConfigs.clear(); // 中身を空にしておく
+	if (clearBefore) stateConfigs.clear(); // 中身を空にしておく
 
 	// ノードエディターで保存したnodesの設定を復元する
 	if (root.count("nodes") > 0)

@@ -48,6 +48,15 @@ struct BTCondition
 	float judgmentValue = 0.0f; // 判定値
 };
 
+// アクションタイプ
+enum class BTActionType
+{
+	None = 0,
+	Idle,
+	Pursuit,
+	NormalMagicAttack,
+};
+
 // ノードデータ
 struct BTNode
 {
@@ -64,6 +73,8 @@ struct BTNode
 	AnimationConfig config; // アニメーション設定
 
 	ImVec2 position = { 0, 0 }; // ノードの位置
+
+	BTActionType actionType = BTActionType::None; // BTアクションの種類
 
 	std::vector<BTCondition> conditions; // 条件情報郡
 };
