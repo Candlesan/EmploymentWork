@@ -433,7 +433,21 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 				auto& cond = node.conditions[i];
 
 				// 条件の名前のリスト
-				const char* conditionNames[] = { u8"プレイヤーとの距離", u8"ボスのHPの割合(%)", u8"タイマー(秒)", u8"攻撃のクールダウン", u8"条件なし"};
+				const char* conditionNames[] = {
+					u8"プレイヤーとの距離",
+					u8"ボスのHPの割合(%)",
+					u8"タイマー(秒)",
+					u8"攻撃のクールダウン",
+					u8"敵の現在の魔力残量",
+					u8"敵の現在のヒート値",
+					u8"敵の現在の防御魔法の耐久値",
+					u8"プレイヤーの現在の魔力残量",
+					u8"プレイヤーの現在のヒート値",
+					u8"プレイヤーの現在の防御魔法の耐久値",
+					u8"プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)",
+					u8"自身に向かって飛んできている魔法の数",
+					u8"条件なし"
+				};
 				ImGui::Combo(u8"条件の種類", &cond.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
 
 				if (cond.conditionType != (int)BTConditionType::None)

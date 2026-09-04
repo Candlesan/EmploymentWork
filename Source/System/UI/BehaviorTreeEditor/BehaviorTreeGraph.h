@@ -18,7 +18,7 @@ enum class BTConditionType
 	timer,					// タイマー
 	AttackCoolDown,			// 攻撃のクールダウン
 	EnemyCurrentMagic,		// 敵の現在の魔力残量
-	EnemyCurrentHeat,		// 敵の源蔵のヒート値
+	EnemyCurrentHeat,		// 敵の現在のヒート値
 	EnemyCurrentDefense,	// 敵の現在の防御魔法の耐久値
 	PlayerCurrentMagic,		// プレイヤーの現在の魔力残量
 	PlayerCurrentHeat,		// プレイヤーの現在のヒート値
@@ -61,7 +61,6 @@ struct BTNode
 	BehaviorTree::SelectRule selectRule = BehaviorTree::SelectRule::Non;
 	int priority = 1; // 優先順位
 
-	std::string animState; // アニメーション名
 	AnimationConfig config; // アニメーション設定
 
 	ImVec2 position = { 0, 0 }; // ノードの位置

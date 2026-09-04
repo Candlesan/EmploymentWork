@@ -73,8 +73,8 @@ bool FloatConditionJudgment::Judgment()
     case BTCompareType::Less:         return currentValue < Threshold;
     case BTCompareType::GreaterEqual: return currentValue >= Threshold;
     case BTCompareType::LessEqual:    return currentValue <= Threshold;
-    case BTCompareType::Equal:        return fabsf(currentValue <= Threshold) <= 0.0001f; // floatは誤差があるから「==」じゃなくて差の絶対値で判定する
-    case BTCompareType::NotEqual:     return fabsf(currentValue != Threshold) > 0.0001f; // 上のと同じで誤差を含めて判定した不一致の判定
+    case BTCompareType::Equal:        return fabsf(currentValue - Threshold) <= 0.0001f; // floatは誤差があるから「==」じゃなくて差の絶対値で判定する
+    case BTCompareType::NotEqual:     return fabsf(currentValue - Threshold) > 0.0001f; // 上のと同じで誤差を含めて判定した不一致の判定
     default: return false;
     }
 }

@@ -10,7 +10,6 @@ void BehaviorTreeGraph::AddNode(const std::string& StateName, ImVec2 pos)
 	node.pinIn = NextId();
 	node.pinOut = NextId();
 	node.name = StateName;
-	node.animState = "animName";
 	node.position = pos;
 	nodes.push_back(node);
 }
@@ -199,7 +198,6 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.parentName = nodeJson.value("parentName", "");
 			newNode.selectRule = (BehaviorTree::SelectRule)nodeJson.value("selectRule", 0);
 			newNode.priority = nodeJson.value("priority", 1);
-			newNode.animState = nodeJson.value("StateName", "");
 
 			// conditionsƒf[ƒ^‚ª‘¶Ý‚·‚ê‚Î“Ç‚Ýž‚Þ
 			if (nodeJson.count("conditions") > 0)
