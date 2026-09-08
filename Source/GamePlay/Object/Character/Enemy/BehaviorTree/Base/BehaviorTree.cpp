@@ -11,7 +11,7 @@ BehaviorTree::~BehaviorTree()
 	NodeAllClear(root);
 }
 
-void BehaviorTree::AddNode(std::string parentName, std::string entryName, int priority, SelectRule selectRule, JudgmentBase* judgment, ActionBase* action)
+void BehaviorTree::AddNode(std::string parentName, std::string entryName, int priority, SelectRule selectRule, JudgmentBase* judgment, ActionBase* action, bool interruptible)
 {
 	if (parentName != "")
 	{
@@ -19,7 +19,7 @@ void BehaviorTree::AddNode(std::string parentName, std::string entryName, int pr
 
 		if (parentNode != nullptr)
 		{
-			NodeBase* addNode = new NodeBase(entryName, parentNode, priority, selectRule, judgment, action);
+			NodeBase* addNode = new NodeBase(entryName, parentNode, priority, selectRule, judgment, action, interruptible);
 			parentNode->AddChild(addNode);
 		}
 	}

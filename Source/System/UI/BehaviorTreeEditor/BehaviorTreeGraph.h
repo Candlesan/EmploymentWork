@@ -77,6 +77,8 @@ struct BTNode
 	BTActionType actionType = BTActionType::None; // BTアクションの種類
 
 	std::vector<BTCondition> conditions; // 条件情報郡
+
+	bool interruptible = false; // 再評価用の変数
 };
 
 // 親子を繋ぐ線
@@ -104,7 +106,6 @@ public:
 	void Load(const std::string& path); // Jsonファイルを読み込む
 
 	int NextId() { return nextId++; }
-
 private:
 	static int nextId;
 };

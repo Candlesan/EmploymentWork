@@ -105,6 +105,12 @@ void Enemy::Update(float elapsedTime)
 	// プレビュー中はAIを止める
 	if (!isPreviewMode && AISwitch)
 	{
+
+		if (activeNode != nullptr && activeNode->IsInterruptible() && !activeNode->Judgment())
+		{
+			activeNode = nullptr; // 推論をやめる
+		}
+
 		// 現在実行されているノードが無ければ推論
 		if (activeNode == nullptr)
 		{

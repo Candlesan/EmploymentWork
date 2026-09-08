@@ -33,7 +33,7 @@ public:
 	NodeBase* SequenceBack(NodeBase* sequenceNode, BehaviorData* data);
 
 	// ÉmÅ[Éhí«â¡
-	void AddNode(std::string parentName, std::string entryName, int priority, SelectRule selectRule, JudgmentBase* judgment, ActionBase* action);
+	void AddNode(std::string parentName, std::string entryName, int priority, SelectRule selectRule, JudgmentBase* judgment, ActionBase* action, bool interruptible = false);
 
 	// é¿çs
 	NodeBase* Run(NodeBase* actionNode, BehaviorData* data, float elapsedTime);

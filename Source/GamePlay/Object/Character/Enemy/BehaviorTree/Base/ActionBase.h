@@ -23,6 +23,8 @@ public:
 	// 実行処理(純粋仮想関数)
 	virtual ActionBase::State Run(float elapsedTime) = 0;
 
+	// 途中中断したときのリセット関数
+	virtual void Abort() { step = 0; }
 protected:
 	Enemy* owner;
 	int step = 0;

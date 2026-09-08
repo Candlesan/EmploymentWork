@@ -25,6 +25,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "interruptible": false,
             "name": "Root",
             "parentName": "",
             "position": [
@@ -51,6 +52,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "interruptible": false,
             "name": "待機",
             "parentName": "Root",
             "position": [
@@ -67,7 +69,7 @@
                 {
                     "compareType": 2,
                     "conditionType": 0,
-                    "judgmentValue": 10.0
+                    "judgmentValue": 5.0
                 }
             ],
             "config": {
@@ -77,6 +79,7 @@
                 "useRootMotion": true,
                 "useRootMotionEx": false
             },
+            "interruptible": true,
             "name": "追跡",
             "parentName": "Root",
             "position": [
@@ -94,6 +97,11 @@
                     "compareType": 3,
                     "conditionType": 0,
                     "judgmentValue": 5.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": 3,
+                    "judgmentValue": 0.0
                 }
             ],
             "config": {
@@ -103,6 +111,7 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "interruptible": false,
             "name": "通常攻撃魔法",
             "parentName": "Root",
             "position": [

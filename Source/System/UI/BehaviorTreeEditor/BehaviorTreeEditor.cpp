@@ -294,7 +294,7 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		}
 
 		// ツリーに登録（条件とアクションをセットで渡す！）
-		tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, finalJudgment, finalAction);
+		tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, finalJudgment, finalAction, node.interruptible);
 	}
 }
 
@@ -383,6 +383,10 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			node.selectRule = (BehaviorTree::SelectRule)rule;
 
 		ImGui::InputInt(u8"優先順位", &node.priority);
+		ImGui::Separator();
+
+		ImGui::Checkbox(u8"途中中断可能", &node.interruptible);
+		ImGui::Separator();
 
 		if (!animationNames.empty())
 		{

@@ -17,9 +17,10 @@ class NodeBase
 public:
 	// コンストラクタ
 	NodeBase(std::string name, NodeBase* parent, int priority,
-		BehaviorTree::SelectRule selectRule, JudgmentBase* judgment, ActionBase* action):
-		name(name), parent(parent), priority(priority),
-		selectRule(selectRule), judgment(judgment), action(action), children(NULL)
+		BehaviorTree::SelectRule selectRule, JudgmentBase* judgment, ActionBase* action, bool interruptible = false)
+		:	name(name), parent(parent), priority(priority),
+		selectRule(selectRule), judgment(judgment), action(action), children(NULL),
+		interruptible(interruptible)
 	{
 	}
 	// デストラクタ
@@ -47,6 +48,8 @@ public:
 	// 実行
 	ActionBase::State Run(float elapsedTime);
 	std::vector<NodeBase*> children; // 子ノード
+
+	bool IsInterruptible() { return interruptible; }
 protected:
 	std::string				 name;			// 名前
 	BehaviorTree::SelectRule selectRule;	// 選択ルール
@@ -54,4 +57,5 @@ protected:
 	ActionBase*				 action;		// 実行クラス
 	unsigned int			 priority;		// 優先実行
 	NodeBase*				 parent;		// 親ノード
+	bool					 interruptible = false; // 中断フラグ
 };

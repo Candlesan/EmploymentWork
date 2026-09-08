@@ -42,10 +42,10 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
     // ‚»‚Ì•ûŒü‚Öi‚Þ
     owner->Move(moveVec.x, moveVec.z, owner->GetMoveSpeed());
 
-    if (owner->GetDistanceToPlayer() <= 5.0f)
-    {
-        return ActionBase::State::Complete;
-    }
+    //if (owner->GetDistanceToPlayer() <= 5.0f)
+    //{
+    //    return ActionBase::State::Complete;
+    //}
 
     return ActionBase::State::Run;
 }

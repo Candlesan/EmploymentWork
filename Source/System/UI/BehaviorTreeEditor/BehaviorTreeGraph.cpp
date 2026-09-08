@@ -67,6 +67,7 @@ void BehaviorTreeGraph::RemoveLink(ed::LinkId id)
 		links.erase(it);
 }
 
+// リンクから検索して親のノードの名前を付ける
 void BehaviorTreeGraph::UpdateParentNames()
 {
 	// 全ノードの parentName をリセット
@@ -81,6 +82,7 @@ void BehaviorTreeGraph::UpdateParentNames()
 	}
 }
 
+// 保存
 void BehaviorTreeGraph::Save(const std::string& path)
 {
 
@@ -122,6 +124,7 @@ void BehaviorTreeGraph::Save(const std::string& path)
 		   {"StateName", node.name},
 		   {"position", {node.position.x, node.position.y}},
 		   {"actionType", (int)node.actionType},
+			{"interruptible", node.interruptible},
 
 		   {"config", {
 		   {"animationName", node.config.animationName},
@@ -164,6 +167,7 @@ void BehaviorTreeGraph::Save(const std::string& path)
 	file << j.dump(4);
 }
 
+// 読み込み
 void BehaviorTreeGraph::Load(const std::string& path)
 {
 	using json = nlohmann::json;
@@ -200,6 +204,7 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.selectRule = (BehaviorTree::SelectRule)nodeJson.value("selectRule", 0);
 			newNode.priority = nodeJson.value("priority", 1);
 			newNode.actionType = (BTActionType)nodeJson.value("actionType", BTActionType::None);
+			newNode.interruptible = nodeJson.value("interruptible", false);
 
 			// conditionsデータが存在すれば読み込む
 			if (nodeJson.count("conditions") > 0)
