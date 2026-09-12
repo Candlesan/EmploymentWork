@@ -52,8 +52,8 @@ public:
 	// ターゲットの座標に向かって旋回する
 	void LockAtTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
 
-	// ターゲットの座標に向かって進む
-	void MoveDirection(const DirectX::XMFLOAT3& movePos);
+	// ターゲットの方向を取得する(正規化済み)
+	DirectX::XMFLOAT3 GetMoveDirection(const DirectX::XMFLOAT3& movePos) const;
 
 	// =========================================================================
 	//  セッター

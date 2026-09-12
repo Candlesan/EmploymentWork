@@ -6,11 +6,27 @@
         },
         {
             "from": "Root",
-            "to": "追跡"
+            "to": "通常攻撃魔法"
         },
         {
             "from": "Root",
-            "to": "通常攻撃魔法"
+            "to": "前進"
+        },
+        {
+            "from": "Root",
+            "to": "後退"
+        },
+        {
+            "from": "横移動",
+            "to": "左"
+        },
+        {
+            "from": "横移動",
+            "to": "右"
+        },
+        {
+            "from": "Root",
+            "to": "横移動"
         }
     ],
     "nodes": [
@@ -33,7 +49,7 @@
                 66.0
             ],
             "priority": 1,
-            "selectRule": 4
+            "selectRule": 1
         },
         {
             "StateName": "待機",
@@ -41,7 +57,7 @@
             "conditions": [
                 {
                     "compareType": 0,
-                    "conditionType": 4,
+                    "conditionType": 12,
                     "judgmentValue": 0.0
                 }
             ],
@@ -56,37 +72,10 @@
             "name": "待機",
             "parentName": "Root",
             "position": [
-                -182.0,
-                196.0
-            ],
-            "priority": 3,
-            "selectRule": 0
-        },
-        {
-            "StateName": "追跡",
-            "actionType": 2,
-            "conditions": [
-                {
-                    "compareType": 2,
-                    "conditionType": 0,
-                    "judgmentValue": 5.0
-                }
-            ],
-            "config": {
-                "animationName": "AS_Run_Combat_F_0_Loop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": true,
-                "useRootMotionEx": false
-            },
-            "interruptible": true,
-            "name": "追跡",
-            "parentName": "Root",
-            "position": [
                 -38.0,
-                196.0
+                180.0
             ],
-            "priority": 2,
+            "priority": 4,
             "selectRule": 0
         },
         {
@@ -96,7 +85,7 @@
                 {
                     "compareType": 3,
                     "conditionType": 0,
-                    "judgmentValue": 5.0
+                    "judgmentValue": 150.0
                 },
                 {
                     "compareType": 3,
@@ -115,11 +104,128 @@
             "name": "通常攻撃魔法",
             "parentName": "Root",
             "position": [
-                106.0,
-                196.0
+                74.0,
+                180.0
             ],
             "priority": 1,
             "selectRule": 0
+        },
+        {
+            "StateName": "前進",
+            "actionType": 4,
+            "conditions": [
+                {
+                    "compareType": 2,
+                    "conditionType": 0,
+                    "judgmentValue": 100.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Run_Combat_Fast_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "interruptible": true,
+            "name": "前進",
+            "parentName": "Root",
+            "position": [
+                -150.0,
+                180.0
+            ],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "後退",
+            "actionType": 5,
+            "conditions": [
+                {
+                    "compareType": 3,
+                    "conditionType": 0,
+                    "judgmentValue": 50.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Run_Combat_B_180_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "interruptible": true,
+            "name": "後退",
+            "parentName": "Root",
+            "position": [
+                -262.0,
+                180.0
+            ],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "右",
+            "actionType": 6,
+            "conditions": [],
+            "config": {
+                "animationName": "AS_Run_Combat_F_R_90_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "interruptible": false,
+            "name": "右",
+            "parentName": "横移動",
+            "position": [
+                -358.0,
+                292.0
+            ],
+            "priority": 0,
+            "selectRule": 0
+        },
+        {
+            "StateName": "左",
+            "actionType": 7,
+            "conditions": [],
+            "config": {
+                "animationName": "AS_Run_Combat_F_L_90_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "interruptible": false,
+            "name": "左",
+            "parentName": "横移動",
+            "position": [
+                -486.0,
+                292.0
+            ],
+            "priority": 0,
+            "selectRule": 0
+        },
+        {
+            "StateName": "横移動",
+            "actionType": 0,
+            "conditions": [],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "横移動",
+            "parentName": "Root",
+            "position": [
+                -406.0,
+                178.0
+            ],
+            "priority": 3,
+            "selectRule": 4
         }
     ]
 }

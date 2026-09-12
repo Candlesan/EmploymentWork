@@ -55,6 +55,10 @@ enum class BTActionType
 	Idle,
 	Pursuit,
 	NormalMagicAttack,
+	MoveForward,
+	MoveBack,
+	Right,
+	Left,
 };
 
 // ノードデータ

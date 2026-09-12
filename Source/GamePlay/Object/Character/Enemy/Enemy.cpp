@@ -105,10 +105,19 @@ void Enemy::Update(float elapsedTime)
 	// プレビュー中はAIを止める
 	if (!isPreviewMode && AISwitch)
 	{
-
-		if (activeNode != nullptr && activeNode->IsInterruptible() && !activeNode->Judgment())
+		// 中断
+		if (activeNode != nullptr && activeNode->IsInterruptible())
 		{
-			activeNode = nullptr; // 推論をやめる
+			// 毎フレーム推論し直して、選ばれるノードが変わったら乗り換える
+			NodeBase* next = aiTree->ActiveNodeInference(behaviorData);
+			if (next != activeNode)
+			{
+				activeNode = next;
+				if (activeNode != nullptr)
+				{
+					lastInferredNode = activeNode;
+				}
+			}
 		}
 
 		// 現在実行されているノードが無ければ推論
@@ -452,6 +461,20 @@ void Enemy::LockAtTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos)
 	DirectX::XMStoreFloat3(&lookDir, Dir);
 
 	Turn(elapsedTime, lookDir.x, lookDir.z, turnSpeed);
+}
+
+// ターゲットの方向を取得する
+DirectX::XMFLOAT3 Enemy::GetMoveDirection(const DirectX::XMFLOAT3& movePos) const
+{
+	DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&movePos);
+
+	DirectX::XMVECTOR Dir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(PPos, EPos));
+
+	DirectX::XMFLOAT3 direction;
+	DirectX::XMStoreFloat3(&direction, Dir);
+
+	return direction;
 }
 
 // =========================================================================

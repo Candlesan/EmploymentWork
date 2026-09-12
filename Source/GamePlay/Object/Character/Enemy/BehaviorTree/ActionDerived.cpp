@@ -1,4 +1,4 @@
-#include "ActionDerived.h"
+Ôªø#include "ActionDerived.h"
 #include "System/Core/Mathf.h"
 #include "GamePlay/Object/Character/Player/Player.h"
 
@@ -6,31 +6,33 @@
 #include <string>
 
 
-// ë“ã@çsìÆ
-ActionBase::State IdleAction::Run(float elapsedTime)
+// ÂæÖÊ©üË°åÂãï
+ActionBase::State Idle::Run(float elapsedTime)
 {
     float runTimer = owner->GetRunTimer();
     DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
 
-    // ë“ã@ÉAÉjÉÅÅ[ÉVÉáÉìÇçƒê∂
+    // ÂæÖÊ©ü„Ç¢„Éã„É°„Éº„Ç∑„Éß„É≥„ÇíÂÜçÁîü
     owner->ChangeAnimationState(stateName);
 
-    // ÉvÉåÉCÉÑÅ[ÇÃï˚ÇÇ∂Ç¡Ç∆å©Ç¬ÇﬂÇÈ
+    // „Éó„É¨„Ç§„É§„Éº„ÅÆÊñπ„Çí„Åò„Å£„Å®Ë¶ã„Å§„ÇÅ„Çã
     owner->LockAtTarget(elapsedTime, playerPos);
 
     return ActionBase::State::Complete;
 }
 
-// í«ê’çsìÆ
-ActionBase::State PursuitAction::Run(float elapsedTime)
+// ËøΩË∑°Ë°åÂãï
+ActionBase::State Pursuit::Run(float elapsedTime)
 {
-    // ÉvÉåÉCÉÑÅ[ÇÃà íuÇéÊìæÇ∑ÇÈ
+    // „Éó„É¨„Ç§„É§„Éº„ÅÆ‰ΩçÁΩÆ„ÇíÂèñÂæó„Åô„Çã
     DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
 
     owner->ChangeAnimationState(stateName);
+
+    // „Éó„É¨„Ç§„É§„Éº„ÅÆÂêë„Åç„ÇíË¶ã„Çã
     owner->LockAtTarget(elapsedTime, playerPosition);
 
-    // êiçsï˚å¸ÇåvéZÇ∑ÇÈ
+    // ÈÄ≤Ë°åÊñπÂêë„ÇíË®àÁÆó„Åô„Çã
     DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
     DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&playerPosition);
     DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
@@ -39,24 +41,103 @@ ActionBase::State PursuitAction::Run(float elapsedTime)
     DirectX::XMFLOAT3 moveVec;
     DirectX::XMStoreFloat3(&moveVec, Vec);
 
-    // ÇªÇÃï˚å¸Ç÷êiÇﬁ
+    // „Åù„ÅÆÊñπÂêë„Å∏ÈÄ≤„ÇÄ
     owner->Move(moveVec.x, moveVec.z, owner->GetMoveSpeed());
-
-    //if (owner->GetDistanceToPlayer() <= 5.0f)
-    //{
-    //    return ActionBase::State::Complete;
-    //}
 
     return ActionBase::State::Run;
 }
 
-// í èÌçUåÇñÇñ@
-ActionBase::State NormalMagicAttackAction::Run(float elapsedTime)
+// ÂâçÈÄ≤
+ActionBase::State MoveForward::Run(float elapsedTime)
+{
+    const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
+    owner->ChangeAnimationState(stateName);
+    owner->LockAtTarget(elapsedTime, playerPos);
+
+    DirectX::XMFLOAT3 dir = owner->GetMoveDirection(playerPos);
+    owner->Move(dir.x, dir.z, owner->GetMoveSpeed());
+
+    return ActionBase::State::Run;
+}
+
+// ÂæåÈÄÄ
+ActionBase::State MoveBack::Run(float elapsedTime)
+{
+    const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
+    owner->ChangeAnimationState(stateName);
+    owner->LockAtTarget(elapsedTime, playerPos);
+
+    DirectX::XMFLOAT3 dir = owner->GetMoveDirection(playerPos);
+    owner->Move(-dir.x, -dir.z, owner->GetMoveSpeed());
+
+    return ActionBase::State::Run;
+}
+
+// Âè≥
+ActionBase::State MoveRight::Run(float elapsedTime)
+{
+    if (timer <= 0.0f) timer = owner->GetRunTimer();
+
+    const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
+    owner->ChangeAnimationState(stateName);
+    owner->LockAtTarget(elapsedTime, playerPos);
+
+    DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&owner->GetMoveDirection(playerPos));
+    DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
+    DirectX::XMVECTOR Right = DirectX::XMVector3Cross(Up, Dir);
+
+    DirectX::XMFLOAT3 right;
+    DirectX::XMStoreFloat3(&right, Right);
+
+    owner->Move(right.x * strafeDir, right.z * strafeDir, owner->GetMoveSpeed());
+
+    owner->SetRunTimer(Mathf::RandomRange(1.0f, 3.0f));
+
+    timer -= elapsedTime;
+    if (timer <= 0.0f)
+    {
+        return ActionBase::State::Complete;
+    }
+
+    return ActionBase::State::Run;
+}
+
+// Â∑¶
+ActionBase::State MoveLeft::Run(float elapsedTime)
+{
+    if (timer <= 0.0f) timer = owner->GetRunTimer();
+
+    const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
+    owner->ChangeAnimationState(stateName);
+    owner->LockAtTarget(elapsedTime, playerPos);
+
+    DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&owner->GetMoveDirection(playerPos));
+    DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
+    DirectX::XMVECTOR Left = DirectX::XMVector3Cross(Up, Dir);
+
+    DirectX::XMFLOAT3 left;
+    DirectX::XMStoreFloat3(&left, Left);
+
+    owner->Move(left.x * strafeDir, left.z * strafeDir, owner->GetMoveSpeed());
+
+    owner->SetRunTimer(Mathf::RandomRange(1.0f, 3.0f));
+
+    timer -= elapsedTime;
+    if (timer <= 0.0f)
+    {
+        return ActionBase::State::Complete;
+    }
+
+    return ActionBase::State::Run;
+}
+
+// ÈÄöÂ∏∏ÊîªÊíÉÈ≠îÊ≥ï
+ActionBase::State NormalMagicAttack::Run(float elapsedTime)
 {
     const auto playerPos = Player::Instance().GetPosition();
     owner->LockAtTarget(elapsedTime, playerPos);
 
-    // éñëOåvéZÇ≈ìGÇ©ÇÁÉvÉåÉCÉÑÅ[ÇÃÉxÉNÉgÉãÇåvéZÇµÇƒÇ®Ç≠
+    // ‰∫ãÂâçË®àÁÆó„ÅßÊïµ„Åã„Çâ„Éó„É¨„Ç§„É§„Éº„ÅÆ„Éô„ÇØ„Éà„É´„ÇíË®àÁÆó„Åó„Å¶„Åä„Åè
     DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
     DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&playerPos);
     DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
@@ -79,7 +160,7 @@ ActionBase::State NormalMagicAttackAction::Run(float elapsedTime)
 
         if(!hasFired)
         {
-            // ñÇñ@Çê›íËÇ∑ÇÈ
+            // È≠îÊ≥ï„ÇíË®≠ÂÆö„Åô„Çã
             MagicSpawnInfo info;
             info.angleY = owner->GetAngle().y;
             info.direction = shotVec;
@@ -96,7 +177,7 @@ ActionBase::State NormalMagicAttackAction::Run(float elapsedTime)
         if (owner->GetCurrentAnimationSeconds()
             >= owner->GetCurrentAnimationLength())
         {
-            owner->SetAttackCoolTimer(2.0f);
+            owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
             phase = Phase::Start;
             return State::Complete;
         }

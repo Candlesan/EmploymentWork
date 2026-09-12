@@ -5,26 +5,66 @@
 
 
 // 待機行動
-class IdleAction : public ActionBase
+class Idle : public ActionBase
 {
 public:
-	IdleAction(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	Idle(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
 	ActionBase::State Run(float elapsedTime);
 };
 
 // 徘徊行動
-class PursuitAction : public ActionBase
+class Pursuit : public ActionBase
 {
 public:
-	PursuitAction(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	Pursuit(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
 	ActionBase::State Run(float elapsedTime);
 };
 
-// 通常攻撃魔法
-class NormalMagicAttackAction : public ActionBase
+// 前進
+class MoveForward : public ActionBase
 {
 public:
-	NormalMagicAttackAction(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	MoveForward(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	ActionBase::State Run(float elapsedTime);
+};
+
+// 後退
+class MoveBack : public ActionBase
+{
+public:
+	MoveBack(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	ActionBase::State Run(float elapsedTime);
+};
+
+// 右
+class MoveRight : public ActionBase
+{
+public:
+	MoveRight(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	ActionBase::State Run(float elapsedTime);
+
+private:
+	float strafeDir = 1.0f;
+	float timer = 0.0f;
+};
+
+// 左
+class MoveLeft : public ActionBase
+{
+public:
+	MoveLeft(Enemy* enemy, std::string anim) : ActionBase(enemy, anim) {}
+	ActionBase::State Run(float elapsedTime);
+
+private:
+	float strafeDir = -1.0f;
+	float timer = 0.0f;
+};
+
+// 通常攻撃魔法
+class NormalMagicAttack : public ActionBase
+{
+public:
+	NormalMagicAttack(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
 	ActionBase::State Run(float elapsedTime);
 
 private:

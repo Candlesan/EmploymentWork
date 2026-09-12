@@ -813,7 +813,7 @@
       <Filter>Source\System\Resource\TextureResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionFactory.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

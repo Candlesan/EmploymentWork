@@ -12,15 +12,31 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 
 		break;
 	case BTActionType::Idle:
-		return new IdleAction(enemy, stateName);
+		return new Idle(enemy, stateName);
 
 		break;
 	case BTActionType::Pursuit:
-		return new PursuitAction(enemy, stateName);
+		return new Pursuit(enemy, stateName);
 
 		break;
 	case BTActionType::NormalMagicAttack:
-		return new NormalMagicAttackAction(enemy, stateName);
+		return new NormalMagicAttack(enemy, stateName);
+
+		break;
+	case BTActionType::MoveForward:
+		return new MoveForward(enemy, stateName);
+
+		break;
+	case BTActionType::MoveBack:
+		return new MoveBack(enemy, stateName);
+
+		break;
+	case BTActionType::Right:
+		return new MoveRight(enemy, stateName);
+
+		break;
+	case BTActionType::Left:
+		return new MoveLeft(enemy, stateName);
 
 		break;
 	}

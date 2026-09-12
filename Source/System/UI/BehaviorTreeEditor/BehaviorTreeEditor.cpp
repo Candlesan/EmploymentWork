@@ -3,6 +3,7 @@
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionFactory.h"
 
+#include <set>
 #include <algorithm>
 
 void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy)
@@ -257,44 +258,80 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 		}
 	}
 
+	// 未登録のノードを集める
+	std::vector<const BTNode*> pending;
+	for (auto& node : graph.nodes)
+	{
+		if (node.name == "Root") continue;
+		pending.push_back(&node);
+	}
+
+	// 登録済みノード名（親の存在を確認）
+	std::set<std::string> addedNames;
+	addedNames.insert("Root");
+
+	// 親が先に登録されている必要があるので、追加出来なくなるまで繰り返す
+	bool added = true;
+	while (added && !pending.empty())
+	{
+		added = false;
+
+		for (auto itr = pending.begin(); itr != pending.end();) // 更新の内容が変わるからループヘッダーには書かない
+		{
+			const BTNode& node = **itr; // BTNodeの実体を取り出す
+
+			// 親がまだツリーになければ次の周回に回す
+			if (addedNames.count(node.parentName) == 0)
+			{
+				++itr;
+				continue;
+			}
+
+			JudgmentBase* finalJudgment = nullptr;
+
+			if (!node.conditions.empty())
+			{
+				AndJudgment* andJ = new AndJudgment(enemy);
+				for (auto& cond : node.conditions)
+				{
+					if (cond.conditionType == (int)BTConditionType::None) {
+						andJ->AddJudgment(new NoneJudgment(enemy));
+					}
+					else {
+						andJ->AddJudgment(new FloatConditionJudgment(enemy, cond.conditionType, cond.judgmentValue, cond.compareType));
+					}
+				}
+				finalJudgment = andJ;
+			}
+			else
+			{
+				finalJudgment = new NoneJudgment(enemy);
+			}
+
+			// アクション（Action）の構築
+			ActionBase* finalAction = nullptr;
+
+			// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
+			if (node.selectRule == BehaviorTree::SelectRule::Non)
+			{
+				finalAction = ActionFactory::Creat(node.actionType, enemy, node.name);
+			}
+
+			// ツリーに登録（条件とアクションをセットで渡す！）
+			tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, finalJudgment, finalAction, node.interruptible);
+
+			addedNames.insert(node.name);
+			itr = pending.erase(itr);
+			added = true;
+		}
+	}
+
 	// 残りの全ノードを処理する（条件とアクションを同時に作る）
 	for (auto& node : graph.nodes)
 	{
 		if (node.name == "Root") continue;
 
 		// 条件（Judgment）の構築
-		JudgmentBase* finalJudgment = nullptr;
-
-		if (!node.conditions.empty())
-		{
-			AndJudgment* andJ = new AndJudgment(enemy);
-			for (auto& cond : node.conditions)
-			{
-				if (cond.conditionType == (int)BTConditionType::None) {
-					andJ->AddJudgment(new NoneJudgment(enemy));
-				}
-				else {
-					andJ->AddJudgment(new FloatConditionJudgment(enemy, cond.conditionType, cond.judgmentValue, cond.compareType));
-				}
-			}
-			finalJudgment = andJ;
-		}
-		else
-		{
-			finalJudgment = new NoneJudgment(enemy);
-		}
-
-		// アクション（Action）の構築
-		ActionBase* finalAction = nullptr;
-
-		// SelectRule が Non（末端ノード）の場合のみ、アクションを割り当てる
-		if (node.selectRule == BehaviorTree::SelectRule::Non)
-		{
-			finalAction = ActionFactory::Creat(node.actionType, enemy, node.name);
-		}
-
-		// ツリーに登録（条件とアクションをセットで渡す！）
-		tree->AddNode(node.parentName, node.name, node.priority, node.selectRule, finalJudgment, finalAction, node.interruptible);
 	}
 }
 
@@ -363,7 +400,11 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			"None",
 			"Idle",
 			"Pursuit",
-			"NormalMagicAttack"
+			"NormalMagicAttack",
+			"MoveForward",
+			"MoveBack",
+			"MoveRight",
+			"MoveLeft",
 		};
 		int currentActionType = (int)(node.actionType);
 		if (ImGui::Combo(u8"アクションの種類", &currentActionType, actionTypes, IM_ARRAYSIZE(actionTypes)))
