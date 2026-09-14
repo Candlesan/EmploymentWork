@@ -71,3 +71,24 @@ private:
 	NormalMagic::NormalMagicConfig magicConfig;
 	bool hasFired = false; // 既に魔法を発射したかのフラグ
 };
+
+// 連射魔法
+class RapidFireMagic : public ActionBase
+{
+public:
+	RapidFireMagic(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
+
+	void Abort() override { phase = Phase::Start; }
+private:
+	enum class Phase
+	{
+		Start,
+		Attacking
+	};
+
+	Phase phase = Phase::Start;
+	RapidMagic rapidMagic;
+	RapidMagic::RapidMagicConfig magicConfig;
+	float fireTimer = 0.0f;     // 撃ち続ける残り時間
+};

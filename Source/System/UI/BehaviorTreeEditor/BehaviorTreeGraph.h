@@ -53,11 +53,12 @@ enum class BTActionType
 {
 	None = 0,
 	Idle,
-	NormalMagicAttack,
 	MoveForward,
 	MoveBack,
 	Right,
 	Left,
+	NormalMagicAttack,
+	RapidFire,
 };
 
 // ノードデータ

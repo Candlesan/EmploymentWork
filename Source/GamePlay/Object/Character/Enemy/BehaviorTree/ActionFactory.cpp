@@ -15,10 +15,6 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new Idle(enemy, stateName);
 
 		break;
-	case BTActionType::NormalMagicAttack:
-		return new NormalMagicAttack(enemy, stateName);
-
-		break;
 	case BTActionType::MoveForward:
 		return new MoveForward(enemy, stateName);
 
@@ -35,5 +31,15 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new MoveLeft(enemy, stateName);
 
 		break;
+	case BTActionType::NormalMagicAttack:
+		return new NormalMagicAttack(enemy, stateName);
+
+		break;
+
+	case BTActionType::RapidFire:
+		return new RapidFireMagic(enemy, stateName);
+
+		break;
+
 	}
 }

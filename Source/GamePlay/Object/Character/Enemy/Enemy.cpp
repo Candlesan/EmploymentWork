@@ -115,6 +115,7 @@ void Enemy::Update(float elapsedTime)
 				activeNode = next;
 				if (activeNode != nullptr)
 				{
+					activeNode->Abort();
 					lastInferredNode = activeNode;
 				}
 			}

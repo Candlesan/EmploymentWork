@@ -24,7 +24,7 @@ public:
 	virtual ActionBase::State Run(float elapsedTime) = 0;
 
 	// “r’†’†’f‚µ‚½‚Æ‚«‚ÌƒŠƒZƒbƒgŠÖ”
-	virtual void Abort() { step = 0; }
+	virtual void Abort() {}
 protected:
 	Enemy* owner;
 	int step = 0;

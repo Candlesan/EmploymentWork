@@ -49,7 +49,11 @@ public:
 	ActionBase::State Run(float elapsedTime);
 	std::vector<NodeBase*> children; // 子ノード
 
+	// 中断フラグがONになっているか
 	bool IsInterruptible() { return interruptible; }
+
+	// 中断のリセット処理
+	void Abort() { if (action) action->Abort(); }
 protected:
 	std::string				 name;			// 名前
 	BehaviorTree::SelectRule selectRule;	// 選択ルール

@@ -27,6 +27,10 @@
         {
             "from": "Root",
             "to": "横移動"
+        },
+        {
+            "from": "Root",
+            "to": "連射魔法"
         }
     ],
     "nodes": [
@@ -80,7 +84,7 @@
         },
         {
             "StateName": "通常攻撃魔法",
-            "actionType": 2,
+            "actionType": 6,
             "conditions": [
                 {
                     "compareType": 3,
@@ -112,7 +116,7 @@
         },
         {
             "StateName": "前進",
-            "actionType": 3,
+            "actionType": 2,
             "conditions": [
                 {
                     "compareType": 2,
@@ -139,7 +143,7 @@
         },
         {
             "StateName": "後退",
-            "actionType": 4,
+            "actionType": 3,
             "conditions": [
                 {
                     "compareType": 3,
@@ -166,7 +170,7 @@
         },
         {
             "StateName": "右",
-            "actionType": 5,
+            "actionType": 4,
             "conditions": [],
             "config": {
                 "animationName": "AS_Run_Combat_F_R_90_Loop_Seq_0",
@@ -179,7 +183,7 @@
             "name": "右",
             "parentName": "横移動",
             "position": [
-                -358.0,
+                -342.0,
                 292.0
             ],
             "priority": 0,
@@ -187,7 +191,7 @@
         },
         {
             "StateName": "左",
-            "actionType": 6,
+            "actionType": 5,
             "conditions": [],
             "config": {
                 "animationName": "AS_Run_Combat_F_L_90_Loop_Seq_0",
@@ -226,6 +230,38 @@
             ],
             "priority": 3,
             "selectRule": 4
+        },
+        {
+            "StateName": "連射魔法",
+            "actionType": 7,
+            "conditions": [
+                {
+                    "compareType": 3,
+                    "conditionType": 5,
+                    "judgmentValue": 10.0
+                },
+                {
+                    "compareType": 2,
+                    "conditionType": 4,
+                    "judgmentValue": 0.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Skill_02_01_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "連射魔法",
+            "parentName": "Root",
+            "position": [
+                202.0,
+                180.0
+            ],
+            "priority": 1,
+            "selectRule": 0
         }
     ]
 }

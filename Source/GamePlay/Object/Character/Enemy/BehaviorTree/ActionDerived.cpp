@@ -161,3 +161,51 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
 
     return State::Failed;
 }
+
+// 連射魔法
+ActionBase::State RapidFireMagic::Run(float elapsedTime)
+{
+    const auto playerPos = Player::Instance().GetPosition();
+    owner->LockAtTarget(elapsedTime, playerPos);
+
+    switch (phase)
+    {
+    case Phase::Start:
+        owner->ChangeAnimationState(stateName);
+        magicConfig.Load();
+        fireTimer = Mathf::RandomRange(1.0f, 5.0f);
+        phase = Phase::Attacking;
+        return State::Run;
+
+    case Phase::Attacking:
+        DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
+        DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&playerPos);
+        DirectX::XMVECTOR Vec = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(PPos, EPos));
+
+        // 魔法を設定する
+        MagicSpawnInfo info;
+        info.angleY = owner->GetAngle().y;
+        DirectX::XMStoreFloat3(&info.direction, Vec);
+        info.position = owner->GetPosition();
+        info.holdTime = 0.0f;
+        info.owner = owner;
+        info.target = &Player::Instance();
+
+        owner->SetIsRapidFire(true);
+
+        rapidMagic.Update(elapsedTime, &owner->GetMagicManager(), info, magicConfig, true);
+
+        fireTimer -= elapsedTime;
+        if (fireTimer <= 0.0f)
+        {
+            owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
+            owner->SetIsRapidFire(false);
+            phase = Phase::Start;
+            return State::Complete;
+        }
+
+        return State::Run;
+    }
+
+    return State::Failed;
+}

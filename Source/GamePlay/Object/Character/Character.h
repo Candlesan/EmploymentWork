@@ -113,6 +113,8 @@ public:
 	// ガード耐久値減少
 	void OnGuardHit(float amount);
 
+	void SetIsRapidFire(bool flag) { status.isRapidFire = flag; }
+
 	// ----- 移動 / 回転 -----
 
 	// 移動処理（入力 vx, vz, speed を受け取る）

@@ -399,11 +399,12 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 		const char* actionTypes[] = {
 			"None",
 			"Idle",
-			"NormalMagicAttack",
 			"MoveForward",
 			"MoveBack",
 			"MoveRight",
 			"MoveLeft",
+			"NormalMagicAttack",
+			"RapidFire",
 		};
 		int currentActionType = (int)(node.actionType);
 		if (ImGui::Combo(u8"アクションの種類", &currentActionType, actionTypes, IM_ARRAYSIZE(actionTypes)))
@@ -463,16 +464,13 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			// ブレンド時間
 			ImGui::DragFloat(u8"ブレンド時間(秒)", &node.config.blendTime, 0.01f, 0.0f, 2.0f);
 
-			if (node.selectRule == BehaviorTree::SelectRule::Non)
+			ImGui::Separator();
+			if (ImGui::Button(u8"シーケンサーを開く", ImVec2(-1, 0)))
 			{
-				ImGui::Separator();
-				if (ImGui::Button(u8"シーケンサーを開く", ImVec2(-1, 0)))
-				{
-					requestOpenSequencer = true;
-					selectedAnimName = node.name;
-				}
-				ImGui::Separator();
+				requestOpenSequencer = true;
+				selectedAnimName = node.name;
 			}
+			ImGui::Separator();
 		}
 		else if(node.selectRule == BehaviorTree::SelectRule::Non)
 		{
