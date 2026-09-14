@@ -399,7 +399,6 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 		const char* actionTypes[] = {
 			"None",
 			"Idle",
-			"Pursuit",
 			"NormalMagicAttack",
 			"MoveForward",
 			"MoveBack",
@@ -429,7 +428,7 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 		ImGui::Checkbox(u8"途中中断可能", &node.interruptible);
 		ImGui::Separator();
 
-		if (!animationNames.empty())
+		if (!animationNames.empty() && node.selectRule == BehaviorTree::SelectRule::Non)
 		{
 			std::vector<const char*> comboItems;
 			for (const auto& name : animationNames)
@@ -475,7 +474,7 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 				ImGui::Separator();
 			}
 		}
-		else
+		else if(node.selectRule == BehaviorTree::SelectRule::Non)
 		{
 			// もしモデルのアニメーションリストが空っぽだった時のための安全対策
 			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), u8"※アニメーションリストが読み込まれていません。");

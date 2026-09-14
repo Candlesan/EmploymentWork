@@ -21,32 +21,6 @@ ActionBase::State Idle::Run(float elapsedTime)
     return ActionBase::State::Complete;
 }
 
-// 追跡行動
-ActionBase::State Pursuit::Run(float elapsedTime)
-{
-    // プレイヤーの位置を取得する
-    DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
-
-    owner->ChangeAnimationState(stateName);
-
-    // プレイヤーの向きを見る
-    owner->LockAtTarget(elapsedTime, playerPosition);
-
-    // 進行方向を計算する
-    DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
-    DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&playerPosition);
-    DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PPos, EPos);
-    Vec = DirectX::XMVector3Normalize(Vec);
-
-    DirectX::XMFLOAT3 moveVec;
-    DirectX::XMStoreFloat3(&moveVec, Vec);
-
-    // その方向へ進む
-    owner->Move(moveVec.x, moveVec.z, owner->GetMoveSpeed());
-
-    return ActionBase::State::Run;
-}
-
 // 前進
 ActionBase::State MoveForward::Run(float elapsedTime)
 {

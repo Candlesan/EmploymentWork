@@ -53,7 +53,6 @@ enum class BTActionType
 {
 	None = 0,
 	Idle,
-	Pursuit,
 	NormalMagicAttack,
 	MoveForward,
 	MoveBack,

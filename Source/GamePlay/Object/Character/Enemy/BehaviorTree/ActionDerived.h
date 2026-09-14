@@ -12,14 +12,6 @@ public:
 	ActionBase::State Run(float elapsedTime);
 };
 
-// úpújçsìÆ
-class Pursuit : public ActionBase
-{
-public:
-	Pursuit(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
-	ActionBase::State Run(float elapsedTime);
-};
-
 // ëOêi
 class MoveForward : public ActionBase
 {

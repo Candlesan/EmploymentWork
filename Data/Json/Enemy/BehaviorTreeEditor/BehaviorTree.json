@@ -80,7 +80,7 @@
         },
         {
             "StateName": "通常攻撃魔法",
-            "actionType": 3,
+            "actionType": 2,
             "conditions": [
                 {
                     "compareType": 3,
@@ -112,7 +112,7 @@
         },
         {
             "StateName": "前進",
-            "actionType": 4,
+            "actionType": 3,
             "conditions": [
                 {
                     "compareType": 2,
@@ -139,7 +139,7 @@
         },
         {
             "StateName": "後退",
-            "actionType": 5,
+            "actionType": 4,
             "conditions": [
                 {
                     "compareType": 3,
@@ -166,7 +166,7 @@
         },
         {
             "StateName": "右",
-            "actionType": 6,
+            "actionType": 5,
             "conditions": [],
             "config": {
                 "animationName": "AS_Run_Combat_F_R_90_Loop_Seq_0",
@@ -187,7 +187,7 @@
         },
         {
             "StateName": "左",
-            "actionType": 7,
+            "actionType": 6,
             "conditions": [],
             "config": {
                 "animationName": "AS_Run_Combat_F_L_90_Loop_Seq_0",

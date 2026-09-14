@@ -15,10 +15,6 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new Idle(enemy, stateName);
 
 		break;
-	case BTActionType::Pursuit:
-		return new Pursuit(enemy, stateName);
-
-		break;
 	case BTActionType::NormalMagicAttack:
 		return new NormalMagicAttack(enemy, stateName);
 
