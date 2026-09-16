@@ -3,16 +3,6 @@
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 
 
-
-// œpœjs“®
-class WanderJudgment : public JudgmentBase
-{
-public:
-	WanderJudgment(Enemy* enemy) : JudgmentBase(enemy) {}
-	// ”»’è
-	bool Judgment();
-};
-
 // FloatŒ^‚ÌğŒ”»’è
 class FloatConditionJudgment : public JudgmentBase
 {

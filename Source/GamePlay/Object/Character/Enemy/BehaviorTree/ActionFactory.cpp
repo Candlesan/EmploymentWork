@@ -40,6 +40,10 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new RapidFireMagic(enemy, stateName);
 
 		break;
+	case BTActionType::Intercept:
+		return new InterceptMagic(enemy, stateName);
+
+		break;
 
 	}
 }

@@ -5,12 +5,6 @@
 #include <cmath>
 
 
-// 徘徊に遷移できるか判定
-bool WanderJudgment::Judgment()
-{
-    return false;
-}
-
 // Float型の条件判定
 bool FloatConditionJudgment::Judgment()
 {
@@ -61,8 +55,36 @@ bool FloatConditionJudgment::Judgment()
     case BTConditionType::IsPlayerDefending: // プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)
         currentValue = player.GetIsGuarding() ? 1.0f : 0.0f;
         break;
-    case BTConditionType::IncomingMagicCount: // 自身に向かって飛んできている魔法の数 (迎撃判断用)
+    case BTConditionType::IncomingMagicCount: // 自身に向かって飛んできている魔法の数 (回避・迎撃判断用)
+    {
+        // プレイヤーからの魔法を受け取る
+        MagicManager& magicManager = Player::Instance().GetMagicManager();
+        std::vector<MagicBase*> magic = magicManager.FindNearProjectiles(owner, owner->GetPosition(), owner->GetIntercepRudius());
+
+        int count = 0;
+        DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
+
+        // 内積をとって正か負かで判定をとる
+        for (auto& p : magic)
+        {
+            // 進行ベクトルを計算する
+            DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&p->GetPosition());
+            DirectX::XMVECTOR moveDir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(magicPos, EPos));
+
+            // 弾の進行方向を取得する
+            DirectX::XMVECTOR magicDir = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&p->GetDirection()));
+
+            // 内積をとる
+            float Dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(moveDir, magicDir));
+            if (Dot > 0.0f)
+            {
+                count++; // 正だったらカウントを増やす
+            }
+        }
+
+        currentValue = static_cast<float>(count);
         break;
+    }
     }
 
     // BTCompareTypeに応じてcurrentValueとThresholdを比較する

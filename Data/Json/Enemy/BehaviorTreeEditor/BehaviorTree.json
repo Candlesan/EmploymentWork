@@ -31,6 +31,10 @@
         {
             "from": "Root",
             "to": "連射魔法"
+        },
+        {
+            "from": "Root",
+            "to": "迎撃"
         }
     ],
     "nodes": [
@@ -258,6 +262,38 @@
             "parentName": "Root",
             "position": [
                 202.0,
+                180.0
+            ],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "迎撃",
+            "actionType": 8,
+            "conditions": [
+                {
+                    "compareType": 2,
+                    "conditionType": 11,
+                    "judgmentValue": 1.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": 6,
+                    "judgmentValue": 50.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Combo_Attack_01_04_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": true,
+            "name": "迎撃",
+            "parentName": "Root",
+            "position": [
+                314.0,
                 180.0
             ],
             "priority": 1,

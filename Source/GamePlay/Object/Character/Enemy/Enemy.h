@@ -81,8 +81,9 @@ public:
 	float GetMaxHealth() { return status.maxHp; }
 
 	// ── タイマー・戦闘 ──
-	float GetRunTimer() { return runTimer; }
-	float GetAttackCoolTimer() const { return attackCoolTimer; }
+	float GetRunTimer() const { return runTimer; } // 実行時間
+	float GetAttackCoolTimer() const { return attackCoolTimer; } // 攻撃のクールダウン
+	float GetIntercepRudius() const { return interceptRadius; } // 迎撃範囲の半径
 
 	// ── シーケンサー・マネージャー ──
 	AnimationSequencer& GetAnimSequence() { return animSequence; }

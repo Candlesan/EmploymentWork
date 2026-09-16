@@ -59,6 +59,7 @@ enum class BTActionType
 	Left,
 	NormalMagicAttack,
 	RapidFire,
+	Intercept,
 };
 
 // ノードデータ

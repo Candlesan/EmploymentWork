@@ -18,7 +18,7 @@ ActionBase::State Idle::Run(float elapsedTime)
     // プレイヤーの方をじっと見つめる
     owner->LockAtTarget(elapsedTime, playerPos);
 
-    return ActionBase::State::Complete;
+    return State::Complete;
 }
 
 // 前進
@@ -31,7 +31,7 @@ ActionBase::State MoveForward::Run(float elapsedTime)
     DirectX::XMFLOAT3 dir = owner->GetMoveDirection(playerPos);
     owner->Move(dir.x, dir.z, owner->GetMoveSpeed());
 
-    return ActionBase::State::Run;
+    return State::Run;
 }
 
 // 後退
@@ -44,7 +44,7 @@ ActionBase::State MoveBack::Run(float elapsedTime)
     DirectX::XMFLOAT3 dir = owner->GetMoveDirection(playerPos);
     owner->Move(-dir.x, -dir.z, owner->GetMoveSpeed());
 
-    return ActionBase::State::Run;
+    return State::Run;
 }
 
 // 右
@@ -70,10 +70,10 @@ ActionBase::State MoveRight::Run(float elapsedTime)
     timer -= elapsedTime;
     if (timer <= 0.0f)
     {
-        return ActionBase::State::Complete;
+        return State::Complete;
     }
 
-    return ActionBase::State::Run;
+    return State::Run;
 }
 
 // 左
@@ -99,10 +99,10 @@ ActionBase::State MoveLeft::Run(float elapsedTime)
     timer -= elapsedTime;
     if (timer <= 0.0f)
     {
-        return ActionBase::State::Complete;
+        return State::Complete;
     }
 
-    return ActionBase::State::Run;
+    return State::Run;
 }
 
 // 通常攻撃魔法
@@ -208,4 +208,75 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
     }
 
     return State::Failed;
+}
+
+// 迎撃
+
+// メモ：仕様書の「迎撃は魔力消費が激しい」を効かせるなら targetMagic->GetInterceptMagicCost() を引く処理が要るけど、Player側もまだやってへんからやる
+ActionBase::State InterceptMagic::Run(float elapsedTime)
+{
+    if (phase == Phase::Start)
+    {
+        owner->ChangeAnimationState(stateName);
+        normalConfig.Load();
+        rapidFireConfig.Load();
+        fireTimer = 0.0f;
+        phase = Phase::Attacking;
+        return State::Run;
+    }
+
+    // 迎撃の中心位置
+    DirectX::XMFLOAT3 EPos = owner->GetPosition();
+    DirectX::XMFLOAT3 centerPos = { EPos.x, EPos.y + 1.0f, EPos.z };
+
+    // プレイヤーの魔法から一番近いものを取る
+    MagicManager& playerManager = Player::Instance().GetMagicManager();
+    std::vector<MagicBase*> targets = playerManager.FindNearProjectiles(owner, centerPos, owner->GetIntercepRudius());
+
+    // 撃ち落とす魔法がなくなったら終了
+    if (targets.empty())
+    {
+        phase = Phase::Start;
+        return State::Complete;
+    }
+
+    MagicBase* targetMagic = targets[0]; // ソート済みの１番近い魔法
+
+    owner->LockAtTarget(elapsedTime, Player::Instance().GetPosition());
+
+    // 迎撃をする方向
+    DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&targetMagic->GetPosition());
+    DirectX::XMVECTOR myPos = DirectX::XMLoadFloat3(&centerPos);
+    DirectX::XMVECTOR Dir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(magicPos, myPos));
+
+    MagicSpawnInfo info;
+    info.position = EPos;
+    DirectX::XMStoreFloat3(&info.direction, Dir);
+    info.angleY = owner->GetAngle().y;
+    info.target = &Player::Instance();
+    info.holdTime = 0.0f;
+
+    fireTimer -= elapsedTime;
+    if (fireTimer <= 0.0f)
+    {
+        // 飛んできた弾と同じ種類で撃ち返す
+        switch (targetMagic->GetMagicKind())
+        {
+        case MagicKind::Normal:
+            normalMagic.Emit(&owner->GetMagicManager(), info, normalConfig);
+            fireTimer = 0.5f;
+            break;
+
+        case MagicKind::Rapid:
+            rapidMagic.Emit(&owner->GetMagicManager(), info, rapidFireConfig);
+            fireTimer = rapidFireConfig.rapidInterval;
+            break;
+        }
+
+        // 撃ち落とす
+        owner->RecoverMagic(targetMagic->GetMagicmagicRefund());
+        targetMagic->OnTerminate();
+    }
+
+    return State::Run;
 }

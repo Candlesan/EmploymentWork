@@ -92,3 +92,26 @@ private:
 	RapidMagic::RapidMagicConfig magicConfig;
 	float fireTimer = 0.0f;     // 撃ち続ける残り時間
 };
+
+// 迎撃
+class InterceptMagic : public ActionBase
+{
+public:
+	InterceptMagic(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
+
+private:
+	enum class Phase
+	{
+		Start,
+		Attacking
+	};
+
+	Phase phase = Phase::Start;
+	NormalMagic normalMagic;
+	NormalMagic::NormalMagicConfig normalConfig;
+	RapidMagic rapidMagic;
+	RapidMagic::RapidMagicConfig rapidFireConfig;
+	bool hasFired = false; // 既に魔法を発射したかのフラグ
+	float fireTimer = 0.0f;     // 撃ち続ける残り時間
+};

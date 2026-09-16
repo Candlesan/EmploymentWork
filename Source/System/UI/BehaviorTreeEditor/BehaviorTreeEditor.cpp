@@ -405,6 +405,7 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			"MoveLeft",
 			"NormalMagicAttack",
 			"RapidFire",
+			"Intercept",
 		};
 		int currentActionType = (int)(node.actionType);
 		if (ImGui::Combo(u8"ƒAƒNƒVƒ‡ƒ“‚ÌŽí—Þ", &currentActionType, actionTypes, IM_ARRAYSIZE(actionTypes)))
