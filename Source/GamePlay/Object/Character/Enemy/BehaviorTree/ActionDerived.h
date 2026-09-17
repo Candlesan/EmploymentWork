@@ -100,6 +100,14 @@ public:
 	InterceptMagic(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
 	ActionBase::State Run(float elapsedTime);
 
+	void Abort() override {
+		owner->SetIsIntercept(false);
+		owner->SetIsRapidFire(false);
+		Phase phase = Phase::Start;
+		hasFired = false;
+		fireTimer = 0.0f;
+	}
+
 private:
 	enum class Phase
 	{

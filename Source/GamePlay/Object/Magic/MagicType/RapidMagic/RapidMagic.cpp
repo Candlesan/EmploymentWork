@@ -73,7 +73,6 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 
 		const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
 
-		magic->SetInterceptMagicCost(magicCost);
 		magic->SetMagicmagicRefund(magicCost + interceptBonus);
 	}
 
@@ -90,7 +89,7 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 }
 
 // 更新処理
-void RapidMagic::Update(float elapsedTime, MagicManager* manager, const MagicSpawnInfo& info, const RapidMagicConfig& config, bool isTriggered)
+void  RapidMagic::Update(float elapsedTime, MagicManager* manager, const MagicSpawnInfo& info, const RapidMagicConfig& config, bool isTriggered)
 {
 	if (isTriggered)
 	{

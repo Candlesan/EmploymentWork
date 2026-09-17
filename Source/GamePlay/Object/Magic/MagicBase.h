@@ -82,10 +82,6 @@ public:
 	float GetMagicmagicRefund() const { return interceptProfile.magicRefund; }
 	void SetMagicmagicRefund(float regein) { interceptProfile.magicRefund = regein; }
 
-	// Œ}Œ‚‚Ì–‚—ÍÁ”ï—Ê
-	float GetInterceptMagicCost() const { return interceptProfile.magicCost; }
-	void SetInterceptMagicCost(float cost) { interceptProfile.magicCost = cost; }
-
 	// –‚–@‚ğŒ‚‚Á‚½l
 	Character* GetOwner() const { return owner; }
 	void SetOwner(Character* o) { owner = o; }

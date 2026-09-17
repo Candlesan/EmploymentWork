@@ -170,23 +170,16 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	// 魔力消費
 	if (info.owner != nullptr)
 	{
-		const float normalMagicCost = config.normalMagicCost;
-		const float chargeMagicCost = config.chargeMagicCost;
 
-		const float normalInterceptBonus = 5.0f; // 通常の迎撃成功時のボーナス
-		const float chargeInterceptBonus = 10.0f; // チャージ時の迎撃成功時のボーナス
-
-		if (isCharging)
+		if (isFullCharged)
 		{
 			magic->SetNormalMagicLevel(NormalMagicLevel::Charged);
-			magic->SetInterceptMagicCost(chargeMagicCost);
-			magic->SetMagicmagicRefund(chargeMagicCost + chargeInterceptBonus);
+			info.owner->ConsumMagic(config.chargeMagicCost);
 		}
 		else
 		{
 			magic->SetNormalMagicLevel(NormalMagicLevel::Normal);
-			magic->SetInterceptMagicCost(normalMagicCost);
-			magic->SetMagicmagicRefund(normalMagicCost + normalInterceptBonus);
+			info.owner->ConsumMagic(config.normalMagicCost);
 		}
 	}
 

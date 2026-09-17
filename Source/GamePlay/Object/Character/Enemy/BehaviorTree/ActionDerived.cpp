@@ -151,7 +151,7 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
         if (owner->GetCurrentAnimationSeconds()
             >= owner->GetCurrentAnimationLength())
         {
-            owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
+            owner->SetAttackCoolTimer(Mathf::RandomRange(0.0f, 5.0f));
             phase = Phase::Start;
             return State::Complete;
         }
@@ -211,8 +211,6 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
 }
 
 // 迎撃
-
-// メモ：仕様書の「迎撃は魔力消費が激しい」を効かせるなら targetMagic->GetInterceptMagicCost() を引く処理が要るけど、Player側もまだやってへんからやる
 ActionBase::State InterceptMagic::Run(float elapsedTime)
 {
     if (phase == Phase::Start)
@@ -237,6 +235,8 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
     if (targets.empty())
     {
         phase = Phase::Start;
+        owner->SetIsIntercept(false);
+        owner->SetIsRapidFire(false);
         return State::Complete;
     }
 
@@ -259,18 +259,14 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
     fireTimer -= elapsedTime;
     if (fireTimer <= 0.0f)
     {
-        // 飛んできた弾と同じ種類で撃ち返す
-        switch (targetMagic->GetMagicKind())
+        if (targetMagic->GetMagicKind() == MagicKind::Rapid)
         {
-        case MagicKind::Normal:
-            normalMagic.Emit(&owner->GetMagicManager(), info, normalConfig);
-            fireTimer = 0.5f;
-            break;
+            // 連射で迎撃している間
+            owner->SetIsIntercept(true);
+            owner->SetIsRapidFire(true);
 
-        case MagicKind::Rapid:
             rapidMagic.Emit(&owner->GetMagicManager(), info, rapidFireConfig);
             fireTimer = rapidFireConfig.rapidInterval;
-            break;
         }
 
         // 撃ち落とす

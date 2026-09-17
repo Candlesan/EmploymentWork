@@ -24,11 +24,12 @@ struct CharacterStatus
 	float magicRecoverDelayTimer = 0.0f;   // 魔力が回復し始めるまでの遅延
 
 	float rapidFireMagicCost = 6.0f;	// 連射魔法の魔力消費量
+	float interceptMagicCost = 10.0f;	// 迎撃中の魔力消費量
 
 	// --- ヒート値 ---
 	float maxHeat = 100.0f;				// 最大ヒート値
 	float currentHeat = 0.0f;			// 現在のヒート値
-	float heatIncreaseSpeed = 20.0f;		// ヒート値の増加スピード
+	float heatIncreaseSpeed = 20.0f;	// ヒート値の増加スピード
 	float heatRecoverSpeed = 5.0f;		// ヒート値の回復速度
 
 	// --- 防御系 ---
@@ -114,6 +115,7 @@ public:
 	void OnGuardHit(float amount);
 
 	void SetIsRapidFire(bool flag) { status.isRapidFire = flag; }
+	void SetIsIntercept(bool flag) { status.isIntercept = flag; }
 
 	// ----- 移動 / 回転 -----
 

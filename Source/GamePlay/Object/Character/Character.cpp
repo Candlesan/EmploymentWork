@@ -186,8 +186,9 @@ void Character::UpdateStatus(float elapsedTime)
 	// ヒート値回復
 	if (status.isRapidFire)
 	{
-		// 魔力を消費させる
-		ConsumMagic(status.rapidFireMagicCost * elapsedTime);
+		// 迎撃しながらの連射は消費が大きい
+		float cost = status.isIntercept ? status.interceptMagicCost : status.rapidFireMagicCost;
+		ConsumMagic(cost * elapsedTime);
 
 		// ヒート値を回復させる
 		status.currentHeat += status.heatIncreaseSpeed * elapsedTime;
@@ -262,6 +263,10 @@ void Character::ConsumMagic(float amount)
 void Character::RecoverMagic(float amount)
 {
 	status.currentMagic += amount;
+
+	// 最大値を超えないようにする
+	if (status.currentMagic >= status.maxMagic)
+		status.currentMagic = status.maxMagic;
 }
 
 // ガード耐久値減少

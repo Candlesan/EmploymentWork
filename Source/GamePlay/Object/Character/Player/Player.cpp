@@ -742,14 +742,6 @@ void Player::MagicInput(float elapsedTime)
 			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 			magicCoolDownTimer = fullcChargeCoolDownValue;
 			normalMagic.ResetCharge();
-
-			// 敵がチャージ魔法なら撃ち落とす
-			if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Normal &&
-				targetMagic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
-			{
-				RecoverMagic(targetMagic->GetMagicmagicRefund());
-				targetMagic->OnTerminate();
-			}
 		}
 	}
 
@@ -769,20 +761,11 @@ void Player::MagicInput(float elapsedTime)
 			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 			magicCoolDownTimer = coolDownValue;
 			normalMagic.ResetCharge();
-
-			// 敵が通常攻撃魔法なら撃ち落とす
-			if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Normal &&
-				targetMagic->GetNormalMagicLevel() == NormalMagicLevel::Normal)
-			{
-				RecoverMagic(targetMagic->GetMagicmagicRefund());
-				if (targetMagic->GetIsAlive())
-				targetMagic->OnTerminate();
-			}
 		}
 	}
 
 	// 連射魔法
-	if(gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
 	{
 		status.isRapidFire = true;
 
@@ -807,8 +790,8 @@ void Player::MagicInput(float elapsedTime)
 		if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Rapid)
 		{
 			RecoverMagic(targetMagic->GetMagicmagicRefund());
-			if(targetMagic->GetIsAlive())
-			targetMagic->OnTerminate();
+			if (targetMagic->GetIsAlive())
+				targetMagic->OnTerminate();
 		}
 
 	}
