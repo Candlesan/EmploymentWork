@@ -240,7 +240,7 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
                 // トランスフォーム行列を合成してモデルに適用
                 DirectX::XMFLOAT4X4 worldTransform;
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
-                rNode.meshModel->UpdateTransform(worldTransform);
+                rNode.worldTransform = worldTransform;
             }
         }
         // トレイルの処理
@@ -446,6 +446,7 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
                 dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
                 // 行列とパラメータを定数バッファに更新して描画コール！
+                shader->SetWorldTransForm(rNode.worldTransform);
                 shader->Update(rc, mesh);
                 dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
             }
