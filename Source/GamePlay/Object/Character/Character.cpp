@@ -278,21 +278,6 @@ void Character::OnGuardHit(float amount)
 		status.currentDefenseDurability = 0.0f;
 }
 
-// ステージのエリア制限
-void Character::AreaRestriction()
-{
-	float areaDisrance = sqrtf(position.x * position.x + position.y * position.y + position.z * position.z);
-
-	if (areaDisrance > stageRadius)
-	{
-		float normalDisX = position.x / areaDisrance;
-		float normalDisZ = position.z / areaDisrance;
-
-		position.x = normalDisX * stageRadius;
-		position.z = normalDisZ * stageRadius;
-	}
-}
-
 //水平速力更新処理
 void Character::UpdateHorizontalVelocity(float elapsedTime)
 {

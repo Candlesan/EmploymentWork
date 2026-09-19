@@ -289,9 +289,6 @@ void Player::Update(float elapsedTime)
 	// サウンド再生
 	UpdateSounds(this->currentState);
 
-	// エリア移動制限
-	AreaRestriction();
-
 	// 移動時の背骨の回転角度を求める関数
 	CalculateSpineRotation(elapsedTime);
 

@@ -131,9 +131,6 @@ public:
 		return DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
 	}
 
-	// ステージ外移動制限
-	void AreaRestriction();
-
 	// ステータスを取得する
 	const CharacterStatus& GetStatus() const { return status; }
 	void SetStatus(CharacterStatus& s) { status = s; }
@@ -209,7 +206,4 @@ protected:
 	float weight = 0.5f;  // 重さ
 
 	bool isGround = false; // 地面と接地しているか
-
-	// ステージの広さ
-	float stageRadius = 97.5f;
 };

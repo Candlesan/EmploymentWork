@@ -190,36 +190,13 @@ void SceneGame::Update(float elapsedTime)
 		enemy->Update(delta);
 
 		// 当たり判定更新
-		collisonManager.Update(player, *enemy);
+		collisonManager.Update(player, *enemy, *stage);
 
 		// デバック表示のON/OFFを切り替える関数
 		ShowDebugSwitch();
 
 		// エフェクトエディターの更新
 		effectEditor->Update(Graphics::Instance().GetDeviceContext(), elapsedTime);
-
-		//// Xキーを押した瞬間に降雪エフェクトを発生させる
-		//if (GetAsyncKeyState('P') & 0x8000)
-		//{
-		//	DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3((rand() % 30 - 15) * 0.1f, (rand() % 30 * 0.1f + 1) + 10.0f, (rand() % 30 - 15) * 0.1f + 3);
-		//	int max = 100;
-		//	for (int i = 0; i < max; i++)
-		//	{
-		//		//	発生位置
-		//		DirectX::XMFLOAT3 p = { 0,0,0 };
-		//		p.x = pos.x + (rand() % 10001 - 5000) * 0.01f;
-		//		p.y = pos.y;
-		//		p.z = pos.z + (rand() % 10001 - 5000) * 0.01f;
-		//		//	発生方向
-		//		DirectX::XMFLOAT3 v = { 0,0,0 };
-		//		v.y = -(rand() % 10001) * 0.0002f - 0.002f;
-		//		//	力
-		//		DirectX::XMFLOAT3 f = { 0,0,0 };
-		//		f.x = (rand() % 10001) * 0.00001f + 0.1f;
-		//		f.z = (rand() % 10001 - 5000) * 0.00001f;
-		//		//	大きさ
-		//		DirectX::XMFLOAT2 s = { .2f,.2f };
-
 
 		// エフェクト更新処理 
 		EffectManager::Instance().Update(delta);
@@ -299,7 +276,7 @@ void SceneGame::Render()
 
 		player.RenderDebugPrimitive(shapeRenderer);
 		enemy->RenderDebugPrimitive(shapeRenderer);
-
+		stage->RenderDebugPrimitive(shapeRenderer);
 	}
 
 	// 3Dモデル描画
@@ -686,6 +663,7 @@ void SceneGame::DrawGUI()
 
 	player.DrawGUI();
 	enemy->DrawGUI();
+	stage->DrawGUI();
 }
 
 void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)

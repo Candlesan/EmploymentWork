@@ -192,6 +192,43 @@ bool Collision::IntersectCapsuleVsCapsule(
     return false;
 }
 
+// カプセルと円柱の中にいるか。はみ出していたら押し戻した位置を返す
+bool Collision::ContainCapsuleInCylinder(
+    const DirectX::XMFLOAT3& capsulePos, float capsuleRadius, float capsuleHeight,
+    const DirectX::XMFLOAT3& cylinderPos, float cylinderRadius, float cylinderHeight,
+    DirectX::XMFLOAT3& outPos)
+{
+    outPos = capsulePos;
+    bool isOut = false;
+
+    // 横の計算
+    float dx = capsulePos.x - cylinderPos.x;
+    float dz = capsulePos.z - cylinderPos.z;
+    float distXZ = sqrtf(dx * dx + dz * dz); // 円柱の中心からキャラの水平距離
+    float limit = cylinderRadius - capsuleRadius; // キャラクターの動ける範囲
+
+    if (distXZ > limit)
+    {
+        // 中心から今の方向に向かってlimitの位置まで戻す
+        // cylinderPos +: 基準位置からの加算
+        // dx / distXZ: 正規化
+        // * limit: 限界距離まで引き延ばす
+        outPos.x = cylinderPos.x + dx / distXZ * limit;
+        outPos.z = cylinderPos.z + dz / distXZ * limit;
+        isOut = true;
+    }
+
+    // 縦の計算
+    float minY = cylinderPos.y; // 床
+    float maxY = cylinderPos.y + cylinderHeight - capsuleHeight; // 天井から身長分下げた位置
+
+    if (outPos.y < minY) { outPos.y = minY; isOut = true; }
+    if (outPos.y > maxY) { outPos.y = maxY; isOut = true; }
+
+    return isOut;
+}
+
+// スフィアキャスト
 bool Collision::SphereCast(
     const DirectX::XMFLOAT3& origin,
     const DirectX::XMFLOAT3& direction,

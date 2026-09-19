@@ -176,9 +176,6 @@ void Enemy::Update(float elapsedTime)
 	defenseMagic.Update(this, elapsedTime);
 	debugShot(elapsedTime);
 
-	// エリア移動制限
-	AreaRestriction();
-
 	// モデル更新処理
 	UpdateTransform();
 	enemy->UpdateTransform(transform);

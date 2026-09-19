@@ -7,8 +7,9 @@
 // 当たり判定の形状
 enum class HitBoxShape
 {
-	Sphere,
-	Capsule
+	Sphere,		// 球
+	Capsule,	// カプセル
+	Cylinder,	// 円柱
 };
 
 //コリジョン
@@ -50,6 +51,13 @@ public:
 		DirectX::XMFLOAT3& outPositionB
 	);
 
+	// ステージ用の当たり判定
+	// カプセルが円柱の中にあるか。はみ出していたら押し戻した位置を返す関数
+	static bool ContainCapsuleInCylinder(
+		const DirectX::XMFLOAT3& capsulePos, float capsuleRadius, float capsuleHeight,
+		const DirectX::XMFLOAT3& cylinderPos, float cylinderRadius, float cylinderHeight,
+		DirectX::XMFLOAT3& outPos);
+
 	// 三角形の定義
 	struct Triangle
 	{
@@ -74,6 +82,7 @@ public:
 		DirectX::XMFLOAT3& hitPosition,
 		DirectX::XMFLOAT3& hitNormal,
 		bool spaceDivisionFlag = false);
+
 private:
 	// ヘルパー関数：線分と線分の最短距離を求める計算
 	static void ClosetPointSegmentSegment(

@@ -1,5 +1,9 @@
 #include "Stage.h"
 #include "System/Graphic/Graphics.h"
+#include "System/Renderer/ShapeRenderer.h"
+
+#include <imgui.h>
+
 
 // コンストラクタ
 Stage::Stage()
@@ -9,7 +13,6 @@ Stage::Stage()
 
 	// ステージモデル読み込み
 	stage = std::make_shared<Model>(device, "Data/Model/Stage/circle_of_death.gltf");
-	//stage = std::make_shared<Model>(device, "Data/Model/Stage/ExampleStage.gltf");
 
 	scale.x = scale.y = scale.z = 0.025f;
 
@@ -123,12 +126,54 @@ void Stage::Update(float elapsedTime)
 {
 	// 特に何もすることがないはず
 	UpdateTransform();
-	stage->UpdateTransform(GetTransform());
+	stage->UpdateTransform(transform); // モデルの行列を更新する
 }
 
 // 描画処理
 void Stage::Render(const RenderContext& rc, ModelRenderer* renderer)
 {
-	// ゲープロVはDrawで描画をためてRenderで描画する
+	if(drawStage)
+	// Drawで描画をためてRenderで描画する
 	renderer->Draw(ShaderId::PBR, stage);
+}
+
+// デバックプリミティブ描画
+void Stage::RenderDebugPrimitive(ShapeRenderer* renderer)
+{
+	if(drawArea)
+	renderer->DrawCylinder(areaPosition, areaRadius, areaHeight, { 1.0f, 0.5f, 0.5f, 1.0f });
+}
+
+// GUI描画
+void Stage::DrawGUI()
+{
+	ImGui::Begin(u8"ステージ");
+	ImGui::Checkbox(u8"ステージの表示", &drawStage);
+	ImGui::Checkbox(u8"エリアの表示", &drawArea);
+	ImGui::Separator();
+
+	ImGui::DragFloat3(u8"エリアの位置", &areaPosition.x, 0.1f);
+	ImGui::DragFloat(u8"エリアの半径", &areaRadius, 0.1f);
+	ImGui::DragFloat(u8"エリアの高さ", &areaHeight, 0.1f);
+
+	ImGui::End();
+}
+
+// 行列更新
+void Stage::UpdateTransform()
+{
+	//スケール行列作成
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+
+	//回転行列を作成
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
+
+	//位置行列を作成
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+	//3つの行列を組み合わせ,ワールド行列を作成
+	DirectX::XMMATRIX W = S * R * T;
+
+	//計算したワールド行列を取り出す
+	DirectX::XMStoreFloat4x4(&transform, W);
 }
