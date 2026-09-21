@@ -294,7 +294,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 	if (length > 0.0f)
 	{
 		// 空中にいる時は摩擦をほぼ0にする
-		float currentFriction = isGround ? (this->friction * elapsedTime) : (this->friction * 0.02f * elapsedTime);
+		float currentFriction = isGround ? (this->friction * elapsedTime) : (this->friction * 0.5f * elapsedTime);
 
 		//摩擦力
 		//float friction = this->friction * elapsedTime;
@@ -325,7 +325,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 		if (moveVeclength > 0.0f)
 		{
 			// 空中でスティックを倒したときの空中制御力を下げる。自由にターンできるのを防ぐため
-			float currentAcceleration = isGround ? (this->acceleration * elapsedTime) : (this->acceleration * 0.3f * elapsedTime);
+			float currentAcceleration = isGround ? (this->acceleration * elapsedTime) : (this->acceleration * 1.0f * elapsedTime);
 
 			//加速力
 			//float acceleration = this->acceleration * elapsedTime;

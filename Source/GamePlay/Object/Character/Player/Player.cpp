@@ -343,8 +343,25 @@ void Player::DrawGUI()
 				ImGui::Text(u8"現在の上半身ステート: %s", currentOverlayState.c_str());
 			}
 
+			// トランスフォーム情報
+			if (ImGui::CollapsingHeader(u8"トランスフォーム (位置・回転・拡縮)", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat3(u8"座標 (Position)", &position.x);
+
+				DirectX::XMFLOAT3 a;
+				a.x = DirectX::XMConvertToDegrees(angle.x);
+				a.y = DirectX::XMConvertToDegrees(angle.y);
+				a.z = DirectX::XMConvertToDegrees(angle.z);
+				ImGui::DragFloat3(u8"回転角度 (Angle)", &a.x);
+				angle.x = DirectX::XMConvertToRadians(a.x);
+				angle.y = DirectX::XMConvertToRadians(a.y);
+				angle.z = DirectX::XMConvertToRadians(a.z);
+
+				ImGui::DragFloat3(u8"拡縮比 (Scale)", &scale.x);
+			}
+
 			// パラメーター
-			if (ImGui::CollapsingHeader(u8"戦闘パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader(u8"パラメータ", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				if (ImGui::Button(u8"HP全回復"))
 				{
@@ -438,6 +455,12 @@ void Player::DrawGUI()
 				}
 			}
 
+			if (ImGui::CollapsingHeader(u8"飛行", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Text(u8"飛行中か: %s", flightController.IsFlying() ? "true" : "false");
+				ImGui::DragFloat(u8"飛行中の移動速度", &flightSpeed, 0.1f);
+			}
+
 			// 魔法関係
 			if (ImGui::CollapsingHeader(u8"通常魔法", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -511,23 +534,6 @@ void Player::DrawGUI()
 
 			//　防御魔法
 			defenseMagic.DrawGUI();
-
-			// トランスフォーム情報
-			if (ImGui::CollapsingHeader(u8"トランスフォーム (位置・回転・拡縮)", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::DragFloat3(u8"座標 (Position)", &position.x);
-
-				DirectX::XMFLOAT3 a;
-				a.x = DirectX::XMConvertToDegrees(angle.x);
-				a.y = DirectX::XMConvertToDegrees(angle.y);
-				a.z = DirectX::XMConvertToDegrees(angle.z);
-				ImGui::DragFloat3(u8"回転角度 (Angle)", &a.x);
-				angle.x = DirectX::XMConvertToRadians(a.x);
-				angle.y = DirectX::XMConvertToRadians(a.y);
-				angle.z = DirectX::XMConvertToRadians(a.z);
-
-				ImGui::DragFloat3(u8"拡縮比 (Scale)", &scale.x);
-			}
 
 			// 当たり判定情報
 			if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
@@ -660,7 +666,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 
 	if (defenseMagic.GetIsActive())
 	{
-		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), {0, 0, 1, 1});
+		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), { 0, 0, 1, 1 });
 	}
 
 	DirectX::XMFLOAT3 centerPos = {
@@ -1027,17 +1033,16 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	std::string state = GetCurrentState();
-	bool isHybridState = (state.find("Avoid") != std::string::npos ||
-		state.find("Dash") != std::string::npos);
-
-
-	if ((!useRootMotion && !useRootMotionEx) || isHybridState)
+	if ((!useRootMotion && !useRootMotionEx))
 	{
-		float finalSpeed = (isHybridState) ? moveSpeed : 3.0f;
-
 		// 移動処理
-		Move(moveVec.x, moveVec.z, finalSpeed);
+		Move(moveVec.x, moveVec.z, 0.0f);
+	}
+
+	if (flightController.IsFlying())
+	{
+		// 移動処理
+		Move(moveVec.x, moveVec.z, 20.0f);
 	}
 
 	// 回転処理
@@ -1190,35 +1195,6 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentState)
 	{
-		//// ジャンプ処理
-		//if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
-		//{
-		//	if (IsGround())
-		//	{
-		//		Jump(jumpSpeed);
-
-		//		// 空中に飛び出すときに勢いを載せる
-		//		if (moveLength > 0.1f)
-		//		{
-		//			float mvX = moveVec.x / moveLength;
-		//			float mvZ = moveVec.z / moveLength;
-
-		//			// 走ってるときの速度を掛けてVelocityに送る
-		//			float jumpForwardSpeed = maxMoveSpeed;
-		//			velocity.x = mvX * jumpForwardSpeed;
-		//			velocity.z = mvZ * jumpForwardSpeed;
-		//		}
-		//		else
-		//		{
-		//			velocity.x = 0.0f;
-		//			velocity.z = 0.0f;
-		//		}
-
-		//		jumpCount++;
-		//		bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
-		//	}
-		//}
-
 		// アクションを実行する
 		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
 		if (trans)
@@ -1871,27 +1847,6 @@ void Player::CalculateStatusParameters()
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	falling = (velocity.y < -0.1f);
-
-	// 滞空処理
-	if (falling && gamePad.GetButton() & GamePad::BTN_A)
-	{
-		SetGravity(-1.0f);
-
-		DirectX::XMFLOAT3 moveVec = GetMoveVec();
-
-		float glideSpeed = 4.0f;
-
-		velocity.x = moveVec.x * glideSpeed;
-		velocity.z = moveVec.z * glideSpeed;
-	}
-	else if (falling)
-	{
-		SetGravity(-25.0f);
-	}
-	else
-	{
-		SetGravity(-9.8f);
-	}
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);

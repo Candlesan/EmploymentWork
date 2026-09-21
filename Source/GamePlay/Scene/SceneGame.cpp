@@ -316,9 +316,6 @@ void SceneGame::Render()
 
 		modelRenderer->Render(rc);
 
-		// シェイプレンダラ描画
-		shapeRenderer->DrawSphere({ 5.0f, 1.0f, 0.0f }, 1.0f, { 1.0f, 0.0f, 1.0f, 1.0f });
-
 		if (showDebugPrimitive)
 		{
 			shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());

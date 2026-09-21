@@ -146,6 +146,7 @@ private:
 
 	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;
+	float flightSpeed = 20.0f;
 	float maxMoveSpeed = 7.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 	float moveLength = 0.0f;

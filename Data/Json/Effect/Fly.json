@@ -6,59 +6,31 @@
             "colorB": 1.0,
             "colorG": 1.0,
             "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 50.0,
-                    "type": 21
-                }
-            ],
-            "fromState": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "AS_Skill_02_01_End_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 0
-                }
-            ],
-            "fromState": "AS_Skill_02_01_End_Seq_0",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "Exit"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 20
-                }
-            ],
+            "conditions": [],
             "fromState": "Entry",
             "priority": 0,
             "toSlot": 0,
-            "toState": "AS_Attack_Air_to_Floor_02_Loop_Seq_0"
+            "toState": "AS_Jump_Combat_Loop_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.20000000298023224,
+                    "type": 14
+                }
+            ],
+            "fromState": "AS_Jump_Combat_Loop_0_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
         }
     ],
     "nodes": [
@@ -75,8 +47,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -44.0,
-                73.0
+                -108.0,
+                -7.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -94,36 +66,17 @@
             },
             "mixRate": 0.0,
             "position": [
-                -44.0,
-                361.0
+                291.0,
+                -7.0
             ],
             "subGraphPath": "",
             "type": 0
         },
         {
-            "StateName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
+            "StateName": "AS_Jump_Combat_Loop_0_Seq_0",
             "assetName": "",
             "config": {
-                "animationName": "AS_Attack_Air_to_Floor_02_Loop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "targetBoneName": "",
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "mixRate": 0.0,
-            "position": [
-                -44.0,
-                169.0
-            ],
-            "subGraphPath": "",
-            "type": 0
-        },
-        {
-            "StateName": "AS_Skill_02_01_End_Seq_0",
-            "assetName": "",
-            "config": {
-                "animationName": "AS_Skill_02_01_End_Seq_0",
+                "animationName": "AS_Jump_Combat_Loop_0_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -132,8 +85,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -44.0,
-                265.0
+                3.0,
+                -7.0
             ],
             "subGraphPath": "",
             "type": 0
