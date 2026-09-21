@@ -290,6 +290,11 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
                 isLoop = true;
                 break;
             }
+            else if (node.type == RenderType::Mesh && node.isLoop)
+            {
+                isLoop = true;
+                break;
+            }
         }
 
         if (isLoop)
@@ -898,12 +903,6 @@ void EffectEditor::DrawFileToolbar()
                 runtimeNodes[selectedNodeIndex].meshModel = std::make_shared<Model>(device, currentConfig.nodes[selectedNodeIndex].meshPath.c_str());
             }
         }
-    }
-
-    // テスト再生ボタン
-    if (ImGui::Button(u8"再生"))
-    {
-        PlayTestEffect(testSpawnPos);
     }
 }
 void EffectEditor::DrawNodeList()

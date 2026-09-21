@@ -261,6 +261,12 @@ void CustomEffect::Update(float elapsedTime)
                 isLoop = true;
                 break;
             }
+            else if (node.config.type == RenderType::Mesh && node.config.isLoop)
+            {
+                isLoop = true;
+                break;
+            }
+
         }
 
         if (isLoop)
