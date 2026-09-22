@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <d3d11.h>
 #include <DirectXMath.h>
 
 // 前方宣言
@@ -11,14 +12,15 @@ class Sprite;
 
 struct UIElement
 {
-	std::string name;			// UI名(Findとかで探すよう)
+	std::string name = "name";			// UI名(Findとかで探すよう)
 	std::string texturePath;	// テクスチャパス
 	DirectX::XMFLOAT4 uvRect;	// 画像の切り抜き範囲
 
 	// Transform
 	DirectX::XMFLOAT2 position = { 0.0f, 0.0f };			// 位置(アンカーからの位置)
 	float rotation = 0.0f;									// 回転
-	DirectX::XMFLOAT2 scale = { 1.0f, 1.0f };				// 拡大(幅・高さ)
+	DirectX::XMFLOAT2 size = { 100.0f, 100.0f };			// 拡大(幅・高さ)
+	DirectX::XMFLOAT2 scale = { 1.0f, 1.0f };				// 拡大率
 	DirectX::XMFLOAT2 pivot = { 0.5f, 0.5f };				// 自分の中で回転・拡大の中心となる点
 	DirectX::XMFLOAT2 anchor = { 0.5f, 0.5f };				// 親の四角形のどこを基準のするか
 
@@ -38,5 +40,18 @@ struct UIElement
 class UIEditor
 {
 public:
+	UIEditor() = default;
+	~UIEditor() = default;
+
+	void Initialize(ID3D11Device* device);
+	void Update(float elapsedTime);
+	void Render(ID3D11DeviceContext* dc);
+	void DrawGUI();
 private:
+	void Save(const std::string& path);
+	void Load(const std::string& path);
+private:
+	UIElement element;
+	std::shared_ptr<Sprite> sprite;
+	ID3D11Device* device = nullptr;
 };

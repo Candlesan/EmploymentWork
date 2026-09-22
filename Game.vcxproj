@@ -312,6 +312,7 @@
     <ClCompile Include="Source\System\UI\EffectEditor\EffectEditor.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.cpp" />
+    <ClCompile Include="Source\System\UI\UIEditor\UIEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

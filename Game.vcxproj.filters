@@ -824,6 +824,9 @@
     <ClCompile Include="Source\System\UI\Dialog\Dialog.cpp">
       <Filter>Source\System\UI\Dialog</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\UI\UIEditor\UIEditor.cpp">
+      <Filter>Source\System\UI\UIEditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

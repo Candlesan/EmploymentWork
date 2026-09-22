@@ -1,0 +1,38 @@
+{
+    "anchor": [
+        0.5,
+        0.5
+    ],
+    "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "name": "test",
+    "pivot": [
+        0.5,
+        0.5
+    ],
+    "position": [
+        0.0,
+        0.0
+    ],
+    "rotation": 0.0,
+    "scale": [
+        1.0,
+        1.0
+    ],
+    "size": [
+        500.0,
+        500.0
+    ],
+    "texturePath": "Data/Sprite/Texture/aruki.png",
+    "uvRect": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "visible": true
+}

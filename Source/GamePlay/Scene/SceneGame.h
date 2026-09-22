@@ -16,6 +16,7 @@
 #include "System/Renderer/Shader/SkyMap/SkyMap.h"
 #include "System/Renderer/Shader/bloom/bloom.h"
 #include "System/UI/EffectEditor/EffectEditor.h"
+#include "System/UI/UIEditor/UIEditor.h"
 
 
 // ゲームシーン
@@ -116,6 +117,9 @@ private:
 	std::unique_ptr<EffectEditor> effectEditor;
 	std::string effectName;
 	bool showEffectEditor = true;
+
+	// UIEditor関係
+	UIEditor uiEditor;
 
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;

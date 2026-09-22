@@ -99,6 +99,9 @@ void SceneGame::Initialize()
 
 	// 自作エフェクトマネージャー初期化
 	CustomEffectManager::Instance().Initialize(device);
+
+	// UIエディター初期化
+	uiEditor.Initialize(device);
 }
 
 // 終了化
@@ -347,6 +350,7 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
+		uiEditor.Render(dc);
 	}
 }
 
@@ -661,6 +665,7 @@ void SceneGame::DrawGUI()
 	player.DrawGUI();
 	enemy->DrawGUI();
 	stage->DrawGUI();
+	uiEditor.DrawGUI();
 }
 
 void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
