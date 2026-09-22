@@ -7,7 +7,7 @@ DialogResult Dialog::OpenFileName(char* filepath, int size, const char* filter, 
 {
 	// 初期パス設定
 	char dirname[MAX_PATH];
-	if (filepath[0] != '0')
+	if (filepath[0] != '\0')
 	{
 		// ディレクトリパス取得
 		::_splitpath_s(filepath, nullptr, 0, dirname, MAX_PATH, nullptr, 0, nullptr, 0);
@@ -79,7 +79,7 @@ DialogResult Dialog::SaveFileName(char* filepath, int size, const char* filter, 
 {
 	// 初期パス設定
 	char dirname[MAX_PATH];
-	if (filepath[0] != '0')
+	if (filepath[0] != '\0')
 	{
 		// ディレクトリパス取得
 		::_splitpath_s(filepath, nullptr, 0, dirname, MAX_PATH, nullptr, 0, nullptr, 0);

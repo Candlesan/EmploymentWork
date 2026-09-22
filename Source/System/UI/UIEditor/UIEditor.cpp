@@ -12,13 +12,6 @@
 void UIEditor::Initialize(ID3D11Device* device)
 {
 	this->device = device;
-
-	element.texturePath = "Data/Sprite/Texture/aruki.png";
-	element.position = { 960.0f, 540.0f };
-	element.size = { 200.0f, 200.0f };
-
-	// スプライトを作る
-	sprite = std::make_shared<Sprite>(device, element.texturePath.c_str());
 }
 
 // 更新処理
@@ -30,23 +23,40 @@ void UIEditor::Update(float elapsedTime)
 // 描画処理
 void UIEditor::Render(ID3D11DeviceContext* dc)
 {
+	if (element.texturePath.empty()) return;
+
 	// 表示サイズ
 	float w = element.size.x * element.scale.x;
 	float h = element.size.y * element.scale.y;
-	float x = element.position.x;
-	float y = element.position.y;
 
-	// 4隅(左上、右上、左下、右下)
+	// 基準点(画像の中のどこか, px)
+	// pivot×表示サイズ
+	float px = element.pivot.x * w;
+	float py = element.pivot.y * h;
+
+	// 基準点を原点にした4隅(左上、右上、左下、右下)
 	DirectX::XMFLOAT2 cornners[4] = {
-		{x, y},
-		{x + w, y},
-		{x, y + h},
-		{x + w, y + h}
+		{-px, -py},
+		{w - px, -py},
+		{-px, h - py},
+		{w - px, h - py}
 	};
+
+	// 回転→位置に移動
+	float theta = DirectX::XMConvertToRadians(element.rotation);
+	float c = cosf(theta);
+	float s = sinf(theta);
+	for (auto& p : cornners)
+	{
+		float rx = c * p.x - s * p.y;
+		float ry = s * p.x + c * p.y;
+		p.x = rx + element.position.x;
+		p.y = ry + element.position.y;
+	}
 
 	// 切り抜き範囲（sw,shが0なら画像全体を使う）
 	DirectX::XMFLOAT4 uv = element.uvRect;
-	if (uv.z <= 0.0f || uv.w <= 0.0f);
+	if (uv.z <= 0.0f || uv.w <= 0.0f)
 	{
 		DirectX::XMFLOAT2 texSize = sprite->GetTextureSize();
 		uv = { 0.0f, 0.0f, texSize.x, texSize.y };
@@ -88,9 +98,31 @@ void UIEditor::DrawGUI()
 			hwnd) == DialogResult::OK)
 		{
 			Load(filepath);
+			sprite = std::make_shared<Sprite>(device, element.texturePath.c_str());
 		}
 	}
 	ImGui::Separator();
+
+	if (ImGui::Button(u8"テクスチャ読み込み"))
+	{
+		char filePath[MAX_PATH] = { 0 };
+		HWND hwnd = Graphics::Instance().GetWindowHandle();
+		if (Dialog::OpenFileName(filePath, MAX_PATH,
+			"PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
+			"テクスチャ選択",
+			hwnd) == DialogResult::OK)
+		{
+			std::string pathStr = filePath;
+			size_t pos = pathStr.find("Data");
+			if (pos != std::string::npos) pathStr = pathStr.substr(pos);
+
+			element.texturePath = pathStr;
+			sprite = std::make_shared<Sprite>(device, element.texturePath.c_str());
+		}
+
+	}
+	ImGui::Separator();
+
 
 	char nameBuffer[128];
 	strcpy_s(nameBuffer, element.name.c_str());
@@ -98,6 +130,11 @@ void UIEditor::DrawGUI()
 	{
 		element.name = nameBuffer;
 	}
+	ImGui::Separator();
+
+
+	ImGui::DragFloat2(u8"基準点", &element.pivot.x, 0.01f, 0.0f, 1.0f);
+	ImGui::Separator();
 
 	ImGui::DragFloat2(u8"位置", &element.position.x, 0.1f);
 	ImGui::DragFloat2(u8"画像サイズ", &element.size.x, 0.1f);
