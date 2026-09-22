@@ -226,6 +226,9 @@
     <Filter Include="Source\System\UI\Dialog">
       <UniqueIdentifier>{e6965b58-c3f2-4f1b-bd2d-ee2986d87d1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\UI\UIEditor">
+      <UniqueIdentifier>{41a4167f-04eb-4bf2-8e0b-8962415ca0fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -542,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="Source\System\UI\Dialog\Dialog.h">
       <Filter>Source\System\UI\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\UI\UIEditor\UIEditor.h">
+      <Filter>Source\System\UI\UIEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

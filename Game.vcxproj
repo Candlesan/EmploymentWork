@@ -218,6 +218,7 @@
     <ClInclude Include="Source\System\UI\EffectEditor\EffectEditor.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffectManager.h" />
+    <ClInclude Include="Source\System\UI\UIEditor\UIEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp" />

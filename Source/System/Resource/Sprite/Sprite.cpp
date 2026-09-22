@@ -208,44 +208,7 @@ void Sprite::Update(
 
 	ID3D11DeviceContext* immediate_context = Graphics::Instance().GetDeviceContext();
 
-	// 現在設定されているビューポートからスクリーンサイズを取得する。
-	D3D11_VIEWPORT viewport;
-	UINT numViewports = 1;
-	immediate_context->RSGetViewports(&numViewports, &viewport);
-	float screenWidth = viewport.Width;
-	float screenHeight = viewport.Height;
-
-	// スクリーン座標系からNDC座標系へ変換する。
-	for (DirectX::XMFLOAT2& p : positions)
-	{
-		p.x = 2.0f * p.x / screenWidth - 1.0f;
-		p.y = 1.0f - 2.0f * p.y / screenHeight;
-	}
-
-	// 頂点バッファの内容の編集を開始する。
-	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-	HRESULT hr = immediate_context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
-	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-	// 頂点バッファの内容を編集
-	Vertex* v = static_cast<Vertex*>(mappedSubresource.pData);
-	for (int i = 0; i < 4; ++i)
-	{
-		v[i].position.x = positions[i].x;
-		v[i].position.y = positions[i].y;
-		v[i].position.z = dz;
-
-		v[i].color.x = r;
-		v[i].color.y = g;
-		v[i].color.z = b;
-		v[i].color.w = a;
-
-		v[i].texcoord.x = texcoords[i].x / textureWidth;
-		v[i].texcoord.y = texcoords[i].y / textureHeight;
-	}
-
-	// 頂点バッファの内容の編集を終了する。
-	immediate_context->Unmap(vertexBuffer.Get(), 0);
+	WriteVertices(immediate_context, positions, dz, sx, sy, sw, sh, { r, g, b, a });
 }
 
 // 描画実行
@@ -285,4 +248,78 @@ void Sprite::Render(ID3D11DeviceContext* dc,
 	) const
 {
 	Render(dc, dx, dy, dz, dw, dh, 0, 0, textureWidth, textureHeight, angle, r, g, b, a);
+}
+
+// 描画実行
+void Sprite::Render(
+	ID3D11DeviceContext* dc,
+	const DirectX::XMFLOAT2 corners[4],
+	float dz,
+	float sx, float sy, float sw, float sh,
+	const DirectX::XMFLOAT4& color) const
+{
+	WriteVertices(dc, corners, dz, sx, sy, sw, sh, color);
+	Draw(dc);
+}
+
+// 4頂点NDCに変換して頂点バッファに書き込む
+void Sprite::WriteVertices(
+	ID3D11DeviceContext* dc, 
+	const DirectX::XMFLOAT2 corners[4],
+	float dz,
+	float sx, float sy, float sw, float sh,
+	const DirectX::XMFLOAT4& color) const
+{
+	// テクスチャ座標
+	DirectX::XMFLOAT2 texcoords[] = {
+		DirectX::XMFLOAT2(sx, sy),				// 左上
+		DirectX::XMFLOAT2(sx + sw, sy),			// 右上
+		DirectX::XMFLOAT2(sx, sy + sh),			// 左下
+		DirectX::XMFLOAT2(sx + sw, sy + sh),	// 右下
+	};
+
+	// 現在設定されているビューポートからスクリーンサイズを取得する。
+	D3D11_VIEWPORT viewport;
+	UINT numViewports = 1;
+	dc->RSGetViewports(&numViewports, &viewport);
+
+	// 毎フレーム位置が変わるような動的な頂点データ（パーティクルや2Dスプライトなど）を、CPUからGPUへ効率よく送り込むための処理
+	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+	HRESULT hr = dc->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource); // D3D11_MAP_WRITE_DISCARD：古いバッファの内容を全て破棄（Discard）し、まったく新しいメモリ領域を割り当てる
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+
+	Vertex* v = static_cast<Vertex*>(mappedSubresource.pData);
+	for (int i = 0; i < 4; ++i)
+	{
+		// スクリーン座標系からNDC座標系へ変換する。
+		v[i].position.x = 2.0f * corners[i].x / viewport.Width - 1.0f; // 0 ～ 1に正規化するして-1 ～ +1に変換する
+		v[i].position.y = 1.0f - 2.0f * corners[i].y / viewport.Height;
+		v[i].position.z = dz;
+
+		v[i].color = color;
+
+		v[i].texcoord.x = texcoords[i].x / textureWidth;
+		v[i].texcoord.y = texcoords[i].y / textureHeight;
+	}
+
+	// 頂点バッファの内容の編集を終了する。
+	dc->Unmap(vertexBuffer.Get(), 0);
+}
+
+// シェーダー等をセットして描画
+void Sprite::Draw(ID3D11DeviceContext* dc) const
+{
+	// GPUに描画するためのデータを渡す
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	dc->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+	dc->IASetInputLayout(inputLayout.Get());
+	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	dc->VSSetShader(vertexShader.Get(), nullptr, 0);
+	dc->PSSetShader(pixelShader.Get(), nullptr, 0);
+	dc->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
+
+	// 描画
+	dc->Draw(4, 0);
 }
