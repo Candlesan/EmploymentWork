@@ -213,7 +213,7 @@
     <ClInclude Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.h" />
     <ClInclude Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeEditor.h" />
     <ClInclude Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeGraph.h" />
-    <ClInclude Include="Source\System\UI\Dialog.h" />
+    <ClInclude Include="Source\System\UI\Dialog\Dialog.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectConfig.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectEditor.h" />
     <ClInclude Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.h" />
@@ -306,7 +306,7 @@
     <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequencerEditor.cpp" />
     <ClCompile Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeEditor.cpp" />
     <ClCompile Include="Source\System\UI\BehaviorTreeEditor\BehaviorTreeGraph.cpp" />
-    <ClCompile Include="Source\System\UI\Dialog.cpp" />
+    <ClCompile Include="Source\System\UI\Dialog\Dialog.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectConfig.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectEditor.cpp" />
     <ClCompile Include="Source\System\UI\EffectEditor\EffectManager\CustomEffect.cpp" />

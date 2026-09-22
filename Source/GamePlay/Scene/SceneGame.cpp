@@ -5,7 +5,7 @@
 #include "System/Effect/EffectManager.h"
 #include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 #include "System/Core/Input/Input.h"
-#include "System/UI/Dialog.h"
+#include "System/UI/Dialog/Dialog.h"
 
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"

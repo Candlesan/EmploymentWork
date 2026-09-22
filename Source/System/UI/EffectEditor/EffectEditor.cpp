@@ -1,5 +1,5 @@
 #include "EffectEditor.h"
-#include "System/UI/Dialog.h"
+#include "System/UI/Dialog/Dialog.h"
 #include "System/Graphic/Graphics.h"
 #include "System/Renderer/Shader/meshVFX/meshVFX.h"
 #include "System/Core/Mathf.h"

@@ -223,6 +223,9 @@
     <Filter Include="Source\System\Resource\ModelResourceManager">
       <UniqueIdentifier>{e2b305a1-4c0f-43bd-8d9c-168eecc1c2a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\UI\Dialog">
+      <UniqueIdentifier>{e6965b58-c3f2-4f1b-bd2d-ee2986d87d1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -335,9 +338,6 @@
     </ClInclude>
     <ClInclude Include="Source\System\Resource\Sprite\Sprite.h">
       <Filter>Source\System\Resource\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\UI\Dialog.h">
-      <Filter>Source\System\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Framework.h">
       <Filter>Source\GamepPlay</Filter>
@@ -540,6 +540,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionFactory.h">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\UI\Dialog\Dialog.h">
+      <Filter>Source\System\UI\Dialog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -631,9 +634,6 @@
     </ClCompile>
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp">
       <Filter>Source\System\Resource\Sprite</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\UI\Dialog.cpp">
-      <Filter>Source\System\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Framework.cpp">
       <Filter>Source\GamepPlay</Filter>
@@ -814,6 +814,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\ActionFactory.cpp">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\Dialog\Dialog.cpp">
+      <Filter>Source\System\UI\Dialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

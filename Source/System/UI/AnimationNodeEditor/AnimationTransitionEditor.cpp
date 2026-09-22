@@ -4,7 +4,7 @@
 
 #include "System/Core/Input/Input.h"
 #include "System/Graphic/Graphics.h"
-#include "System/UI/Dialog.h"
+#include "System/UI/Dialog/Dialog.h"
 
 // ノードエディタ描画
 std::string AnimationTransitionEditor::Draw(
