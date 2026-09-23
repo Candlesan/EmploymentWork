@@ -14,7 +14,7 @@ struct UIElement
 {
 	std::string name = "name";			// UI名(Findとかで探すよう)
 	std::string texturePath;	// テクスチャパス
-	DirectX::XMFLOAT4 uvRect;	// 画像の切り抜き範囲
+	DirectX::XMFLOAT4 uvRect = { 0.0f, 0.0f, 0.0f, 0.0f };	// 画像の切り抜き範囲
 
 	// Transform
 	DirectX::XMFLOAT2 position = { 0.0f, 0.0f };			// 位置(アンカーからの位置)
@@ -35,6 +35,9 @@ struct UIElement
 	// 実行時に使う変数
 	DirectX::XMFLOAT4X4 worldMatrix;
 	DirectX::XMFLOAT4 worldColor;
+
+	// UIElementに持たせることでElementごとに違う画像が出せる
+	std::shared_ptr<Sprite> sprite;
 };
 
 class UIEditor
@@ -43,15 +46,31 @@ public:
 	UIEditor() = default;
 	~UIEditor() = default;
 
+	// 初期化
 	void Initialize(ID3D11Device* device);
+
+	// 更新処理
 	void Update(float elapsedTime);
+
+	// 描画処理
 	void Render(ID3D11DeviceContext* dc);
+
+	// GUI描画
 	void DrawGUI();
 private:
+	// 保存
 	void Save(const std::string& path);
+
+	// 読み込み
 	void Load(const std::string& path);
+
+	// UI追加
+	UIElement* AddElement();
+
+	// テクスチャ設定
+	void SetTexture(UIElement& e, const std::string& path);
 private:
-	UIElement element;
-	std::shared_ptr<Sprite> sprite;
+	std::vector<std::unique_ptr<UIElement>> elements;
 	ID3D11Device* device = nullptr;
+	int selectedIndex = -1; // 選択中のUI(-1は未選択)
 };
