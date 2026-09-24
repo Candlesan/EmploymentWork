@@ -24,6 +24,16 @@ void UIEditor::Update(float elapsedTime)
 // 描画処理
 void UIEditor::Render(ID3D11DeviceContext* dc)
 {
+	RenderState* renderState = Graphics::Instance().GetRenderState();
+
+	// 半透明で描く
+	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
+	// 深度は見ないので書かない(常に配列の順番通りに描く)
+	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::NoTestNoWrite), 0);
+	// <テクスチャのサンプラーをセットする
+	ID3D11SamplerState* sampler = renderState->GetSamplerState(SamplerState::LinearClamp);
+	dc->PSSetSamplers(0, 1, &sampler);
+
 	for (auto& e : elements)
 	{
 		if (!e->visible || e->texturePath.empty() || !e->sprite) continue;
