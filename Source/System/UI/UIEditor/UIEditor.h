@@ -57,6 +57,11 @@ public:
 
 	// GUI描画
 	void DrawGUI();
+
+private:
+	void DrawToolBar();
+	void DrawNode();
+	void DrawInspector();
 private:
 	// 保存
 	void Save(const std::string& path);
@@ -69,6 +74,9 @@ private:
 
 	// テクスチャ設定
 	void SetTexture(UIElement& e, const std::string& path);
+
+	// Elementの移動
+	void MoveElement(int from, int to);
 private:
 	std::vector<std::unique_ptr<UIElement>> elements;
 	ID3D11Device* device = nullptr;

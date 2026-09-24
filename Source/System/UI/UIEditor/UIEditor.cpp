@@ -1,4 +1,4 @@
-#include "UIEditor.h"
+ï»¿#include "UIEditor.h"
 #include "System/Graphic/Graphics.h"
 #include "System/Resource/Sprite/Sprite.h"
 #include "System/UI/Dialog/Dialog.h"
@@ -9,28 +9,28 @@
 #include <fstream>
 
 
-// ‰Šú‰»
+// åˆæœŸåŒ–
 void UIEditor::Initialize(ID3D11Device* device)
 {
 	this->device = device;
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void UIEditor::Update(float elapsedTime)
 {
 
 }
 
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void UIEditor::Render(ID3D11DeviceContext* dc)
 {
 	RenderState* renderState = Graphics::Instance().GetRenderState();
 
-	// ”¼“§–¾‚Å•`‚­
+	// åŠé€æ˜ã§æã
 	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
-	// [“x‚ÍŒ©‚È‚¢‚Ì‚Å‘‚©‚È‚¢(í‚É”z—ñ‚Ì‡”Ô’Ê‚è‚É•`‚­)
+	// æ·±åº¦ã¯è¦‹ãªã„ã®ã§æ›¸ã‹ãªã„(å¸¸ã«é…åˆ—ã®é †ç•ªé€šã‚Šã«æã)
 	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::NoTestNoWrite), 0);
-	// <ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒ“ƒvƒ‰[‚ğƒZƒbƒg‚·‚é
+	// <ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚’ã‚»ãƒƒãƒˆã™ã‚‹
 	ID3D11SamplerState* sampler = renderState->GetSamplerState(SamplerState::LinearClamp);
 	dc->PSSetSamplers(0, 1, &sampler);
 
@@ -38,16 +38,16 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 	{
 		if (!e->visible || e->texturePath.empty() || !e->sprite) continue;
 
-		// •\¦ƒTƒCƒY
+		// è¡¨ç¤ºã‚µã‚¤ã‚º
 		float w = e->size.x * e->scale.x;
 		float h = e->size.y * e->scale.y;
 
-		// Šî€“_(‰æ‘œ‚Ì’†‚Ì‚Ç‚±‚©, px)
-		// pivot~•\¦ƒTƒCƒY
+		// åŸºæº–ç‚¹(ç”»åƒã®ä¸­ã®ã©ã“ã‹, px)
+		// pivotÃ—è¡¨ç¤ºã‚µã‚¤ã‚º
 		float px = e->pivot.x * w;
 		float py = e->pivot.y * h;
 
-		// Šî€“_‚ğŒ´“_‚É‚µ‚½4‹÷(¶ãA‰EãA¶‰ºA‰E‰º)
+		// åŸºæº–ç‚¹ã‚’åŸç‚¹ã«ã—ãŸ4éš…(å·¦ä¸Šã€å³ä¸Šã€å·¦ä¸‹ã€å³ä¸‹)
 		DirectX::XMFLOAT2 cornners[4] = {
 			{-px, -py},
 			{w - px, -py},
@@ -55,7 +55,7 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 			{w - px, h - py}
 		};
 
-		// ‰ñ“]¨ˆÊ’u‚ÉˆÚ“®
+		// å›è»¢â†’ä½ç½®ã«ç§»å‹•
 		float theta = DirectX::XMConvertToRadians(e->rotation);
 		float c = cosf(theta);
 		float s = sinf(theta);
@@ -67,7 +67,7 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 			p.y = ry + e->position.y;
 		}
 
-		// Ø‚è”²‚«”ÍˆÍisw,sh‚ª0‚È‚ç‰æ‘œ‘S‘Ì‚ğg‚¤j
+		// åˆ‡ã‚ŠæŠœãç¯„å›²ï¼ˆsw,shãŒ0ãªã‚‰ç”»åƒå…¨ä½“ã‚’ä½¿ã†ï¼‰
 		DirectX::XMFLOAT4 uv = e->uvRect;
 		if (uv.z <= 0.0f || uv.w <= 0.0f)
 		{
@@ -83,7 +83,7 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 	}
 }
 
-// GUI•`‰æ
+// GUIæç”»
 void UIEditor::DrawGUI()
 {
 	if (selectedIndex >= elements.size())
@@ -91,29 +91,38 @@ void UIEditor::DrawGUI()
 		selectedIndex = 0;
 	}
 
-	ImGui::Begin(u8"UIƒGƒfƒBƒ^[");
+	ImGui::Begin(u8"UIã‚¨ãƒ‡ã‚£ã‚¿ãƒ¼");
 
-	if (ImGui::Button(u8"•Û‘¶"))
+	DrawToolBar();
+	DrawNode();
+	DrawInspector();
+
+	ImGui::End();
+}
+
+void UIEditor::DrawToolBar()
+{
+	if (ImGui::Button(u8"ä¿å­˜"))
 	{
 		char filepath[MAX_PATH] = { 0 };
 		HWND hwnd = Graphics::Instance().GetWindowHandle();
 		if (Dialog::SaveFileName(filepath, MAX_PATH,
-			"JSON File\0*.json\0\0",	// ƒtƒBƒ‹ƒ^[
-			"–¼‘O‚ğ•t‚¯‚Ä•Û‘¶",	// ƒ^ƒCƒgƒ‹
-			"json",// Šg’£q
+			"JSON File\0*.json\0\0",	// ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼
+			"åå‰ã‚’ä»˜ã‘ã¦ä¿å­˜",	// ã‚¿ã‚¤ãƒˆãƒ«
+			"json",// æ‹¡å¼µå­
 			hwnd) == DialogResult::OK)
 		{
 			Save(filepath);
 		}
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(u8"“Ç‚İ‚İ"))
+	if (ImGui::Button(u8"èª­ã¿è¾¼ã¿"))
 	{
 		char filepath[MAX_PATH] = { 0 };
 		HWND hwnd = Graphics::Instance().GetWindowHandle();
 		if (Dialog::OpenFileName(filepath, MAX_PATH,
 			"JSON File\0*.json\0\0",
-			"ƒtƒ@ƒCƒ‹‚ğŠJ‚­",
+			"ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‹ã",
 			hwnd) == DialogResult::OK)
 		{
 			Load(filepath);
@@ -121,16 +130,16 @@ void UIEditor::DrawGUI()
 	}
 	ImGui::Separator();
 
-	if (ImGui::Button(u8"+ UI’Ç‰Á"))
+	if (ImGui::Button(u8"+ UIè¿½åŠ "))
 	{
 		AddElement();
 	}
 	ImGui::SameLine();
 
-	// 1ŒÂ‚µ‚©‚È‚¢‚Æ‚«‚Ííœ‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
+	// 1å€‹ã—ã‹ãªã„ã¨ãã¯å‰Šé™¤ã§ããªã„ã‚ˆã†ã«ã™ã‚‹
 	if (elements.size() > 1)
 	{
-		if (ImGui::Button(u8"- ‘I‘ğUI‚ğíœ"))
+		if (ImGui::Button(u8"- é¸æŠUIã‚’å‰Šé™¤"))
 		{
 			elements.erase(elements.begin() + selectedIndex);
 			if (selectedIndex >= 0 && selectedIndex < static_cast<int>(elements.size()))
@@ -140,36 +149,91 @@ void UIEditor::DrawGUI()
 		}
 	}
 	ImGui::Separator();
+}
 
-
-	// UIˆê——
-	for (int i = 0; i < elements.size(); i++)
+void UIEditor::DrawNode()
+{
+	// æ ä»˜ãã®é ˜åŸŸ
+	ImGui::BeginChild("UIList", ImVec2(0, 200), true);
 	{
-		auto& e = elements[i];
-		bool isSelected = (selectedIndex == i);
+		int pendingMoveFrom = -1;
+		int pendingMoveTo = -1;
 
-		ImGui::PushID(i); // ID”í‚è–h~
+		// UIä¸€è¦§
+		ImGui::Text(u8"UIä¸€è¦§");
 
-		if (ImGui::Selectable(e->name.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick))
+		for (int i = 0; i < static_cast<int>(elements.size()); i++)
 		{
-			selectedIndex = i;
-		}
-		ImGui::PopID();
-	}
-	ImGui::Separator();
+			auto& e = elements[i];
+			bool isSelected = (selectedIndex == i);
 
-	// ‘I‘ğ‚ª‰Â”\‚È‚¾‚¯•ÒWUI‚ğ•`‚­
+			ImGui::PushID(i); // IDè¢«ã‚Šé˜²æ­¢
+
+			// ç›®ç‰(è¡¨ç¤º/éè¡¨ç¤ºã®åˆ‡ã‚Šæ›¿ãˆ)
+			if (ImGui::Button(e->visible ? u8"o" : u8"-", ImVec2(28, 0)))
+			{
+				e->visible = !e->visible;
+			}
+			ImGui::SameLine();
+
+			// åå‰ï¼ˆã‚¯ãƒªãƒƒã‚¯ã§é¸æŠï¼‰ã€‚æ´ã‚€æ‰€ã®å¹…ã¶ã‚“ã ã‘ç©ºã‘ã¦ãŠã
+			float nameWidth = ImGui::GetContentRegionAvail().x - 32;
+			if (ImGui::Selectable(e->name.c_str(), selectedIndex == i, 0, ImVec2(nameWidth, 0)))
+			{
+				selectedIndex = i;
+			}
+
+			// é›¢ã™å´
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("UI_ELEMENT"))
+				{
+					int from = *static_cast<const int*>(payload->Data);
+					pendingMoveFrom = from; // äºˆç´„ã‚’ã™ã‚‹
+					pendingMoveTo = i;
+				}
+				ImGui::EndDragDropTarget();
+			}
+			ImGui::SameLine();
+
+			// æ´ã‚€å´
+			ImGui::Button(u8"=", ImVec2(28, 0));
+			if (ImGui::BeginDragDropSource())
+			{
+				//æ´ã‚“ã IDã‚’æ¸¡ã™
+				ImGui::SetDragDropPayload("UI_ELEMENT", &i, sizeof(int));
+				ImGui::Text(u8"%s", elements[i]->name.c_str());
+				ImGui::EndDragDropSource();
+
+			}
+
+			ImGui::PopID();
+			ImGui::Separator();
+		}
+
+		// ãƒ«ãƒ¼ãƒ—ã®å¤–ã§å‹•ã‹ã•ãªã„ã¨æç”»ãŒãŠã‹ã—ããªã£ãŸã‚Šã€ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã—ãŸã‚Šã™ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§ãƒ«ãƒ¼ãƒ—å¤–ã§å‹•ã‹ã™
+		if (pendingMoveFrom >= 0)
+		{
+			MoveElement(pendingMoveFrom, pendingMoveTo);
+		}
+	}
+	ImGui::EndChild();
+}
+
+void UIEditor::DrawInspector()
+{
+	// é¸æŠãŒå¯èƒ½ãªæ™‚ã ã‘ç·¨é›†UIã‚’æã
 	if (selectedIndex >= 0 && selectedIndex < static_cast<int>(elements.size()))
 	{
 		UIElement& selectedElement = *elements[selectedIndex];
 
-		if (ImGui::Button(u8"ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ"))
+		if (ImGui::Button(u8"ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿"))
 		{
 			char filePath[MAX_PATH] = { 0 };
 			HWND hwnd = Graphics::Instance().GetWindowHandle();
 			if (Dialog::OpenFileName(filePath, MAX_PATH,
 				"PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
-				"ƒeƒNƒXƒ`ƒƒ‘I‘ğ",
+				"ãƒ†ã‚¯ã‚¹ãƒãƒ£é¸æŠ",
 				hwnd) == DialogResult::OK)
 			{
 				std::string pathStr = filePath;
@@ -185,35 +249,33 @@ void UIEditor::DrawGUI()
 		ImGui::Separator();
 
 
-		ImGui::Checkbox(selectedElement.visible ? u8"•\¦" : u8"”ñ•\¦", &selectedElement.visible);
+		ImGui::Checkbox(selectedElement.visible ? u8"è¡¨ç¤º" : u8"éè¡¨ç¤º", &selectedElement.visible);
 		char nameBuffer[128];
 		strcpy_s(nameBuffer, selectedElement.name.c_str());
-		if (ImGui::InputText(u8"UI–¼", nameBuffer, sizeof(nameBuffer)))
+		if (ImGui::InputText(u8"UIå", nameBuffer, sizeof(nameBuffer)))
 		{
 			selectedElement.name = nameBuffer;
 		}
 		ImGui::Separator();
 
 
-		ImGui::DragFloat2(u8"Šî€“_", &selectedElement.pivot.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat2(u8"åŸºæº–ç‚¹", &selectedElement.pivot.x, 0.01f, 0.0f, 1.0f);
 		ImGui::Separator();
 
-		ImGui::DragFloat2(u8"ˆÊ’u", &selectedElement.position.x, 0.1f);
-		ImGui::DragFloat2(u8"‰æ‘œƒTƒCƒY", &selectedElement.size.x, 0.1f);
-		ImGui::DragFloat2(u8"Šg‘å—¦", &selectedElement.scale.x, 0.1f);
-		ImGui::DragFloat(u8"‰ñ“]", &selectedElement.rotation, 0.1f);
-		ImGui::ColorEdit4(u8"F", &selectedElement.color.x);
+		ImGui::DragFloat2(u8"ä½ç½®", &selectedElement.position.x, 0.1f);
+		ImGui::DragFloat2(u8"ç”»åƒã‚µã‚¤ã‚º", &selectedElement.size.x, 0.1f);
+		ImGui::DragFloat2(u8"æ‹¡å¤§ç‡", &selectedElement.scale.x, 0.1f);
+		ImGui::DragFloat(u8"å›è»¢", &selectedElement.rotation, 0.1f);
+		ImGui::ColorEdit4(u8"è‰²", &selectedElement.color.x);
 
 	}
 	else
 	{
-		ImGui::TextDisabled(u8"UI‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+		ImGui::TextDisabled(u8"UIãŒé¸æŠã•ã‚Œã¦ã„ã¾ã›ã‚“");
 	}
-
-	ImGui::End();
 }
 
-// •Û‘¶
+// ä¿å­˜
 void UIEditor::Save(const std::string& path)
 {
 	using json = nlohmann::json;
@@ -247,7 +309,7 @@ void UIEditor::Save(const std::string& path)
 	}
 }
 
-// “Ç‚İ‚İ
+// èª­ã¿è¾¼ã¿
 void UIEditor::Load(const std::string& path)
 {
 	using json = nlohmann::json;
@@ -257,13 +319,13 @@ void UIEditor::Load(const std::string& path)
 	json j;
 	file >> j;
 
-	// ”z—ñ‚ª‘¶İ‚·‚éê‡‘S‚Ä“Ç‚İ‚Ş
+	// é…åˆ—ãŒå­˜åœ¨ã™ã‚‹å ´åˆå…¨ã¦èª­ã¿è¾¼ã‚€
 	if (j.find("UI") != j.end() && j["UI"].is_array())
 	{
-		// Šù‘¶‚ÌElement‚ğíœ‚µ‚ÄƒŠƒZƒbƒgI
+		// æ—¢å­˜ã®Elementã‚’å‰Šé™¤ã—ã¦ãƒªã‚»ãƒƒãƒˆï¼
 		elements.clear();
 
-		for (const auto& je : j["UI"])   // je = —v‘f1ŒÂ•ª‚ÌJSON
+		for (const auto& je : j["UI"])   // je = è¦ç´ 1å€‹åˆ†ã®JSON
 		{
 			auto element = std::make_unique<UIElement>();
 
@@ -277,43 +339,63 @@ void UIEditor::Load(const std::string& path)
 			if (je.find("pivot") != je.end())    element->pivot = { je["pivot"][0], je["pivot"][1] };
 			if (je.find("anchor") != je.end())   element->anchor = { je["anchor"][0], je["anchor"][1] };
 			if (je.find("color") != je.end())    element->color = { je["color"][0], je["color"][1], je["color"][2], je["color"][3] };
-			element->visible = je.value("visible", true);   // © ‰Šú’l‚Í true ‚É
+			element->visible = je.value("visible", true);   // â† åˆæœŸå€¤ã¯ true ã«
 
-			// ƒeƒNƒXƒ`ƒƒ‚ğ“Ç‚İ’¼‚·
+			// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’èª­ã¿ç›´ã™
 			if (!element->texturePath.empty())
 			{
 				element->sprite = std::make_shared<Sprite>(device, element->texturePath.c_str());
 			}
 
-			elements.emplace_back(std::move(element));   // © ”z—ñ‚É“ü‚ê‚é
+			elements.emplace_back(std::move(element));   // â† é…åˆ—ã«å…¥ã‚Œã‚‹
 		}
 
-		selectedIndex = elements.empty() ? -1 : 0;   // © ‘I‘ğ‚à–ß‚·
+		selectedIndex = elements.empty() ? -1 : 0;   // â† é¸æŠã‚‚æˆ»ã™
 	}
 }
 
-// UI’Ç‰Á
+// UIè¿½åŠ 
 UIElement* UIEditor::AddElement()
 {
 	auto e = std::make_unique<UIElement>();
 	e->name = "Element" + std::to_string(elements.size() + 1);
-	e->position = { 960.0f, 540.0f }; // ‰æ–Ê’†‰›
+	e->position = { 960.0f, 540.0f }; // ç”»é¢ä¸­å¤®
 
-	// ƒIƒuƒWƒFƒNƒg‚ÌŠ—LŒ ‚ğˆÚ“®‚³‚¹‚Ä––”ö‚É’Ç‰Á‚·‚é
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ‰€æœ‰æ¨©ã‚’ç§»å‹•ã•ã›ã¦æœ«å°¾ã«è¿½åŠ ã™ã‚‹
 	elements.emplace_back(std::move(e));
 	selectedIndex = static_cast<int>(elements.size() - 1);
 	return elements.back().get();
 }
 
-// ƒeƒNƒXƒ`ƒƒİ’è
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£è¨­å®š
 void UIEditor::SetTexture(UIElement& e, const std::string& path)
 {
 	e.texturePath = path;
 
-	// ƒLƒƒƒbƒVƒ…Ï‚İ‚È‚ç‚»‚ê‚ğg‚¢‰ñ‚·
+	// ã‚­ãƒ£ãƒƒã‚·ãƒ¥æ¸ˆã¿ãªã‚‰ãã‚Œã‚’ä½¿ã„å›ã™
 	auto srv = TextureResourceManager::Instance().GetOrLoad(device, path);
 	e.sprite = std::make_shared<Sprite>(device, srv);
 
 	DirectX::XMFLOAT2 texSize = e.sprite->GetTextureSize();
-	e.size = texSize; // ‰æ‘œ‚ÌƒTƒCƒY‚Å•\¦‚·‚é
+	e.size = texSize; // ç”»åƒã®ã‚µã‚¤ã‚ºã§è¡¨ç¤ºã™ã‚‹
+}
+
+// Elementã®ç§»å‹•
+void UIEditor::MoveElement(int from, int to)
+{
+	if (from == to)return;
+	if (from < 0 || from >= static_cast<int>(elements.size()))return;
+	if (to < 0 || to >= static_cast<int>(elements.size()))return;
+
+	// ä¸­èº«ã‚’å–ã‚Šå‡ºã™(å–ã‚Šå‡ºã—ãŸå¾Œã®elemens[from]ã¯ç©ºã«ãªã‚‹)
+	auto moved = std::move(elements[from]);
+
+	// ç©ºã«ãªã£ãŸç®±ã‚’é…åˆ—ã‹ã‚‰å–ã‚Šé™¤ã
+	elements.erase(elements.begin() + from);
+
+	// å¾Œã‚ã‹ã‚‰å‰ã«å‹•ã‹ã—ãŸå ´åˆã€eraseã§ç•ªå·ãŒãšã‚Œã¦ã„ã‚‹
+	if (from < to) to--;
+
+	// ç›®çš„ã®ä½ç½®ã«å…¥ã‚Œç›´ã™
+	elements.insert(elements.begin() + to, std::move(moved));
 }

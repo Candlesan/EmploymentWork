@@ -9,44 +9,6 @@
                 1.0,
                 1.0,
                 1.0,
-                1.0
-            ],
-            "name": "歩くテクスチャ",
-            "pivot": [
-                0.5,
-                0.5
-            ],
-            "position": [
-                629.2999877929688,
-                540.0
-            ],
-            "rotation": 0.0,
-            "scale": [
-                1.0,
-                1.0
-            ],
-            "size": [
-                100.0,
-                100.0
-            ],
-            "texturePath": "Data\\Sprite\\Texture\\aruki.png",
-            "uvRect": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "visible": true
-        },
-        {
-            "anchor": [
-                0.5,
-                0.5
-            ],
-            "color": [
-                1.0,
-                1.0,
-                1.0,
                 0.9960784316062927
             ],
             "name": "激おこハム",
@@ -68,6 +30,82 @@
                 938.0
             ],
             "texturePath": "Data\\Sprite\\Texture\\20250724_001838.jpg",
+            "uvRect": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "visible": true
+        },
+        {
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "歩くテクスチャ",
+            "pivot": [
+                0.5,
+                0.5
+            ],
+            "position": [
+                757.5999755859375,
+                540.0
+            ],
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "size": [
+                109.19999694824219,
+                100.0
+            ],
+            "texturePath": "Data\\Sprite\\Texture\\aruki.png",
+            "uvRect": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "visible": true
+        },
+        {
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "Element3",
+            "pivot": [
+                0.5,
+                0.5
+            ],
+            "position": [
+                960.0,
+                540.0
+            ],
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "size": [
+                225.0,
+                225.0
+            ],
+            "texturePath": "Data\\Sprite\\Texture\\aruki.png",
             "uvRect": [
                 0.0,
                 0.0,
