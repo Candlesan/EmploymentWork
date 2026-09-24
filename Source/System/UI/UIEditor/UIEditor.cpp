@@ -115,7 +115,7 @@ void UIEditor::DrawGUI()
 	{
 		AddElement();
 	}
-	ImGui::Separator();
+	ImGui::SameLine();
 
 	// 1ŒÂ‚µ‚©‚È‚¢‚Æ‚«‚Ííœ‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚é
 	if (elements.size() > 1)
@@ -170,6 +170,8 @@ void UIEditor::DrawGUI()
 			}
 
 		}
+		ImGui::SameLine();
+		ImGui::Text(u8": %s", selectedElement.texturePath.c_str());
 		ImGui::Separator();
 
 

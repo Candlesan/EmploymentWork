@@ -214,7 +214,6 @@ void SceneGame::Render()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 	RenderState* renderState = Graphics::Instance().GetRenderState();
-	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
 	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
 	ShapeRenderer* shapeRenderer = Graphics::Instance().GetShapeRenderer();
 
@@ -287,38 +286,31 @@ void SceneGame::Render()
 		framebuffers[0]->clear(dc);
 		framebuffers[0]->activate(dc);
 
-		// ステージ描画
-		stage->Render(rc, modelRenderer);
-
-		// プレイヤー描画
-		player.Render(rc, modelRenderer);
-
-		// エネミー描画
-		enemy->Render(rc, modelRenderer);
+		// ===== モデル =====
+		stage->Render(rc, modelRenderer); // ステージ描画
+		player.Render(rc, modelRenderer); // プレイヤー描画
+		enemy->Render(rc, modelRenderer); // エネミー描画		
 
 		// 全モデル描画
-		modelRenderer->Render(rc);
+		modelRenderer->Render(rc); 
 
-		// スカイマップ描画
-		skyMap->Draw(rc);
 
-		// エフェクト描画 
+		// ===== シェーダー =====
+		
+		skyMap->Draw(rc); // スカイマップ描画
+
+		// エフェクト描画 (Effekseer)
 		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
 
-		// エフェクト描画
+		// エフェクト描画 (自作エフェクトエディター)
 		effectEditor->Render(rc, modelRenderer);
-
-		// 自作エフェクトマネージャー描画
-		CustomEffectManager::Instance().Render(rc);
-
-		// メッシュVFX描画
 		effectEditor->RenderMeshVFX(modelRenderer);
 
-		// 自作エフェクトマネージャーのメッシュVFX描画
+		// エフェクト描画 (ゲーム実行時)
+		CustomEffectManager::Instance().Render(rc);
 		CustomEffectManager::Instance().RenderMeshVFX(modelRenderer);
 
-		modelRenderer->Render(rc);
-
+		// シェイプ描画
 		if (showDebugPrimitive)
 		{
 			shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
@@ -329,6 +321,7 @@ void SceneGame::Render()
 		// ブルーム描画
 		bloomer->make(dc, framebuffers[0]->shader_resource_views[0].Get(), renderState);
 
+		// ブルーム設定
 		ID3D11ShaderResourceView* shader_resource_views[] =
 		{
 			framebuffers[0]->shader_resource_views[0].Get(),
@@ -342,10 +335,6 @@ void SceneGame::Render()
 
 		bloomer->set_constant_buffer(dc);
 		bit_block_transfer->blit(dc, shader_resource_views, 0, 2, pixel_shaders[0].Get());
-
-		// プリミティブ描画
-		primitiveRenderer->Render(dc, camera.GetView(), camera.GetProjection(),
-			D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	}
 
 	// 2Dスプライト描画
@@ -359,8 +348,6 @@ void SceneGame::RenderShadowMap()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 	RenderState* renderState = Graphics::Instance().GetRenderState();
-	PrimitiveRenderer* primitiveRenderer = Graphics::Instance().GetPrimitiveRenderer();
-	ShapeRenderer* shapeRenderer = Graphics::Instance().GetShapeRenderer();
 	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	Graphics& graphics = Graphics::Instance();
