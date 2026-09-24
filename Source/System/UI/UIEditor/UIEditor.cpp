@@ -248,8 +248,6 @@ void UIEditor::DrawInspector()
 		ImGui::Text(u8": %s", selectedElement.texturePath.c_str());
 		ImGui::Separator();
 
-
-		ImGui::Checkbox(selectedElement.visible ? u8"表示" : u8"非表示", &selectedElement.visible);
 		char nameBuffer[128];
 		strcpy_s(nameBuffer, selectedElement.name.c_str());
 		if (ImGui::InputText(u8"UI名", nameBuffer, sizeof(nameBuffer)))
