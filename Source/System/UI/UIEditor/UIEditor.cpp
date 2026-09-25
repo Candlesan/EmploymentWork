@@ -46,13 +46,31 @@ void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 	// 非表示なら子も含めて描かない
 	if (!e->visible) return;
 
+	// 親の四角形の中のanhcorの位置
+	DirectX::XMFLOAT2 anchorPos;
+	if (e->parent)
+	{
+		// 親の(0,0)は親のpivotの位置なので、pivotからの距離にする
+		anchorPos.x = (e->anchor.x - e->parent->pivot.x) * e->parent->size.x;
+		anchorPos.y = (e->anchor.y - e->parent->pivot.y) * e->parent->size.y;
+	}
+	else
+	{
+		// ルートの親はCanvas(左上(0,0))
+		anchorPos.x = e->anchor.x * canvas.referenceResolution.x;
+		anchorPos.y = e->anchor.y * canvas.referenceResolution.y;
+	}
+
 	// ローカル行列を作る
 	DirectX::XMMATRIX Scale = DirectX::XMMatrixScaling(e->scale.x, e->scale.y, 1.0f);
 	DirectX::XMMATRIX Angle = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(e->rotation)); // Z軸しか2Dは回転しやんからXMMatrixRotationZ
-	DirectX::XMMATRIX Position = DirectX::XMMatrixTranslation(e->position.x, e->position.y, 0.0f);
+	DirectX::XMMATRIX Position = DirectX::XMMatrixTranslation(
+		anchorPos.x + e->position.x,
+		anchorPos.y + e->position.y,
+		0.0f
+	);
 	DirectX::XMMATRIX world = Scale * Angle * Position * parentWorld;
 	DirectX::XMStoreFloat4x4(&e->worldMatrix, world);
-
 
 	if (!e->texturePath.empty() && e->sprite)
 	{
@@ -289,8 +307,10 @@ void UIEditor::DrawInspector()
 		}
 		ImGui::Separator();
 
+		ImGui::DragFloat2(u8"anchor", &selectedElement.anchor.x, 0.01f, 0.0f, 1.0f);
+		ImGui::Separator();
 
-		ImGui::DragFloat2(u8"基準点", &selectedElement.pivot.x, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat2(u8"Pivot", &selectedElement.pivot.x, 0.01f, 0.0f, 1.0f);
 		ImGui::Separator();
 
 		ImGui::DragFloat2(u8"位置", &selectedElement.position.x, 0.1f);

@@ -25,7 +25,7 @@ struct UIElement
 	DirectX::XMFLOAT2 size = { 100.0f, 100.0f };			// 拡大(幅・高さ)
 	DirectX::XMFLOAT2 scale = { 1.0f, 1.0f };				// 拡大率
 	DirectX::XMFLOAT2 pivot = { 0.5f, 0.5f };				// 自分の中で回転・拡大の中心となる点
-	DirectX::XMFLOAT2 anchor = { 0.5f, 0.5f };				// 親の四角形のどこを基準のするか
+	DirectX::XMFLOAT2 anchor = { 0.0f, 0.0f };				// 親の四角形のどこを基準のするか
 
 	// Color
 	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };	// 色
