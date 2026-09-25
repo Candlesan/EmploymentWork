@@ -1,5 +1,6 @@
 #pragma once
 #include "System/UI/Dialog/Dialog.h"
+#include "json.hpp"
 
 #include <string>
 #include <vector>
@@ -10,6 +11,8 @@
 // 前方宣言
 class Sprite;
 
+
+// UIの要素
 struct UIElement
 {
 	std::string name = "name";			// UI名(Findとかで探すよう)
@@ -40,6 +43,13 @@ struct UIElement
 	std::shared_ptr<Sprite> sprite;
 };
 
+// キャンバス
+struct Canvas
+{
+	DirectX::XMFLOAT2 referenceResolution = { 1920.0f, 1080.0f }; // 基準解像度
+	std::vector<std::unique_ptr<UIElement>> elements;
+};
+
 class UIEditor
 {
 public:
@@ -54,31 +64,42 @@ public:
 
 	// 描画処理
 	void Render(ID3D11DeviceContext* dc);
+	void RenderElement(ID3D11DeviceContext* dc, UIElement* e, const DirectX::XMMATRIX& parentWorld, const DirectX::XMFLOAT4& parentColor);
 
 	// GUI描画
 	void DrawGUI();
 
-private:
+private: // 見た目の部分
 	void DrawToolBar();
 	void DrawNode();
+	void DrawTreeNode(UIElement* e);
 	void DrawInspector();
+
 private:
 	// 保存
 	void Save(const std::string& path);
+	nlohmann::json SaveElement(const UIElement* e);
 
 	// 読み込み
 	void Load(const std::string& path);
+	std::unique_ptr<UIElement> LoadElement(const nlohmann::json& je, UIElement* parent);
 
 	// UI追加
 	UIElement* AddElement();
+
+	// 子を追加
+	UIElement* AddChild(UIElement* parent);
 
 	// テクスチャ設定
 	void SetTexture(UIElement& e, const std::string& path);
 
 	// Elementの移動
-	void MoveElement(int from, int to);
+	void MoveElement(UIElement* e, int direction);
+
+	// 要素が入っている配列(兄弟の配列)を返す
+	std::vector<std::unique_ptr<UIElement>>& GetSiblings(UIElement* e);
 private:
-	std::vector<std::unique_ptr<UIElement>> elements;
-	ID3D11Device* device = nullptr;
-	int selectedIndex = -1; // 選択中のUI(-1は未選択)
+	ID3D11Device* device = nullptr; // デバイス保存用変数
+	Canvas canvas; // 編集中のUI
+	UIElement* selected = nullptr; // 選択中のUI(未選択はnullptr)
 };

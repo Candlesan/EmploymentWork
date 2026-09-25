@@ -1,93 +1,18 @@
 {
-    "UI": [
+    "elements": [
         {
             "anchor": [
                 0.5,
                 0.5
             ],
+            "children": [],
             "color": [
                 1.0,
                 1.0,
-                1.0,
-                0.9960784316062927
-            ],
-            "name": "激おこハム",
-            "pivot": [
-                0.5,
-                0.5
-            ],
-            "position": [
-                1292.300048828125,
-                540.0
-            ],
-            "rotation": 0.0,
-            "scale": [
-                1.0,
+                0.2705882489681244,
                 1.0
             ],
-            "size": [
-                1202.0,
-                938.0
-            ],
-            "texturePath": "Data\\Sprite\\Texture\\20250724_001838.jpg",
-            "uvRect": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "visible": true
-        },
-        {
-            "anchor": [
-                0.5,
-                0.5
-            ],
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "name": "歩くテクスチャ",
-            "pivot": [
-                0.5,
-                0.5
-            ],
-            "position": [
-                757.5999755859375,
-                540.0
-            ],
-            "rotation": 0.0,
-            "scale": [
-                1.0,
-                1.0
-            ],
-            "size": [
-                109.19999694824219,
-                100.0
-            ],
-            "texturePath": "Data\\Sprite\\Texture\\aruki.png",
-            "uvRect": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "visible": true
-        },
-        {
-            "anchor": [
-                0.5,
-                0.5
-            ],
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "name": "Element3",
+            "name": "歩き２",
             "pivot": [
                 0.5,
                 0.5
@@ -113,6 +38,167 @@
                 0.0
             ],
             "visible": true
+        },
+        {
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "children": [],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "激おこハム",
+            "pivot": [
+                0.5,
+                0.5
+            ],
+            "position": [
+                960.0,
+                540.0
+            ],
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "size": [
+                1202.0,
+                938.0
+            ],
+            "texturePath": "Data\\Sprite\\Texture\\20250724_001838.jpg",
+            "uvRect": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "visible": true
+        },
+        {
+            "anchor": [
+                0.5,
+                0.5
+            ],
+            "children": [
+                {
+                    "anchor": [
+                        0.5,
+                        0.5
+                    ],
+                    "children": [],
+                    "color": [
+                        1.0,
+                        0.3921568691730499,
+                        0.14509804546833038,
+                        1.0
+                    ],
+                    "name": "child1",
+                    "pivot": [
+                        0.5,
+                        0.5
+                    ],
+                    "position": [
+                        175.60000610351563,
+                        0.0
+                    ],
+                    "rotation": 52.900001525878906,
+                    "scale": [
+                        0.5,
+                        1.2000000476837158
+                    ],
+                    "size": [
+                        225.0,
+                        225.0
+                    ],
+                    "texturePath": "Data\\Sprite\\Texture\\aruki.png",
+                    "uvRect": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "visible": true
+                },
+                {
+                    "anchor": [
+                        0.5,
+                        0.5
+                    ],
+                    "children": [],
+                    "color": [
+                        0.0,
+                        0.0,
+                        1.0,
+                        1.0
+                    ],
+                    "name": "child2",
+                    "pivot": [
+                        0.5,
+                        0.5
+                    ],
+                    "position": [
+                        -175.60000610351563,
+                        0.0
+                    ],
+                    "rotation": 0.0,
+                    "scale": [
+                        0.5,
+                        0.5
+                    ],
+                    "size": [
+                        225.0,
+                        225.0
+                    ],
+                    "texturePath": "Data\\Sprite\\Texture\\aruki.png",
+                    "uvRect": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "visible": true
+                }
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "歩く１",
+            "pivot": [
+                0.5,
+                0.5
+            ],
+            "position": [
+                960.0,
+                540.0
+            ],
+            "rotation": -11.399999618530273,
+            "scale": [
+                1.2999999523162842,
+                1.0
+            ],
+            "size": [
+                225.0,
+                225.0
+            ],
+            "texturePath": "Data\\Sprite\\Texture\\aruki.png",
+            "uvRect": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "visible": true
         }
+    ],
+    "referenceResolution": [
+        1920.0,
+        1080.0
     ]
 }

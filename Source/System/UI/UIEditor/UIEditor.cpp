@@ -3,10 +3,10 @@
 #include "System/Resource/Sprite/Sprite.h"
 #include "System/UI/Dialog/Dialog.h"
 #include "System/Resource/TextureResourceManager/TextureResourceManager.h"
-#include "json.hpp"
 
 #include <imgui.h>
 #include <fstream>
+#include <algorithm>
 
 
 // 初期化
@@ -34,13 +34,31 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 	ID3D11SamplerState* sampler = renderState->GetSamplerState(SamplerState::LinearClamp);
 	dc->PSSetSamplers(0, 1, &sampler);
 
-	for (auto& e : elements)
+	for (auto& e : canvas.elements)
 	{
-		if (!e->visible || e->texturePath.empty() || !e->sprite) continue;
+		// eは今処理をしている自分
+		RenderElement(dc, e.get(), DirectX::XMMatrixIdentity(), {1, 1, 1, 1});
+	}
+}
 
+void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const DirectX::XMMATRIX& parentWorld, const DirectX::XMFLOAT4& parentColor)
+{
+	// 非表示なら子も含めて描かない
+	if (!e->visible) return;
+
+	// ローカル行列を作る
+	DirectX::XMMATRIX Scale = DirectX::XMMatrixScaling(e->scale.x, e->scale.y, 1.0f);
+	DirectX::XMMATRIX Angle = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(e->rotation)); // Z軸しか2Dは回転しやんからXMMatrixRotationZ
+	DirectX::XMMATRIX Position = DirectX::XMMatrixTranslation(e->position.x, e->position.y, 0.0f);
+	DirectX::XMMATRIX world = Scale * Angle * Position * parentWorld;
+	DirectX::XMStoreFloat4x4(&e->worldMatrix, world);
+
+
+	if (!e->texturePath.empty() && e->sprite)
+	{
 		// 表示サイズ
-		float w = e->size.x * e->scale.x;
-		float h = e->size.y * e->scale.y;
+		float w = e->size.x;
+		float h = e->size.y;
 
 		// 基準点(画像の中のどこか, px)
 		// pivot×表示サイズ
@@ -55,16 +73,12 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 			{w - px, h - py}
 		};
 
-		// 回転→位置に移動
-		float theta = DirectX::XMConvertToRadians(e->rotation);
-		float c = cosf(theta);
-		float s = sinf(theta);
+		// 4隅をワールド行列で変換（回転・拡大・移動が全部かかる）
 		for (auto& p : cornners)
 		{
-			float rx = c * p.x - s * p.y;
-			float ry = s * p.x + c * p.y;
-			p.x = rx + e->position.x;
-			p.y = ry + e->position.y;
+			DirectX::XMVECTOR v = DirectX::XMLoadFloat2(&p);
+			v = DirectX::XMVector2TransformCoord(v, world);
+			DirectX::XMStoreFloat2(&p, v);
 		}
 
 		// 切り抜き範囲（sw,shが0なら画像全体を使う）
@@ -75,22 +89,31 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 			uv = { 0.0f, 0.0f, texSize.x, texSize.y };
 		}
 
+		e->worldColor = {
+			parentColor.x * e->color.x,
+			parentColor.y * e->color.y,
+			parentColor.z * e->color.z,
+			parentColor.w * e->color.w
+		};
+
 		e->sprite->Render(dc,
 			cornners,
 			0.0f,
 			uv.x, uv.y, uv.z, uv.w,
-			e->color);
+			e->worldColor);
+	}
+
+	// 子を描く(自分の後に描くので子が手前に出る)
+	for (auto& child : e->children)
+	{
+		RenderElement(dc, child.get(), world, e->worldColor);
 	}
 }
+
 
 // GUI描画
 void UIEditor::DrawGUI()
 {
-	if (selectedIndex >= elements.size())
-	{
-		selectedIndex = 0;
-	}
-
 	ImGui::Begin(u8"UIエディター");
 
 	DrawToolBar();
@@ -132,19 +155,31 @@ void UIEditor::DrawToolBar()
 
 	if (ImGui::Button(u8"+ UI追加"))
 	{
-		AddElement();
+		selected = AddElement();
 	}
 	ImGui::SameLine();
+	if (ImGui::Button(u8"+ 子を追加"))
+	{
+		if(selected)
+		selected = AddChild(selected);
+	}
 
 	// 1個しかないときは削除できないようにする
-	if (elements.size() > 1)
+	if (selected && (selected->parent || canvas.elements.size() > 1))
 	{
 		if (ImGui::Button(u8"- 選択UIを削除"))
 		{
-			elements.erase(elements.begin() + selectedIndex);
-			if (selectedIndex >= 0 && selectedIndex < static_cast<int>(elements.size()))
+			auto& siblings = GetSiblings(selected);
+
+			// selectedと同じものを探す
+			auto it = std::find_if(siblings.begin(), siblings.end(),
+				[this](const std::unique_ptr<UIElement>& e) {return e.get() == selected; });
+
+			// 見つかったらその要素を消す
+			if (it != siblings.end())
 			{
-				selectedIndex = static_cast<int>(elements.size()) - 1;
+				siblings.erase(it);
+				selected = nullptr; // 消した要素の場所をnullptrにしておく
 			}
 		}
 	}
@@ -153,79 +188,77 @@ void UIEditor::DrawToolBar()
 
 void UIEditor::DrawNode()
 {
+	// UI一覧
+	ImGui::Text(u8"UI一覧");
+
+	// 並び変えボタン
+
+	auto it = std::find_if(canvas.elements.begin(), canvas.elements.end(),
+		[this](const std::unique_ptr<UIElement>& e) {return e.get() == selected; });
+
+	if (ImGui::Button(u8"UIを奥へ"))
+	{
+		if (selected) MoveElement(selected, -1);
+	}
+	ImGui::SameLine();
+
+	if (ImGui::Button(u8"UIを手前へ"))
+	{
+		if (selected) MoveElement(selected, +1);
+	}
+
 	// 枠付きの領域
 	ImGui::BeginChild("UIList", ImVec2(0, 200), true);
 	{
-		int pendingMoveFrom = -1;
-		int pendingMoveTo = -1;
-
-		// UI一覧
-		ImGui::Text(u8"UI一覧");
-
-		for (int i = 0; i < static_cast<int>(elements.size()); i++)
+		for (auto& e : canvas.elements)
 		{
-			auto& e = elements[i];
-			bool isSelected = (selectedIndex == i);
-
-			ImGui::PushID(i); // ID被り防止
-
-			// 目玉(表示/非表示の切り替え)
-			if (ImGui::Button(e->visible ? u8"o" : u8"-", ImVec2(28, 0)))
-			{
-				e->visible = !e->visible;
-			}
-			ImGui::SameLine();
-
-			// 名前（クリックで選択）。掴む所の幅ぶんだけ空けておく
-			float nameWidth = ImGui::GetContentRegionAvail().x - 32;
-			if (ImGui::Selectable(e->name.c_str(), selectedIndex == i, 0, ImVec2(nameWidth, 0)))
-			{
-				selectedIndex = i;
-			}
-
-			// 離す側
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("UI_ELEMENT"))
-				{
-					int from = *static_cast<const int*>(payload->Data);
-					pendingMoveFrom = from; // 予約をする
-					pendingMoveTo = i;
-				}
-				ImGui::EndDragDropTarget();
-			}
-			ImGui::SameLine();
-
-			// 掴む側
-			ImGui::Button(u8"=", ImVec2(28, 0));
-			if (ImGui::BeginDragDropSource())
-			{
-				//掴んだIDを渡す
-				ImGui::SetDragDropPayload("UI_ELEMENT", &i, sizeof(int));
-				ImGui::Text(u8"%s", elements[i]->name.c_str());
-				ImGui::EndDragDropSource();
-
-			}
-
-			ImGui::PopID();
-			ImGui::Separator();
-		}
-
-		// ループの外で動かさないと描画がおかしくなったり、クラッシュしたりする可能性があるのでループ外で動かす
-		if (pendingMoveFrom >= 0)
-		{
-			MoveElement(pendingMoveFrom, pendingMoveTo);
+			DrawTreeNode(e.get());
 		}
 	}
 	ImGui::EndChild();
 }
 
+// ツリーの中身
+void UIEditor::DrawTreeNode(UIElement* e)
+{
+	ImGui::PushID(e); // ID被り防止
+
+	// 目玉(表示/非表示の切り替え)
+	if (ImGui::Button(e->visible ? u8"o" : u8"-", ImVec2(28, 0)))
+	{
+		e->visible = !e->visible;
+	}
+	ImGui::SameLine();
+
+	// フラグ
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+	if (e->children.empty()) flags |= ImGuiTreeNodeFlags_Leaf;	// 子がいなければ矢印なし
+	if (selected == e)       flags |= ImGuiTreeNodeFlags_Selected;	// 選択中ならハイライト
+
+	bool open = ImGui::TreeNodeEx(e, flags, "%s", e->name.c_str());
+
+	// クリックで選択(開閉に関係なくTreeNodeExの直後で見る)
+	if (ImGui::IsItemClicked()) selected = e;
+
+	// ツリーを開いていたら子を描く
+	if (open)
+	{
+		for (auto& child : e->children)
+		{
+			DrawTreeNode(child.get());
+		}
+		ImGui::TreePop();
+	}
+
+	ImGui::PopID();
+}
+
 void UIEditor::DrawInspector()
 {
 	// 選択が可能な時だけ編集UIを描く
-	if (selectedIndex >= 0 && selectedIndex < static_cast<int>(elements.size()))
+	if (selected)
 	{
-		UIElement& selectedElement = *elements[selectedIndex];
+		UIElement& selectedElement = *selected;
 
 		if (ImGui::Button(u8"テクスチャ読み込み"))
 		{
@@ -273,31 +306,22 @@ void UIEditor::DrawInspector()
 	}
 }
 
+
 // 保存
 void UIEditor::Save(const std::string& path)
 {
 	using json = nlohmann::json;
 	json j;
-	j["UI"] = json::array();
 
-	for (auto& e : elements)
+	j["referenceResolution"] = { canvas.referenceResolution.x, canvas.referenceResolution.y };
+
+	// 要素
+	j["elements"] = json::array();
+	for (auto& e : canvas.elements)
 	{
-		json element;
-		element["name"] = e->name;
-		element["texturePath"] = e->texturePath;
-		element["uvRect"] = { e->uvRect.x, e->uvRect.y, e->uvRect.z, e->uvRect.w };
-
-		element["position"] = { e->position.x, e->position.y };
-		element["rotation"] = e->rotation;
-		element["size"] = { e->size.x, e->size.y };
-		element["scale"] = { e->scale.x, e->scale.y };
-		element["pivot"] = { e->pivot.x, e->pivot.y };
-		element["anchor"] = { e->anchor.x, e->anchor.y };
-		element["color"] = { e->color.x, e->color.y, e->color.z, e->color.w };
-
-		element["visible"] = e->visible;
-
-		j["UI"].push_back(element);
+		j["elements"].push_back({
+			SaveElement(e.get())
+		});
 	}
 
 	std::ofstream file(path);
@@ -305,6 +329,37 @@ void UIEditor::Save(const std::string& path)
 	{
 		file << j.dump(4, ' ', false, nlohmann::json::error_handler_t::replace);
 	}
+}
+
+// 要素1個分(＋子)をJSONにする
+nlohmann::json UIEditor::SaveElement(const UIElement* e)
+{
+	using json = nlohmann::json;
+
+	// 自分の中身
+	json j = {
+			{"name",e->name},
+			{"texturePath", e->texturePath},
+			{"uvRect", { e->uvRect.x, e->uvRect.y, e->uvRect.z, e->uvRect.w }},
+			{"position", {e->position.x, e->position.y}},
+			{"rotation", e->rotation},
+			{"size", {e->size.x, e->size.y}},
+			{"scale", {e->scale.x, e->scale.y}},
+			{"pivot", {e->pivot.x, e->pivot.y}},
+			{"anchor", {e->anchor.x, e->anchor.y}},
+			{"color", { e->color.x, e->color.y, e->color.z, e->color.w }},
+			{"visible", e->visible},
+
+	};
+
+	// 子は子自身に保存してもらう
+	j["children"] = json::array();
+	for (auto& child : e->children)
+	{
+		j["children"].push_back(SaveElement(child.get()));
+	}
+
+	return j;
 }
 
 // 読み込み
@@ -317,52 +372,79 @@ void UIEditor::Load(const std::string& path)
 	json j;
 	file >> j;
 
+	if (j.find("referenceResolution") != j.end()) canvas.referenceResolution = { j["referenceResolution"][0], j["referenceResolution"][1] };
+
 	// 配列が存在する場合全て読み込む
-	if (j.find("UI") != j.end() && j["UI"].is_array())
+	if (j.find("elements") != j.end() && j["elements"].is_array())
 	{
 		// 既存のElementを削除してリセット！
-		elements.clear();
+		canvas.elements.clear();
+		selected = nullptr;
 
-		for (const auto& je : j["UI"])   // je = 要素1個分のJSON
+		for (const auto& je : j["elements"])   // je = 要素1個分のJSON
 		{
-			auto element = std::make_unique<UIElement>();
-
-			element->name = je.value("name", "");
-			element->texturePath = je.value("texturePath", "");
-			if (je.find("uvRect") != je.end())   element->uvRect = { je["uvRect"][0], je["uvRect"][1], je["uvRect"][2], je["uvRect"][3] };
-			if (je.find("position") != je.end()) element->position = { je["position"][0], je["position"][1] };
-			element->rotation = je.value("rotation", 0.0f);
-			if (je.find("size") != je.end())     element->size = { je["size"][0], je["size"][1] };
-			if (je.find("scale") != je.end())    element->scale = { je["scale"][0], je["scale"][1] };
-			if (je.find("pivot") != je.end())    element->pivot = { je["pivot"][0], je["pivot"][1] };
-			if (je.find("anchor") != je.end())   element->anchor = { je["anchor"][0], je["anchor"][1] };
-			if (je.find("color") != je.end())    element->color = { je["color"][0], je["color"][1], je["color"][2], je["color"][3] };
-			element->visible = je.value("visible", true);   // ← 初期値は true に
-
-			// テクスチャを読み直す
-			if (!element->texturePath.empty())
-			{
-				element->sprite = std::make_shared<Sprite>(device, element->texturePath.c_str());
-			}
-
-			elements.emplace_back(std::move(element));   // ← 配列に入れる
+			// ルートなので親はいない
+			canvas.elements.emplace_back(LoadElement(je, nullptr));
 		}
-
-		selectedIndex = elements.empty() ? -1 : 0;   // ← 選択も戻す
 	}
+}
+
+std::unique_ptr<UIElement> UIEditor::LoadElement(const nlohmann::json& je, UIElement* parent)
+{
+	auto element = std::make_unique<UIElement>();
+	element->parent = parent;
+
+	// 自分自身の中身
+	element->name = je.value("name", "");
+	element->texturePath = je.value("texturePath", "");
+	if (je.find("uvRect") != je.end())   element->uvRect = { je["uvRect"][0], je["uvRect"][1], je["uvRect"][2], je["uvRect"][3] };
+	if (je.find("position") != je.end()) element->position = { je["position"][0], je["position"][1] };
+	element->rotation = je.value("rotation", 0.0f);
+	if (je.find("size") != je.end())     element->size = { je["size"][0], je["size"][1] };
+	if (je.find("scale") != je.end())    element->scale = { je["scale"][0], je["scale"][1] };
+	if (je.find("pivot") != je.end())    element->pivot = { je["pivot"][0], je["pivot"][1] };
+	if (je.find("anchor") != je.end())   element->anchor = { je["anchor"][0], je["anchor"][1] };
+	if (je.find("color") != je.end())    element->color = { je["color"][0], je["color"][1], je["color"][2], je["color"][3] };
+	element->visible = je.value("visible", true);   // ← 初期値は true に
+
+	// テクスチャを読み直す
+	if (!element->texturePath.empty())
+	{
+		element->sprite = std::make_shared<Sprite>(device, element->texturePath.c_str());
+	}
+
+	// 子は子自身に読み込んでもらう
+	if (je.find("children") != je.end() && je["children"].is_array())
+	{
+		for (const auto& jc : je["children"])
+		{
+			element->children.emplace_back(LoadElement(jc, element.get()));
+		}
+	}
+
+	return element;
 }
 
 // UI追加
 UIElement* UIEditor::AddElement()
 {
 	auto e = std::make_unique<UIElement>();
-	e->name = "Element" + std::to_string(elements.size() + 1);
+	e->name = "Element" + std::to_string(canvas.elements.size() + 1);
 	e->position = { 960.0f, 540.0f }; // 画面中央
 
 	// オブジェクトの所有権を移動させて末尾に追加する
-	elements.emplace_back(std::move(e));
-	selectedIndex = static_cast<int>(elements.size() - 1);
-	return elements.back().get();
+	canvas.elements.emplace_back(std::move(e));
+	return canvas.elements.back().get();
+}
+
+UIElement* UIEditor::AddChild(UIElement* parent)
+{
+	auto e = std::make_unique<UIElement>();
+	e->parent = parent;
+	e->name = "child" + std::to_string(parent->children.size() + 1);
+	e->position = { 0.0f, 0.0f };
+	parent->children.emplace_back(std::move(e));
+	return parent->children.back().get();
 }
 
 // テクスチャ設定
@@ -379,21 +461,33 @@ void UIEditor::SetTexture(UIElement& e, const std::string& path)
 }
 
 // Elementの移動
-void UIEditor::MoveElement(int from, int to)
+void UIEditor::MoveElement(UIElement* e, int direction)
 {
-	if (from == to)return;
-	if (from < 0 || from >= static_cast<int>(elements.size()))return;
-	if (to < 0 || to >= static_cast<int>(elements.size()))return;
+	auto& siblings = GetSiblings(e);
+
+	// selectedと同じものを探す
+	auto it = std::find_if(siblings.begin(), siblings.end(),
+		[e](const std::unique_ptr<UIElement>& s) {return s.get() == e; });
+
+	int from = static_cast<int>(it - siblings.begin()); // 移動元
+	int to = from + direction; // 移動先
+	if (to < 0 || to >= static_cast<int>(siblings.size()))return;
 
 	// 中身を取り出す(取り出した後のelemens[from]は空になる)
-	auto moved = std::move(elements[from]);
+	auto moved = std::move(siblings[from]);
 
 	// 空になった箱を配列から取り除く
-	elements.erase(elements.begin() + from);
-
-	// 後ろから前に動かした場合、eraseで番号がずれている
-	if (from < to) to--;
+	canvas.elements.erase(siblings.begin() + from);
 
 	// 目的の位置に入れ直す
-	elements.insert(elements.begin() + to, std::move(moved));
+	canvas.elements.insert(siblings.begin() + to, std::move(moved));
+}
+
+// 要素が入っている配列(兄弟の配列)を返す
+std::vector<std::unique_ptr<UIElement>>& UIEditor::GetSiblings(UIElement* e)
+{
+	if (e->parent)
+		return e->parent->children; // 親がいれば親の子の配列
+	else
+		return canvas.elements; // いなければルートの配列
 }
