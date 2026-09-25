@@ -450,7 +450,7 @@ UIElement* UIEditor::AddElement()
 {
 	auto e = std::make_unique<UIElement>();
 	e->name = "Element" + std::to_string(canvas.elements.size() + 1);
-	e->position = { 960.0f, 540.0f }; // 画面中央
+	e->position = { 0.0f, 0.0f }; // 画面中央
 
 	// オブジェクトの所有権を移動させて末尾に追加する
 	canvas.elements.emplace_back(std::move(e));
