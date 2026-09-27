@@ -18,7 +18,26 @@ void UIEditor::Initialize(ID3D11Device* device)
 // 更新処理
 void UIEditor::Update(float elapsedTime)
 {
+	for (auto& e : canvas.elements)
+	{
+		UpdateElement(e.get(), elapsedTime);
+	}
+}
+void UIEditor::UpdateElement(UIElement* e, float elapsedTime)
+{
+	// 自分自身を更新
+	if (e->fade.playing)
+	{
+		e->fade.Update(elapsedTime);
+		e->fadeAlpha = e->fade.GetValue();
+	}
+	
 
+	// 子を更新する
+	for (auto& child : e->children)
+	{
+		UpdateElement(child.get(), elapsedTime);
+	}
 }
 
 // 描画処理
@@ -40,7 +59,6 @@ void UIEditor::Render(ID3D11DeviceContext* dc)
 		RenderElement(dc, e.get(), DirectX::XMMatrixIdentity(), {1, 1, 1, 1});
 	}
 }
-
 void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const DirectX::XMMATRIX& parentWorld, const DirectX::XMFLOAT4& parentColor)
 {
 	// 非表示なら子も含めて描かない
@@ -111,7 +129,7 @@ void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 			parentColor.x * e->color.x,
 			parentColor.y * e->color.y,
 			parentColor.z * e->color.z,
-			parentColor.w * e->color.w
+			parentColor.w * e->color.w * e->fadeAlpha
 		};
 
 		e->sprite->Render(dc,
@@ -140,7 +158,6 @@ void UIEditor::DrawGUI()
 
 	ImGui::End();
 }
-
 void UIEditor::DrawToolBar()
 {
 	if (ImGui::Button(u8"保存"))
@@ -203,7 +220,6 @@ void UIEditor::DrawToolBar()
 	}
 	ImGui::Separator();
 }
-
 void UIEditor::DrawNode()
 {
 	// UI一覧
@@ -235,8 +251,6 @@ void UIEditor::DrawNode()
 	}
 	ImGui::EndChild();
 }
-
-// ツリーの中身
 void UIEditor::DrawTreeNode(UIElement* e)
 {
 	ImGui::PushID(e); // ID被り防止
@@ -270,7 +284,6 @@ void UIEditor::DrawTreeNode(UIElement* e)
 
 	ImGui::PopID();
 }
-
 void UIEditor::DrawInspector()
 {
 	// 選択が可能な時だけ編集UIを描く
@@ -278,47 +291,79 @@ void UIEditor::DrawInspector()
 	{
 		UIElement& selectedElement = *selected;
 
-		if (ImGui::Button(u8"テクスチャ読み込み"))
+		if (ImGui::BeginTabBar(u8"UITabs"))
 		{
-			char filePath[MAX_PATH] = { 0 };
-			HWND hwnd = Graphics::Instance().GetWindowHandle();
-			if (Dialog::OpenFileName(filePath, MAX_PATH,
-				"PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
-				"テクスチャ選択",
-				hwnd) == DialogResult::OK)
+			if (ImGui::BeginTabItem(u8"基本"))
 			{
-				std::string pathStr = filePath;
-				size_t pos = pathStr.find("Data");
-				if (pos != std::string::npos) pathStr = pathStr.substr(pos);
+				if (ImGui::Button(u8"テクスチャ読み込み"))
+				{
+					char filePath[MAX_PATH] = { 0 };
+					HWND hwnd = Graphics::Instance().GetWindowHandle();
+					if (Dialog::OpenFileName(filePath, MAX_PATH,
+						"PNG File\0*.png\0DDS File\0*.dds\0TGA File\0*.tga\0All Files\0*.*\0\0",
+						"テクスチャ選択",
+						hwnd) == DialogResult::OK)
+					{
+						std::string pathStr = filePath;
+						size_t pos = pathStr.find("Data");
+						if (pos != std::string::npos) pathStr = pathStr.substr(pos);
 
-				SetTexture(selectedElement, pathStr);
+						SetTexture(selectedElement, pathStr);
+					}
+
+				}
+				ImGui::SameLine();
+				ImGui::Text(u8": %s", selectedElement.texturePath.c_str());
+				ImGui::Separator();
+
+				char nameBuffer[128];
+				strcpy_s(nameBuffer, selectedElement.name.c_str());
+				if (ImGui::InputText(u8"UI名", nameBuffer, sizeof(nameBuffer)))
+				{
+					selectedElement.name = nameBuffer;
+				}
+				ImGui::Separator();
+
+				ImGui::DragFloat2(u8"anchor", &selectedElement.anchor.x, 0.01f, 0.0f, 1.0f);
+				ImGui::Separator();
+
+				ImGui::DragFloat2(u8"Pivot", &selectedElement.pivot.x, 0.01f, 0.0f, 1.0f);
+				ImGui::Separator();
+
+				ImGui::DragFloat2(u8"位置", &selectedElement.position.x, 0.1f);
+				ImGui::DragFloat2(u8"画像サイズ", &selectedElement.size.x, 0.1f);
+				ImGui::DragFloat2(u8"拡大率", &selectedElement.scale.x, 0.1f);
+				ImGui::DragFloat(u8"回転", &selectedElement.rotation, 0.1f);
+				ImGui::ColorEdit4(u8"色", &selectedElement.color.x);
+
+				ImGui::EndTabItem();
 			}
 
+			if (ImGui::BeginTabItem(u8"アニメーション"))
+			{
+				ImGui::DragFloat(u8"再生時間", &selectedElement.fade.duration, 0.1f);
+
+				if (ImGui::Button(u8"フェードイン再生"))
+				{
+					selectedElement.fade.Start(0.0f, 1.0f, selectedElement.fade.duration);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(u8"フェードアウト再生"))
+				{
+					selectedElement.fade.Start(1.0f, 0.0f, selectedElement.fade.duration);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(u8"リセット"))
+				{
+					selectedElement.fade.playing = false;
+					selectedElement.fadeAlpha = 1.0f;
+				}
+
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
 		}
-		ImGui::SameLine();
-		ImGui::Text(u8": %s", selectedElement.texturePath.c_str());
-		ImGui::Separator();
-
-		char nameBuffer[128];
-		strcpy_s(nameBuffer, selectedElement.name.c_str());
-		if (ImGui::InputText(u8"UI名", nameBuffer, sizeof(nameBuffer)))
-		{
-			selectedElement.name = nameBuffer;
-		}
-		ImGui::Separator();
-
-		ImGui::DragFloat2(u8"anchor", &selectedElement.anchor.x, 0.01f, 0.0f, 1.0f);
-		ImGui::Separator();
-
-		ImGui::DragFloat2(u8"Pivot", &selectedElement.pivot.x, 0.01f, 0.0f, 1.0f);
-		ImGui::Separator();
-
-		ImGui::DragFloat2(u8"位置", &selectedElement.position.x, 0.1f);
-		ImGui::DragFloat2(u8"画像サイズ", &selectedElement.size.x, 0.1f);
-		ImGui::DragFloat2(u8"拡大率", &selectedElement.scale.x, 0.1f);
-		ImGui::DragFloat(u8"回転", &selectedElement.rotation, 0.1f);
-		ImGui::ColorEdit4(u8"色", &selectedElement.color.x);
-
 	}
 	else
 	{
@@ -350,8 +395,6 @@ void UIEditor::Save(const std::string& path)
 		file << j.dump(4, ' ', false, nlohmann::json::error_handler_t::replace);
 	}
 }
-
-// 要素1個分(＋子)をJSONにする
 nlohmann::json UIEditor::SaveElement(const UIElement* e)
 {
 	using json = nlohmann::json;
@@ -408,7 +451,6 @@ void UIEditor::Load(const std::string& path)
 		}
 	}
 }
-
 std::unique_ptr<UIElement> UIEditor::LoadElement(const nlohmann::json& je, UIElement* parent)
 {
 	auto element = std::make_unique<UIElement>();
@@ -456,7 +498,6 @@ UIElement* UIEditor::AddElement()
 	canvas.elements.emplace_back(std::move(e));
 	return canvas.elements.back().get();
 }
-
 UIElement* UIEditor::AddChild(UIElement* parent)
 {
 	auto e = std::make_unique<UIElement>();

@@ -1,5 +1,7 @@
 #pragma once
 #include "System/UI/Dialog/Dialog.h"
+#include "System/Core/Mathf.h"
+#include "System/UI/UIEditor/UITween.h"
 #include "json.hpp"
 
 #include <string>
@@ -10,7 +12,6 @@
 
 // 前方宣言
 class Sprite;
-
 
 // UIの要素
 struct UIElement
@@ -41,6 +42,9 @@ struct UIElement
 
 	// UIElementに持たせることでElementごとに違う画像が出せる
 	std::shared_ptr<Sprite> sprite;
+
+	float fadeAlpha = 1.0f; // フェード用の倍率
+	UITween<float> fade; // フェードのアニメーション
 };
 
 // キャンバス
@@ -61,6 +65,7 @@ public:
 
 	// 更新処理
 	void Update(float elapsedTime);
+	void UpdateElement(UIElement* e, float elapsedTime);
 
 	// 描画処理
 	void Render(ID3D11DeviceContext* dc);
@@ -98,6 +103,7 @@ private:
 
 	// 要素が入っている配列(兄弟の配列)を返す
 	std::vector<std::unique_ptr<UIElement>>& GetSiblings(UIElement* e);
+
 private:
 	ID3D11Device* device = nullptr; // デバイス保存用変数
 	Canvas canvas; // 編集中のUI

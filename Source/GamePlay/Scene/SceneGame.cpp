@@ -206,6 +206,8 @@ void SceneGame::Update(float elapsedTime)
 
 		// 自作エフェクトマネージャ更新
 		CustomEffectManager::Instance().Update(delta);
+
+		uiEditor.Update(elapsedTime);
 	}
 }
 

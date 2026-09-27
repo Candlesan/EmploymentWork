@@ -38,6 +38,11 @@ float Mathf::Lerp(float a, float b, float t)
 	return a + (b - a) * t;
 }
 
+DirectX::XMFLOAT2 Mathf::Lerp(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b, float t)
+{
+	return { a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t };
+}
+
 // 3次エルミート補間によるイージング
 float Mathf::EaseCurve(float t, int startSpeed, int endSpeed)
 {

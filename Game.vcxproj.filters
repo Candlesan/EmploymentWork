@@ -549,6 +549,9 @@
     <ClInclude Include="Source\System\UI\UIEditor\UIEditor.h">
       <Filter>Source\System\UI\UIEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\UI\UIEditor\UITween.h">
+      <Filter>Source\System\UI\UIEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
