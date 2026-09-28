@@ -26,6 +26,8 @@ struct UITween
 	bool reverse = false;   // 逆再生
 	int remaining = 0;      // 残り回数
 
+	bool enabled = false; // このアニメーションを使用するか
+
 	// 再生開始
 	// 読むだけで書き換えないって意味にするためにconstを付ける
 	void Start(const T& from, const T& to, float duration,

@@ -9,6 +9,39 @@
 #include <algorithm>
 
 
+static nlohmann::json ToJson(float v) { return v; }
+static nlohmann::json ToJson(const DirectX::XMFLOAT2& v) { return { v.x, v.y }; }
+
+static void FromJson(const nlohmann::json& j, float& v) { v = j.get<float>(); }
+static void FromJson(const nlohmann::json& j, DirectX::XMFLOAT2& v) { v = { j[0], j[1] }; }
+
+template<typename T>
+static nlohmann::json SaveTween(const UITween<T>& tween)
+{
+	return {
+		{"from", ToJson(tween.from)},
+		{"to", ToJson(tween.to)},
+		{"duration", tween.duration},
+		{"ease", static_cast<int>(tween.ease)},
+		{"loop", static_cast<int>(tween.loop)},
+		{"loopCount", tween.loopCount},
+		{"enabled", tween.enabled},
+	};
+}
+
+// Tween1個分の設定を読み込み(ない項目は今の値のまま)
+template<typename T>
+static void LoadTween(const nlohmann::json& j, UITween<T>& tween)
+{
+	if (j.find("from") != j.end())      FromJson(j["from"], tween.from);
+	if (j.find("to") != j.end())        FromJson(j["to"], tween.to);
+	tween.duration = j.value("duration", tween.duration);
+	tween.ease = static_cast<EasingType>(j.value("ease", static_cast<int>(tween.ease)));
+	tween.loop = static_cast<LoopType>(j.value("loop", static_cast<int>(tween.loop)));
+	tween.loopCount = j.value("loopCount", -1);
+	tween.enabled = j.value("enabled", false);
+}
+
 // 初期化
 void UIEditor::Initialize(ID3D11Device* device)
 {
@@ -35,7 +68,7 @@ void UIEditor::UpdateElement(UIElement* e, float elapsedTime)
 	if (e->moveAnim.playing)
 	{
 		e->moveAnim.Update(elapsedTime);
-		e->animOffset = e->moveAnim.GetValue();
+		e->animPosition = e->moveAnim.GetValue();
 	}
 
 	if (e->rotationAnim.playing)
@@ -99,9 +132,11 @@ void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 	// ローカル行列を作る
 	DirectX::XMMATRIX Scale = DirectX::XMMatrixScaling(e->scale.x * e->scaleValue, e->scale.y * e->scaleValue, 1.0f);
 	DirectX::XMMATRIX Angle = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(e->rotation + e->rotationValue)); // Z軸しか2Dは回転しやんからXMMatrixRotationZ
+
+	DirectX::XMFLOAT2 pos = e->moveAnim.enabled ? e->animPosition : e->position;
 	DirectX::XMMATRIX Position = DirectX::XMMatrixTranslation(
-		anchorPos.x + e->position.x + e->animOffset.x,
-		anchorPos.y + e->position.y + e->animOffset.y,
+		anchorPos.x + pos.x,
+		anchorPos.y + pos.y,
 		0.0f
 	);
 	DirectX::XMMATRIX world = Scale * Angle * Position * parentWorld;
@@ -311,11 +346,6 @@ void UIEditor::DrawInspector()
 		const char* easingItems[] = { "Linear", "EaseInCubic", "EaseOutCubic", "EaseInOutCubic", "EaseOutBack", "EaseOutBounce" };
 		const char* loopItems[] = { "Once", "Loop", "PingPong" };
 
-		if (ImGui::Button(u8"リセット"))
-		{
-			ResetAnimation(&selectedElement);
-		}
-
 		if (ImGui::BeginTabBar(u8"UITabs"))
 		{
 
@@ -367,7 +397,14 @@ void UIEditor::DrawInspector()
 
 			if (ImGui::BeginTabItem(u8"アニメーション"))
 			{
-				if (ImGui::TreeNode(u8"移動アニメーション"))
+				if (ImGui::Button(u8"リセット"))
+				{
+					ResetAnimation(&selectedElement);
+				}
+				ImGui::Separator();
+
+				ImGui::Checkbox(u8"移動アニメーション", &selectedElement.moveAnim.enabled);
+				if (selectedElement.moveAnim.enabled)
 				{
 					if (ImGui::Button(u8"テスト##move"))
 					{
@@ -406,10 +443,10 @@ void UIEditor::DrawInspector()
 					ImGui::DragFloat2(u8"終了位置", &selectedElement.moveAnim.to.x, 0.1f);
 					ImGui::Separator();
 
-					ImGui::TreePop();
 				}
 
-				if (ImGui::TreeNode(u8"回転アニメーション"))
+				ImGui::Checkbox(u8"回転アニメーション", &selectedElement.rotationAnim.enabled);
+				if (selectedElement.rotationAnim.enabled)
 				{
 					if (ImGui::Button(u8"テスト##rotation"))
 					{
@@ -445,11 +482,10 @@ void UIEditor::DrawInspector()
 
 					ImGui::DragFloat(u8"開始角度", &selectedElement.rotationAnim.from, 0.1f);
 					ImGui::DragFloat(u8"終了角度", &selectedElement.rotationAnim.to, 0.1f);
-
-					ImGui::TreePop();
 				}
 
-				if (ImGui::TreeNode(u8"拡大アニメーション"))
+				ImGui::Checkbox(u8"拡大アニメーション", &selectedElement.scaleAnim.enabled);
+				if (selectedElement.scaleAnim.enabled)
 				{
 					if (ImGui::Button(u8"テスト##scale"))
 					{
@@ -485,11 +521,10 @@ void UIEditor::DrawInspector()
 
 					ImGui::DragFloat(u8"開始角度", &selectedElement.scaleAnim.from, 0.1f);
 					ImGui::DragFloat(u8"終了角度", &selectedElement.scaleAnim.to, 0.1f);
-
-					ImGui::TreePop();
 				}
 
-				if (ImGui::TreeNode(u8"フェードアニメーション"))
+				ImGui::Checkbox(u8"フェードアニメーション", &selectedElement.fadeAnim.enabled);
+				if (selectedElement.fadeAnim.enabled)
 				{
 
 					int fadeLoop = static_cast<int>(selectedElement.fadeAnim.loop);
@@ -537,8 +572,6 @@ void UIEditor::DrawInspector()
 					{
 						selectedElement.fadeAnim.Stop();
 					}
-
-					ImGui::TreePop();
 				}
 
 				ImGui::EndTabItem();
@@ -566,9 +599,7 @@ void UIEditor::Save(const std::string& path)
 	j["elements"] = json::array();
 	for (auto& e : canvas.elements)
 	{
-		j["elements"].push_back({
-			SaveElement(e.get())
-		});
+		j["elements"] .push_back(SaveElement(e.get()));
 	}
 
 	std::ofstream file(path);
@@ -595,6 +626,13 @@ nlohmann::json UIEditor::SaveElement(const UIElement* e)
 			{"color", { e->color.x, e->color.y, e->color.z, e->color.w }},
 			{"visible", e->visible},
 
+	};
+
+	j["animations"] = {
+	{"fade", SaveTween(e->fadeAnim)},
+	{"move", SaveTween(e->moveAnim)},
+	{"rotation", SaveTween(e->rotationAnim)},
+	{"scale", SaveTween(e->scaleAnim)},
 	};
 
 	// 子は子自身に保存してもらう
@@ -655,6 +693,15 @@ std::unique_ptr<UIElement> UIEditor::LoadElement(const nlohmann::json& je, UIEle
 	if (!element->texturePath.empty())
 	{
 		element->sprite = std::make_shared<Sprite>(device, element->texturePath.c_str());
+	}
+
+	if (je.find("animations") != je.end())
+	{
+		const auto& ja = je["animations"];
+		if (ja.find("fade") != ja.end())     LoadTween(ja["fade"], element->fadeAnim);
+		if (ja.find("move") != ja.end())     LoadTween(ja["move"], element->moveAnim);
+		if (ja.find("rotation") != ja.end()) LoadTween(ja["rotation"], element->rotationAnim);
+		if (ja.find("scale") != ja.end())    LoadTween(ja["scale"], element->scaleAnim);
 	}
 
 	// 子は子自身に読み込んでもらう
@@ -746,7 +793,7 @@ void UIEditor::ResetAnimation(UIElement* e)
 
 	// アニメーションの結果を初期値に戻す
 	e->fadeAlpha = 1.0f;
-	e->animOffset = { 0.0f, 0.0f };
+	e->animPosition = { 0.0f, 0.0f };
 	e->rotationValue = 0.0f;
 	e->scaleValue = 1.0f;
 }

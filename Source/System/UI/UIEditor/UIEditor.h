@@ -13,7 +13,7 @@
 // 前方宣言
 class Sprite;
 
-// UIの要素
+
 struct UIElement
 {
 	std::string name = "name";			// UI名(Findとかで探すよう)
@@ -47,7 +47,7 @@ struct UIElement
 	float fadeAlpha = 1.0f;					// フェード用の倍率
 
 	UITween<DirectX::XMFLOAT2> moveAnim;	// 移動のアニメーション
-	DirectX::XMFLOAT2 animOffset = { 0.0f, 0.0f };
+	DirectX::XMFLOAT2 animPosition = { 0.0f, 0.0f };
 
 	UITween<float> rotationAnim;			// 回転のアニメーション
 	float rotationValue = 0.0f;
@@ -56,7 +56,6 @@ struct UIElement
 	float scaleValue = 1.0f;
 };
 
-// キャンバス
 struct Canvas
 {
 	DirectX::XMFLOAT2 referenceResolution = { 1920.0f, 1080.0f }; // 基準解像度
