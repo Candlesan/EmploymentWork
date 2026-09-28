@@ -552,6 +552,9 @@
     <ClInclude Include="Source\System\UI\UIEditor\UITween.h">
       <Filter>Source\System\UI\UIEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Core\Easing.h">
+      <Filter>Source\System\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -829,6 +832,9 @@
     </ClCompile>
     <ClCompile Include="Source\System\UI\UIEditor\UIEditor.cpp">
       <Filter>Source\System\UI\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Core\Easing.cpp">
+      <Filter>Source\System\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

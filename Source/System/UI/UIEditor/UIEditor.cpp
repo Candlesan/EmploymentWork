@@ -291,6 +291,8 @@ void UIEditor::DrawInspector()
 	{
 		UIElement& selectedElement = *selected;
 
+		const char* easingItems[] = { "Linear", "EaseInCubic", "EaseOutCubic", "EaseInOutCubic", "EaseOutBack", "EaseOutBounce" };
+
 		if (ImGui::BeginTabBar(u8"UITabs"))
 		{
 			if (ImGui::BeginTabItem(u8"基本"))
@@ -342,6 +344,12 @@ void UIEditor::DrawInspector()
 			if (ImGui::BeginTabItem(u8"アニメーション"))
 			{
 				ImGui::DragFloat(u8"再生時間", &selectedElement.fade.duration, 0.1f);
+
+				int fadeEase = static_cast<int>(selectedElement.fade.ease);
+				if (ImGui::Combo(u8"##fadeEase", &fadeEase, easingItems, IM_ARRAYSIZE(easingItems)))
+				{
+					selectedElement.fade.ease = static_cast<EasingType>(fadeEase);
+				}
 
 				if (ImGui::Button(u8"フェードイン再生"))
 				{

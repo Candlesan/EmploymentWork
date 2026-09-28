@@ -1,4 +1,5 @@
 #pragma once
+#include "System/Core/Easing.h"
 
 // 1つの値を時間をかけて動かす
 template<typename T>
@@ -10,7 +11,7 @@ struct UITween
 	float timer = 0.0f;		// 経過時間
 	bool playing = false;	// 再生中か
 
-	// 後でイージングも追加する
+	EasingType ease = EasingType::Linear; // イージング
 
 	// 再生開始
 	// 読むだけで書き換えないって意味にするためにconstを付ける
@@ -39,9 +40,16 @@ struct UITween
 		}
 	}
 
+	// 現在の値を返す
 	T GetValue() const
 	{
+		// 時間の進み具合を計算する
 		float t = (duration > 0.0f) ? timer / duration : 1.0f;
-		return Mathf::Lerp(from, to, t); // 型ごとの補間を呼ぶ
+
+		// イージングを掛ける
+		t = Easing::Ease(ease, t);
+
+		// 型ごとの補間を呼ぶ
+		return Mathf::Lerp(from, to, t);
 	}
 };
