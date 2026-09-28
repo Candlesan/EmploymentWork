@@ -50,7 +50,7 @@ float Easing::EaseOutCubic(float t)
 float Easing::EaseInOutCubic(float t)
 {
     float f = -2.0f * t + 2.0f;
-    return t < 0.5f ? 4 * t * t * t : (f * f * f) / 2.0f;
+    return t < 0.5f ? 4 * t * t * t : 1 - (f * f * f) / 2.0f;
 }
 
 float Easing::EaseOutBack(float t)

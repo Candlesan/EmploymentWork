@@ -26,12 +26,29 @@ void UIEditor::Update(float elapsedTime)
 void UIEditor::UpdateElement(UIElement* e, float elapsedTime)
 {
 	// 自分自身を更新
-	if (e->fade.playing)
+	if (e->fadeAnim.playing)
 	{
-		e->fade.Update(elapsedTime);
-		e->fadeAlpha = e->fade.GetValue();
+		e->fadeAnim.Update(elapsedTime);
+		e->fadeAlpha = e->fadeAnim.GetValue();
 	}
 	
+	if (e->moveAnim.playing)
+	{
+		e->moveAnim.Update(elapsedTime);
+		e->animOffset = e->moveAnim.GetValue();
+	}
+
+	if (e->rotationAnim.playing)
+	{
+		e->rotationAnim.Update(elapsedTime);
+		e->rotationValue = e->rotationAnim.GetValue();
+	}
+
+	if (e->scaleAnim.playing)
+	{
+		e->scaleAnim.Update(elapsedTime);
+		e->scaleValue = e->scaleAnim.GetValue();
+	}
 
 	// 子を更新する
 	for (auto& child : e->children)
@@ -80,15 +97,22 @@ void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 	}
 
 	// ローカル行列を作る
-	DirectX::XMMATRIX Scale = DirectX::XMMatrixScaling(e->scale.x, e->scale.y, 1.0f);
-	DirectX::XMMATRIX Angle = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(e->rotation)); // Z軸しか2Dは回転しやんからXMMatrixRotationZ
+	DirectX::XMMATRIX Scale = DirectX::XMMatrixScaling(e->scale.x * e->scaleValue, e->scale.y * e->scaleValue, 1.0f);
+	DirectX::XMMATRIX Angle = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(e->rotation + e->rotationValue)); // Z軸しか2Dは回転しやんからXMMatrixRotationZ
 	DirectX::XMMATRIX Position = DirectX::XMMatrixTranslation(
-		anchorPos.x + e->position.x,
-		anchorPos.y + e->position.y,
+		anchorPos.x + e->position.x + e->animOffset.x,
+		anchorPos.y + e->position.y + e->animOffset.y,
 		0.0f
 	);
 	DirectX::XMMATRIX world = Scale * Angle * Position * parentWorld;
 	DirectX::XMStoreFloat4x4(&e->worldMatrix, world);
+
+	e->worldColor = {
+	parentColor.x * e->color.x,
+	parentColor.y * e->color.y,
+	parentColor.z * e->color.z,
+	parentColor.w * e->color.w * e->fadeAlpha
+	};
 
 	if (!e->texturePath.empty() && e->sprite)
 	{
@@ -124,13 +148,6 @@ void UIEditor::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 			DirectX::XMFLOAT2 texSize = e->sprite->GetTextureSize();
 			uv = { 0.0f, 0.0f, texSize.x, texSize.y };
 		}
-
-		e->worldColor = {
-			parentColor.x * e->color.x,
-			parentColor.y * e->color.y,
-			parentColor.z * e->color.z,
-			parentColor.w * e->color.w * e->fadeAlpha
-		};
 
 		e->sprite->Render(dc,
 			cornners,
@@ -343,28 +360,101 @@ void UIEditor::DrawInspector()
 
 			if (ImGui::BeginTabItem(u8"アニメーション"))
 			{
-				ImGui::DragFloat(u8"再生時間", &selectedElement.fade.duration, 0.1f);
 
-				int fadeEase = static_cast<int>(selectedElement.fade.ease);
-				if (ImGui::Combo(u8"##fadeEase", &fadeEase, easingItems, IM_ARRAYSIZE(easingItems)))
+				if (ImGui::TreeNode(u8"移動アニメーション"))
 				{
-					selectedElement.fade.ease = static_cast<EasingType>(fadeEase);
+					if (ImGui::Button(u8"テスト##move"))
+					{
+						selectedElement.moveAnim.Start(selectedElement.moveAnim.from, selectedElement.moveAnim.to, selectedElement.moveAnim.duration);
+					}
+
+					ImGui::DragFloat(u8"再生時間##move", &selectedElement.moveAnim.duration, 0.1f);
+					ImGui::Separator();
+
+					int moveEase = static_cast<int>(selectedElement.moveAnim.ease);
+					if (ImGui::Combo(u8"##move", &moveEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.moveAnim.ease = static_cast<EasingType>(moveEase);
+					}
+
+					ImGui::DragFloat2(u8"開始位置", &selectedElement.moveAnim.from.x, 0.1f);
+					ImGui::DragFloat2(u8"終了位置", &selectedElement.moveAnim.to.x, 0.1f);
+					ImGui::Separator();
+
+					ImGui::TreePop();
 				}
 
-				if (ImGui::Button(u8"フェードイン再生"))
+				if (ImGui::TreeNode(u8"回転アニメーション"))
 				{
-					selectedElement.fade.Start(0.0f, 1.0f, selectedElement.fade.duration);
+					if (ImGui::Button(u8"テスト##rotation"))
+					{
+						selectedElement.rotationAnim.Start(selectedElement.rotationAnim.from, selectedElement.rotationAnim.to, selectedElement.rotationAnim.duration);
+					}
+
+					ImGui::DragFloat(u8"再生時間##rotation", &selectedElement.rotationAnim.duration, 0.1f);
+					ImGui::Separator();
+
+					int rotationEase = static_cast<int>(selectedElement.rotationAnim.ease);
+					if (ImGui::Combo(u8"##rotation", &rotationEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.rotationAnim.ease = static_cast<EasingType>(rotationEase);
+					}
+
+					ImGui::DragFloat(u8"開始角度", &selectedElement.rotationAnim.from, 0.1f);
+					ImGui::DragFloat(u8"終了角度", &selectedElement.rotationAnim.to, 0.1f);
+
+					ImGui::TreePop();
 				}
-				ImGui::SameLine();
-				if (ImGui::Button(u8"フェードアウト再生"))
+
+				if (ImGui::TreeNode(u8"拡大アニメーション"))
 				{
-					selectedElement.fade.Start(1.0f, 0.0f, selectedElement.fade.duration);
+					if (ImGui::Button(u8"テスト##scale"))
+					{
+						selectedElement.scaleAnim.Start(selectedElement.scaleAnim.from, selectedElement.scaleAnim.to, selectedElement.scaleAnim.duration);
+					}
+
+					ImGui::DragFloat(u8"再生時間##scale", &selectedElement.scaleAnim.duration, 0.1f);
+					ImGui::Separator();
+
+					int scaleEase = static_cast<int>(selectedElement.scaleAnim.ease);
+					if (ImGui::Combo(u8"##scale", &scaleEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.scaleAnim.ease = static_cast<EasingType>(scaleEase);
+					}
+
+					ImGui::DragFloat(u8"開始角度", &selectedElement.scaleAnim.from, 0.1f);
+					ImGui::DragFloat(u8"終了角度", &selectedElement.scaleAnim.to, 0.1f);
+
+					ImGui::TreePop();
 				}
-				ImGui::SameLine();
-				if (ImGui::Button(u8"リセット"))
+
+				if (ImGui::TreeNode(u8"フェードアニメーション"))
 				{
-					selectedElement.fade.playing = false;
-					selectedElement.fadeAlpha = 1.0f;
+					ImGui::DragFloat(u8"再生時間", &selectedElement.fadeAnim.duration, 0.1f);
+
+					int fadeEase = static_cast<int>(selectedElement.fadeAnim.ease);
+					if (ImGui::Combo(u8"##fadeEase", &fadeEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.fadeAnim.ease = static_cast<EasingType>(fadeEase);
+					}
+
+					if (ImGui::Button(u8"フェードイン再生"))
+					{
+						selectedElement.fadeAnim.Start(0.0f, 1.0f, selectedElement.fadeAnim.duration);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"フェードアウト再生"))
+					{
+						selectedElement.fadeAnim.Start(1.0f, 0.0f, selectedElement.fadeAnim.duration);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"リセット"))
+					{
+						selectedElement.fadeAnim.playing = false;
+						selectedElement.fadeAlpha = 1.0f;
+					}
+
+					ImGui::TreePop();
 				}
 
 				ImGui::EndTabItem();

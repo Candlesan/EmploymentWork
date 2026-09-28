@@ -43,8 +43,17 @@ struct UIElement
 	// UIElementに持たせることでElementごとに違う画像が出せる
 	std::shared_ptr<Sprite> sprite;
 
-	float fadeAlpha = 1.0f; // フェード用の倍率
-	UITween<float> fade; // フェードのアニメーション
+	UITween<float> fadeAnim;				// フェードのアニメーション
+	float fadeAlpha = 1.0f;					// フェード用の倍率
+
+	UITween<DirectX::XMFLOAT2> moveAnim;	// 移動のアニメーション
+	DirectX::XMFLOAT2 animOffset = { 0.0f, 0.0f };
+
+	UITween<float> rotationAnim;			// 回転のアニメーション
+	float rotationValue = 0.0f;
+
+	UITween<float> scaleAnim;				// 拡大のアニメーション
+	float scaleValue = 1.0f;;
 };
 
 // キャンバス
