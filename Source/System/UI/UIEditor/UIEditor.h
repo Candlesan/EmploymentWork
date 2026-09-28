@@ -53,7 +53,7 @@ struct UIElement
 	float rotationValue = 0.0f;
 
 	UITween<float> scaleAnim;				// 拡大のアニメーション
-	float scaleValue = 1.0f;;
+	float scaleValue = 1.0f;
 };
 
 // キャンバス
@@ -113,6 +113,8 @@ private:
 	// 要素が入っている配列(兄弟の配列)を返す
 	std::vector<std::unique_ptr<UIElement>>& GetSiblings(UIElement* e);
 
+	// 要素のアニメーションを全部止めて、見た目を元に戻す
+	void ResetAnimation(UIElement* e);
 private:
 	ID3D11Device* device = nullptr; // デバイス保存用変数
 	Canvas canvas; // 編集中のUI

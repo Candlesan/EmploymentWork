@@ -309,9 +309,16 @@ void UIEditor::DrawInspector()
 		UIElement& selectedElement = *selected;
 
 		const char* easingItems[] = { "Linear", "EaseInCubic", "EaseOutCubic", "EaseInOutCubic", "EaseOutBack", "EaseOutBounce" };
+		const char* loopItems[] = { "Once", "Loop", "PingPong" };
+
+		if (ImGui::Button(u8"リセット"))
+		{
+			ResetAnimation(&selectedElement);
+		}
 
 		if (ImGui::BeginTabBar(u8"UITabs"))
 		{
+
 			if (ImGui::BeginTabItem(u8"基本"))
 			{
 				if (ImGui::Button(u8"テクスチャ読み込み"))
@@ -360,22 +367,40 @@ void UIEditor::DrawInspector()
 
 			if (ImGui::BeginTabItem(u8"アニメーション"))
 			{
-
 				if (ImGui::TreeNode(u8"移動アニメーション"))
 				{
 					if (ImGui::Button(u8"テスト##move"))
 					{
-						selectedElement.moveAnim.Start(selectedElement.moveAnim.from, selectedElement.moveAnim.to, selectedElement.moveAnim.duration);
+						selectedElement.moveAnim.Start(selectedElement.moveAnim.from, selectedElement.moveAnim.to, selectedElement.moveAnim.duration,
+							selectedElement.moveAnim.ease,
+							selectedElement.moveAnim.loop,
+							selectedElement.moveAnim.loopCount);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"停止##move"))
+					{
+						selectedElement.moveAnim.Stop();
+					}
+
+					int moveLoop = static_cast<int>(selectedElement.moveAnim.loop);
+					if (ImGui::Combo(u8"ループ##moveLoop", &moveLoop, loopItems, IM_ARRAYSIZE(loopItems)))
+					{
+						selectedElement.moveAnim.loop = static_cast<LoopType>(moveLoop);
+					}
+					if (selectedElement.moveAnim.loop == LoopType::PingPong)
+					{
+						ImGui::DragInt(u8"往復回数", &selectedElement.moveAnim.loopCount, 1);
+					}
+
+
+					int moveEase = static_cast<int>(selectedElement.moveAnim.ease);
+					if (ImGui::Combo(u8"イージング##move", &moveEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.moveAnim.ease = static_cast<EasingType>(moveEase);
 					}
 
 					ImGui::DragFloat(u8"再生時間##move", &selectedElement.moveAnim.duration, 0.1f);
 					ImGui::Separator();
-
-					int moveEase = static_cast<int>(selectedElement.moveAnim.ease);
-					if (ImGui::Combo(u8"##move", &moveEase, easingItems, IM_ARRAYSIZE(easingItems)))
-					{
-						selectedElement.moveAnim.ease = static_cast<EasingType>(moveEase);
-					}
 
 					ImGui::DragFloat2(u8"開始位置", &selectedElement.moveAnim.from.x, 0.1f);
 					ImGui::DragFloat2(u8"終了位置", &selectedElement.moveAnim.to.x, 0.1f);
@@ -388,17 +413,35 @@ void UIEditor::DrawInspector()
 				{
 					if (ImGui::Button(u8"テスト##rotation"))
 					{
-						selectedElement.rotationAnim.Start(selectedElement.rotationAnim.from, selectedElement.rotationAnim.to, selectedElement.rotationAnim.duration);
+						selectedElement.rotationAnim.Start(selectedElement.rotationAnim.from, selectedElement.rotationAnim.to, selectedElement.rotationAnim.duration,
+							selectedElement.rotationAnim.ease,
+							selectedElement.rotationAnim.loop,
+							selectedElement.rotationAnim.loopCount);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"停止##rotation"))
+					{
+						selectedElement.rotationAnim.Stop();
+					}
+
+					int rotationLoop = static_cast<int>(selectedElement.rotationAnim.loop);
+					if (ImGui::Combo(u8"ループ##rotation", &rotationLoop, loopItems, IM_ARRAYSIZE(loopItems)))
+					{
+						selectedElement.rotationAnim.loop = static_cast<LoopType>(rotationLoop);
+					}
+					if (selectedElement.rotationAnim.loop == LoopType::PingPong)
+					{
+						ImGui::DragInt(u8"往復回数", &selectedElement.rotationAnim.loopCount, 1);
+					}
+
+					int rotationEase = static_cast<int>(selectedElement.rotationAnim.ease);
+					if (ImGui::Combo(u8"イージング##rotation", &rotationEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.rotationAnim.ease = static_cast<EasingType>(rotationEase);
 					}
 
 					ImGui::DragFloat(u8"再生時間##rotation", &selectedElement.rotationAnim.duration, 0.1f);
 					ImGui::Separator();
-
-					int rotationEase = static_cast<int>(selectedElement.rotationAnim.ease);
-					if (ImGui::Combo(u8"##rotation", &rotationEase, easingItems, IM_ARRAYSIZE(easingItems)))
-					{
-						selectedElement.rotationAnim.ease = static_cast<EasingType>(rotationEase);
-					}
 
 					ImGui::DragFloat(u8"開始角度", &selectedElement.rotationAnim.from, 0.1f);
 					ImGui::DragFloat(u8"終了角度", &selectedElement.rotationAnim.to, 0.1f);
@@ -410,17 +453,35 @@ void UIEditor::DrawInspector()
 				{
 					if (ImGui::Button(u8"テスト##scale"))
 					{
-						selectedElement.scaleAnim.Start(selectedElement.scaleAnim.from, selectedElement.scaleAnim.to, selectedElement.scaleAnim.duration);
+						selectedElement.scaleAnim.Start(selectedElement.scaleAnim.from, selectedElement.scaleAnim.to, selectedElement.scaleAnim.duration,
+							selectedElement.scaleAnim.ease,
+							selectedElement.scaleAnim.loop,
+							selectedElement.scaleAnim.loopCount);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"停止##scale"))
+					{
+						selectedElement.scaleAnim.Stop();
+					}
+
+					int scaleLoop = static_cast<int>(selectedElement.scaleAnim.loop);
+					if (ImGui::Combo(u8"ループ##scale", &scaleLoop, loopItems, IM_ARRAYSIZE(loopItems)))
+					{
+						selectedElement.scaleAnim.loop = static_cast<LoopType>(scaleLoop);
+					}
+					if (selectedElement.scaleAnim.loop == LoopType::PingPong)
+					{
+						ImGui::DragInt(u8"往復回数", &selectedElement.scaleAnim.loopCount, 1);
+					}
+
+					int scaleEase = static_cast<int>(selectedElement.scaleAnim.ease);
+					if (ImGui::Combo(u8"イージング##scale", &scaleEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					{
+						selectedElement.scaleAnim.ease = static_cast<EasingType>(scaleEase);
 					}
 
 					ImGui::DragFloat(u8"再生時間##scale", &selectedElement.scaleAnim.duration, 0.1f);
 					ImGui::Separator();
-
-					int scaleEase = static_cast<int>(selectedElement.scaleAnim.ease);
-					if (ImGui::Combo(u8"##scale", &scaleEase, easingItems, IM_ARRAYSIZE(easingItems)))
-					{
-						selectedElement.scaleAnim.ease = static_cast<EasingType>(scaleEase);
-					}
 
 					ImGui::DragFloat(u8"開始角度", &selectedElement.scaleAnim.from, 0.1f);
 					ImGui::DragFloat(u8"終了角度", &selectedElement.scaleAnim.to, 0.1f);
@@ -430,28 +491,51 @@ void UIEditor::DrawInspector()
 
 				if (ImGui::TreeNode(u8"フェードアニメーション"))
 				{
-					ImGui::DragFloat(u8"再生時間", &selectedElement.fadeAnim.duration, 0.1f);
+
+					int fadeLoop = static_cast<int>(selectedElement.fadeAnim.loop);
+					if (ImGui::Combo(u8"ループ##fadeLoop", &fadeLoop, loopItems, IM_ARRAYSIZE(loopItems)))
+					{
+						selectedElement.fadeAnim.loop = static_cast<LoopType>(fadeLoop);
+					}
+					if (selectedElement.fadeAnim.loop == LoopType::PingPong)
+					{
+						ImGui::DragInt(u8"往復回数", &selectedElement.fadeAnim.loopCount, 1);
+					}
 
 					int fadeEase = static_cast<int>(selectedElement.fadeAnim.ease);
-					if (ImGui::Combo(u8"##fadeEase", &fadeEase, easingItems, IM_ARRAYSIZE(easingItems)))
+					if (ImGui::Combo(u8"イージング##fadeEase", &fadeEase, easingItems, IM_ARRAYSIZE(easingItems)))
 					{
 						selectedElement.fadeAnim.ease = static_cast<EasingType>(fadeEase);
 					}
 
+					ImGui::DragFloat(u8"再生時間", &selectedElement.fadeAnim.duration, 0.1f);
+
 					if (ImGui::Button(u8"フェードイン再生"))
 					{
-						selectedElement.fadeAnim.Start(0.0f, 1.0f, selectedElement.fadeAnim.duration);
+						selectedElement.fadeAnim.Start(0.0f, 1.0f, selectedElement.fadeAnim.duration,
+							selectedElement.fadeAnim.ease,
+							selectedElement.fadeAnim.loop,
+							selectedElement.fadeAnim.loopCount);
 					}
 					ImGui::SameLine();
 					if (ImGui::Button(u8"フェードアウト再生"))
 					{
-						selectedElement.fadeAnim.Start(1.0f, 0.0f, selectedElement.fadeAnim.duration);
+						selectedElement.fadeAnim.Start(1.0f, 0.0f, selectedElement.fadeAnim.duration,
+							selectedElement.fadeAnim.ease,
+							selectedElement.fadeAnim.loop,
+							selectedElement.fadeAnim.loopCount);
 					}
-					ImGui::SameLine();
+					ImGui::Separator();
+
 					if (ImGui::Button(u8"リセット"))
 					{
 						selectedElement.fadeAnim.playing = false;
 						selectedElement.fadeAlpha = 1.0f;
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"停止##scale"))
+					{
+						selectedElement.fadeAnim.Stop();
 					}
 
 					ImGui::TreePop();
@@ -649,4 +733,20 @@ std::vector<std::unique_ptr<UIElement>>& UIEditor::GetSiblings(UIElement* e)
 		return e->parent->children; // 親がいれば親の子の配列
 	else
 		return canvas.elements; // いなければルートの配列
+}
+
+// 要素のアニメーションを全部止めて、見た目を元に戻す
+void UIEditor::ResetAnimation(UIElement* e)
+{
+	// 全部のTweenを止める(from・to・時間などの設定は残る)
+	e->fadeAnim.Stop();
+	e->moveAnim.Stop();
+	e->rotationAnim.Stop();
+	e->scaleAnim.Stop();
+
+	// アニメーションの結果を初期値に戻す
+	e->fadeAlpha = 1.0f;
+	e->animOffset = { 0.0f, 0.0f };
+	e->rotationValue = 0.0f;
+	e->scaleValue = 1.0f;
 }

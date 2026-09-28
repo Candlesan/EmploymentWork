@@ -1,6 +1,14 @@
 #pragma once
 #include "System/Core/Easing.h"
 
+// ループの種類
+enum class LoopType
+{
+	Once, // 一回だけ
+	Loop, // 終わったら最初から
+	PingPong, // 終わったら逆向きに
+};
+
 // 1つの値を時間をかけて動かす
 template<typename T>
 struct UITween
@@ -13,14 +21,27 @@ struct UITween
 
 	EasingType ease = EasingType::Linear; // イージング
 
+	LoopType loop = LoopType::Once;
+	int loopCount = -1;     // ループ回数
+	bool reverse = false;   // 逆再生
+	int remaining = 0;      // 残り回数
+
 	// 再生開始
 	// 読むだけで書き換えないって意味にするためにconstを付ける
-	void Start(const T& from, const T& to, float duration)
+	void Start(const T& from, const T& to, float duration,
+		EasingType ease = EasingType::Linear,
+		LoopType loop = LoopType::Once,
+		int loopCount = -1)
 	{
 		this->from = from;
 		this->to = to;
 		this->duration = duration;
+		this->ease = ease;
+		this->loop = loop;
+		this->loopCount = loopCount;
+		remaining = this->loopCount;
 		timer = 0.0f;
+		reverse = false;
 		playing = true;
 	}
 
@@ -31,25 +52,48 @@ struct UITween
 		if (!playing) return;
 
 		timer += elapsedTime;
+		if (timer < duration) return; // まだ途中
 
-		// 終わったら止める
-		if (timer >= duration)
+		// 1週が終わった
+		if (loop == LoopType::Once || duration == 0.0f)
 		{
 			timer = duration;
 			playing = false;
+			return;
 		}
+
+		// 回数を減らす
+		if (remaining > 0 && --remaining == 0)
+		{
+			timer = duration;
+			playing = false;
+			return;
+		}
+
+		// はみ出た時間次の週に持ち越す
+		timer -= duration;
+
+		// 往復なら逆向きにする
+		if (loop == LoopType::PingPong) reverse = !reverse;
 	}
 
 	// 現在の値を返す
 	T GetValue() const
 	{
 		// 時間の進み具合を計算する
-		float t = (duration > 0.0f) ? timer / duration : 1.0f;
+		float t = (duration > 0.0f) ? Mathf::Clamp(timer / duration) : 1.0f;
+
+		if (reverse) t = 1.0f - t; // 逆向きなら進み具合をひっくり返す
 
 		// イージングを掛ける
 		t = Easing::Ease(ease, t);
 
 		// 型ごとの補間を呼ぶ
 		return Mathf::Lerp(from, to, t);
+	}
+
+	void Stop()
+	{
+		playing = false;
 	}
 };
