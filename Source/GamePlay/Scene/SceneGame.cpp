@@ -102,6 +102,8 @@ void SceneGame::Initialize()
 
 	// UIエディター初期化
 	uiEditor.Initialize(device);
+	uiCanvas.Initialize(device);
+	uiCanvas.Load("Data/Json/UI/testUI.json");
 }
 
 // 終了化
@@ -208,6 +210,7 @@ void SceneGame::Update(float elapsedTime)
 		CustomEffectManager::Instance().Update(delta);
 
 		uiEditor.Update(elapsedTime);
+		uiCanvas.Update(elapsedTime);
 	}
 }
 
@@ -342,6 +345,7 @@ void SceneGame::Render()
 	// 2Dスプライト描画
 	{
 		uiEditor.Render(dc);
+		uiCanvas.Render(dc);
 	}
 }
 
@@ -655,6 +659,7 @@ void SceneGame::DrawGUI()
 	enemy->DrawGUI();
 	stage->DrawGUI();
 	uiEditor.DrawGUI();
+	uiCanvas.DrawGUI();
 }
 
 void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)

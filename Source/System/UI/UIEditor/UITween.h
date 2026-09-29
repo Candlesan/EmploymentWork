@@ -1,5 +1,6 @@
 #pragma once
 #include "System/Core/Easing.h"
+#include "System/Core/Mathf.h"
 
 // ƒ‹[ƒv‚Ìí—Ş
 enum class LoopType
@@ -92,6 +93,12 @@ struct UITween
 
 		// Œ^‚²‚Æ‚Ì•âŠÔ‚ğŒÄ‚Ô
 		return Mathf::Lerp(from, to, t);
+	}
+
+	void Play()
+	{
+		if (!enabled) return;
+		Start(from, to, duration, ease, loop, loopCount);
 	}
 
 	void Stop()

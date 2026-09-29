@@ -17,6 +17,7 @@
 #include "System/Renderer/Shader/bloom/bloom.h"
 #include "System/UI/EffectEditor/EffectEditor.h"
 #include "System/UI/UIEditor/UIEditor.h"
+#include "System/UI/UIEditor/UICanvas.h"
 
 
 // ゲームシーン
@@ -120,6 +121,7 @@ private:
 
 	// UIEditor関係
 	UIEditor uiEditor;
+	UICanvas uiCanvas;
 
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;

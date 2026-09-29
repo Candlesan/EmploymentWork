@@ -9,7 +9,7 @@
                 "fade": {
                     "duration": 0.0,
                     "ease": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "from": 0.0,
                     "loop": 0,
                     "loopCount": -1,
@@ -33,7 +33,7 @@
                 "rotation": {
                     "duration": 0.0,
                     "ease": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "from": 0.0,
                     "loop": 0,
                     "loopCount": -1,
@@ -42,7 +42,7 @@
                 "scale": {
                     "duration": 0.0,
                     "ease": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "from": 0.0,
                     "loop": 0,
                     "loopCount": -1,
@@ -62,7 +62,7 @@
                 0.5
             ],
             "position": [
-                0.0,
+                2000.0,
                 540.0
             ],
             "rotation": 0.0,

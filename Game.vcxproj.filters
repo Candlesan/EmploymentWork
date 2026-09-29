@@ -555,6 +555,9 @@
     <ClInclude Include="Source\System\Core\Easing.h">
       <Filter>Source\System\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\UI\UIEditor\UICanvas.h">
+      <Filter>Source\System\UI\UIEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -835,6 +838,9 @@
     </ClCompile>
     <ClCompile Include="Source\System\Core\Easing.cpp">
       <Filter>Source\System\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\UI\UIEditor\UICanvas.cpp">
+      <Filter>Source\System\UI\UIEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
