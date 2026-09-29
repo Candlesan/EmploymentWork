@@ -229,6 +229,21 @@
     <Filter Include="Source\System\UI\UIEditor">
       <UniqueIdentifier>{41a4167f-04eb-4bf2-8e0b-8962415ca0fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Scene">
+      <UniqueIdentifier>{fd0cac8f-e930-4f40-8c78-3b33823a83e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Game">
+      <UniqueIdentifier>{ca9cc0dd-00e0-4a1f-986b-76244de4d189}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Title">
+      <UniqueIdentifier>{77ee80d5-bc04-4123-a36c-6a79abdff482}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Load">
+      <UniqueIdentifier>{e4b15525-4707-4a63-b17f-f2b5243ee574}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Result">
+      <UniqueIdentifier>{3ad5da3c-acca-4367-89ee-98c8b7297653}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -278,15 +293,6 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h">
       <Filter>Source\GamepPlay\Object\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Scene\Scene.h">
-      <Filter>Source\GamepPlay\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Scene\SceneGame.h">
-      <Filter>Source\GamepPlay\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Scene\SceneManager.h">
-      <Filter>Source\GamepPlay\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\Core\HighResolutionTimer.h">
       <Filter>Source\System\Core</Filter>
@@ -558,6 +564,24 @@
     <ClInclude Include="Source\System\UI\UIEditor\UICanvas.h">
       <Filter>Source\System\UI\UIEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Game\SceneGame.h">
+      <Filter>Source\GamepPlay\Scene\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Scene\Scene.h">
+      <Filter>Source\GamepPlay\Scene\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Scene\SceneManager.h">
+      <Filter>Source\GamepPlay\Scene\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Title\SceneTitle.h">
+      <Filter>Source\GamepPlay\Scene\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Load\SceneLoad.h">
+      <Filter>Source\GamepPlay\Scene\Load</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Result\SceneResult.h">
+      <Filter>Source\GamepPlay\Scene\Result</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -598,15 +622,6 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp">
       <Filter>Source\GamepPlay\Object\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Scene\Scene.cpp">
-      <Filter>Source\GamepPlay\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Scene\SceneGame.cpp">
-      <Filter>Source\GamepPlay\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GamePlay\Scene\SceneManager.cpp">
-      <Filter>Source\GamepPlay\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\System\Core\Main.cpp">
       <Filter>Source\System\Core</Filter>
@@ -841,6 +856,24 @@
     </ClCompile>
     <ClCompile Include="Source\System\UI\UIEditor\UICanvas.cpp">
       <Filter>Source\System\UI\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\Game\SceneGame.cpp">
+      <Filter>Source\GamepPlay\Scene\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\Manager\SceneManager.cpp">
+      <Filter>Source\GamepPlay\Scene\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\Manager\Scene.cpp">
+      <Filter>Source\GamepPlay\Scene\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\Title\SceneTitle.cpp">
+      <Filter>Source\GamepPlay\Scene\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\Load\SceneLoad.cpp">
+      <Filter>Source\GamepPlay\Scene\Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\Result\SceneResult.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,91 @@
+{
+    "elements": [
+        {
+            "anchor": [
+                1.0,
+                1.0
+            ],
+            "animations": {
+                "fade": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                },
+                "move": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": [
+                        0.0,
+                        0.0
+                    ],
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                "rotation": {
+                    "duration": 3.0,
+                    "ease": 0,
+                    "enabled": true,
+                    "from": 0.0,
+                    "loop": 1,
+                    "loopCount": -1,
+                    "to": 360.0
+                },
+                "scale": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                }
+            },
+            "children": [],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "name": "NowLoading",
+            "pivot": [
+                0.5,
+                0.5
+            ],
+            "position": [
+                -155.3000030517578,
+                -149.1999969482422
+            ],
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "size": [
+                256.0,
+                256.0
+            ],
+            "texturePath": "Data\\Sprite\\Texture\\LoadingIcon.png",
+            "uvRect": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "visible": true
+        }
+    ],
+    "referenceResolution": [
+        1920.0,
+        1080.0
+    ]
+}

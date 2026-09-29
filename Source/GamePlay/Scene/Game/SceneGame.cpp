@@ -10,10 +10,7 @@
 #include "Gameplay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Character/Player/Player.h"
-#include "SceneManager.h"
-
- // シェーダー
-#include "System/Renderer/Shader/SkyMap/SkyMap.h"
+#include "Gameplay/Scene/Manager/SceneManager.h"
 
 #include <imgui.h>
 #include <fstream>
@@ -242,8 +239,8 @@ void SceneGame::Render()
 	rc.deviceContext = dc;
 	rc.renderState = renderState;
 	rc.camera = &camera;
-	rc.pbrMetalness = this->pbrMetalness;
-	rc.pbrRoughness = this->pbrRoughness;
+	rc.pbrMetalness = pbrMetalness;
+	rc.pbrRoughness = pbrRoughness;
 	rc.lightManager = &lightManager;
 
 	// シャドウマップ準備

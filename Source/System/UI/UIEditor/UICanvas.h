@@ -77,6 +77,9 @@ public:
 	// Ä¶
 	void Play(UIElement* e);
 
+	// UI‚ğ‘S‚ÄÄ¶
+	void AllPlay();
+
 	// ’â~
 	void Stop(UIElement* e);
 

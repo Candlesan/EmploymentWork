@@ -13,7 +13,7 @@
 void UIEditor::Initialize(ID3D11Device* device)
 {
 	this->device = device;
-	uiCanvas.Initialize(device);
+	uiCanvas.Initialize(this->device);
 }
 
 // 更新処理

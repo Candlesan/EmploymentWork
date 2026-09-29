@@ -1,5 +1,5 @@
 #pragma once
-#include "Scene.h"
+#include "Gameplay/Scene/Manager/Scene.h"
 #include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
 #include "GamePlay/Object/Particle/Compute_Particle.h"

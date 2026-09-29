@@ -372,11 +372,29 @@ UIElement* UICanvas::FindElement(UIElement* e, const std::string& name)
 // 再生関数
 void UICanvas::Play(UIElement* e)
 {
-	if (!e) return;
+	if (!e) return; // UIが見つからなかったら処理をしない
+
+	if (IsPlaying(e)) return; // 再生中なら2重呼び出しをしないようにする
+
+	// 自分自身を再生する
 	e->moveAnim.Play();
 	e->rotationAnim.Play();
 	e->scaleAnim.Play();
 	e->fadeAnim.Play();
+
+	for (auto& child : e->children)
+	{
+		Play(child.get());
+	}
+}
+
+// 全て再生する
+void UICanvas::AllPlay()
+{
+	for (auto& e : canvas.elements)
+	{
+		Play(e.get());
+	}
 }
 
 // 停止
