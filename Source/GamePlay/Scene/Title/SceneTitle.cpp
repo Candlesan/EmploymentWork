@@ -27,13 +27,27 @@ void SceneTitle::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	if (gamePad.GetButtonDown() & GamePad::BTN_A)
-	{
-		SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
-	}
+	UIElement* fade = uiCanvas.Find("fade");
 
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
+
+	// フェード中
+	if (isFadeing)
+	{
+		if (!uiCanvas.IsPlaying(fade))
+		{
+			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
+		}
+		return; // フェード中は操作を受け付けない
+	}
+
+	// Aボタンを押してフェード開始
+	if (gamePad.GetButtonDown() & GamePad::BTN_A)
+	{
+		uiCanvas.Play(fade);
+		isFadeing = true;
+	}
 }
 
 // 描画処理

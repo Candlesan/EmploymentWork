@@ -37,4 +37,6 @@ public:
 private:
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
+
+	bool isFadeing = false;
 };

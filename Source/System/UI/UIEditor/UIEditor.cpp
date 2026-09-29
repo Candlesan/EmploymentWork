@@ -357,6 +357,18 @@ void UIEditor::DrawInspector()
 				ImGui::Checkbox(u8"フェードアニメーション", &selectedElement.fadeAnim.enabled);
 				if (selectedElement.fadeAnim.enabled)
 				{
+					if (ImGui::Button(u8"テスト##fade"))
+					{
+						selectedElement.fadeAnim.Start(selectedElement.fadeAnim.from, selectedElement.fadeAnim.to, selectedElement.fadeAnim.duration,
+							selectedElement.fadeAnim.ease,
+							selectedElement.fadeAnim.loop,
+							selectedElement.fadeAnim.loopCount);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(u8"停止##fade"))
+					{
+						selectedElement.fadeAnim.Stop();
+					}
 
 					int fadeLoop = static_cast<int>(selectedElement.fadeAnim.loop);
 					if (ImGui::Combo(u8"ループ##fadeLoop", &fadeLoop, loopItems, IM_ARRAYSIZE(loopItems)))
@@ -376,33 +388,9 @@ void UIEditor::DrawInspector()
 
 					ImGui::DragFloat(u8"再生時間", &selectedElement.fadeAnim.duration, 0.1f);
 
-					if (ImGui::Button(u8"フェードイン再生"))
-					{
-						selectedElement.fadeAnim.Start(0.0f, 1.0f, selectedElement.fadeAnim.duration,
-							selectedElement.fadeAnim.ease,
-							selectedElement.fadeAnim.loop,
-							selectedElement.fadeAnim.loopCount);
-					}
-					ImGui::SameLine();
-					if (ImGui::Button(u8"フェードアウト再生"))
-					{
-						selectedElement.fadeAnim.Start(1.0f, 0.0f, selectedElement.fadeAnim.duration,
-							selectedElement.fadeAnim.ease,
-							selectedElement.fadeAnim.loop,
-							selectedElement.fadeAnim.loopCount);
-					}
-					ImGui::Separator();
+					ImGui::DragFloat(u8"開始不透明度", &selectedElement.fadeAnim.from, 0.1f);
+					ImGui::DragFloat(u8"終了不透明度", &selectedElement.fadeAnim.to, 0.1f);
 
-					if (ImGui::Button(u8"リセット"))
-					{
-						selectedElement.fadeAnim.playing = false;
-						selectedElement.fadeAlpha = 1.0f;
-					}
-					ImGui::SameLine();
-					if (ImGui::Button(u8"停止##scale"))
-					{
-						selectedElement.fadeAnim.Stop();
-					}
 				}
 
 				ImGui::EndTabItem();
