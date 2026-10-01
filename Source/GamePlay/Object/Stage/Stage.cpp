@@ -147,16 +147,28 @@ void Stage::RenderDebugPrimitive(ShapeRenderer* renderer)
 // GUI描画
 void Stage::DrawGUI()
 {
-	ImGui::Begin(u8"ステージ");
-	ImGui::Checkbox(u8"ステージの表示", &drawStage);
-	ImGui::Checkbox(u8"エリアの表示", &drawArea);
-	ImGui::Separator();
+	// F8でステージパラメーターの表示をON/OFF
+	static bool wasF8DownLastFrame = false;
+	bool f8Down = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
+	if (f8Down && !wasF8DownLastFrame)
+	{
+		showStageParameter = !showStageParameter;
+	}
+	wasF8DownLastFrame = f8Down;
 
-	ImGui::DragFloat3(u8"エリアの位置", &areaPosition.x, 0.1f);
-	ImGui::DragFloat(u8"エリアの半径", &areaRadius, 0.1f);
-	ImGui::DragFloat(u8"エリアの高さ", &areaHeight, 0.1f);
+	if (showStageParameter)
+	{
+		ImGui::Begin(u8"ステージ");
+		ImGui::Checkbox(u8"ステージの表示", &drawStage);
+		ImGui::Checkbox(u8"エリアの表示", &drawArea);
+		ImGui::Separator();
 
-	ImGui::End();
+		ImGui::DragFloat3(u8"エリアの位置", &areaPosition.x, 0.1f);
+		ImGui::DragFloat(u8"エリアの半径", &areaRadius, 0.1f);
+		ImGui::DragFloat(u8"エリアの高さ", &areaHeight, 0.1f);
+
+		ImGui::End();
+	}
 }
 
 // 行列更新

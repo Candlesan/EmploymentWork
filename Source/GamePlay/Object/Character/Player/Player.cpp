@@ -1987,11 +1987,11 @@ void Player::ShowDebugSwitch()
 	}
 	wasF4DownLastFrame = f4Down;
 
-	// F9でプレイヤーのパラメーターの表示をON/OFF
-	static bool wasF9DownLastFrame = false;
-	bool f9Down = (GetAsyncKeyState(VK_F9) & 0x8000) != 0;
-	if (f9Down && !wasF9DownLastFrame) {
+	// F8でプレイヤーのパラメーターの表示をON/OFF
+	static bool wasF8DownLastFrame = false;
+	bool f8Down = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
+	if (f8Down && !wasF8DownLastFrame) {
 		showPlayerParameter = !showPlayerParameter;
 	}
-	wasF9DownLastFrame = f9Down;
+	wasF8DownLastFrame = f8Down;
 }

@@ -56,4 +56,6 @@ private:
 	float areaRadius = 98.0f; // ˆÚ“®”ÍˆÍ‚Ì”¼Œa
 	float areaHeight = 50.0f; // ˆÚ“®”ÍˆÍ‚Ì‚‚³
 	bool drawArea = true;
+
+	bool showStageParameter = true;
 };

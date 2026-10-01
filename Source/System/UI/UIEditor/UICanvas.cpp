@@ -202,12 +202,6 @@ void UICanvas::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 // GUIï`âÊ
 void UICanvas::DrawGUI()
 {
-	ImGui::Begin(u8"UIÉeÉXÉg");
-	if (ImGui::Button(u8"çƒê∂"))
-	{
-		Play(Find("Element1"));
-	}
-	ImGui::End();
 }
 
 // ï€ë∂

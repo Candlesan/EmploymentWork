@@ -122,6 +122,7 @@ private:
 	// UIEditor関係
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
+	bool showUIEdlitor = true;
 
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;

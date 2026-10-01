@@ -100,7 +100,7 @@ void SceneGame::Initialize()
 	// UIエディター初期化
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
-	uiCanvas.Load("Data/Json/UI/testUI.json");
+	uiCanvas.Load("Data/Json/UI/SceneGame.json");
 }
 
 // 終了化
@@ -612,51 +612,15 @@ void SceneGame::DrawGUI()
 	if (showEffectEditor)
 	{
 		effectEditor->DrawGUI();
-
-		ImGui::Begin(u8"エフェクトマネージャーテスト");
-		{
-			if (ImGui::Button(u8"エフェクトJSONをロード"))
-			{
-				char filepath[MAX_PATH] = { 0 };
-				HWND hwnd = Graphics::Instance().GetWindowHandle();
-
-				// ダイアログを開いてJSONファイルを選択[cite: 25]
-				if (Dialog::OpenFileName(filepath, MAX_PATH, "JSON File\0*.json\0\0", "エフェクト読込", hwnd) == DialogResult::OK)
-				{
-					// パスからファイル名を取り出してエフェクト名にする
-					char filename[MAX_PATH];
-					_splitpath_s(filepath, nullptr, 0, nullptr, 0, filename, MAX_PATH, nullptr, 0);
-
-					// マネージャーにロード＆キャッシュさせる！[cite: 22, 23]
-					CustomEffectManager::Instance().LoadEffectConfig(filename, filepath);
-				}
-			}
-
-			ImGui::Separator();
-
-			// プレイヤーの足元にテスト再生してみるボタン
-			char effectNameBuf[128];
-			strncpy_s(effectNameBuf, effectName.c_str(), sizeof(effectNameBuf));
-			if (ImGui::InputText(u8"エフェクト名入力", effectNameBuf, sizeof(effectNameBuf)))
-			{
-				effectName = effectNameBuf;
-			}
-			ImGui::Separator();
-
-			// キャッシュしておいたエフェクトを再生
-			if (ImGui::Button(u8"エフェクト再生"))
-			{
-				CustomEffectManager::Instance().PlayEffect(effectName.c_str(), { 0.0f, 0.0f, 0.0f });
-			}
-		}
-		ImGui::End();
+	}
+	if (showUIEdlitor)
+	{
+		uiEditor.DrawGUI();
 	}
 
 	player.DrawGUI();
 	enemy->DrawGUI();
 	stage->DrawGUI();
-	uiEditor.DrawGUI();
-	uiCanvas.DrawGUI();
 }
 
 void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
@@ -796,11 +760,12 @@ void SceneGame::ShowDebugSwitch()
 	}
 	wasF7DownLastFrame = f7Down;
 
-	// F7でデバッグプリミティブの表示のON/OFF
+	// F10でエフェクトエディターとUIエディターの表示のON/OFF
 	static bool wasF10DownLastFrame = false;
 	bool f10Down = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
 	if (f10Down && !wasF10DownLastFrame) {
 		showEffectEditor = !showEffectEditor;
+		showUIEdlitor = !showUIEdlitor;
 	}
 	wasF10DownLastFrame = f10Down;
 }
