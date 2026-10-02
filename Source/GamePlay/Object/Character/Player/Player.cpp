@@ -236,6 +236,10 @@ void Player::Update(float elapsedTime)
 	// 魔法を撃つ
 	MagicInput(elapsedTime);
 
+	InputLockOn();
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	lockOn.Update(elapsedTime, camera.GetFront());
+
 	if (!isTyping && !isPreviewMode)
 	{
 
@@ -455,6 +459,8 @@ void Player::DrawGUI()
 				}
 			}
 
+			lockOn.DrawGUI();
+
 			if (ImGui::CollapsingHeader(u8"飛行", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::Text(u8"飛行中か: %s", flightController.IsFlying() ? "true" : "false");
@@ -650,6 +656,8 @@ void Player::DrawGUI()
 // デバックプリミティブ描画
 void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
 	// プレイヤーの当たり判定
 	if (!isAvoid)
 	{
@@ -679,6 +687,12 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	if (status.isIntercept)
 	{
 		renderer->DrawSphere(centerPos, interceptRadius, { 0.0f, 1.0f, 1.0f, 0.5f });
+	}
+
+	if (lockOn.IsLocked())
+	{
+		DirectX::XMFLOAT3 predicted = lockOn.GetPredictedPosition(position, rapidMagicConfig.speed);
+		renderer->DrawSphere(predicted, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
 	}
 }
 
@@ -736,7 +750,7 @@ void Player::MagicInput(float elapsedTime)
 			// フルチャージ発射（もう一度押した瞬間）
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : defultDir;
+			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, 100000.0f);// 即着弾やから数値をデカくしておく
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
@@ -755,7 +769,7 @@ void Player::MagicInput(float elapsedTime)
 		{
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : defultDir;
+			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, 100000.0f);
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
 			spawnInfo.holdTime = rbButtonHoldTime;
@@ -775,7 +789,7 @@ void Player::MagicInput(float elapsedTime)
 		// 魔法の設定
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
-		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : defultDir;
+		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, rapidMagicConfig.speed);
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
 
@@ -872,6 +886,23 @@ void Player::UpdateFly(float elapsedTime)
 	flightController.Update(this, elapsedTime);
 }
 
+void Player::InputLockOn()
+{
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	// 右スティック押し込みでハードロック切り替え
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
+	{
+		if (lockOn.IsHardLock())
+		{
+			lockOn.SetHardLock(false);  // 解除
+		}
+		else if (lockOn.IsLocked())
+		{
+			lockOn.SetHardLock(true);   // ソフトロック中の相手に固定
+		}
+	}
+}
 
 // =========================================================================
 //  セッター（インライン以外）
@@ -1844,8 +1875,6 @@ void Player::UpdateLockAt(float elapsedTime)
 // プレイヤーの状態を計算する関数
 void Player::CalculateStatusParameters()
 {
-	GamePad& gamePad = Input::Instance().GetGamePad();
-
 	falling = (velocity.y < -0.1f);
 
 	// 敵との距離の計算

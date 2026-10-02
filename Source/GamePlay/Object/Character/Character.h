@@ -5,6 +5,7 @@
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Flight/FlightController.h"
+#include "GamePlay/Object/LockOnSystem/LockOnSystem.h"
 
 
 // キャラクターの基本情報
@@ -175,6 +176,7 @@ protected:
 	CharacterStatus status;		  // 現在のステータス
 	CharacterStatus defaltStatus; // 初期データ
 	FlightController flightController; // 飛行情報
+	LockOnSystem lockOn;
 
 	// 位置・回転・スケール・行列
 	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };

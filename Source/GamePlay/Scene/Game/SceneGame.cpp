@@ -59,7 +59,7 @@ void SceneGame::Initialize()
 	enemy->Initialize();
 
 	player.SetEnemy(enemy.get());
-
+	player.GetLockOnSystem().Initialize(&player, enemy.get());
 	// ライト設定
 	DirectionalLight light;
 	// ここに ImGui で決めた数値をそのまま入れる
@@ -158,19 +158,6 @@ void SceneGame::Update(float elapsedTime)
 		DirectX::XMFLOAT3 target = player.GetPosition();
 		target.y += 1.0f; // 注視点を少し上にあげる
 		gameCamera->SetTarget(target);
-
-		// ロックオン対象を毎フレーム渡す
-		gameCamera->SetLockOnTarget(enemy.get());
-
-		if (gameCamera->IsLockOn())
-		{
-			// ロックオン中は敵の位置を教える
-			player.SetLockOnTargetPosition(&enemy->GetPosition());
-		}
-		else
-		{
-			player.ClearLockOnTarget();
-		}
 
 		gameCamera->Update(elapsedTime, stage->GetTriangles(), stage->GetAreas());
 	}

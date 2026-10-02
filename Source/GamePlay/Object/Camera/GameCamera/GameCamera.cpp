@@ -8,21 +8,7 @@
 void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles, const std::vector<Collision::Area>& stageAreas)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
-
-	// 右スティック押し込みでロックオン切り替え
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
-	{
-		// ロックオン対象がいれば切り替え
-		if (cameraMode == CameraMode::Normal && lockOnTarget != nullptr)
-		{
-			cameraMode = CameraMode::RockOn; // ロックオンへ切り替え
-		}
-		else
-		{
-			cameraMode = CameraMode::Normal; // 通常カメラに切り替え
-		}
-	}
-
+	Player& player = Player::Instance();
 	float ax = gamePad.GetAxisRX();
 	float ay = -gamePad.GetAxisRY();
 
@@ -35,10 +21,11 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	// カメラの回転速度
 	float speed = rollSpeed * elapsedTime;
 
-	if (cameraMode == CameraMode::RockOn && lockOnTarget != nullptr)
+	if (player.GetLockOnSystem().IsHardLock()
+		&& player.GetLockOnSystem().GetTarget() != nullptr)
 	{
 		// スティック入力を無視して敵の方向に角度を合わせる
-		DirectX::XMFLOAT3 enemyPos = lockOnTarget->GetPosition();
+		DirectX::XMFLOAT3 enemyPos = player.GetLockOnSystem().GetTarget()->GetPosition();
 		float dx = enemyPos.x - currentTarget.x;
 		float dy = enemyPos.y - currentTarget.y;
 		float dz = enemyPos.z - currentTarget.z;

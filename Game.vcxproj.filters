@@ -265,6 +265,9 @@
     <Filter Include="Source\System\Renderer\UIFillRenderer">
       <UniqueIdentifier>{a9ef3669-4313-410a-a19a-658e16fdc277}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\LockOnSystem">
+      <UniqueIdentifier>{9ab603c7-870d-4506-8557-60a6f7a7fbfa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -609,6 +612,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Player\PlayerUI.h">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.h">
+      <Filter>Source\GamepPlay\Object\LockOnSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -907,6 +913,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Player\PlayerUI.cpp">
       <Filter>Source\GamepPlay\Object\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.cpp">
+      <Filter>Source\GamepPlay\Object\LockOnSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

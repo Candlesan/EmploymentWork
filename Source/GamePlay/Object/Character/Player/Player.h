@@ -54,6 +54,7 @@ public:
 	void AddGraph(std::string name);
 	void UpdateSounds(const std::string& state);
 	void UpdateFly(float elapsedTime);
+	void InputLockOn();
 
 	// =========================================================================
 	//  セッター
@@ -73,6 +74,9 @@ public:
 
 	bool GetIsGuarding() const { return isGuarding; }
 	bool GetIsAvoid() const { return isAvoid; }
+
+	LockOnSystem& GetLockOnSystem() { return lockOn; }
+	const LockOnSystem& GetLockOnSystem() const { return lockOn; }
 
 	// ── 武器・戦闘関係 ──
 	DirectX::XMFLOAT3 GetWeaponPosition() const;
