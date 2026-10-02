@@ -1,7 +1,7 @@
 #pragma once
 
 // ƒVƒXƒeƒ€
-#include "System/Renderer/ModelRenderer.h"
+#include "System/Renderer/ModelRenderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence/AnimationSequence.h"
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/UI/BehaviorTreeEditor/BehaviorTreeEditor.h"

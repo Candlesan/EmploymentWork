@@ -2,7 +2,7 @@
 
 #include "GamePlay/Object/Camera/Camera.h"
 #include "System/Graphic/RenderState.h"
-#include "System/Renderer/Light.h"
+#include "System/Renderer/Light/Light.h"
 
 //	シャドウマップ用情報
 struct ShadowMapData

@@ -1,5 +1,5 @@
 #pragma once
-#include "System/Renderer/Shader/Shader.h"
+#include "System/Shader/Shader.h"
 
 class PBRShader : public Shader
 {

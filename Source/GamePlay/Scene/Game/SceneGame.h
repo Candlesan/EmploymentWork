@@ -8,13 +8,14 @@
 
 // モデル
 #include "Gameplay/Object/Stage/Stage.h"
+#include "GamePlay/Object/Character/Player/PlayerUI.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
 #include "GamePlay/Object/Collision/CollisionManager.h"
 
-#include "System/Renderer/Shader/FrameBuffer/FrameBuffer.h"
-#include "System/Renderer/Shader/fullscreen_quad/fullscreen_quad.h"
-#include "System/Renderer/Shader/SkyMap/SkyMap.h"
-#include "System/Renderer/Shader/bloom/bloom.h"
+#include "System/Shader/FrameBuffer/FrameBuffer.h"
+#include "System/Shader/fullscreen_quad/fullscreen_quad.h"
+#include "System/Shader/SkyMap/SkyMap.h"
+#include "System/Shader/bloom/bloom.h"
 #include "System/UI/EffectEditor/EffectEditor.h"
 #include "System/UI/UIEditor/UIEditor.h"
 #include "System/UI/UIEditor/UICanvas.h"
@@ -119,10 +120,12 @@ private:
 	std::string effectName;
 	bool showEffectEditor = true;
 
-	// UIEditor関係
+	// UI関係
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
+	PlayerUI playerUI;
 	bool showUIEdlitor = true;
+	
 
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;

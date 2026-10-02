@@ -5,7 +5,7 @@
 #include "GamePlay/Object/Trail/Trail.h"
 
 #include "System/Resource/Model/Model.h"
-#include "System/Renderer/ModelRenderer.h"
+#include "System/Renderer/ModelRenderer/ModelRenderer.h"
 #include "System/Graphic/RenderContext.h"
 #include "System/UI/EffectEditor/EffectConfig.h"
 #include <memory>

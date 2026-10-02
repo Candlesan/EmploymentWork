@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <imgui.h>
+#include <algorithm>
 
 
 // ヘルパー関数
@@ -47,6 +48,7 @@ static void LoadTween(const nlohmann::json& j, UITween<T>& tween)
 void UICanvas::Initialize(ID3D11Device* device)
 {
 	this->device = device;
+	uifillRenderer.Initialize(device);
 }
 
 // 更新処理
@@ -185,6 +187,11 @@ void UICanvas::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 			uv = { 0.0f, 0.0f, texSize.x, texSize.y };
 		}
 
+		DirectX::XMFLOAT2 tex = e->sprite->GetTextureSize();
+		uifillRenderer.Apply(dc,
+			{ uv.x / tex.x, uv.y / tex.y, uv.z / tex.x, uv.w / tex.y },
+			e->fillAmount, e->fillMethod);
+
 		e->sprite->Render(dc,
 			cornners,
 			0.0f,
@@ -242,7 +249,7 @@ nlohmann::json UICanvas::SaveElement(const UIElement* e)
 			{"anchor", {e->anchor.x, e->anchor.y}},
 			{"color", { e->color.x, e->color.y, e->color.z, e->color.w }},
 			{"visible", e->visible},
-
+			{"fillMethod", static_cast<int>(e->fillMethod)},
 	};
 
 	j["animations"] = {
@@ -303,12 +310,13 @@ std::unique_ptr<UIElement> UICanvas::LoadElement(const nlohmann::json& je, UIEle
 	if (je.find("pivot") != je.end())    element->pivot = { je["pivot"][0], je["pivot"][1] };
 	if (je.find("anchor") != je.end())   element->anchor = { je["anchor"][0], je["anchor"][1] };
 	if (je.find("color") != je.end())    element->color = { je["color"][0], je["color"][1], je["color"][2], je["color"][3] };
-	element->visible = je.value("visible", true);   // ← 初期値は true に
+	element->visible = je.value("visible", true);
+	element->fillMethod = static_cast<FillMethod>(je.value("fillMethod", FillMethod::None));
 
 	// テクスチャを読み直す
 	if (!element->texturePath.empty())
 	{
-		element->sprite = std::make_shared<Sprite>(device, element->texturePath.c_str());
+		element->sprite = CreateSprite(element->texturePath.c_str());;
 	}
 
 	if (je.find("animations") != je.end())
@@ -424,4 +432,13 @@ void UICanvas::ResetAnimation(UIElement* e)
 	e->animPosition = e->moveAnim.enabled ? DirectX::XMFLOAT2(e->moveAnim.from.x, e->moveAnim.from.y) : DirectX::XMFLOAT2(0.0f, 0.0f);
 	e->rotationValue = e->rotationAnim.enabled ? e->rotationAnim.from : 0.0f;
 	e->scaleValue = e->scaleAnim.enabled ? e->scaleAnim.from : 1.0f;
+}
+
+std::shared_ptr<Sprite> UICanvas::CreateSprite(const std::string& path)
+{
+	// キャッシュ済みならそれを使い回す
+	auto srv = TextureResourceManager::Instance().GetOrLoad(device, path);
+	auto sprite = std::make_shared<Sprite>(device, srv);
+	sprite->SetSpritePS(uifillRenderer.GetPixelShader());
+	return sprite;
 }

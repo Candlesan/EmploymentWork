@@ -4,7 +4,7 @@
 
 #include "Framework.h"
 #include "System/Graphic/Graphics.h"
-#include "System/Renderer/ImGuiRenderer.h"
+#include "System/Renderer/ImGuiRenderer/ImGuiRenderer.h"
 #include "System/Core/Input/Input.h"
 #include "System/Effect/EffectManager.h"
 

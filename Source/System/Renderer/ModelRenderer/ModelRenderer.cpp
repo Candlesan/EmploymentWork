@@ -1,11 +1,11 @@
 #include <algorithm>
 #include "System/Core/Misc.h"
 #include "System/Graphic/GpuResourceUtils.h"
-#include "System/Renderer/ModelRenderer.h"
-#include "Shader/Basic/BasicShader.h"
-#include "Shader/Lambert/LambertShader.h"
-#include "Shader/PBR/PBRShader.h"
-#include "Shader/meshVFX/meshVFX.h"
+#include "System/Renderer/ModelRenderer/ModelRenderer.h"
+#include "System/Shader/Basic/BasicShader.h"
+#include "System/Shader/Lambert/LambertShader.h"
+#include "System/Shader/PBR/PBRShader.h"
+#include "System/Shader/meshVFX/meshVFX.h"
 
 // コンストラクタ
 ModelRenderer::ModelRenderer(ID3D11Device* device)

@@ -1,7 +1,7 @@
 ﻿#include "CustomEffect.h"
 #include "System/Graphic/Graphics.h"
 #include "System/Core/Mathf.h"
-#include "System/Renderer/Shader/meshVFX/meshVFX.h"
+#include "System/Shader/meshVFX/meshVFX.h"
 #include "System/Resource/ModelResourceManager/ModelResourceManager.h"
 #include "System/Resource/TextureResourceManager/TextureResourceManager.h"
 

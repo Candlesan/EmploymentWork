@@ -222,6 +222,21 @@ void UIEditor::DrawInspector()
 				ImGui::DragFloat2(u8"拡大率", &selectedElement.scale.x, 0.1f);
 				ImGui::DragFloat(u8"回転", &selectedElement.rotation, 0.1f);
 				ImGui::ColorEdit4(u8"色", &selectedElement.color.x);
+				ImGui::Separator();
+
+				// 並びはFillMethodのenumと必ず同じ順番にする
+				const char* fillItems[] = { "None", u8"左から右へ", u8"右から左へ", u8"下から上へ", u8"上から下へ", u8"時計回り" };
+				int fillMethod = static_cast<int>(selectedElement.fillMethod);
+				if (ImGui::Combo(u8"塗り方向", &fillMethod, fillItems, IM_ARRAYSIZE(fillItems)))
+				{
+					selectedElement.fillMethod = static_cast<FillMethod>(fillMethod);
+				}
+
+				// プレビュー用（保存はしない）
+				if (selectedElement.fillMethod != FillMethod::None)
+				{
+					ImGui::SliderFloat(u8"塗り割合(確認用)", &selectedElement.fillAmount, 0.0f, 1.0f);
+				}
 
 				ImGui::EndTabItem();
 			}
@@ -457,10 +472,10 @@ void UIEditor::MoveElement(UIElement* e, int direction)
 	auto moved = std::move(siblings[from]);
 
 	// 空になった箱を配列から取り除く
-	uiCanvas.GetElements().erase(siblings.begin() + from);
+	siblings.erase(siblings.begin() + from);
 
 	// 目的の位置に入れ直す
-	uiCanvas.GetElements().insert(siblings.begin() + to, std::move(moved));
+	siblings.insert(siblings.begin() + to, std::move(moved));
 }
 
 // 要素が入っている配列(兄弟の配列)を返す

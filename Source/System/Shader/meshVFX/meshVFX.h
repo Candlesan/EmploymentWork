@@ -1,6 +1,6 @@
 #pragma once
 
-#include "System/Renderer/Shader/Shader.h"
+#include "System/Shader/Shader.h"
 
 class meshVFX : public Shader
 {

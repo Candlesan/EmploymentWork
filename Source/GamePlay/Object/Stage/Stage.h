@@ -1,5 +1,5 @@
 #pragma once
-#include "System/Renderer/ModelRenderer.h"
+#include "System/Renderer/ModelRenderer/ModelRenderer.h"
 #include "GamePlay/Object/Collision/Collision.h"
 
 #include <memory>

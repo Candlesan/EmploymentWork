@@ -101,6 +101,7 @@ void SceneGame::Initialize()
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneGame.json");
+	playerUI.Initialize(uiCanvas);
 }
 
 // 終了化
@@ -205,6 +206,8 @@ void SceneGame::Update(float elapsedTime)
 
 		// 自作エフェクトマネージャ更新
 		CustomEffectManager::Instance().Update(delta);
+
+		playerUI.Update(Player::Instance().GetStatus());
 
 		uiEditor.Update(elapsedTime);
 		uiCanvas.Update(elapsedTime);

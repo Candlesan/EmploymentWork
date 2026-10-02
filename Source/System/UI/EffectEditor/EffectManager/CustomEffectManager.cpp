@@ -1,6 +1,6 @@
 #include "CustomEffectManager.h"
 #include "System/Graphic/Graphics.h"
-#include "System/Renderer/Shader/meshVFX/meshVFX.h"
+#include "System/Shader/meshVFX/meshVFX.h"
 
 
 // ‰Šú‰»

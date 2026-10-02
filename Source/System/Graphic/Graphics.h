@@ -5,12 +5,12 @@
 #include <wrl.h>
 #include <memory>
 #include "RenderState.h"
-#include "System/Renderer/PrimitiveRenderer.h"
-#include "System/Renderer/ShapeRenderer.h"
-#include "System/Renderer/ModelRenderer.h"
+#include "System/Renderer/PrimitiveRenderer/PrimitiveRenderer.h"
+#include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
+#include "System/Renderer/ModelRenderer/ModelRenderer.h"
 
 // シェーダー
-#include "System/Renderer/Shader/ShadowMap/ShadowMap.h"
+#include "System/Shader/ShadowMap/ShadowMap.h"
 
 // グラフィックス
 class Graphics

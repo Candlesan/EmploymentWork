@@ -55,9 +55,6 @@
     <Filter Include="Source\GamepPlay\Scene">
       <UniqueIdentifier>{a61f1707-ba55-493a-a3b7-7f331afd5e90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\System\Renderer\Shader">
-      <UniqueIdentifier>{4916c947-8a1d-423f-a903-5a45aae62a40}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\GamepPlay\Object">
       <UniqueIdentifier>{839e913e-866e-47af-860a-6ce4f85852d5}</UniqueIdentifier>
     </Filter>
@@ -88,15 +85,6 @@
     <Filter Include="Source\GamepPlay\Object\Camera\GameCamera">
       <UniqueIdentifier>{2e50e81b-cf63-4282-bb7b-b88e94cae8cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\System\Renderer\Shader\Basic">
-      <UniqueIdentifier>{20868d74-3e20-4f11-8768-8393fd2d2689}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\System\Renderer\Shader\Lambert">
-      <UniqueIdentifier>{46bae322-cc75-4ecc-b98b-b4252f4bbbc9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\System\Renderer\Shader\PBR">
-      <UniqueIdentifier>{191d4d5b-9553-4c07-b594-dbe6f6328ea6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader\Basic">
       <UniqueIdentifier>{2a9ec1c8-9ced-4eb2-b88c-4e15f8b77a87}</UniqueIdentifier>
     </Filter>
@@ -118,17 +106,11 @@
     <Filter Include="Shader\PBR">
       <UniqueIdentifier>{40b5617b-06d3-4424-9d44-1c6c34e8d427}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\System\Renderer\Shader\SkyMap">
-      <UniqueIdentifier>{6991e4cf-4b26-4fbe-aa3d-8a436bcbe812}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader\SkyMap">
       <UniqueIdentifier>{1c2c9147-fa5f-4f58-bd2c-76c9e0691bc9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shader\ShadowMap">
       <UniqueIdentifier>{83b296cb-ed95-4292-91b1-f7de053c0ee7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\System\Renderer\Shader\ShadowMap">
-      <UniqueIdentifier>{7b5a9c3f-87ae-4c55-b2ca-f263fbb91aea}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\GamepPlay\Object\Character\Enemy\BehaviorTree">
       <UniqueIdentifier>{a4294990-10df-4f16-98c2-20b24a1c8cba}</UniqueIdentifier>
@@ -181,15 +163,6 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType">
       <UniqueIdentifier>{f989ee99-016b-4ecf-8d35-97da2587d692}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\System\Renderer\Shader\bloom">
-      <UniqueIdentifier>{9e774987-599a-48c4-90ba-91cdecf9bb40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\System\Renderer\Shader\fullscreen_quad">
-      <UniqueIdentifier>{44ce5239-6417-4465-af87-1c002a2f14e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\System\Renderer\Shader\FrameBuffer">
-      <UniqueIdentifier>{20218fa6-db37-4ee1-9049-284dbf8668e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader\Bloom">
       <UniqueIdentifier>{f3542b1e-f6b8-46ee-a6d8-224807238f83}</UniqueIdentifier>
     </Filter>
@@ -198,9 +171,6 @@
     </Filter>
     <Filter Include="Shader\meshVFX">
       <UniqueIdentifier>{b696236d-760b-4560-8be6-2a3e0a825d48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\System\Renderer\Shader\meshVFX">
-      <UniqueIdentifier>{7ddd6af1-8b3f-47a5-815a-f4ef035190aa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType\NormalMagic">
       <UniqueIdentifier>{9af6660c-2e08-4dc6-8987-6282056fff05}</UniqueIdentifier>
@@ -243,6 +213,57 @@
     </Filter>
     <Filter Include="Source\GamepPlay\Scene\Result">
       <UniqueIdentifier>{3ad5da3c-acca-4367-89ee-98c8b7297653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\UIFill">
+      <UniqueIdentifier>{d4da3d07-1416-4611-b029-9b866db41f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\ImGuiRenderer">
+      <UniqueIdentifier>{345c816c-2dca-46c3-bdcc-01e713e2e3ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\ModelRenderer">
+      <UniqueIdentifier>{dff91998-304f-4c3f-ac58-2a75994ea8a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\PrimitiveRenderer">
+      <UniqueIdentifier>{f18f999c-abf2-4927-8fd3-6b7aca57373f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\Light">
+      <UniqueIdentifier>{da9da109-8183-4304-aaeb-4a448e946c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\ShapeRenderer">
+      <UniqueIdentifier>{5f5d0a01-6165-4eae-9b22-d87a7940b569}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader">
+      <UniqueIdentifier>{4916c947-8a1d-423f-a903-5a45aae62a40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\Basic">
+      <UniqueIdentifier>{20868d74-3e20-4f11-8768-8393fd2d2689}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\Lambert">
+      <UniqueIdentifier>{46bae322-cc75-4ecc-b98b-b4252f4bbbc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\PBR">
+      <UniqueIdentifier>{191d4d5b-9553-4c07-b594-dbe6f6328ea6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\SkyMap">
+      <UniqueIdentifier>{6991e4cf-4b26-4fbe-aa3d-8a436bcbe812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\ShadowMap">
+      <UniqueIdentifier>{7b5a9c3f-87ae-4c55-b2ca-f263fbb91aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\bloom">
+      <UniqueIdentifier>{9e774987-599a-48c4-90ba-91cdecf9bb40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\fullscreen_quad">
+      <UniqueIdentifier>{44ce5239-6417-4465-af87-1c002a2f14e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\FrameBuffer">
+      <UniqueIdentifier>{20218fa6-db37-4ee1-9049-284dbf8668e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Shader\meshVFX">
+      <UniqueIdentifier>{7ddd6af1-8b3f-47a5-815a-f4ef035190aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Renderer\UIFillRenderer">
+      <UniqueIdentifier>{a9ef3669-4313-410a-a19a-658e16fdc277}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -324,21 +345,6 @@
     <ClInclude Include="Source\System\Graphic\RenderState.h">
       <Filter>Source\System\Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\Shader.h">
-      <Filter>Source\System\Renderer\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\ImGuiRenderer.h">
-      <Filter>Source\System\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Light.h">
-      <Filter>Source\System\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\PrimitiveRenderer.h">
-      <Filter>Source\System\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\ShapeRenderer.h">
-      <Filter>Source\System\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h">
       <Filter>Source\System\Resource\Model</Filter>
     </ClInclude>
@@ -365,21 +371,6 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h">
       <Filter>Source\GamepPlay\Object\Camera\GameCamera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\Basic\BasicShader.h">
-      <Filter>Source\System\Renderer\Shader\Basic</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h">
-      <Filter>Source\System\Renderer\Shader\Lambert</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h">
-      <Filter>Source\System\Renderer\Shader\PBR</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h">
-      <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h">
-      <Filter>Source\System\Renderer\Shader\ShadowMap</Filter>
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.h">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
@@ -447,9 +438,6 @@
     <ClInclude Include="Source\GamePlay\Object\Trail\Trail.h">
       <Filter>Source\GamepPlay\Object\Trail</Filter>
     </ClInclude>
-    <ClInclude Include="Source\System\Renderer\ModelRenderer.h">
-      <Filter>Source\System\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Particle\Compute_Particle.h">
       <Filter>Source\GamepPlay\Object\Particle</Filter>
     </ClInclude>
@@ -483,15 +471,6 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicManager.h">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.h">
-      <Filter>Source\System\Renderer\Shader\FrameBuffer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.h">
-      <Filter>Source\System\Renderer\Shader\fullscreen_quad</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\bloom\bloom.h">
-      <Filter>Source\System\Renderer\Shader\bloom</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClInclude>
@@ -518,9 +497,6 @@
     </ClInclude>
     <ClInclude Include="Source\System\UI\EffectEditor\EffectEditor.h">
       <Filter>Source\System\UI\EffectEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\Renderer\Shader\meshVFX\meshVFX.h">
-      <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
@@ -581,6 +557,57 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Scene\Result\SceneResult.h">
       <Filter>Source\GamepPlay\Scene\Result</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.h">
+      <Filter>Source\System\Renderer\ImGuiRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\ModelRenderer\ModelRenderer.h">
+      <Filter>Source\System\Renderer\ModelRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\Light\Light.h">
+      <Filter>Source\System\Renderer\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\ShapeRenderer\ShapeRenderer.h">
+      <Filter>Source\System\Renderer\ShapeRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\PrimitiveRenderer\PrimitiveRenderer.h">
+      <Filter>Source\System\Renderer\PrimitiveRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\Shader.h">
+      <Filter>Source\System\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\Basic\BasicShader.h">
+      <Filter>Source\System\Shader\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\bloom\bloom.h">
+      <Filter>Source\System\Shader\bloom</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\FrameBuffer\FrameBuffer.h">
+      <Filter>Source\System\Shader\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\fullscreen_quad\fullscreen_quad.h">
+      <Filter>Source\System\Shader\fullscreen_quad</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\Lambert\LambertShader.h">
+      <Filter>Source\System\Shader\Lambert</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\meshVFX\meshVFX.h">
+      <Filter>Source\System\Shader\meshVFX</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\PBR\PBRShader.h">
+      <Filter>Source\System\Shader\PBR</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\ShadowMap\ShadowMap.h">
+      <Filter>Source\System\Shader\ShadowMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Shader\SkyMap\SkyMap.h">
+      <Filter>Source\System\Shader\SkyMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\Renderer\UIFillRenderer\UIFillRenderer.h">
+      <Filter>Source\System\Renderer\UIFillRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\PlayerUI.h">
+      <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -647,15 +674,6 @@
     <ClCompile Include="Source\System\Graphic\RenderState.cpp">
       <Filter>Source\System\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="Source\System\Renderer\ImGuiRenderer.cpp">
-      <Filter>Source\System\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp">
-      <Filter>Source\System\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp">
-      <Filter>Source\System\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp">
       <Filter>Source\System\Resource\Model</Filter>
     </ClCompile>
@@ -682,21 +700,6 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp">
       <Filter>Source\GamepPlay\Object\Camera\GameCamera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp">
-      <Filter>Source\System\Renderer\Shader\Basic</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp">
-      <Filter>Source\System\Renderer\Shader\Lambert</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp">
-      <Filter>Source\System\Renderer\Shader\SkyMap</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\PBR\PBRShader.cpp">
-      <Filter>Source\System\Renderer\Shader\PBR</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp">
-      <Filter>Source\System\Renderer\Shader\ShadowMap</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Animation\AnimationCharacter.cpp">
       <Filter>Source\GamepPlay\Object\Character\Animation</Filter>
@@ -749,9 +752,6 @@
     <ClCompile Include="Source\GamePlay\Object\Trail\Trail.cpp">
       <Filter>Source\GamepPlay\Object\Trail</Filter>
     </ClCompile>
-    <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp">
-      <Filter>Source\System\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Particle\compute_particle_system.cpp">
       <Filter>Source\GamepPlay\Object\Particle</Filter>
     </ClCompile>
@@ -782,15 +782,6 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicManager.cpp">
       <Filter>Source\GamepPlay\Object\Magic</Filter>
     </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.cpp">
-      <Filter>Source\System\Renderer\Shader\FrameBuffer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.cpp">
-      <Filter>Source\System\Renderer\Shader\fullscreen_quad</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\bloom\bloom.cpp">
-      <Filter>Source\System\Renderer\Shader\bloom</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicMove\StraightMagic</Filter>
     </ClCompile>
@@ -814,9 +805,6 @@
     </ClCompile>
     <ClCompile Include="Source\System\UI\EffectEditor\EffectConfig.cpp">
       <Filter>Source\System\UI\EffectEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\System\Renderer\Shader\meshVFX\meshVFX.cpp">
-      <Filter>Source\System\Renderer\Shader\meshVFX</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
@@ -872,8 +860,53 @@
     <ClCompile Include="Source\GamePlay\Scene\Load\SceneLoad.cpp">
       <Filter>Source\GamepPlay\Scene\Load</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.cpp">
+      <Filter>Source\System\Renderer\ImGuiRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\ModelRenderer\ModelRenderer.cpp">
+      <Filter>Source\System\Renderer\ModelRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\ShapeRenderer\ShapeRenderer.cpp">
+      <Filter>Source\System\Renderer\ShapeRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\PrimitiveRenderer\PrimitiveRenderer.cpp">
+      <Filter>Source\System\Renderer\PrimitiveRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\Basic\BasicShader.cpp">
+      <Filter>Source\System\Shader\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\bloom\bloom.cpp">
+      <Filter>Source\System\Shader\bloom</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\FrameBuffer\FrameBuffer.cpp">
+      <Filter>Source\System\Shader\FrameBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\fullscreen_quad\fullscreen_quad.cpp">
+      <Filter>Source\System\Shader\fullscreen_quad</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\Lambert\LambertShader.cpp">
+      <Filter>Source\System\Shader\Lambert</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\meshVFX\meshVFX.cpp">
+      <Filter>Source\System\Shader\meshVFX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\PBR\PBRShader.cpp">
+      <Filter>Source\System\Shader\PBR</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\ShadowMap\ShadowMap.cpp">
+      <Filter>Source\System\Shader\ShadowMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\SkyMap\SkyMap.cpp">
+      <Filter>Source\System\Shader\SkyMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Renderer\UIFillRenderer\UIFillRenderer.cpp">
+      <Filter>Source\System\Renderer\UIFillRenderer</Filter>
+    </ClCompile>
     <ClCompile Include="Source\GamePlay\Scene\Result\SceneResult.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Scene\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\PlayerUI.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1044,6 +1077,9 @@
     </FxCompile>
     <FxCompile Include="Shader\meshVFX\meshVFX_ps.hlsl">
       <Filter>Shader\meshVFX</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\UIFill\UIFillPS.hlsl">
+      <Filter>Shader\UIFill</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

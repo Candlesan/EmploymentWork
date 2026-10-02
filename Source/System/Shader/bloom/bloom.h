@@ -5,8 +5,8 @@
 #include <d3d11.h>
 #include <wrl.h>
 
-#include "System/Renderer/Shader/framebuffer/framebuffer.h"
-#include "System/Renderer/Shader/fullscreen_quad/fullscreen_quad.h"
+#include "System/Shader/framebuffer/framebuffer.h"
+#include "System/Shader/fullscreen_quad/fullscreen_quad.h"
 #include "System/Graphic/RenderState.h"
 
 class bloom

@@ -150,6 +150,7 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Player\PlayerUI.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\CollisionManager.h" />
     <ClInclude Include="Source\GamePlay\Object\Flight\FlightController.h" />
@@ -190,26 +191,27 @@
     <ClInclude Include="Source\System\Graphic\Graphics.h" />
     <ClInclude Include="Source\System\Graphic\RenderContext.h" />
     <ClInclude Include="Source\System\Graphic\RenderState.h" />
-    <ClInclude Include="Source\System\Renderer\ImGuiRenderer.h" />
-    <ClInclude Include="Source\System\Renderer\Light.h" />
-    <ClInclude Include="Source\System\Renderer\ModelRenderer.h" />
-    <ClInclude Include="Source\System\Renderer\PrimitiveRenderer.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\Basic\BasicShader.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\bloom\bloom.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\Lambert\LambertShader.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\meshVFX\meshVFX.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\PBR\PBRShader.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\Shader.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.h" />
-    <ClInclude Include="Source\System\Renderer\Shader\SkyMap\SkyMap.h" />
-    <ClInclude Include="Source\System\Renderer\ShapeRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\Light\Light.h" />
+    <ClInclude Include="Source\System\Renderer\ModelRenderer\ModelRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\PrimitiveRenderer\PrimitiveRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\ShapeRenderer\ShapeRenderer.h" />
+    <ClInclude Include="Source\System\Renderer\UIFillRenderer\UIFillRenderer.h" />
     <ClInclude Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.h" />
     <ClInclude Include="Source\System\Resource\Model\GLTFImporter.h" />
     <ClInclude Include="Source\System\Resource\Model\Model.h" />
     <ClInclude Include="Source\System\Resource\Sprite\Sprite.h" />
     <ClInclude Include="Source\System\Resource\TextureResourceManager\TextureResourceManager.h" />
+    <ClInclude Include="Source\System\Shader\Basic\BasicShader.h" />
+    <ClInclude Include="Source\System\Shader\bloom\bloom.h" />
+    <ClInclude Include="Source\System\Shader\FrameBuffer\FrameBuffer.h" />
+    <ClInclude Include="Source\System\Shader\fullscreen_quad\fullscreen_quad.h" />
+    <ClInclude Include="Source\System\Shader\Lambert\LambertShader.h" />
+    <ClInclude Include="Source\System\Shader\meshVFX\meshVFX.h" />
+    <ClInclude Include="Source\System\Shader\PBR\PBRShader.h" />
+    <ClInclude Include="Source\System\Shader\Shader.h" />
+    <ClInclude Include="Source\System\Shader\ShadowMap\ShadowMap.h" />
+    <ClInclude Include="Source\System\Shader\SkyMap\SkyMap.h" />
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.h" />
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.h" />
     <ClInclude Include="Source\System\UI\AnimationNodeEditor\AnimationTranstion.h" />
@@ -257,6 +259,7 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Player\PlayerUI.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Collision\CollisionManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Flight\FlightController.cpp" />
@@ -293,24 +296,25 @@
     <ClCompile Include="Source\System\Graphic\GpuResourceUtils.cpp" />
     <ClCompile Include="Source\System\Graphic\Graphics.cpp" />
     <ClCompile Include="Source\System\Graphic\RenderState.cpp" />
-    <ClCompile Include="Source\System\Renderer\ImGuiRenderer.cpp" />
-    <ClCompile Include="Source\System\Renderer\ModelRenderer.cpp" />
-    <ClCompile Include="Source\System\Renderer\PrimitiveRenderer.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\Basic\BasicShader.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\bloom\bloom.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\FrameBuffer\FrameBuffer.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\fullscreen_quad\fullscreen_quad.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\Lambert\LambertShader.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\meshVFX\meshVFX.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\PBR\PBRShader.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\ShadowMap\ShadowMap.cpp" />
-    <ClCompile Include="Source\System\Renderer\Shader\SkyMap\SkyMap.cpp" />
-    <ClCompile Include="Source\System\Renderer\ShapeRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\ModelRenderer\ModelRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\PrimitiveRenderer\PrimitiveRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\ShapeRenderer\ShapeRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\UIFillRenderer\UIFillRenderer.cpp" />
     <ClCompile Include="Source\System\Resource\ModelResourceManager\ModelResourceManager.cpp" />
     <ClCompile Include="Source\System\Resource\Model\GLTFImporter.cpp" />
     <ClCompile Include="Source\System\Resource\Model\Model.cpp" />
     <ClCompile Include="Source\System\Resource\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\System\Resource\TextureResourceManager\TextureResourceManager.cpp" />
+    <ClCompile Include="Source\System\Shader\Basic\BasicShader.cpp" />
+    <ClCompile Include="Source\System\Shader\bloom\bloom.cpp" />
+    <ClCompile Include="Source\System\Shader\FrameBuffer\FrameBuffer.cpp" />
+    <ClCompile Include="Source\System\Shader\fullscreen_quad\fullscreen_quad.cpp" />
+    <ClCompile Include="Source\System\Shader\Lambert\LambertShader.cpp" />
+    <ClCompile Include="Source\System\Shader\meshVFX\meshVFX.cpp" />
+    <ClCompile Include="Source\System\Shader\PBR\PBRShader.cpp" />
+    <ClCompile Include="Source\System\Shader\ShadowMap\ShadowMap.cpp" />
+    <ClCompile Include="Source\System\Shader\SkyMap\SkyMap.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionGraph.cpp" />
     <ClCompile Include="Source\System\UI\AnimationSequence\AnimationSequence.cpp" />
@@ -497,6 +501,10 @@
     <FxCompile Include="Shader\Trail\TrailVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shader\UIFill\UIFillPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

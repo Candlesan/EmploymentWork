@@ -1,5 +1,6 @@
 #pragma once
 #include "System/UI/UIEditor/UITween.h"
+#include "System/Renderer/UIFillRenderer/UIFillRenderer.h"
 #include "json.hpp"
 
 #include <string>
@@ -51,6 +52,9 @@ struct UIElement
 
 	UITween<float> scaleAnim;				// 拡大のアニメーション
 	float scaleValue = 1.0f;
+
+	FillMethod fillMethod = FillMethod::None;
+	float fillAmount;
 };
 
 struct Canvas
@@ -102,6 +106,7 @@ public:
 	// 要素のアニメーションを全部止めて、見た目を元に戻す
 	void ResetAnimation(UIElement* e);
 
+	std::shared_ptr<Sprite> CreateSprite(const std::string& path);
 private:
 	void UpdateElement(UIElement* e, float elapsedTime);
 	void RenderElement(ID3D11DeviceContext* dc, UIElement* e, const DirectX::XMMATRIX& parentWorld, const DirectX::XMFLOAT4& parentColor);
@@ -112,4 +117,5 @@ private:
 private:
 	ID3D11Device* device = nullptr; // デバイス保存用変数
 	Canvas canvas; 
+	UIFillRenderer uifillRenderer;
 };

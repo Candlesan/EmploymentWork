@@ -1,6 +1,6 @@
 #include "Stage.h"
 #include "System/Graphic/Graphics.h"
-#include "System/Renderer/ShapeRenderer.h"
+#include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
 
 #include <imgui.h>
 

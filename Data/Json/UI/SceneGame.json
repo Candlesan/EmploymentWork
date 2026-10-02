@@ -106,6 +106,7 @@
                         1.0,
                         1.0
                     ],
+                    "fillMethod": 1,
                     "name": "HP",
                     "pivot": [
                         0.0,
@@ -189,6 +190,7 @@
                         1.0,
                         1.0
                     ],
+                    "fillMethod": 1,
                     "name": "MP",
                     "pivot": [
                         0.0,
@@ -223,6 +225,7 @@
                 1.0,
                 1.0
             ],
+            "fillMethod": 0,
             "name": "Status",
             "pivot": [
                 0.0,
@@ -356,7 +359,8 @@
                         1.0,
                         1.0
                     ],
-                    "name": "GaurdBar",
+                    "fillMethod": 3,
+                    "name": "GuardBar",
                     "pivot": [
                         0.5,
                         0.5
@@ -439,6 +443,7 @@
                         1.0,
                         1.0
                     ],
+                    "fillMethod": 3,
                     "name": "HeatBar",
                     "pivot": [
                         0.5,
@@ -473,6 +478,7 @@
                 1.0,
                 1.0
             ],
+            "fillMethod": 0,
             "name": "CrossHair",
             "pivot": [
                 0.5,

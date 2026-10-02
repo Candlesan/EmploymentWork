@@ -1,8 +1,8 @@
 #pragma once
 #include <DirectXMath.h>
 #include <vector>
-#include "System/Renderer/ModelRenderer.h"
-#include "System/Renderer/ShapeRenderer.h"
+#include "System/Renderer/ModelRenderer/ModelRenderer.h"
+#include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Flight/FlightController.h"
 
