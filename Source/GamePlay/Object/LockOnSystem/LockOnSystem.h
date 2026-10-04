@@ -1,8 +1,13 @@
 #pragma once
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
+
+#include "GamePlay/Object/Character/Player/PlayerUI.h"
+
 #include <DirectXMath.h>
 
+// 前方宣言
 class Character;
+
 
 class LockOnSystem
 {
@@ -39,6 +44,7 @@ private:
 private:
 	Character* owner = nullptr;
 	Character* target = nullptr;
+	PlayerUI ui;
 	
 	// パラメーター
 	State state = State::None;

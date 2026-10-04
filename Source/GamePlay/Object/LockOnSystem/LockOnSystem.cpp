@@ -59,13 +59,15 @@ void LockOnSystem::DrawGUI()
 			break;
 		}
 		ImGui::DragFloat(u8"ターゲット補足時間", &lockTime, 0.1f);
+		ImGui::Separator();
+		ui.DrawGUI();
 	}
 }
 
 DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const
 {
 	DirectX::XMVECTOR E = DirectX::XMLoadFloat3(&target->GetPosition());
-	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.5f, 0, 0));
+	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.25f, 0, 0));
 	DirectX::XMVECTOR V = DirectX::XMLoadFloat3(&target->GetVelocity());
 	DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&muzzlePos);
 	DirectX::XMVECTOR D = DirectX::XMVectorSubtract(E, P);

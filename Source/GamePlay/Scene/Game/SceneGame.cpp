@@ -195,6 +195,7 @@ void SceneGame::Update(float elapsedTime)
 		CustomEffectManager::Instance().Update(delta);
 
 		playerUI.Update(Player::Instance().GetStatus());
+		playerUI.UpdateCrosshair(elapsedTime, player.GetLockOnSystem(), camera);
 
 		uiEditor.Update(elapsedTime);
 		uiCanvas.Update(elapsedTime);
