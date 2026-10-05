@@ -2,6 +2,7 @@
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicInfor.h"
 #include <fstream>
+#include <random>
 
 
 class RapidMagic
@@ -96,4 +97,5 @@ private:
     std::string magicCircle = "MagicCircleFast";
     int currentSpawnIndex = 0;
     float rapidTimer = 0.0f;
+    std::mt19937 rng{ std::random_device{}() };
 };

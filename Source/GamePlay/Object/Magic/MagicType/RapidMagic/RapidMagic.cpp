@@ -30,6 +30,8 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 		config.spawnOffset.z + localOffset.z,
 	};
 
+
+	// ======================== 6か所の発射位置のワールド座標を計算する ===========================
 	// 水平方向の前方向
 	float len = sqrtf(info.direction.x * info.direction.x + info.direction.z * info.direction.z);
 	DirectX::XMFLOAT3 forward = { 0.0f, 0.0f, 0.0f };
@@ -50,11 +52,36 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 		info.position.z + (right.z * totalOffset.x) + (forward.z * totalOffset.z),
 	};	 
 
+	// ============================================================================================
+
+	// ============================ 発射方向＋拡散の値を計算する ================================
+	DirectX::XMVECTOR S = DirectX::XMLoadFloat3(&startPos);
+	DirectX::XMVECTOR T = DirectX::XMLoadFloat3(&info.targetPos);
+	DirectX::XMVECTOR V = DirectX::XMVectorSubtract(T, S);
+	DirectX::XMVECTOR Dir = DirectX::XMVector3Normalize(V);
+
+	DirectX::XMFLOAT3 dir;
+	DirectX::XMStoreFloat3(&dir, Dir);
+
+	// 拡散を入れる
+	std::uniform_real_distribution<float> dist01(0.0f, 1.0f);
+	float a = dist01(rng); //0.0f～1.0fのランダムな値
+
+	float r = config.diffusion * sqrtf(dist01(rng)); // 中心からの距離
+	float theta = dist01(rng) * DirectX::XM_2PI; // 角度
+
+	float offsetX = r * cosf(theta);
+	float offsetY = r * sinf(theta);
+
+	dir.x += offsetX;
+	dir.y += offsetY;
+
+	// ==========================================================================================
+
 	// 弾を生成
 	MagicProjectile* magic = new MagicProjectile(manager, rapidMagic);
 
 	magic->SetOwner(info.owner); // 誰が撃ったか
-
 
 	// 直進移動コンポーネントセット
 	magic->SetMoveComponent(std::make_unique<StraightMove>());
@@ -82,7 +109,7 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetIsAlive(true);
 
 	// 発射
-	magic->Launch(info.direction, startPos, 0.0f);
+	magic->Launch(dir, startPos, 0.0f);
 
 	// 次に発射のためにインデックスを１つ進める
 	currentSpawnIndex = (currentSpawnIndex + 1) % 6;

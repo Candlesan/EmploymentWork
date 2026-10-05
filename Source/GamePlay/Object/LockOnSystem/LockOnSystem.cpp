@@ -74,7 +74,7 @@ void LockOnSystem::DrawGUI()
 DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const
 {
 	DirectX::XMVECTOR E = DirectX::XMLoadFloat3(&target->GetPosition());
-	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.25f, 0, 0)); // ‘_‚¤ˆÊ’u‚ð“G‚Ì˜“–‚½‚è‚É‚·‚é
+	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.5f, 0, 0)); // ‘_‚¤ˆÊ’u‚ð“G‚Ì˜“–‚½‚è‚É‚·‚é
 	DirectX::XMVECTOR V = DirectX::XMLoadFloat3(&target->GetVelocity());
 	DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&muzzlePos);
 	DirectX::XMVECTOR D = DirectX::XMVectorSubtract(E, P);

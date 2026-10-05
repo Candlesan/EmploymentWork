@@ -522,7 +522,8 @@ void Player::DrawGUI()
 				}
 				ImGui::Separator();
 
-				ImGui::DragFloat(u8"発射感覚", &rapidMagicConfig.rapidInterval, 0.01f);
+				ImGui::DragFloat(u8"発射間隔", &rapidMagicConfig.rapidInterval, 0.01f);
+				ImGui::DragFloat(u8"拡散", &rapidMagicConfig.diffusion, 0.1f);
 				ImGui::DragFloat(u8"生身へのダメージ", &rapidMagicConfig.damage, 0.1f);
 				ImGui::DragFloat(u8"防御魔法へのダメージ", &rapidMagicConfig.gaurdDamage, 0.1f);
 				ImGui::DragFloat(u8"魔法の速度", &rapidMagicConfig.speed, 0.1f);
@@ -709,6 +710,12 @@ void Player::MagicInput(float elapsedTime)
 	// カメラの前方向を取得する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	DirectX::XMFLOAT3 defultDir = camera.GetFront();
+	DirectX::XMFLOAT3 defultPos = camera.GetEye();
+	DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&defultPos);
+	DirectX::XMVECTOR cameraFront = DirectX::XMLoadFloat3(&defultDir);
+	DirectX::XMVECTOR Target = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, rapidMagicConfig.speed * rapidMagicConfig.lifeTimer));
+	DirectX::XMFLOAT3 defultTarget;
+	DirectX::XMStoreFloat3(&defultTarget, Target);
 
 	MagicBase* targetMagic = nullptr;
 	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
@@ -792,7 +799,7 @@ void Player::MagicInput(float elapsedTime)
 		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, rapidMagicConfig.speed);
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
-
+		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(position, rapidMagicConfig.speed) : defultTarget;
 		spawnInfo.holdTime = rtButtonHoldTime;
 
 		rapidMagicConfig.damage = 0.01f;
