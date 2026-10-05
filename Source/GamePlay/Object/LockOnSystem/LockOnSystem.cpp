@@ -1,5 +1,8 @@
 #include "LockOnSystem.h"
+
+#include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Character.h"
+
 #include <algorithm>
 #include <imgui.h>
 
@@ -58,20 +61,25 @@ void LockOnSystem::DrawGUI()
 			ImGui::Text(u8"状態:Locked");
 			break;
 		}
+
+		ImGui::DragFloat(u8"ロックオンの感知距離", &range, 0.1f);
+		ImGui::DragFloat(u8"ロックオンの感知角度", &lockAngle, 0.1f);
 		ImGui::DragFloat(u8"ターゲット補足時間", &lockTime, 0.1f);
 		ImGui::Separator();
 		ui.DrawGUI();
 	}
 }
 
+// 予測位置を返す
 DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const
 {
 	DirectX::XMVECTOR E = DirectX::XMLoadFloat3(&target->GetPosition());
-	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.25f, 0, 0));
+	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.25f, 0, 0)); // 狙う位置を敵の腰当たりにする
 	DirectX::XMVECTOR V = DirectX::XMLoadFloat3(&target->GetVelocity());
 	DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&muzzlePos);
 	DirectX::XMVECTOR D = DirectX::XMVectorSubtract(E, P);
 
+	// 判別式の準備をする
 	float a = DirectX::XMVectorGetX(DirectX::XMVector3Dot(V, V)) - (projectileSpeed * projectileSpeed);
 	float b = 2.0f * DirectX::XMVectorGetX(DirectX::XMVector3Dot(D, V));
 	float c = DirectX::XMVectorGetX(DirectX::XMVector3Dot(D, D));
@@ -113,6 +121,7 @@ DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& mu
 		}
 	}
 
+	// 予測位置を出す
 	DirectX::XMVECTOR TargetPos;
 	if (t > 0.0f)
 	{
@@ -178,11 +187,54 @@ bool LockOnSystem::IsTargetable(const DirectX::XMFLOAT3& aimDirection) const
 		}
 	}
 
+	// 画面外ならfalse
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	if (!IsEnemyInScreen(target->GetPosition(), camera))
+	{
+		return false;
+	}
+
 	// プレイヤーとターゲットの位置がrange以上ならfalse
 	if (dist > range)
 	{
 		return false;
 	}
 	
+	return true;
+}
+
+// 敵が画面内にいるか
+bool LockOnSystem::IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Camera& camera) const
+{
+	using namespace DirectX;
+
+	// viewとprojectionを1つの行列にまとめる
+	XMMATRIX View = XMLoadFloat4x4(&camera.GetView());
+	XMMATRIX Projection = XMLoadFloat4x4(&camera.GetProjection());
+	XMMATRIX ViewProjection = View * Projection;
+
+	// w = 1 に変換する
+	XMVECTOR Pos = XMVectorSet(worldPos.x, worldPos.y, worldPos.z, 1.0f);
+
+	// ワールド→ビュー→クリップ座標
+	XMVECTOR Clip = XMVector4Transform(Pos, ViewProjection);
+
+	XMFLOAT4 clip;
+	XMStoreFloat4(&clip, Clip);
+
+	// カメラの後ろにある
+	if (clip.w <= 0.0f) return false;
+
+	// wで割ってNDC（-1～1）にする
+	float ndcX = clip.x / clip.w;
+	float ndcY = clip.y / clip.w;
+
+	// 画面外ならfalse
+	if (ndcX < -1.0f || ndcX > 1.0f ||
+		ndcY < -1.0f || ndcY > 1.0f) 
+	{
+		return false;
+	}
+
 	return true;
 }

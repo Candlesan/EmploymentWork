@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 
 // 前方宣言
+class Camera;
 class Character;
 
 
@@ -24,6 +25,7 @@ public:
 	// GUI描画
 	void DrawGUI();
 
+	// 予測位置を返す
 	DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const;
 
 	// 偏差込みの発射方向（ロックしていなければaimDirectionをそのまま返す）
@@ -41,6 +43,8 @@ private:
 	// ロックオンが出来るか
 	bool IsTargetable(const DirectX::XMFLOAT3& aimDirection) const;
 
+	// 敵が画面内にいるか
+	bool IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Camera& camera) const;
 private:
 	Character* owner = nullptr;
 	Character* target = nullptr;
@@ -54,7 +58,7 @@ private:
 
 	// GUI用
 	float range = 100.0f; // 自動ロックオン射程距離
-	float lockAngle = 20.0f; // ロックオン判定の角度
+	float lockAngle = 45.0f; // ロックオン判定の角度
 	float lockTime = 0.3; // ロックオン判定になるまでの時間(秒)
 	float leadError = 0.0f; // 偏差の誤差
 };
