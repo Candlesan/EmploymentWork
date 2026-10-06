@@ -1601,6 +1601,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 
 	isGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
 
+	// RBボタンの長押し判定
 	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
 	{
 		rbButtonHoldTime += elapsedTime;
@@ -1610,6 +1611,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 		rbButtonHoldTime = 0.0f;
 	}
 
+	// RTボタンの長押し判定
 	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
 	{
 		rtButtonHoldTime += elapsedTime;
@@ -1632,7 +1634,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.HoldTime = rbButtonHoldTime;
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.IsGround = IsGround();
-	ctx.isLockOn = (lockOnTargetPos != nullptr);
+	ctx.isLockOn = lockOn.IsHardLock();
 	ctx.isGuarding = isGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
