@@ -4,6 +4,8 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Core/Input/Input.h"
 #include "System/Audio/Audio.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
@@ -20,12 +22,13 @@
 // 初期化
 void Player::Initialize()
 {
+	// デバイスを取得
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	// モデルの読み込み
 	player = std::make_shared<Model>(device, "Data/Model/Player/Player/SK_SwordsmanGirl_02.gltf");
 	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
-	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.01f;
+	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.01f; //　武器の大きさを調整
 
 	// アニメーターを生成
 	animator = std::make_unique<Animator>();
@@ -41,14 +44,17 @@ void Player::Initialize()
 	status.maxDefenseDurability = 100.0f;
 	status.currentDefenseDurability = 100.0f;
 
+	// 当たり判定の設定
 	weight = 0.5f;
 	radius = 0.8f;
-	height = 1.6f;
+	height = 1.0f;
 	debugOffset = 0.8;
 
+	// 杖の位置設定
 	weapon.position = { 0.07f, 0.0f, 0.03f };
 	weapon.angle = { -0.06, 0.23f, -1.13f };
 
+	// ボーン名の初期化
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "spine_01";
 
@@ -63,6 +69,7 @@ void Player::Initialize()
 	rapidMagic.Initialize();
 	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
+	CustomEffectManager::Instance().LoadEffectConfig("Barreir", "Data/Json/Effect/Barreir.json"); // 防御魔法のエフェクトの読み込み
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
@@ -70,6 +77,7 @@ void Player::Initialize()
 	SetupInitialAnimationState();    // 初期アニメーションの設定
 
 	InitializeHeadDirection(); // 頭の向きを初期化
+	CustomEffectManager::Instance().LoadEffectConfig("Barrier", "Data/Json/Effect/Barrier.json");
 }
 
 // シーケンサーの初期化
@@ -837,14 +845,31 @@ void Player::MagicInput(float elapsedTime)
 	// 防御魔法
 	if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
 	{
-		// 防御魔法を起動
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
+
+		// まだエフェクトを出してなければ1回だけ生成する
+		if (!barrierEffect)
+		{
+			barrierEffect = CustomEffectManager::Instance().PlayEffect("Barreir", position, angle, { 1.5f, 1.5f, 1.5f });
+		}
+		else
+		{
+			// 出してる間はプレイヤーに追従させる
+			barrierEffect->SetPosition(defenseMagic.GetDefensePosition());
+		}
 	}
 	else
 	{
 		status.isGuarding = false;
 		defenseMagic.SetIsActive(status.isGuarding);
+
+		// ボタンを離したら止めて、ポインタも空に戻す
+		if (barrierEffect)
+		{
+			barrierEffect->Stop();
+			barrierEffect = nullptr;
+		}
 	}
 }
 

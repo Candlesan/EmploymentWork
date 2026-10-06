@@ -24,7 +24,17 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
 		Character* target = static_cast<Character*>(b.owner);
 
-		target->ApplyDamage(magic->GetDamage());
+		// 防御魔法を展開していないときにダメージ
+		if (!target->GetIsGaurd())
+		{
+			target->ApplyDamage(magic->GetDamage());
+		}
+		else if (target->GetIsGaurd() && magic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
+		{
+			// 防御魔法を展開してかつチャージ魔法だったら半分のダメージを与える
+			target->ApplyDamage(magic->GetDamage() * 0.5f);
+		}
+
 		magic->OnTerminate(); // 当たったら魔法を消す
 
 	}

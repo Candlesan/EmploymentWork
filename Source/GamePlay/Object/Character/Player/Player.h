@@ -1,5 +1,5 @@
 #pragma once
-// ƒVƒXƒeƒ€
+// ã‚·ã‚¹ãƒ†ãƒ 
 #include "System/Renderer/ModelRenderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence/AnimationSequence.h"
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
@@ -7,7 +7,7 @@
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
 #include "System/Audio/AudioSource.h"
 
-// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg
+// ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Trail/Trail.h"
@@ -18,14 +18,15 @@
 
 #include <memory>
 
-// ‘O•ûéŒ¾
+// å‰æ–¹å®£è¨€
 class Enemy;
+class CustomEffect;
 
 class Player : public AnimationCharacter
 {
 public:
 	// =========================================================================
-	//  ƒCƒ“ƒXƒ^ƒ“ƒXŠÇ—iƒVƒ“ƒOƒ‹ƒgƒ“j
+	//  ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç®¡ç†ï¼ˆã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ï¼‰
 	// =========================================================================
 	static Player& Instance() {
 		static Player instance;
@@ -33,7 +34,7 @@ public:
 	}
 
 	// =========================================================================
-	//  ƒ‰ƒCƒtƒTƒCƒNƒ‹iƒQ[ƒ€‚ÌªŠ²‚Ì—¬‚êj
+	//  ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ï¼ˆã‚²ãƒ¼ãƒ ã®æ ¹å¹¹ã®æµã‚Œï¼‰
 	// =========================================================================
 	void Initialize();
 	void InitializeSequencer();
@@ -48,7 +49,7 @@ public:
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 	// =========================================================================
-	//  ŠO•”‚©‚ç‚ÌƒAƒNƒVƒ‡ƒ“–½—ßiƒvƒŒƒCƒ„[‚ğ“®‚©‚·ŠO‚©‚ç‚ÌƒgƒŠƒK[j
+	//  å¤–éƒ¨ã‹ã‚‰ã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³å‘½ä»¤ï¼ˆãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’å‹•ã‹ã™å¤–ã‹ã‚‰ã®ãƒˆãƒªã‚¬ãƒ¼ï¼‰
 	// =========================================================================
 	void MagicInput(float elapsedTime);
 	void AddGraph(std::string name);
@@ -57,7 +58,7 @@ public:
 	void InputLockOn();
 
 	// =========================================================================
-	//  ƒZƒbƒ^[
+	//  ã‚»ãƒƒã‚¿ãƒ¼
 	// =========================================================================
 	void SetEnemy(Enemy* e) { enemy = e; }
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos);
@@ -65,12 +66,12 @@ public:
 	void SetIsHit(bool hit) { isHit = hit; }
 
 	// =========================================================================
-	//  ƒQƒbƒ^[
+	//  ã‚²ãƒƒã‚¿ãƒ¼
 	// =========================================================================
-	// „Ÿ„Ÿ ƒvƒŒƒCƒ„[‚Ìó‘Ô „Ÿ„Ÿ
-	float GetCurrentMagic() const { return status.currentMagic; } // Œ»İ‚Ì–‚—Í—Ê‚ğ•Ô‚·
-	float GetCurrentHeat() const { return status.currentHeat; } // Œ»İ‚Ìƒq[ƒg’l‚ğ•Ô‚·
-	float GetCurrentDefense() const { return status.currentDefenseDurability; } // Œ»İ‚Ì–hŒä–‚–@‚Ì‘Ï‹v’l‚ğ•Ô‚·
+	// â”€â”€ ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®çŠ¶æ…‹ â”€â”€
+	float GetCurrentMagic() const { return status.currentMagic; } // ç¾åœ¨ã®é­”åŠ›é‡ã‚’è¿”ã™
+	float GetCurrentHeat() const { return status.currentHeat; } // ç¾åœ¨ã®ãƒ’ãƒ¼ãƒˆå€¤ã‚’è¿”ã™
+	float GetCurrentDefense() const { return status.currentDefenseDurability; } // ç¾åœ¨ã®é˜²å¾¡é­”æ³•ã®è€ä¹…å€¤ã‚’è¿”ã™
 
 	bool GetIsGuarding() const { return isGuarding; }
 	bool GetIsAvoid() const { return isAvoid; }
@@ -78,13 +79,13 @@ public:
 	LockOnSystem& GetLockOnSystem() { return lockOn; }
 	const LockOnSystem& GetLockOnSystem() const { return lockOn; }
 
-	// „Ÿ„Ÿ •ŠíEí“¬ŠÖŒW „Ÿ„Ÿ
+	// â”€â”€ æ­¦å™¨ãƒ»æˆ¦é—˜é–¢ä¿‚ â”€â”€
 	DirectX::XMFLOAT3 GetWeaponPosition() const;
 	DirectX::XMFLOAT3 GetWeaponDirection() const;
 	float GetWeaponRadius() const { return weapon.weaponRadius; }
 	float GetWeaponHeight() const { return weapon.weaponHeight; }
 
-	// „Ÿ„Ÿ ƒ}ƒl[ƒWƒƒ[EƒVƒXƒeƒ€Œn‚Ö‚ÌƒAƒNƒZƒX „Ÿ„Ÿ
+	// â”€â”€ ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ãƒ»ã‚·ã‚¹ãƒ†ãƒ ç³»ã¸ã®ã‚¢ã‚¯ã‚»ã‚¹ â”€â”€
 	std::shared_ptr<Model> GetModel() override { return player; }
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
@@ -93,28 +94,28 @@ public:
 
 protected:
 	// =========================================================================
-	//  eqŠÖŒW‚ÌƒI[ƒo[ƒ‰ƒCƒhiAnimationCharacter‚©‚ç‚ÌŒp³ŠÖ”j
+	//  è¦ªå­é–¢ä¿‚ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ï¼ˆAnimationCharacterã‹ã‚‰ã®ç¶™æ‰¿é–¢æ•°ï¼‰
 	// =========================================================================
 	void OnLanding() override;
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
 private:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^ŒQiƒVƒ“ƒOƒ‹ƒgƒ“‚È‚Ì‚Å‰B‚·j
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ç¾¤ï¼ˆã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ãªã®ã§éš ã™ï¼‰
 	Player() {};
 	~Player() override {};
 
 	// =========================================================================
-	//  “à•”ƒwƒ‹ƒp[ŠÖ”
+	//  å†…éƒ¨ãƒ˜ãƒ«ãƒ‘ãƒ¼é–¢æ•°
 	// =========================================================================
-	// „Ÿ„Ÿ ˆÚ“®E“ü—Í‚ÌŒvZ „Ÿ„Ÿ
+	// â”€â”€ ç§»å‹•ãƒ»å…¥åŠ›ã®è¨ˆç®— â”€â”€
 	DirectX::XMFLOAT3 GetMoveVec() const;
 	void InputMove(float elapsedTime);
 	RelativeInputDir CalculateRelativeInputDir();
 
-	// „Ÿ„Ÿ ê—p‹Z „Ÿ„Ÿ
+	// â”€â”€ å°‚ç”¨æŠ€ â”€â”€
 
 
-	// „Ÿ„Ÿ ƒXƒe[ƒgƒ}ƒVƒ“Eæs“ü—Í „Ÿ„Ÿ
+	// â”€â”€ ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ãƒ»å…ˆè¡Œå…¥åŠ› â”€â”€
 	void UpdateStateTransitions(float elapsedTime);
 	void UpdateUpperBodyTransitions(float elapsedTime);
 	TransitionContext InputTransitionContext(float elapsedTime);
@@ -122,64 +123,64 @@ private:
 	void PlayActionGraph(const std::string& graphName);
 	void UpdateStateBehavior();
 
-	// „Ÿ„Ÿ •¨—Eƒ^ƒCƒ}[E‚»‚Ì‘¼ „Ÿ„Ÿ
+	// â”€â”€ ç‰©ç†ãƒ»ã‚¿ã‚¤ãƒãƒ¼ãƒ»ãã®ä»– â”€â”€
 	void UpdateTimers(float elapsedTime);
 	void UpdateLockAt(float elapsedTime);
 	void CalculateStatusParameters();
 	void CalculationRootAndTip();
 	void CalculateSpineRotation(float elapsedTime);
 
-	// ‰¹‚ğæ“¾i–³‚¯‚ê‚Î©“®ƒ[ƒhj‚·‚éŠÖ”
+	// éŸ³ã‚’å–å¾—ï¼ˆç„¡ã‘ã‚Œã°è‡ªå‹•ãƒ­ãƒ¼ãƒ‰ï¼‰ã™ã‚‹é–¢æ•°
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
-	//@ƒm[ƒh‚Ì–¼‘O‚ğ’T‚·ŠÖ”
+	//ã€€ãƒãƒ¼ãƒ‰ã®åå‰ã‚’æ¢ã™é–¢æ•°
 	AnimNode* FindNodeByName(const std::string& stateName);
 
-	// ƒm[ƒh‚Ìİ’è‚ğÅV‚É‚·‚éŠÖ”
+	// ãƒãƒ¼ãƒ‰ã®è¨­å®šã‚’æœ€æ–°ã«ã™ã‚‹é–¢æ•°
 	void RefreshStateConfigs();
 
-	// GUI‚Ì•\¦/”ñ•\¦
+	// GUIã®è¡¨ç¤º/éè¡¨ç¤º
 	void ShowDebugSwitch();
 private:
 	// =========================================================================
-	//  ƒƒ“ƒo•Ï”i‘å—Ê‚É‚ ‚é‚Ì‚ÅAƒWƒƒƒ“ƒ‹‚²‚Æ‚ÉãY—í‚ÉƒOƒ‹[ƒv‰»Ij
+	//  ãƒ¡ãƒ³ãƒå¤‰æ•°ï¼ˆå¤§é‡ã«ã‚ã‚‹ã®ã§ã€ã‚¸ãƒ£ãƒ³ãƒ«ã”ã¨ã«ç¶ºéº—ã«ã‚°ãƒ«ãƒ¼ãƒ—åŒ–ï¼ï¼‰
 	// =========================================================================
-	// „Ÿ„Ÿ 3Dƒ‚ƒfƒ‹‚Æ‘•”õ „Ÿ„Ÿ
+	// â”€â”€ 3Dãƒ¢ãƒ‡ãƒ«ã¨è£…å‚™ â”€â”€
 	std::shared_ptr<Model> player;
 	Enemy* enemy = nullptr;
 
-	// „Ÿ„Ÿ Šî–{ƒpƒ‰ƒ[ƒ^iˆÚ“®E‰ñ“]j „Ÿ„Ÿ
+	// â”€â”€ åŸºæœ¬ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ï¼ˆç§»å‹•ãƒ»å›è»¢ï¼‰ â”€â”€
 	float moveSpeed = 5.0f;
 	float flightSpeed = 20.0f;
 	float maxMoveSpeed = 7.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 	float moveLength = 0.0f;
 
-	// „Ÿ„Ÿ í“¬EƒXƒe[ƒ^ƒXiHPEƒXƒ^ƒ~ƒiE–³“Gj „Ÿ„Ÿ
+	// â”€â”€ æˆ¦é—˜ãƒ»ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ï¼ˆHPãƒ»ã‚¹ã‚¿ãƒŸãƒŠãƒ»ç„¡æ•µï¼‰ â”€â”€
 	float runDisableTimer = 0.0f;
 	float staminaCooldownTimer = 0.0f;
 	bool haveStamina = false;
 	bool isStaminaEmpty = false;
 
-	// „Ÿ„Ÿ ƒAƒNƒVƒ‡ƒ“ó‘Ô‚Ìƒtƒ‰ƒO „Ÿ„Ÿ
+	// â”€â”€ ã‚¢ã‚¯ã‚·ãƒ§ãƒ³çŠ¶æ…‹ã®ãƒ•ãƒ©ã‚° â”€â”€
 	bool isGuarding = false;
 	bool isHit = false;
 	bool isAvoid = false;
 
-	// „Ÿ„Ÿ ƒWƒƒƒ“ƒvŠÖŒW „Ÿ„Ÿ
+	// â”€â”€ ã‚¸ãƒ£ãƒ³ãƒ—é–¢ä¿‚ â”€â”€
 	bool jumpPressed = false;
 	float jumpSpeed = 7.0f;
 	bool falling = false;
 	int jumpCount = 0;
 	int jumpLimit = 1;
 
-	// „Ÿ„Ÿ ƒƒbƒNƒIƒ“E“G‚Æ‚Ì‹——£ „Ÿ„Ÿ
+	// â”€â”€ ãƒ­ãƒƒã‚¯ã‚ªãƒ³ãƒ»æ•µã¨ã®è·é›¢ â”€â”€
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
 	bool hasLockOnTarget = false;
 	float enemyFromDistance = 0.0f;
 	float lockedEnemyDistance = 0.0f;
 
-	// „Ÿ„Ÿ –‚–@ „Ÿ„Ÿ
+	// â”€â”€ é­”æ³• â”€â”€
 	MagicManager magicManager;
 	NormalMagic::NormalMagicConfig normalMagicConfig;
 	NormalMagic normalMagic;
@@ -187,15 +188,15 @@ private:
 	RapidMagic rapidMagic;
 	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
-	float coolDownValue = 1.0f;				// ’ÊíUŒ‚–‚–@‚ÌƒN[ƒ‹ƒ_ƒEƒ“
-	float fullcChargeCoolDownValue = 3.0f;	// ƒtƒ‹ƒ`ƒƒ[ƒWƒVƒ‡ƒbƒgŒã‚ÌƒN[ƒ‹ƒ_ƒEƒ“
-	bool rapidInterval = 0.1f;				// ˜AË–‚–@‚Ì”­ËŠ´Šo
-	float magicRecoverDelay = 0.0f;			// –‚—Í‚ğ‰ñ•œ‚·‚é‚Ü‚Å‚Ì’x‰„
-	float interceptRadius = 10.0f;			// Œ}Œ‚—p‚Ì”¼Œa
-	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // Œ}Œ‚—p‚ÌƒIƒtƒZƒbƒgˆÊ’u
+	float coolDownValue = 1.0f;				// é€šå¸¸æ”»æ’ƒé­”æ³•ã®ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³
+	float fullcChargeCoolDownValue = 3.0f;	// ãƒ•ãƒ«ãƒãƒ£ãƒ¼ã‚¸ã‚·ãƒ§ãƒƒãƒˆå¾Œã®ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³
+	bool rapidInterval = 0.1f;				// é€£å°„é­”æ³•ã®ç™ºå°„æ„Ÿè¦š
+	float magicRecoverDelay = 0.0f;			// é­”åŠ›ã‚’å›å¾©ã™ã‚‹ã¾ã§ã®é…å»¶
+	float interceptRadius = 10.0f;			// è¿æ’ƒç”¨ã®åŠå¾„
+	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // è¿æ’ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆä½ç½®
 	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
 
-	// „Ÿ„Ÿ “Áê‰‰oi”wœ‚ÌŒX‚«E•Ší‚ÌŒ©‚½–ÚEƒgƒŒƒCƒ‹j „Ÿ„Ÿ
+	// â”€â”€ ç‰¹æ®Šæ¼”å‡ºï¼ˆèƒŒéª¨ã®å‚¾ããƒ»æ­¦å™¨ã®è¦‹ãŸç›®ãƒ»ãƒˆãƒ¬ã‚¤ãƒ«ï¼‰ â”€â”€
 	float previousAngleY = 0.0f;
 	float currentBankAngle = 0.0f;
 	float targetSpineAngle = -10.0f;
@@ -214,7 +215,7 @@ private:
 	float dropEndT = 0.0f;
 	float lookAtWeight = 0.0f;
 
-	// „Ÿ„Ÿ “ü—Íƒoƒbƒtƒ@Eè‡’lEƒfƒoƒbƒO „Ÿ„Ÿ
+	// â”€â”€ å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ãƒ»é–¾å€¤ãƒ»ãƒ‡ãƒãƒƒã‚° â”€â”€
 	int bufferedButton = 0;
 	float lerpSpeed = 3.0f;
 	float bButtonHoldTime = 0.0f;
@@ -227,7 +228,7 @@ private:
 	const float RB_THRESHOLD = 0.5f;
 	float debugAngle = 0.0f;
 
-	// „Ÿ„Ÿ ƒV[ƒPƒ“ƒT[Eƒm[ƒhƒGƒfƒBƒ^ „Ÿ„Ÿ
+	// â”€â”€ ã‚·ãƒ¼ã‚±ãƒ³ã‚µãƒ¼ãƒ»ãƒãƒ¼ãƒ‰ã‚¨ãƒ‡ã‚£ã‚¿ â”€â”€
 	AnimationSequencer animSequence;
 	AnimationSequencerEditor sequencerEditor;
 	AnimationTransitionEditor transitionEditor;
@@ -237,14 +238,17 @@ private:
 	int currentGraphIndex = 0;
 	int debugNextState = 0;
 
-	// „Ÿ„Ÿ ƒvƒŒƒrƒ…[ƒ‚[ƒh—p „Ÿ„Ÿ
+	// â”€â”€ ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼ãƒ¢ãƒ¼ãƒ‰ç”¨ â”€â”€
 	bool isPreviewMode = false;
 	std::string editingState = "";
 
-	// „Ÿ„Ÿ ƒTƒEƒ“ƒh „Ÿ„Ÿ
+	// â”€â”€ ã‚µã‚¦ãƒ³ãƒ‰ â”€â”€
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 
-	// „Ÿ„Ÿ ƒfƒoƒbƒN „Ÿ„Ÿ
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆé–¢ä¿‚
+	CustomEffect* barrierEffect = nullptr; // é˜²å¾¡é­”æ³•ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+
+	// â”€â”€ ãƒ‡ãƒãƒƒã‚¯ â”€â”€
 	bool showAnimarionTransitionEditor = true;
 	bool showPlayerParameter = true;
 	bool showPlayer = true;

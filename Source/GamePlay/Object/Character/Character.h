@@ -118,6 +118,9 @@ public:
 	void SetIsRapidFire(bool flag) { status.isRapidFire = flag; }
 	void SetIsIntercept(bool flag) { status.isIntercept = flag; }
 
+	// –hŒä–‚–@‚ğ“WŠJ‚µ‚Ä‚¢‚é‚©
+	bool GetIsGaurd() const { return status.isGuarding; }
+
 	// ----- ˆÚ“® / ‰ñ“] -----
 
 	// ˆÚ“®ˆ—i“ü—Í vx, vz, speed ‚ğó‚¯æ‚éj
