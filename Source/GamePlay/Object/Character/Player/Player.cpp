@@ -42,7 +42,7 @@ void Player::Initialize()
 	status.currentDefenseDurability = 100.0f;
 
 	weight = 0.5f;
-	radius = 0.4f;
+	radius = 0.8f;
 	height = 1.6f;
 	debugOffset = 0.8;
 

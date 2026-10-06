@@ -2,259 +2,6 @@
     "elements": [
         {
             "anchor": [
-                0.0,
-                0.0
-            ],
-            "animations": {
-                "fade": {
-                    "duration": 0.0,
-                    "ease": 0,
-                    "enabled": false,
-                    "from": 0.0,
-                    "loop": 0,
-                    "loopCount": -1,
-                    "to": 0.0
-                },
-                "move": {
-                    "duration": 0.0,
-                    "ease": 0,
-                    "enabled": false,
-                    "from": [
-                        0.0,
-                        0.0
-                    ],
-                    "loop": 0,
-                    "loopCount": -1,
-                    "to": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "rotation": {
-                    "duration": 1.0,
-                    "ease": 4,
-                    "enabled": false,
-                    "from": 0.0,
-                    "loop": 2,
-                    "loopCount": 10,
-                    "to": 90.0
-                },
-                "scale": {
-                    "duration": 0.0,
-                    "ease": 0,
-                    "enabled": false,
-                    "from": 0.0,
-                    "loop": 0,
-                    "loopCount": -1,
-                    "to": 0.0
-                }
-            },
-            "children": [
-                {
-                    "anchor": [
-                        0.0,
-                        0.0
-                    ],
-                    "animations": {
-                        "fade": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        },
-                        "move": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": [
-                                0.0,
-                                0.0
-                            ],
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": [
-                                0.0,
-                                0.0
-                            ]
-                        },
-                        "rotation": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        },
-                        "scale": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        }
-                    },
-                    "children": [],
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "fillMethod": 1,
-                    "name": "HP",
-                    "pivot": [
-                        0.0,
-                        0.0
-                    ],
-                    "position": [
-                        123.4000015258789,
-                        16.0
-                    ],
-                    "rotation": 0.0,
-                    "scale": [
-                        1.0,
-                        1.0
-                    ],
-                    "size": [
-                        668.0,
-                        62.0
-                    ],
-                    "texturePath": "Data\\Sprite\\Texture\\HPBar.PNG",
-                    "uvRect": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "visible": true
-                },
-                {
-                    "anchor": [
-                        0.0,
-                        0.0
-                    ],
-                    "animations": {
-                        "fade": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        },
-                        "move": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": [
-                                0.0,
-                                0.0
-                            ],
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": [
-                                0.0,
-                                0.0
-                            ]
-                        },
-                        "rotation": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        },
-                        "scale": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        }
-                    },
-                    "children": [],
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "fillMethod": 1,
-                    "name": "MP",
-                    "pivot": [
-                        0.0,
-                        0.0
-                    ],
-                    "position": [
-                        123.9000015258789,
-                        82.30000305175781
-                    ],
-                    "rotation": 0.0,
-                    "scale": [
-                        1.0,
-                        1.0
-                    ],
-                    "size": [
-                        664.0,
-                        58.0
-                    ],
-                    "texturePath": "Data\\Sprite\\Texture\\MPBar.PNG",
-                    "uvRect": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "visible": true
-                }
-            ],
-            "color": [
-                1.0,
-                1.0,
-                1.0,
-                1.0
-            ],
-            "fillMethod": 0,
-            "name": "Status",
-            "pivot": [
-                0.0,
-                0.0
-            ],
-            "position": [
-                27.899999618530273,
-                18.899999618530273
-            ],
-            "rotation": 0.0,
-            "scale": [
-                1.0,
-                1.0
-            ],
-            "size": [
-                797.0,
-                154.0
-            ],
-            "texturePath": "Data\\Sprite\\Texture\\StatusBar.PNG",
-            "uvRect": [
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            ],
-            "visible": true
-        },
-        {
-            "anchor": [
                 0.5,
                 0.5
             ],
@@ -303,6 +50,90 @@
                 }
             },
             "children": [
+                {
+                    "anchor": [
+                        0.5,
+                        0.5
+                    ],
+                    "animations": {
+                        "fade": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        },
+                        "move": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": [
+                                0.0,
+                                0.0
+                            ],
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": [
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "rotation": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        },
+                        "scale": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        }
+                    },
+                    "children": [],
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "fillMethod": 0,
+                    "name": "Crosshair2",
+                    "pivot": [
+                        0.5,
+                        0.5
+                    ],
+                    "position": [
+                        0.0,
+                        0.0
+                    ],
+                    "rotation": 0.0,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ],
+                    "size": [
+                        323.0,
+                        317.0
+                    ],
+                    "texturePath": "Data\\Sprite\\Texture\\Crosshair2.PNG",
+                    "uvRect": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "visible": true
+                },
                 {
                     "anchor": [
                         0.0,
@@ -470,6 +301,174 @@
                         0.0
                     ],
                     "visible": true
+                },
+                {
+                    "anchor": [
+                        0.0,
+                        0.0
+                    ],
+                    "animations": {
+                        "fade": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        },
+                        "move": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": [
+                                0.0,
+                                0.0
+                            ],
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": [
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "rotation": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        },
+                        "scale": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        }
+                    },
+                    "children": [],
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "fillMethod": 3,
+                    "name": "HPBar",
+                    "pivot": [
+                        0.5,
+                        0.5
+                    ],
+                    "position": [
+                        54.0,
+                        158.10000610351563
+                    ],
+                    "rotation": 0.0,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ],
+                    "size": [
+                        125.0,
+                        122.0
+                    ],
+                    "texturePath": "Data\\Sprite\\Texture\\HPBar.PNG",
+                    "uvRect": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "visible": true
+                },
+                {
+                    "anchor": [
+                        0.0,
+                        0.0
+                    ],
+                    "animations": {
+                        "fade": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        },
+                        "move": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": [
+                                0.0,
+                                0.0
+                            ],
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": [
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "rotation": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        },
+                        "scale": {
+                            "duration": 0.0,
+                            "ease": 0,
+                            "enabled": false,
+                            "from": 0.0,
+                            "loop": 0,
+                            "loopCount": -1,
+                            "to": 0.0
+                        }
+                    },
+                    "children": [],
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "fillMethod": 3,
+                    "name": "MPBar",
+                    "pivot": [
+                        0.5,
+                        0.5
+                    ],
+                    "position": [
+                        162.6999969482422,
+                        160.6999969482422
+                    ],
+                    "rotation": 0.0,
+                    "scale": [
+                        1.0,
+                        1.0
+                    ],
+                    "size": [
+                        133.0,
+                        119.0
+                    ],
+                    "texturePath": "Data\\Sprite\\Texture\\MPBar.PNG",
+                    "uvRect": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "visible": true
                 }
             ],
             "color": [
@@ -479,7 +478,7 @@
                 1.0
             ],
             "fillMethod": 0,
-            "name": "CrossHair",
+            "name": "Crosshair",
             "pivot": [
                 0.5,
                 0.5

@@ -225,7 +225,7 @@ void UIEditor::DrawInspector()
 				ImGui::Separator();
 
 				// 並びはFillMethodのenumと必ず同じ順番にする
-				const char* fillItems[] = { "None", u8"左から右へ", u8"右から左へ", u8"下から上へ", u8"上から下へ", u8"時計回り" };
+				const char* fillItems[] = { "None", u8"左から右へ", u8"右から左へ", u8"下から上へ", u8"上から下へ", u8"時計回り", u8"反時計回り" };
 				int fillMethod = static_cast<int>(selectedElement.fillMethod);
 				if (ImGui::Combo(u8"塗り方向", &fillMethod, fillItems, IM_ARRAYSIZE(fillItems)))
 				{

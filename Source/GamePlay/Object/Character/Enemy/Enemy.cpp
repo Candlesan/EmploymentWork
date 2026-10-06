@@ -39,7 +39,7 @@ void Enemy::Initialize()
 
 	// 敵モデル・コライダー設定
 	weight = 0.5f;
-	radius = 0.4f;
+	radius = 0.8f;
 	height = 1.6f;
 	debugOffset = 0.8;
 

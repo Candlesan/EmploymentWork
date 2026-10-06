@@ -28,8 +28,14 @@ float4 main(VS_OUT pin) : SV_TARGET
         t = local.y;
     else if (fillMethod == 5) // 時計回り
     {
+        float2 p = local - 0.5f; // 画像の中心へ移動
+        float angle = atan2(p.x, -p.y); // (x,-y)と反転させることで12時の上方向からスタートする
+        t = frac(angle / PI2 + 1.0f); // (-180°～ 180°)
+    }
+    else if (fillMethod == 6) // 反時計回り
+    {
         float2 p = local - 0.5f;
-        float angle = atan2(p.x, -p.y);
+        float angle = atan2(-p.x, -p.y);
         t = frac(angle / PI2 + 1.0f);
     }
     

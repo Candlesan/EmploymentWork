@@ -13,11 +13,11 @@
 // ‰Šú‰»
 void PlayerUI::Initialize(UICanvas& uiCanvas)
 {
-	hpGauge = uiCanvas.Find("HP");
-	mpGauge = uiCanvas.Find("MP");
-	guardGauge = uiCanvas.Find("GuardBar");
-	heatGauge = uiCanvas.Find("HeatBar");
-	crosshair = uiCanvas.Find("CrossHair");
+	hpBar = uiCanvas.Find("HPBar");
+	mpBar = uiCanvas.Find("MPBar");
+	guardBar = uiCanvas.Find("GuardBar");
+	heatBar = uiCanvas.Find("HeatBar");
+	crosshair = uiCanvas.Find("Crosshair");
 }
 
 // XVˆ—
@@ -30,10 +30,10 @@ void PlayerUI::Update(const CharacterStatus& status)
 		e->fillAmount = std::clamp(current / max, 0.0f, 1.0f); // 0`1‚É’¼‚·
 	};
 
-	setFill(hpGauge, status.currentHp, status.maxHp);
-	setFill(mpGauge, status.currentMagic, status.maxMagic);
-	setFill(guardGauge, status.currentDefenseDurability, status.maxDefenseDurability);
-	setFill(heatGauge, status.currentHeat, status.maxHeat);
+	setFill(hpBar, status.currentHp, status.maxHp);
+	setFill(mpBar, status.currentMagic, status.maxMagic);
+	setFill(guardBar, status.currentDefenseDurability, status.maxDefenseDurability);
+	setFill(heatBar, status.currentHeat, status.maxHeat);
 }
 
 // GUI•`‰æ

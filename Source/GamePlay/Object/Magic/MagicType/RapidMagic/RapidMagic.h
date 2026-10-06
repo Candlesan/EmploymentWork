@@ -33,6 +33,7 @@ public:
             SaveBase(j); // êe(ã§í ïîï™)Çï€ë∂
 
             j["rapidInterval"] = rapidInterval;
+            j["diffusion"] = diffusion;
             j["gaurdDamage"] = gaurdDamage;
             j["offsetPosition"] = { offsetPosition.x, offsetPosition.y, offsetPosition.z };
             j["offsetAngle"] = { offsetAngle.x, offsetAngle.y, offsetAngle.z };
@@ -62,6 +63,7 @@ public:
 
                 LoadBase(j); // êeÇì«Ç›çûÇﬁ
                 if (j.find("rapidInterval") != j.end()) rapidInterval = j["rapidInterval"];
+                if (j.find("diffusion") != j.end()) diffusion = j["diffusion"];
                 if (j.find("gaurdDamage") != j.end()) gaurdDamage = j["gaurdDamage"];
                 if (j.find("offsetPosition") != j.end()) offsetPosition = { j["offsetPosition"][0], j["offsetPosition"][1], j["offsetPosition"][2] };
                 if (j.find("offsetAngle") != j.end()) offsetAngle = { j["offsetAngle"][0], j["offsetAngle"][1], j["offsetAngle"][2] };

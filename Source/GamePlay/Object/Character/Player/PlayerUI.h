@@ -25,10 +25,10 @@ private:
 	// 画面に映っていれば true を返し、uiPos に中央からのずれを入れる
 	bool WorldToUI(const DirectX::XMFLOAT3& worldPos, const Camera& camera, DirectX::XMFLOAT2& uiPos);
 private:
-	UIElement* hpGauge = nullptr;
-	UIElement* mpGauge = nullptr;
-	UIElement* guardGauge = nullptr;
-	UIElement* heatGauge = nullptr;
+	UIElement* hpBar = nullptr;
+	UIElement* mpBar = nullptr;
+	UIElement* guardBar = nullptr;
+	UIElement* heatBar = nullptr;
 	UIElement* crosshair = nullptr;
 
 	float crosshairSpeed = 15.0f; // クロスヘアの移動速度
