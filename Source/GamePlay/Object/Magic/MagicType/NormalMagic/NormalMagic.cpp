@@ -73,7 +73,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	}
 
 	// 前方向から右方向ベクトルを作る
-	DirectX::XMFLOAT3 right = { forward.x, 0.0f, -forward.z };
+	DirectX::XMFLOAT3 right = { forward.z, 0.0f, -forward.x };
 
 	// ================ 通常レーザーの計算 =================
 
@@ -191,6 +191,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	// 発射
 	magic->Launch(info.direction, centerPos, 0.0f);
 
+	// エフェクトの再生
 	if (!isFullCharged)
 	{
 		// 通常攻撃

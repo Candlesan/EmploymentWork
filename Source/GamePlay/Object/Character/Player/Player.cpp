@@ -499,7 +499,7 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"フルチャージの維持中の魔力消費量", &normalMagicConfig.chargeHoldMagicCost, 0.1f);
 				ImGui::Separator();
 
-				ImGui::DragFloat3(u8"手元オフセット", &normalMagicConfig.spawnOffset.x, 0.1f);
+				ImGui::DragFloat3(u8"手元オフセット##normal", &normalMagicConfig.spawnOffset.x, 0.1f);
 				ImGui::Separator();
 
 				ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
@@ -530,11 +530,12 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"魔力消費量", &status.rapidFireMagicCost, 0.1f);
 
 
-				ImGui::DragFloat3(u8"手元オフセット", &rapidMagicConfig.spawnOffset.x, 0.1f);
+				ImGui::DragFloat3(u8"手元オフセット##rapid", &rapidMagicConfig.spawnOffset.x, 0.1f);
 				ImGui::Separator();
 
-				ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
-				ImGui::Separator();
+				// 多分いらないはず
+				//ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
+				//ImGui::Separator();
 
 				rapidMagic.DrawGUI(rapidMagicConfig);
 			}
@@ -749,6 +750,13 @@ void Player::MagicInput(float elapsedTime)
 	bool isHold = (rbButtonHoldTime > RB_THRESHOLD);
 	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
+	// 通常魔法の発射位置を計算する
+	DirectX::XMFLOAT3 muzzlePos = {
+		position.x + normalMagicConfig.spawnOffset.x,
+		position.y + normalMagicConfig.spawnOffset.y,
+		position.z + normalMagicConfig.spawnOffset.z,
+	};
+
 	// チャージ魔法
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
 	{
@@ -757,9 +765,10 @@ void Player::MagicInput(float elapsedTime)
 			// フルチャージ発射（もう一度押した瞬間）
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, 100000.0f);// 即着弾やから数値をデカくしておく
+			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(muzzlePos, 100000.0f);// 即着弾やから数値をデカくしておく
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
+			spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
 			spawnInfo.holdTime = rbButtonHoldTime;
 			spawnInfo.angleY = angle.y;
 
@@ -776,9 +785,10 @@ void Player::MagicInput(float elapsedTime)
 		{
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, 100000.0f);
+			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(muzzlePos, 100000.0f);
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
+			spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
 			spawnInfo.holdTime = rbButtonHoldTime;
 			spawnInfo.angleY = angle.y;
 
