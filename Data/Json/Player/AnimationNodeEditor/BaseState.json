@@ -673,9 +673,28 @@
             "mixRate": 0.0,
             "position": [
                 -223.0,
-                -103.0
+                -71.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Burst.json",
+            "type": 1
+        },
+        {
+            "StateName": "Break",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -380.0,
+                -39.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Break.json",
             "type": 1
         }
     ]

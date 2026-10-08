@@ -598,11 +598,24 @@
             "speedKeys": []
         },
         {
-            "assetName": "",
+            "assetName": "Fly",
             "events": [],
             "name": "AS_Jump_Combat_Loop_0_Seq_0",
             "ranges": [],
-            "speedKeys": []
+            "speedKeys": [
+                {
+                    "speed": 0.5,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.5,
+                    "time": 0.1666666716337204
+                },
+                {
+                    "speed": 0.5,
+                    "time": 0.3333333432674408
+                }
+            ]
         },
         {
             "assetName": "",
@@ -1012,6 +1025,40 @@
             "assetName": "State_AirAvoid",
             "events": [],
             "name": "State_AirAvoid",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "AS_Block_Hit_Break_Seq_0",
+            "events": [],
+            "name": "AS_Block_Hit_Break_Seq_0",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "UpperBurst",
+            "events": [],
+            "name": "UpperBurst",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.75,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.75,
+                    "time": 0.5
+                },
+                {
+                    "speed": 1.75,
+                    "time": 1.0
+                }
+            ]
+        },
+        {
+            "assetName": "AS_Run_Combat_Fast_Stop_Seq_0",
+            "events": [],
+            "name": "AS_Run_Combat_Fast_Stop_Seq_0",
             "ranges": [],
             "speedKeys": []
         }

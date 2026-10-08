@@ -230,7 +230,10 @@ void Character::UpdateStatus(float elapsedTime)
 
 		// 現在の値が最大値を超えていたら
 		if (status.currentDefenseDurability > status.maxDefenseDurability)
+		{
 			status.currentDefenseDurability = status.maxDefenseDurability;
+			status.isBreak = false; // 最大になったらfalseにする
+		}
 	}
 	else // ガードしてるときは魔力を減らす
 	{
@@ -278,13 +281,26 @@ void Character::RecoverMagic(float amount)
 		status.currentMagic = status.maxMagic;
 }
 
+// ヒート値を回復する
+void Character::RecoverHeat(float amount)
+{
+	status.currentHeat -= amount;
+
+	// 0を下回らないようにする
+	if (status.currentHeat < 0.0f)
+		status.currentHeat = 0.0f;
+}
+
 // ガード耐久値減少
 void Character::OnGuardHit(float amount)
 {
 	status.currentDefenseDurability -= amount;
 
 	if (status.currentDefenseDurability < 0.0f)
+	{
 		status.currentDefenseDurability = 0.0f;
+		status.isBreak = true;
+	}
 }
 
 //水平速力更新処理

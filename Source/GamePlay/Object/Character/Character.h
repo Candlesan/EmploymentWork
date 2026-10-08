@@ -32,6 +32,7 @@ struct CharacterStatus
 	float currentHeat = 0.0f;			// 現在のヒート値
 	float heatIncreaseSpeed = 20.0f;	// ヒート値の増加スピード
 	float heatRecoverSpeed = 5.0f;		// ヒート値の回復速度
+	float heatRecoverOnBreak = 50.0f;	// 防御魔法を割った時の回復量
 
 	// --- 防御系 ---
 	float maxDefenseDurability = 100.0f;		// 防御魔法の最大耐久値
@@ -46,6 +47,7 @@ struct CharacterStatus
 	bool isDown = false;		// 魔力切れダウン中か
 	bool isBurst = false;		// オーバーヒートしたか
 	bool isBuring = false;		// オーバーヒート中か
+	bool isBreak = false;		// 防御魔法が割れたか
 	bool isRapidFire = false;	// 連射攻撃か
 	bool isIntercept = false;   // 迎撃中か
 	bool isGuarding = false;	// ガード中か
@@ -112,6 +114,9 @@ public:
 
 	// 魔力回復
 	void RecoverMagic(float amount);
+
+	// ヒート値回復
+	void RecoverHeat(float amount);
 
 	// ガード耐久値減少
 	void OnGuardHit(float amount);

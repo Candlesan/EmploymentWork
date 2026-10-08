@@ -402,13 +402,12 @@ void Player::DrawGUI()
 				{
 					ConsumMagic(10.0f, magicRecoverDelay);
 				}
-				ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding);
-				ImGui::Separator();
 
 				ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
 				ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
 				ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
 				ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
+				ImGui::DragFloat(u8"防御魔法を割った時の回復量", &status.heatRecoverOnBreak, 0.1f);
 				ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
 				ImGui::Separator();
 
@@ -419,6 +418,9 @@ void Player::DrawGUI()
 					OnGuardHit(10.0f);
 				}
 				ImGui::Separator();
+				ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding);
+				ImGui::Separator();
+
 
 				ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 				ImGui::Separator();
@@ -834,7 +836,6 @@ void Player::MagicInput(float elapsedTime)
 			if (targetMagic->GetIsAlive())
 				targetMagic->OnTerminate();
 		}
-
 	}
 	else
 	{
@@ -842,7 +843,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 防御魔法
-	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER) && !status.isDown && !status.isBuring) // ダウン状態でもバースト状態でもないとき
+	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER) && !status.isDown && !status.isBuring && !status.isBreak) // ダウン状態でもバースト状態でもないとき
 	{
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
@@ -1946,6 +1947,12 @@ void Player::CalculateStatusParameters()
 	{
 		PlayActionGraph("Burst");
 	}
+
+	if (status.isBreak && !wasBreak)
+	{
+		PlayActionGraph("Break");
+	}
+	wasBreak = status.isBreak;
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);

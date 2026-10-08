@@ -45,6 +45,13 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		Character* guardOwner = static_cast<Character*>(b.owner);
 
 		guardOwner->OnGuardHit(magic->GetGuardDamage());  // ガード耐久値を削る
+
+		// このヒットでガードを割ったら、撃った人のヒート値を大きく減らす
+		if (guardOwner->GetStatus().currentDefenseDurability <= 0.0f && magic->GetOwner())
+		{
+			magic->GetOwner()->RecoverHeat(magic->GetOwner()->GetStatus().heatRecoverOnBreak);
+		}
+
 		magic->OnTerminate(); // 魔法は消える
 	}
 	// aもbもキャラクターの場合押し出し処理

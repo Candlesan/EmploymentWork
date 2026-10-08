@@ -251,4 +251,5 @@ private:
 	bool showAnimarionTransitionEditor = true;
 	bool showPlayerParameter = true;
 	bool showPlayer = true;
+	bool wasBreak = false;
 };
