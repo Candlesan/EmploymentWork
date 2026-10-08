@@ -194,19 +194,28 @@ void Character::UpdateStatus(float elapsedTime)
 		status.currentHeat += status.heatIncreaseSpeed * elapsedTime;
 
 		// 最大値を超えないようにする
-		if (status.currentHeat > status.maxHeat)
+		if (status.currentHeat >= status.maxHeat)
+		{
 			status.currentHeat = status.maxHeat;
+			status.isBurst = true;
+			status.isBuring = true;
+		}
 	}
 	else
 	{
 		if (status.currentHeat > 0.0f)
 		{
+			status.isBurst = false;
+
 			// ヒート値があったら下げていく
 			status.currentHeat -= status.heatRecoverSpeed * elapsedTime;
 
 			// ヒート値が0よりも低かったら
-			if (status.currentHeat < 0.0f)
+			if (status.currentHeat <= 0.0f)
+			{
 				status.currentHeat = 0.0f;
+				status.isBuring = false;
+			}
 		}
 	}
 

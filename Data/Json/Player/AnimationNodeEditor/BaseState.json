@@ -382,6 +382,147 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "State_Idle"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 20
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 10
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Block_Hit_Break_Seq_0"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Block_Hit_Break_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Idle"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Block_Hit_Break_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 20
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Block_Hit_Break_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 14
+                }
+            ],
+            "fromState": "Down",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Fly"
         }
     ],
     "nodes": [
@@ -417,8 +558,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -220.0,
-                297.0
+                -204.0,
+                393.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
             "type": 1
@@ -436,8 +577,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -220.0,
-                377.0
+                -204.0,
+                473.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Avoid.json",
             "type": 1
@@ -474,8 +615,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -92.0,
-                9.0
+                -63.0,
+                -23.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -493,10 +634,48 @@
             },
             "mixRate": 0.0,
             "position": [
-                -60.0,
-                105.0
+                49.0,
+                265.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Down.json",
+            "type": 1
+        },
+        {
+            "StateName": "AS_Block_Hit_Break_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Block_Hit_Break_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -444.0,
+                217.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Burst",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -223.0,
+                -103.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Burst.json",
             "type": 1
         }
     ]

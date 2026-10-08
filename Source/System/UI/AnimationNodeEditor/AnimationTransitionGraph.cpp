@@ -198,6 +198,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.IsDown;
 			break;
 
+		case TransitionConditionType::IsBurst:
+			result = ctx.IsBurst;
+			break;
+
 		case TransitionConditionType::Always:
 			result = true;
 			break;

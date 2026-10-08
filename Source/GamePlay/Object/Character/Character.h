@@ -45,6 +45,7 @@ struct CharacterStatus
 	// --- 状態フラグ ---
 	bool isDown = false;		// 魔力切れダウン中か
 	bool isBurst = false;		// オーバーヒートしたか
+	bool isBuring = false;		// オーバーヒート中か
 	bool isRapidFire = false;	// 連射攻撃か
 	bool isIntercept = false;   // 迎撃中か
 	bool isGuarding = false;	// ガード中か

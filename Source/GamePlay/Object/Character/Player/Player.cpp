@@ -806,7 +806,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 連射魔法
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && !status.isDown)
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && !status.isDown && !status.isBuring)
 	{
 		status.isRapidFire = true;
 
@@ -842,7 +842,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 防御魔法
-	if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER && !status.isDown)
+	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER) && !status.isDown && !status.isBuring) // ダウン状態でもバースト状態でもないとき
 	{
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
@@ -1665,6 +1665,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
 	ctx.IsDown = status.isDown;
+	ctx.IsBurst = status.isBurst;
 	ctx.inputDir = CalculateRelativeInputDir();
 
 	return ctx;
@@ -1937,7 +1938,14 @@ void Player::UpdateLockAt(float elapsedTime)
 // プレイヤーの状態を計算する関数
 void Player::CalculateStatusParameters()
 {
+	// Y軸の加速度が-0.1以下なら落ちている判定
 	falling = (velocity.y < -0.1f);
+
+	// バーストの瞬間にアニメーションを呼ぶ
+	if (status.isBurst && flightController.IsFlying())
+	{
+		PlayActionGraph("Burst");
+	}
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);

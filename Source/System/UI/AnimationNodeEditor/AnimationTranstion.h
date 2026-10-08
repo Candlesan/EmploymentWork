@@ -34,6 +34,7 @@ enum class TransitionConditionType
 	Always,				// 無条件
 
 	IsDown,				// ダウン状態
+	IsBurst,				// ダウン状態
 };
 
 enum class TransitionActionType
@@ -100,5 +101,6 @@ struct TransitionContext
 	bool IsCancelable;
 	bool IsFalling;
 	bool IsDown;
+	bool IsBurst;
 	RelativeInputDir inputDir;
 };
