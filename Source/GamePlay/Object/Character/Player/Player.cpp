@@ -250,7 +250,6 @@ void Player::Update(float elapsedTime)
 
 	if (!isTyping && !isPreviewMode)
 	{
-
 		// 移動処理
 		InputMove(elapsedTime);
 
@@ -730,7 +729,7 @@ void Player::MagicInput(float elapsedTime)
 	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
 
 	// 迎撃
-	if (status.isIntercept)
+	if (status.isIntercept && !status.isDown)
 	{
 		// 迎撃の中心位置
 		DirectX::XMFLOAT3 centerPos = {
@@ -766,7 +765,7 @@ void Player::MagicInput(float elapsedTime)
 	};
 
 	// チャージ魔法
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && !status.isDown)
 	{
 		if (normalMagic.IsFullCharged())
 		{
@@ -787,7 +786,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 通常攻撃魔法
-	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER)
+	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER && !status.isDown)
 	{
 		if (!normalMagic.IsFullCharged() && magicCoolDownTimer <= 0.0f) // フルチャージ済みなら上のifで既に処理済みなので除外
 		{
@@ -807,7 +806,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 連射魔法
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && !status.isDown)
 	{
 		status.isRapidFire = true;
 
@@ -843,7 +842,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 防御魔法
-	if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)
+	if (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER && !status.isDown)
 	{
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
@@ -926,6 +925,12 @@ void Player::UpdateFly(float elapsedTime)
 
 	// 状態を更新する
 	flightController.Update(this, elapsedTime);
+
+	// ダウン状態になると落下するようにする
+	if (status.isDown)
+	{
+		flightController.SetFlightMode(FlightMode::OFF);
+	}
 }
 
 void Player::InputLockOn()
@@ -1103,6 +1108,8 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 // 入力処理
 void Player::InputMove(float elapsedTime)
 {
+	if (status.isDown) return;
+
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
@@ -1663,6 +1670,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.isGuarding = isGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
+	ctx.IsDown = status.isDown;
 	ctx.inputDir = CalculateRelativeInputDir();
 
 	return ctx;

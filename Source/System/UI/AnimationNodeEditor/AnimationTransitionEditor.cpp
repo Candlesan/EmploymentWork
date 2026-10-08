@@ -754,6 +754,8 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "PositionY",			TransitionConditionType::PositionY },           
 				{ "PositionZ",			TransitionConditionType::PositionZ },
 
+				{ "IsDown",			TransitionConditionType::IsDown },
+
 				{ "Always",				TransitionConditionType::Always },
 			};
 
