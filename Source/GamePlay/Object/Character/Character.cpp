@@ -287,8 +287,11 @@ void Character::RecoverHeat(float amount)
 	status.currentHeat -= amount;
 
 	// 0‚ð‰º‰ñ‚ç‚È‚¢‚æ‚¤‚É‚·‚é
-	if (status.currentHeat < 0.0f)
+	if (status.currentHeat <= 0.0f)
+	{
 		status.currentHeat = 0.0f;
+		status.isBurst = false;
+	}
 }
 
 // ƒK[ƒh‘Ï‹v’lŒ¸­
@@ -296,7 +299,7 @@ void Character::OnGuardHit(float amount)
 {
 	status.currentDefenseDurability -= amount;
 
-	if (status.currentDefenseDurability < 0.0f)
+	if (status.currentDefenseDurability <= 0.0f)
 	{
 		status.currentDefenseDurability = 0.0f;
 		status.isBreak = true;

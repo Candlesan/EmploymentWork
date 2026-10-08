@@ -1114,16 +1114,25 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if ((!useRootMotion && !useRootMotionEx))
+	if (flightController.IsFlying() && !normalMagic.IsFullCharged())
 	{
-		// 移動処理
+		// 飛行中の移動速度
+		Move(moveVec.x, moveVec.z, 20.0f);
+	}
+	else if (normalMagic.IsFullCharged() && flightController.IsFlying())
+	{
+		// 飛行中かつチャージ済み移動速度
+		Move(moveVec.x, moveVec.z, 15.0f);
+	}
+	else if (useRootMotion || useRootMotionEx)
+	{
+		// ルートモーションを使ってる時の移動速度
 		Move(moveVec.x, moveVec.z, 0.0f);
 	}
-
-	if (flightController.IsFlying())
+	else
 	{
-		// 移動処理
-		Move(moveVec.x, moveVec.z, 20.0f);
+		// 通常の移動速度
+		Move(moveVec.x, moveVec.z, moveSpeed);
 	}
 
 	// 回転処理
@@ -1662,7 +1671,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.IsGround = IsGround();
 	ctx.isLockOn = lockOn.IsHardLock();
-	ctx.isGuarding = isGuarding;
+	ctx.isGuarding = status.isGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
 	ctx.IsDown = status.isDown;

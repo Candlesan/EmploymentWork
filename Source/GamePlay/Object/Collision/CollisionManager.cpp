@@ -44,12 +44,19 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
 		Character* guardOwner = static_cast<Character*>(b.owner);
 
+		bool wasBroken = guardOwner->GetStatus().isBreak;
 		guardOwner->OnGuardHit(magic->GetGuardDamage());  // ガード耐久値を削る
 
-		// このヒットでガードを割ったら、撃った人のヒート値を大きく減らす
-		if (guardOwner->GetStatus().currentDefenseDurability <= 0.0f && magic->GetOwner())
+		// このヒットで割れた瞬間だけ、連射魔法を撃った人のヒート値を回復
+		if (!wasBroken && guardOwner->GetStatus().isBreak
+			&& magic->GetMagicKind() == MagicKind::Rapid && magic->GetOwner())
 		{
 			magic->GetOwner()->RecoverHeat(magic->GetOwner()->GetStatus().heatRecoverOnBreak);
+		}
+
+		if (magic->GetMagicKind() == MagicKind::Normal && magic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
+		{
+			guardOwner->OnGuardHit(200);
 		}
 
 		magic->OnTerminate(); // 魔法は消える
