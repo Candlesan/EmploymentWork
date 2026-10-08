@@ -1108,7 +1108,7 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 // 入力処理
 void Player::InputMove(float elapsedTime)
 {
-	if (status.isDown) return;
+	if (IsDownState()) return;
 
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -1204,12 +1204,6 @@ RelativeInputDir Player::CalculateRelativeInputDir()
 		return RelativeInputDir::None;
 	}
 }
-
-
-// =========================================================================
-//  専用技
-// =========================================================================
-
 
 
 // =========================================================================
@@ -1788,6 +1782,22 @@ void Player::PlayActionGraph(const std::string& graphName)
 // 遷移以外の細かい条件
 void Player::UpdateStateBehavior()
 {
+}
+
+// 今ダウン中かを判定する
+bool Player::IsDownState()
+{
+	// ダウン中じゃないならfalseを返す
+	if (status.isDown) return true;
+
+	// サブグラフのDownの中にいる時は操作を出来ないようにする
+	for (auto& idx : activeGraphStack)
+	{
+		if (transitionGraphs[idx].graphName == "Down") return true;
+	}
+
+	// Exit 直後、親グラフで "Down" ノードに留まっているフレームも操作不可
+	return currentState == "Down";
 }
 
 

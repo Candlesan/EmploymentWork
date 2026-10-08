@@ -112,8 +112,6 @@ private:
 	void InputMove(float elapsedTime);
 	RelativeInputDir CalculateRelativeInputDir();
 
-	// ── 専用技 ──
-
 
 	// ── ステートマシン・先行入力 ──
 	void UpdateStateTransitions(float elapsedTime);
@@ -122,6 +120,7 @@ private:
 	void Player::EnterSubGraph(const std::string& subGraphPath, const TransitionContext& ctx);
 	void PlayActionGraph(const std::string& graphName);
 	void UpdateStateBehavior();
+	bool IsDownState();
 
 	// ── 物理・タイマー・その他 ──
 	void UpdateTimers(float elapsedTime);

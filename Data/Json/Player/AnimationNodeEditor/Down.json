@@ -61,12 +61,7 @@
             "toState": "AS_Hit_Combat_Air_Large_To_Floor_Loop_Seq_0"
         },
         {
-            "Actions": [
-                {
-                    "type": 2,
-                    "value": 720.0
-                }
-            ],
+            "Actions": [],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
