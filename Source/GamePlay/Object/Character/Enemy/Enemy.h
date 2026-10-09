@@ -99,14 +99,12 @@ protected:
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
 
-	void OnDown() override;
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
 private:
 	// =========================================================================
 	//  内部ヘルパー関数
 	// =========================================================================
-	void UpdateStatus();
 
 	// ── サウンド ──
 	void UpdateSounds(const std::string& state);
@@ -115,6 +113,7 @@ private:
 	// ── ビヘイビアツリー ──
 	void ClearActiveNode() { moveBT.Abort(); attackBT.Abort(); }
 	bool IsFullBodyAction();
+	bool UpdateForcedState(float elapsedTime);
 
 	// ── デバッグ ──
 	void ShowDebugSwitch();
@@ -139,8 +138,10 @@ private:
 	float debugOffset = 0.5;
 
 	// ── ダメージ・戦闘ステータス ──
-	bool Ondown = false;
 	float attackCoolTimer = 0.0f;
+
+	enum class ForcedState { None, Down, GetUp };
+	ForcedState forcedState = ForcedState::None;
 
 	// ── ビヘイビアツリー ──
 	BehaviorTreeRunner moveBT; // 移動・回避・飛行用

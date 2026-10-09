@@ -1,0 +1,20 @@
+{
+    "nodes": [
+        {
+            "StateName": "DownLoop",
+            "config": {
+                "animationName": "AS_Knock_Down_Combat_Loop_Seq_0",
+                "loop": true,
+                "blendTime": 0.2
+            }
+        },
+        {
+            "StateName": "DownEnd",
+            "config": {
+                "animationName": "AS_Knock_Down_Combat_End_Seq_0",
+                "loop": false,
+                "blendTime": 0.2
+            }
+        }
+    ]
+}

@@ -88,6 +88,9 @@ void Enemy::Initialize()
 	attackEditor.ApplyToTree(attackBT.GetTree(), this, attackGraph);
 	attackEditor.SetJsonPath(attackBTPath);
 
+	// 状態のアニメーションを読み込む
+	LoadAnimationData("Data/Json/Enemy/AnimationState/EnemyStates.json", false);
+
 	// シーケンサーの初期化
 	std::string seqPath = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
 	sequencerEditor.SetJsonPath(seqPath);
@@ -113,8 +116,11 @@ void Enemy::Initialize()
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
+	// ダウン状態か
+	bool isForced = UpdateForcedState(elapsedTime);
+
 	// プレビュー中はAIを止める
-	if (!isPreviewMode && AISwitch)
+	if (!isPreviewMode && AISwitch && !isForced)
 	{
 		moveBT.Update(elapsedTime);
 
@@ -485,12 +491,6 @@ DirectX::XMFLOAT3 Enemy::GetMoveDirection(const DirectX::XMFLOAT3& movePos) cons
 //  親子関係のオーバーライド
 // =========================================================================
 
-// ダウン時の処理
-void Enemy::OnDown()
-{
-	Ondown = true;
-}
-
 // アニメーションステート変化時のコールバック
 void Enemy::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
@@ -500,14 +500,6 @@ void Enemy::OnStateChanged(const std::string& oldState, const std::string& newSt
 // =========================================================================
 //  内部ヘルパー
 // =========================================================================
-
-void Enemy::UpdateStatus()
-{
-	if (status.isDown)
-	{
-
-	}
-}
 
 // サウンド再生の更新
 void Enemy::UpdateSounds(const std::string& state)
@@ -567,7 +559,43 @@ AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 
 bool Enemy::IsFullBodyAction()
 {
-	return status.isDown || status.isAvoid || status.isBurstTrigger || status.isBuring;
+	return status.isAvoid || status.isBurstTrigger || status.isBuring;
+}
+
+
+bool Enemy::UpdateForcedState(float elapsedTime)
+{
+	switch (forcedState)
+	{
+	case Enemy::ForcedState::None:
+		if (status.isDown)
+		{
+			moveBT.Abort(); // この間はAIを動かさない
+			ChangeAnimationState("DownLoop");
+			forcedState = ForcedState::Down;
+			return true;
+		}
+		return false;
+
+	case Enemy::ForcedState::Down:
+		// 魔力が満タンになったら起き上がる
+		if (!status.isDown)
+		{
+			ChangeAnimationState("DownEnd");
+			forcedState = ForcedState::GetUp;
+		}
+		return true;
+
+	case Enemy::ForcedState::GetUp:
+		// アニメーションが終わったらAIを元に戻す
+		if (GetCurrentAnimationSeconds() >= GetCurrentAnimationLength())
+		{
+			forcedState = ForcedState::None;
+			return false;
+		}
+		return true;
+	}
+	return false;
 }
 
 // GUI表示切り替えキー入力
