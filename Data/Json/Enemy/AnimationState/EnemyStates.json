@@ -15,6 +15,22 @@
                 "loop": false,
                 "blendTime": 0.2
             }
+        },
+        {
+            "StateName": "Burst",
+            "config": {
+                "animationName": "AS_Block_Hit_Break_Seq_0",
+                "loop": false,
+                "blendTime": 0.2
+            }
+        },
+        {
+            "StateName": "Break",
+            "config": {
+                "animationName": "AS_Block_Hit_Seq_0",
+                "loop": false,
+                "blendTime": 0.2
+            }
         }
     ]
 }

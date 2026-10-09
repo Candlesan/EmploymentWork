@@ -88,6 +88,7 @@ public:
 	void Abort() override
 	{
 		phase = Phase::Start;
+		owner->SetIsRapidFire(false);
 		owner->StopOverlayAnimation();
 	}
 private:

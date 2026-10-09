@@ -80,6 +80,11 @@
                     "compareType": 2,
                     "conditionType": 7,
                     "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": 12,
+                    "judgmentValue": 0.0
                 }
             ],
             "config": {
@@ -112,6 +117,11 @@
                     "compareType": 0,
                     "conditionType": 6,
                     "judgmentValue": 50.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": 12,
+                    "judgmentValue": 0.0
                 }
             ],
             "config": {

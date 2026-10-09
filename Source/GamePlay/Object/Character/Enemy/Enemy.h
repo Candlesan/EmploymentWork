@@ -140,8 +140,10 @@ private:
 	// ── ダメージ・戦闘ステータス ──
 	float attackCoolTimer = 0.0f;
 
-	enum class ForcedState { None, Down, GetUp };
+	enum class ForcedState { None, Down, GetUp, Burst, Break };
 	ForcedState forcedState = ForcedState::None;
+	bool wasBurstTrigger = false;
+	bool wasBreak = false;
 
 	// ── ビヘイビアツリー ──
 	BehaviorTreeRunner moveBT; // 移動・回避・飛行用

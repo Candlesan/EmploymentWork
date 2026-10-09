@@ -53,7 +53,7 @@
             "conditions": [
                 {
                     "compareType": 0,
-                    "conditionType": 12,
+                    "conditionType": 14,
                     "judgmentValue": 0.0
                 }
             ],

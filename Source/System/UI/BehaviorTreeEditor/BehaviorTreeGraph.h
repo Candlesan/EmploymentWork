@@ -25,6 +25,8 @@ enum class BTConditionType
 	PlayerCurrentDefense,	// プレイヤーの現在の防御魔法の耐久値
 	IsPlayerDefending,		// プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)
 	IncomingMagicCount,		// 自身に向かって飛んできている魔法の数 (迎撃判断用)
+	IsBurst,				// バースト状態か
+	IsBreak,				// バリアが壊れたか
 	None,					// 条件なし
 	Count,					// enumの総数
 };

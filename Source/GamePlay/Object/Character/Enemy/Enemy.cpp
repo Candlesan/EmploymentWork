@@ -559,7 +559,7 @@ AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 
 bool Enemy::IsFullBodyAction()
 {
-	return status.isAvoid || status.isBurstTrigger || status.isBuring;
+	return status.isAvoid ;
 }
 
 
@@ -568,6 +568,13 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 	switch (forcedState)
 	{
 	case Enemy::ForcedState::None:
+	{
+		// 立ち上がりの瞬間だけ拾う
+		bool burstStarted = status.isBurstTrigger && !wasBurstTrigger;
+		bool breakStarted = status.isBreak && !wasBreak;
+		wasBurstTrigger = status.isBurstTrigger;
+		wasBreak = status.isBreak;
+
 		if (status.isDown)
 		{
 			moveBT.Abort(); // この間はAIを動かさない
@@ -575,8 +582,17 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 			forcedState = ForcedState::Down;
 			return true;
 		}
-		return false;
 
+		if (burstStarted || breakStarted)
+		{
+			moveBT.Abort();
+			attackBT.Abort();
+			ChangeAnimationState(burstStarted ? "Burst" : "Break");
+			forcedState = burstStarted ? ForcedState::Burst : ForcedState::Break;
+			return true;
+		}
+		return false;
+	}
 	case Enemy::ForcedState::Down:
 		// 魔力が満タンになったら起き上がる
 		if (!status.isDown)
@@ -588,6 +604,16 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 
 	case Enemy::ForcedState::GetUp:
 		// アニメーションが終わったらAIを元に戻す
+		if (GetCurrentAnimationSeconds() >= GetCurrentAnimationLength())
+		{
+			forcedState = ForcedState::None;
+			return false;
+		}
+		return true;
+
+	case ForcedState::Burst:
+	case ForcedState::Break:
+		if (status.isDown) { forcedState = ForcedState::None; return true; } // ダウンを優先させる（次のフレームで None からダウンに入る）
 		if (GetCurrentAnimationSeconds() >= GetCurrentAnimationLength())
 		{
 			forcedState = ForcedState::None;

@@ -85,6 +85,13 @@ bool FloatConditionJudgment::Judgment()
         currentValue = static_cast<float>(count);
         break;
     }
+    case BTConditionType::IsBurst: // バースト中か
+        currentValue = owner->GetStatus().isBuring ? 1.0f : 0.0f;
+        break;
+
+    case BTConditionType::IsBreak: // バリアブレイク中か
+        currentValue = owner->GetStatus().isBreak ? 1.0f : 0.0f;
+        break;
     }
 
     // BTCompareTypeに応じてcurrentValueとThresholdを比較する

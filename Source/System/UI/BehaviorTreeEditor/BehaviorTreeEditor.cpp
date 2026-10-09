@@ -479,6 +479,8 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 					u8"プレイヤーの現在の防御魔法の耐久値",
 					u8"プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)",
 					u8"自身に向かって飛んできている魔法の数",
+					u8"バースト状態か",
+					u8"バリアブレイクをしたか",
 					u8"条件なし"
 				};
 				ImGui::Combo(u8"条件の種類", &cond.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
