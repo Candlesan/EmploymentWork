@@ -15,9 +15,6 @@ ActionBase::State Idle::Run(float elapsedTime)
     // 待機アニメーションを再生
     owner->ChangeAnimationState(stateName);
 
-    // プレイヤーの方をじっと見つめる
-    owner->LockAtTarget(elapsedTime, playerPos);
-
     return State::Complete;
 }
 
@@ -26,7 +23,6 @@ ActionBase::State MoveForward::Run(float elapsedTime)
 {
     const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
     owner->ChangeAnimationState(stateName);
-    owner->LockAtTarget(elapsedTime, playerPos);
 
     DirectX::XMFLOAT3 dir = owner->GetMoveDirection(playerPos);
     owner->Move(dir.x, dir.z, owner->GetMoveSpeed());
@@ -39,7 +35,6 @@ ActionBase::State MoveBack::Run(float elapsedTime)
 {
     const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
     owner->ChangeAnimationState(stateName);
-    owner->LockAtTarget(elapsedTime, playerPos);
 
     DirectX::XMFLOAT3 dir = owner->GetMoveDirection(playerPos);
     owner->Move(-dir.x, -dir.z, owner->GetMoveSpeed());
@@ -54,7 +49,6 @@ ActionBase::State MoveRight::Run(float elapsedTime)
 
     const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
     owner->ChangeAnimationState(stateName);
-    owner->LockAtTarget(elapsedTime, playerPos);
 
     DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&owner->GetMoveDirection(playerPos));
     DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
@@ -83,7 +77,6 @@ ActionBase::State MoveLeft::Run(float elapsedTime)
 
     const DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
     owner->ChangeAnimationState(stateName);
-    owner->LockAtTarget(elapsedTime, playerPos);
 
     DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&owner->GetMoveDirection(playerPos));
     DirectX::XMVECTOR Up = DirectX::XMVectorSet(0, 1, 0, 0);
@@ -123,7 +116,7 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
     switch (phase)
     {
     case Phase::Start:
-        owner->ChangeAnimationState(stateName);
+        owner->StartOverlayAnimation(stateName);
         hasFired = false;
         magicConfig.Load();
         phase = Phase::Attacking;
@@ -148,10 +141,11 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
             hasFired = true;
         }
 
-        if (owner->GetCurrentAnimationSeconds()
-            >= owner->GetCurrentAnimationLength())
+        if (owner->GetOverlayAnimationSeconds()
+            >= owner->GetOverlayAnimationLength())
         {
             owner->SetAttackCoolTimer(Mathf::RandomRange(0.0f, 5.0f));
+            owner->StopOverlayAnimation();
             phase = Phase::Start;
             return State::Complete;
         }
@@ -173,7 +167,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
     switch (phase)
     {
     case Phase::Start:
-        owner->ChangeAnimationState(stateName);
+        owner->StartOverlayAnimation(stateName);
         magicConfig.Load();
         fireTimer = Mathf::RandomRange(1.0f, 5.0f);
         phase = Phase::Attacking;
@@ -209,7 +203,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         MagicSpawnInfo info;
         info.angleY = owner->GetAngle().y;
         info.direction = dir;       // 発射位置オフセットの向き用
-        info.targetPos = aimPos;    // 実際の弾道はこっちで決まる
+        info.targetPos = aimPos;    // 実際の弾道
         info.position = myPos;
         info.holdTime = 0.0f;
         info.owner = owner;
@@ -223,6 +217,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         {
             owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
             owner->SetIsRapidFire(false);
+            owner->StopOverlayAnimation();
             phase = Phase::Start;
             return State::Complete;
         }
@@ -238,7 +233,7 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
 {
     if (phase == Phase::Start)
     {
-        owner->ChangeAnimationState(stateName);
+        owner->StartOverlayAnimation(stateName);
         normalConfig.Load();
         rapidFireConfig.Load();
         fireTimer = 0.0f;
@@ -260,6 +255,7 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
         phase = Phase::Start;
         owner->SetIsIntercept(false);
         owner->SetIsRapidFire(false);
+        owner->StopOverlayAnimation();
         return State::Complete;
     }
 

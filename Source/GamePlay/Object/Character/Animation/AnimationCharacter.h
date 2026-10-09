@@ -20,6 +20,7 @@ public:
 
 	// 上半身のアニメーションを開始する（オーバーレイ再生）
 	void StartOverlayAnimation(const std::string& newState);
+	void StopOverlayAnimation(); // 上半身の再生を止める
 
 	// 毎フレームのアニメーション更新
 	void UpdateAnimation(float elapsedTime);
@@ -55,6 +56,10 @@ public:
 	// 再生中の秒数を取得
 	float GetCurrentAnimationSeconds() const { return animationSeconds; }
 	float GetCurrentAnimationLength() const;
+
+	// 上半身の再生中の時間を取得
+	float GetOverlayAnimationSeconds() const { return animator ? animator->GetUpperCurrentSeconds() : 0.0f; }
+	float GetOverlayAnimationLength() const { return animator ? animator->GetUpperAnimationLength() : 0.0f; }
 
 	// JSONからアニメーション設定を読み込む
 	void LoadAnimationData(const std::string& jsonPath, bool clearBefore = false);

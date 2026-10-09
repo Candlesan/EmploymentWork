@@ -53,6 +53,7 @@ struct CharacterStatus
 	bool isGuarding = false;		// ƒK[ƒh’†‚©
 	bool isFlying = false;			// ”òs’†‚©
 	bool isHovering = false;		// ‘Ø‹ó’†‚©
+	bool isAvoid = false;			// ‰ñ”ğ‚µ‚½‚©
 };
 
 class Character

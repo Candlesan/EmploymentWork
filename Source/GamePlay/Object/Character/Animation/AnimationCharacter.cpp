@@ -78,6 +78,13 @@ void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 	}
 }
 
+// 上半身の再生を止める
+void AnimationCharacter::StopOverlayAnimation()
+{
+	if (animator) animator->StopUpper();
+	currentOverlayState = ""; // 空にしないと次に同じ技を出せない
+}
+
 // アニメーション更新
 void AnimationCharacter::UpdateAnimation(float elapsedTime)
 {

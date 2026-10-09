@@ -147,6 +147,7 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\JudgmentBase.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorData.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />

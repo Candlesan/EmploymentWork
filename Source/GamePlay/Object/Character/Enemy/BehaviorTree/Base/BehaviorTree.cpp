@@ -35,6 +35,8 @@ void BehaviorTree::AddNode(std::string parentName, std::string entryName, int pr
 // 次に実行するノードを推論
 NodeBase* BehaviorTree::ActiveNodeInference(BehaviorData* data)
 {
+	if (root == nullptr) return nullptr;
+
 	// データをリセットして開始
 	data->Init();
 	return root->Inference(data);

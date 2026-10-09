@@ -10,6 +10,7 @@
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
 #include "GamePlay/Object/Character/Player/Player.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h" 
 
 #include <imgui.h>
 
@@ -21,8 +22,6 @@
 // デストラクタ
 Enemy::~Enemy()
 {
-	delete aiTree;
-	delete behaviorData;
 }
 
 // 初期化
@@ -60,11 +59,9 @@ void Enemy::Initialize()
 	enemy->GetNodePoses(nodePoses);
 	enemy->GetNodePoses(oldNodePoses);
 	rootMotionNodeName = "root";
-	upperBodyNodeName = "pelvis";
+	upperBodyNodeName = "spine_01";
 
 	// ビヘイビアツリー初期化
-	behaviorData = new BehaviorData();
-	aiTree = new BehaviorTree();
 	AISwitch = false;
 
 	// モデルからアニメーション名一覧を取得してエディターに渡す
@@ -73,11 +70,23 @@ void Enemy::Initialize()
 	{
 		animNames.push_back(anim.name);
 	}
-	btEditor.SetAnimationList(animNames);
+	moveEditor.SetAnimationList(animNames);
+	attackEditor.SetAnimationList(animNames);
 
-	btGraph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-	LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json", true);
-	btEditor.ApplyToTree(aiTree, this, btGraph);
+	const std::string moveBTPath = "Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json";
+	const std::string attackBTPath = "Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree_Attack.json";
+
+	// アニメ設定は2つ目を clearBefore=false にしないと、1つ目の分が消える
+	LoadAnimationData(moveBTPath, true);
+	LoadAnimationData(attackBTPath, false);
+
+	moveGraph.Load(moveBTPath);
+	moveEditor.ApplyToTree(moveBT.GetTree(), this, moveGraph);
+	moveEditor.SetJsonPath(moveBTPath);
+
+	attackGraph.Load(attackBTPath);
+	attackEditor.ApplyToTree(attackBT.GetTree(), this, attackGraph);
+	attackEditor.SetJsonPath(attackBTPath);
 
 	// シーケンサーの初期化
 	std::string seqPath = "Data/Json/Enemy/AnimationSequencer/EnemyAnimationSequence.json";
@@ -107,36 +116,15 @@ void Enemy::Update(float elapsedTime)
 	// プレビュー中はAIを止める
 	if (!isPreviewMode && AISwitch)
 	{
-		// 中断
-		if (activeNode != nullptr && activeNode->IsInterruptible())
-		{
-			// 毎フレーム推論し直して、選ばれるノードが変わったら乗り換える
-			NodeBase* next = aiTree->ActiveNodeInference(behaviorData);
-			if (next != activeNode)
-			{
-				activeNode = next;
-				if (activeNode != nullptr)
-				{
-					activeNode->Abort();
-					lastInferredNode = activeNode;
-				}
-			}
-		}
+		moveBT.Update(elapsedTime);
 
-		// 現在実行されているノードが無ければ推論
-		if (activeNode == nullptr)
+		if (IsFullBodyAction())
 		{
-			activeNode = aiTree->ActiveNodeInference(behaviorData);
-			if (activeNode != nullptr)
-			{
-				lastInferredNode = activeNode;
-			}
+			attackBT.Abort(); // 撃っている途中なら後始末をして止める
 		}
-
-		// 現在実行するノードがあれば実行
-		if (activeNode != nullptr)
+		else
 		{
-			activeNode = aiTree->Run(activeNode, behaviorData, elapsedTime);
+			attackBT.Update(elapsedTime);
 		}
 	}
 	else
@@ -196,11 +184,8 @@ void Enemy::Render(RenderContext& rc, ModelRenderer* renderer)
 void Enemy::DrawGUI()
 {
 	// 実行中のAIのステート名
-	std::string str = "";
-	if (activeNode != nullptr)
-	{
-		str = activeNode->GetName();
-	}
+	std::string moveStr = moveBT.GetActiveNode() ? moveBT.GetActiveNode()->GetName() : "";
+	std::string attackStr = attackBT.GetActiveNode() ? attackBT.GetActiveNode()->GetName() : "";
 
 	// 敵のパラメーター表示
 	if (showEnemyParameter)
@@ -229,7 +214,7 @@ void Enemy::DrawGUI()
 			}
 			ImGui::Separator();
 
-			// 射撃テスト
+			// テスト
 			if (ImGui::Button(u8"通常攻撃魔法"))
 			{
 				onNormalMagic = true;
@@ -250,6 +235,13 @@ void Enemy::DrawGUI()
 			ImGui::SameLine();
 			ImGui::Checkbox(u8"連射魔法", &onRapidMagic);
 			ImGui::Separator();
+			if (ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
+			{
+				defenseMagic.SetIsActive(status.isGuarding);
+			}
+			ImGui::Separator();
+
+
 
 			// 体力
 			ImGui::Text(u8"体力 : %f.0", status.currentHp);
@@ -267,11 +259,6 @@ void Enemy::DrawGUI()
 			{
 				ConsumMagic(10.0f, magicRecoverDelay);
 			}
-			if (ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
-			{
-				defenseMagic.SetIsActive(status.isGuarding);
-			}
-			ImGui::Separator();
 
 			// ヒート値
 			ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
@@ -294,7 +281,8 @@ void Enemy::DrawGUI()
 			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 			ImGui::Separator();
 
-			ImGui::Text(u8"ステート %s", str.c_str());
+			ImGui::Text(u8"移動ステート %s", moveStr.c_str());
+			ImGui::Text(u8"攻撃ステート %s", attackStr.c_str());
 			std::string animState = GetCurrentState();
 			ImGui::Text(u8"AnimState: %s", animState.c_str());
 
@@ -336,19 +324,35 @@ void Enemy::DrawGUI()
 			{
 				AISwitch = !AISwitch;
 			}
-			btEditor.Draw(btGraph, aiTree, this);
+
+			if (ImGui::BeginTabBar("BTTabs"))
+			{
+				if (ImGui::BeginTabItem(u8"移動"))
+				{
+					moveEditor.Draw(moveGraph, moveBT, this);
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem(u8"攻撃"))
+				{
+					attackEditor.Draw(attackGraph, attackBT, this);
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
+			}
 		}
 		ImGui::End();
 
-		if (btEditor.requestOpenSequencer)
+		// シーケンサーを開くリクエストはどちらのエディターからも来る
+		for (BehaviorTreeEditor* editor : { &moveEditor, &attackEditor })
 		{
-			isPreviewMode = true;
-			editingState = btEditor.selectedAnimName;
-
-			ChangeAnimationState(editingState); // アニメーションを対象の技に切り替え
-			ImGui::SetWindowFocus("Enemy Sequencer");
-
-			btEditor.requestOpenSequencer = false; // フラグを戻す
+			if (editor->requestOpenSequencer)
+			{
+				isPreviewMode = true;
+				editingState = editor->selectedAnimName;
+				ChangeAnimationState(editingState);
+				ImGui::SetWindowFocus("Enemy Sequencer");
+				editor->requestOpenSequencer = false;
+			}
 		}
 
 		// プレビューモード用の操作ウィンドウ
@@ -494,8 +498,16 @@ void Enemy::OnStateChanged(const std::string& oldState, const std::string& newSt
 
 
 // =========================================================================
-//  内部ヘルパー（サウンド・デバッグ）
+//  内部ヘルパー
 // =========================================================================
+
+void Enemy::UpdateStatus()
+{
+	if (status.isDown)
+	{
+
+	}
+}
 
 // サウンド再生の更新
 void Enemy::UpdateSounds(const std::string& state)
@@ -551,6 +563,11 @@ AudioSource* Enemy::GetOrLoadSound(const std::string& soundName)
 		sounds[soundName] = nullptr;
 		return nullptr;
 	}
+}
+
+bool Enemy::IsFullBodyAction()
+{
+	return status.isDown || status.isAvoid || status.isBurstTrigger || status.isBuring;
 }
 
 // GUI表示切り替えキー入力

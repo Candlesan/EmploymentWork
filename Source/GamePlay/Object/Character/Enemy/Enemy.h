@@ -9,9 +9,11 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
-#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorTree.h"
-#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/BehaviorData.h"
-#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
+
+// ビヘイビアツリー
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/BehaviorTreeRunner.h"
+
+// 魔法
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
@@ -90,14 +92,6 @@ public:
 	MagicManager& GetMagicManager() { return magicManager; }
 	DefenseMagic& GetDefenseMagic() { return defenseMagic; }
 
-	// ── ビヘイビアツリー ──
-	void ClearActiveNode() {
-		activeNode = nullptr;
-		lastInferredNode = nullptr;
-	}
-	NodeBase* GetActiveNode() const { return activeNode; }
-	NodeBase* GetLastInferredNode() const { return lastInferredNode; }
-
 protected:
 	// =========================================================================
 	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
@@ -112,9 +106,15 @@ private:
 	// =========================================================================
 	//  内部ヘルパー関数
 	// =========================================================================
+	void UpdateStatus();
+
 	// ── サウンド ──
 	void UpdateSounds(const std::string& state);
 	AudioSource* GetOrLoadSound(const std::string& soundName);
+
+	// ── ビヘイビアツリー ──
+	void ClearActiveNode() { moveBT.Abort(); attackBT.Abort(); }
+	bool IsFullBodyAction();
 
 	// ── デバッグ ──
 	void ShowDebugSwitch();
@@ -143,16 +143,16 @@ private:
 	float attackCoolTimer = 0.0f;
 
 	// ── ビヘイビアツリー ──
-	BehaviorTree* aiTree = nullptr;
-	BehaviorData* behaviorData = nullptr;
-	NodeBase* activeNode = nullptr;
-	NodeBase* lastInferredNode = nullptr;
+	BehaviorTreeRunner moveBT; // 移動・回避・飛行用
+	BehaviorTreeRunner attackBT; // 攻撃用
 	float runTimer = 0.0f;
 	bool AISwitch = false;
 
 	// ── ビヘイビアツリーエディタ ──
-	BehaviorTreeGraph btGraph;
-	BehaviorTreeEditor btEditor;
+	BehaviorTreeGraph moveGraph;
+	BehaviorTreeEditor moveEditor;
+	BehaviorTreeGraph attackGraph;
+	BehaviorTreeEditor attackEditor;
 
 	// ── シーケンサー・プレビュー ──
 	AnimationSequencer animSequence;

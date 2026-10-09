@@ -58,6 +58,12 @@ class NormalMagicAttack : public ActionBase
 public:
 	NormalMagicAttack(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
 	ActionBase::State Run(float elapsedTime);
+	void Abort() override 
+	{
+		phase = Phase::Start; 
+		hasFired = false;
+		owner->StopOverlayAnimation();
+	}
 
 private:
 	enum class Phase
@@ -79,7 +85,11 @@ public:
 	RapidFireMagic(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
 	ActionBase::State Run(float elapsedTime);
 
-	void Abort() override { phase = Phase::Start; }
+	void Abort() override
+	{
+		phase = Phase::Start;
+		owner->StopOverlayAnimation();
+	}
 private:
 	enum class Phase
 	{
@@ -103,7 +113,8 @@ public:
 	void Abort() override {
 		owner->SetIsIntercept(false);
 		owner->SetIsRapidFire(false);
-		Phase phase = Phase::Start;
+		owner->StopOverlayAnimation();
+		phase = Phase::Start;
 		hasFired = false;
 		fireTimer = 0.0f;
 	}

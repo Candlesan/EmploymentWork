@@ -2,13 +2,15 @@
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionFactory.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/BehaviorTreeRunner.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h"
 
 #include <set>
 #include <algorithm>
 
-void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy)
+void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTreeRunner& runner, Enemy* enemy)
 {
-	DrawToolbar(graph, tree, enemy);
+	DrawToolbar(graph, runner, enemy);
 
 	ed::SetCurrentEditor(context);
 	ed::Begin(u8"ビヘイビアツリーエディター",ImVec2(0,0));
@@ -25,7 +27,7 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 		// ノードを描画
 		for (auto& node : graph.nodes)
 		{
-			bool isActive = (enemy->GetLastInferredNode() != nullptr && enemy->GetLastInferredNode()->GetName() == node.name);
+			bool isActive = (runner.GetLastInferredNode() != nullptr && runner.GetLastInferredNode()->GetName() == node.name);
 			// 色設定
 			if (node.name == "Root")
 				ed::PushStyleColor(ed::StyleColor_NodeBg, ImColor(80, 50, 10, 220));
@@ -101,7 +103,7 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 			{
 				if (node.pinIn == link.endPin)
 				{
-					if (enemy->GetActiveNode() != nullptr && enemy->GetActiveNode()->GetName() == node.name)
+					if (runner.GetActiveNode() != nullptr && runner.GetActiveNode()->GetName() == node.name)
 					{
 						isLinkActive = true;
 					}
@@ -226,20 +228,9 @@ void BehaviorTreeEditor::Draw(BehaviorTreeGraph& graph, BehaviorTree*& tree, Ene
 
 	if (isNeedRebuild)
 	{
-		if (tree != nullptr)
-		{
-			delete tree;
-			tree = new BehaviorTree();
-		}
-		if (enemy != nullptr)
-		{
-			enemy->ClearActiveNode();
-		}
-
-		// エディター実行用ツリーに流し込む
-		ApplyToTree(tree, enemy, graph);
-		graph.UpdateParentNames();
-
+		runner.Reset(); // ビヘイビアツリーを作り直す
+		ApplyToTree(runner.GetTree(), enemy, graph); // ツリーに詰め込む
+		graph.UpdateParentNames(); // rootを探す
 		isNeedRebuild = false;
 	}
 
@@ -335,7 +326,7 @@ void BehaviorTreeEditor::ApplyToTree(BehaviorTree* tree, Enemy* enemy, const Beh
 	}
 }
 
-void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tree, Enemy* enemy)
+void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTreeRunner& runner, Enemy* enemy)
 {
 	if (ImGui::Button(u8"ノードを追加"))
 	{
@@ -345,7 +336,7 @@ void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tr
 
 	if (ImGui::Button(u8"保存"))
 	{
-		graph.Save("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
+		graph.Save(jsonPath);
 	}
 	ImGui::SameLine();
 
@@ -354,29 +345,13 @@ void BehaviorTreeEditor::DrawToolbar(BehaviorTreeGraph& graph, BehaviorTree*& tr
 		// 重複防止のためにグラフをクリア
 		graph.nodes.clear();
 		graph.links.clear();
+		graph.Load(jsonPath);
 
-		graph.Load("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json");
-
-		// 参照渡しの tree を安全にリセットする
-		if (tree != nullptr)
-		{
-			delete tree;
-			tree = nullptr; // 一度完全に nullptr にして安全を確保する
-		}
-
-		// まっさらな状態から再生成
-		tree = new BehaviorTree();
-
-		if (enemy != nullptr)
-		{
-			enemy->ClearActiveNode(); // 敵の実行状態の記憶を消す
-		}
-
-		// まっさらになったツリーに最新データを適用する
-		ApplyToTree(tree, enemy, graph);
+		runner.Reset(); // ビヘイビアツリーを作り直す
+		ApplyToTree(runner.GetTree(), enemy, graph); // ツリーに詰め込む
 
 		// アニメーションデータも最新の数値で読み直す
-		enemy->LoadAnimationData("Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json", true);
+		enemy->LoadAnimationData(jsonPath, false); // true にするともう片方のツリーのアニメ設定が消える
 	}
 }
 
@@ -545,30 +520,4 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 	}
 
 	ImGui::End();
-}
-
-// ピンの描画ヘルパー関数
-void BehaviorTreeEditor::DrawArrowPin(bool filled)
-{
-
-	ImVec2 p = ImGui::GetCursorScreenPos();
-	float size = 12.0f;
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-	// 下向き三角形（▼）
-	ImVec2 p1 = ImVec2(p.x + size * 0.5f, p.y + size); // 下の頂点
-	ImVec2 p2 = ImVec2(p.x, p.y);          // 左上
-	ImVec2 p3 = ImVec2(p.x + size, p.y);          // 右上
-
-	ImU32 color = filled
-		? IM_COL32(255, 255, 255, 255)
-		: IM_COL32(255, 255, 255, 100);
-
-	if (filled)
-		drawList->AddTriangleFilled(p1, p2, p3, color);
-	else
-		drawList->AddTriangle(p1, p2, p3, color, 1.5f);
-
-	// ImGuiにこのサイズ分のスペースを確保させる
-	ImGui::Dummy(ImVec2(size, size));
 }

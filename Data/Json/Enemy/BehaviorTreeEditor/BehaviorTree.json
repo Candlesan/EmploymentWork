@@ -6,10 +6,6 @@
         },
         {
             "from": "Root",
-            "to": "通常攻撃魔法"
-        },
-        {
-            "from": "Root",
             "to": "前進"
         },
         {
@@ -27,14 +23,6 @@
         {
             "from": "Root",
             "to": "横移動"
-        },
-        {
-            "from": "Root",
-            "to": "連射魔法"
-        },
-        {
-            "from": "Root",
-            "to": "迎撃"
         }
     ],
     "nodes": [
@@ -53,8 +41,8 @@
             "name": "Root",
             "parentName": "",
             "position": [
-                -38.0,
-                66.0
+                -198.0,
+                18.0
             ],
             "priority": 1,
             "selectRule": 1
@@ -84,38 +72,6 @@
                 180.0
             ],
             "priority": 4,
-            "selectRule": 0
-        },
-        {
-            "StateName": "通常攻撃魔法",
-            "actionType": 6,
-            "conditions": [
-                {
-                    "compareType": 3,
-                    "conditionType": 0,
-                    "judgmentValue": 150.0
-                },
-                {
-                    "compareType": 3,
-                    "conditionType": 3,
-                    "judgmentValue": 0.0
-                }
-            ],
-            "config": {
-                "animationName": "AS_Attack_01_01_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "interruptible": false,
-            "name": "通常攻撃魔法",
-            "parentName": "Root",
-            "position": [
-                74.0,
-                180.0
-            ],
-            "priority": 1,
             "selectRule": 0
         },
         {
@@ -234,70 +190,6 @@
             ],
             "priority": 3,
             "selectRule": 4
-        },
-        {
-            "StateName": "連射魔法",
-            "actionType": 7,
-            "conditions": [
-                {
-                    "compareType": 3,
-                    "conditionType": 5,
-                    "judgmentValue": 10.0
-                },
-                {
-                    "compareType": 2,
-                    "conditionType": 4,
-                    "judgmentValue": 0.0
-                }
-            ],
-            "config": {
-                "animationName": "AS_Skill_02_01_Loop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": true,
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "interruptible": false,
-            "name": "連射魔法",
-            "parentName": "Root",
-            "position": [
-                202.0,
-                180.0
-            ],
-            "priority": 1,
-            "selectRule": 0
-        },
-        {
-            "StateName": "迎撃",
-            "actionType": 8,
-            "conditions": [
-                {
-                    "compareType": 2,
-                    "conditionType": 11,
-                    "judgmentValue": 1.0
-                },
-                {
-                    "compareType": 0,
-                    "conditionType": 6,
-                    "judgmentValue": 50.0
-                }
-            ],
-            "config": {
-                "animationName": "AS_Combo_Attack_01_04_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "useRootMotion": false,
-                "useRootMotionEx": false
-            },
-            "interruptible": true,
-            "name": "迎撃",
-            "parentName": "Root",
-            "position": [
-                314.0,
-                180.0
-            ],
-            "priority": 1,
-            "selectRule": 0
         }
     ]
 }

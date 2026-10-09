@@ -155,25 +155,17 @@ NodeBase* NodeBase::SelectSequence(std::vector<NodeBase*>* list, BehaviorData* d
             step = 0;
             data->SetSequenceStep(name, 0);
         }
-        // 実行可能リストに登録されているデータの数だけループを行う
-        for (auto itr = list->begin(); itr != list->end(); itr++)
-        {
-            // 現在の実行ノードの保存、次に実行するステップの保存を行った後、
-            // 現在のステップ番号のノードをリターンしなさい
-            // ①スタックにはdata->PushSequenceNode関数を使用する。保存するデータは実行中の中間ノード。
-            // ②また、次に実行する中間ノードとステップ数を保存する
-            // 　保存にはdata->SetSequenceStep関数を使用。
-            // 　保存データは中間ノードの名前と次のステップ数です(step + 1)
-            // ③ステップ番号目の子ノードを実行ノードとしてリターンする
-            data->PushSequenceNode(this);
-
-            data->SetSequenceStep(name, step + 1);
-
-            return (*list)[step];
-        }
     }
+
+    if (step >= list->size()) return nullptr; // childrenより短くなってしまう可能性があってstepがlistの範囲を超えてクラッシュするからチェックする
+
+    data->PushSequenceNode(this);
+
+    data->SetSequenceStep(name, step + 1);
+
+    return (*list)[step];
     // 指定された中間ノードに実行可能ノードが無いのでnullptrをリターンする
-    return nullptr;
+    //return nullptr;
 }
 
 // 判定

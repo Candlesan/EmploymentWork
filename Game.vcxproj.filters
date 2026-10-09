@@ -387,9 +387,6 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\BehaviorTree.h">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\JudgmentBase.h">
-      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\NodeBase.h">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree\Base</Filter>
     </ClInclude>
@@ -614,6 +611,12 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.h">
       <Filter>Source\GamepPlay\Object\LockOnSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\JudgmentBase.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -916,6 +919,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.cpp">
       <Filter>Source\GamepPlay\Object\LockOnSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
