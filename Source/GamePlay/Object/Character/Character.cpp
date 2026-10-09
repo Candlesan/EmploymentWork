@@ -197,7 +197,7 @@ void Character::UpdateStatus(float elapsedTime)
 		if (status.currentHeat >= status.maxHeat)
 		{
 			status.currentHeat = status.maxHeat;
-			status.isBurst = true;
+			status.isBurstTrigger = true;
 			status.isBuring = true;
 		}
 	}
@@ -205,7 +205,7 @@ void Character::UpdateStatus(float elapsedTime)
 	{
 		if (status.currentHeat > 0.0f)
 		{
-			status.isBurst = false;
+			status.isBurstTrigger = false;
 
 			// ƒq[ƒg’l‚ª‚ ‚Á‚½‚ç‰º‚°‚Ä‚¢‚­
 			status.currentHeat -= status.heatRecoverSpeed * elapsedTime;
@@ -290,7 +290,8 @@ void Character::RecoverHeat(float amount)
 	if (status.currentHeat <= 0.0f)
 	{
 		status.currentHeat = 0.0f;
-		status.isBurst = false;
+		status.isBurstTrigger = false;
+		status.isBuring = false;
 	}
 }
 

@@ -92,6 +92,8 @@ void Enemy::Initialize()
 	rapidMagic.Initialize();
 	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
+
+	lockOn.Initialize(this, &Player::Instance());
 }
 
 

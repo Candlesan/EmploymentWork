@@ -168,6 +168,8 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
     const auto playerPos = Player::Instance().GetPosition();
     owner->LockAtTarget(elapsedTime, playerPos);
 
+    LockOnSystem& lockOn = owner->GetLockOnSystem();
+
     switch (phase)
     {
     case Phase::Start:
@@ -178,19 +180,40 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         return State::Run;
 
     case Phase::Attacking:
-        DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&owner->GetPosition());
-        DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&playerPos);
-        DirectX::XMVECTOR Vec = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(PPos, EPos));
+        // 撃つ方向を計算する
+        DirectX::XMFLOAT3 myPos = owner->GetPosition();
+        DirectX::XMFLOAT3 aimPos = lockOn.GetPredictedPosition(myPos, magicConfig.speed);
+
+        DirectX::XMVECTOR MyPos = DirectX::XMLoadFloat3(&myPos);
+
+        // 予測位置までの距離
+        float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(
+            DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&aimPos), MyPos)));
+
+        // 角度で誤差を決める（距離に比例させる）
+        const float errorAngle = 2.0f; // 最大誤差（度）
+        float leadError = distance * std::tanf(DirectX::XMConvertToRadians(errorAngle));
+
+        aimPos.x += Mathf::RandomRange(-leadError, leadError);
+        aimPos.y += Mathf::RandomRange(-leadError, leadError);
+        aimPos.z += Mathf::RandomRange(-leadError, leadError);
+
+        // 誤差込みの狙い位置から方向を出す
+        DirectX::XMVECTOR Vec = DirectX::XMVector3Normalize(
+            DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&aimPos), MyPos));
+
+        DirectX::XMFLOAT3 dir;
+        DirectX::XMStoreFloat3(&dir, Vec);
 
         // 魔法を設定する
         MagicSpawnInfo info;
         info.angleY = owner->GetAngle().y;
-        DirectX::XMStoreFloat3(&info.direction, Vec);
-        info.position = owner->GetPosition();
+        info.direction = dir;       // 発射位置オフセットの向き用
+        info.targetPos = aimPos;    // 実際の弾道はこっちで決まる
+        info.position = myPos;
         info.holdTime = 0.0f;
         info.owner = owner;
         info.target = &Player::Instance();
-
         owner->SetIsRapidFire(true);
 
         rapidMagic.Update(elapsedTime, &owner->GetMagicManager(), info, magicConfig, true);

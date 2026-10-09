@@ -1675,7 +1675,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
 	ctx.IsDown = status.isDown;
-	ctx.IsBurst = status.isBurst;
+	ctx.IsBurst = status.isBurstTrigger;
 	ctx.inputDir = CalculateRelativeInputDir();
 
 	return ctx;
@@ -1952,7 +1952,7 @@ void Player::CalculateStatusParameters()
 	falling = (velocity.y < -0.1f);
 
 	// バーストの瞬間にアニメーションを呼ぶ
-	if (status.isBurst && flightController.IsFlying())
+	if (status.isBurstTrigger && flightController.IsFlying())
 	{
 		PlayActionGraph("Burst");
 	}
