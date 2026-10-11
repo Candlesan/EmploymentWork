@@ -127,7 +127,7 @@ public:
 
 	// –hŒä–‚–@‚ğ“WŠJ‚µ‚Ä‚¢‚é‚©
 	bool GetIsGaurd() const { return status.isGuarding; }
-
+	void SetIsGaurd(bool flag) { status.isGuarding = flag; }
 	// ----- ˆÚ“® / ‰ñ“] -----
 
 	// ˆÚ“®ˆ—i“ü—Í vx, vz, speed ‚ğó‚¯æ‚éj

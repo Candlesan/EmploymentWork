@@ -13,6 +13,7 @@ namespace ed = ax::NodeEditor;
 // 中間ノードの判断条件の種類
 enum class BTConditionType
 {
+	None,					// 条件なし
 	Distance,				// プレイヤーとの距離
 	BossHpRate,				// ボスのHPの割合
 	timer,					// タイマー
@@ -27,7 +28,6 @@ enum class BTConditionType
 	IncomingMagicCount,		// 自身に向かって飛んできている魔法の数 (迎撃判断用)
 	IsBurst,				// バースト状態か
 	IsBreak,				// バリアが壊れたか
-	None,					// 条件なし
 	Count,					// enumの総数
 };
 
@@ -62,6 +62,53 @@ enum class BTActionType
 	NormalMagicAttack,
 	RapidFire,
 	Intercept,
+	Guard,
+	DropGuard,
+};
+
+struct BTConditionInfo
+{
+	BTConditionType type;
+	const char* id;		// JSONに保存する名前
+	const char* label;	// エディターの表示名
+};
+
+inline const BTConditionInfo kConditionInfos[] = {
+	{BTConditionType::Distance,               "Distance",               u8"プレイヤーとの距離"},
+	{BTConditionType::BossHpRate,             "BossHpRate",             u8"ボスのHPの割合(%)"},
+	{BTConditionType::timer,                  "timer",                  u8"タイマー(秒)"},
+	{BTConditionType::AttackCoolDown,         "AttackCoolDown",         u8"攻撃のクールダウン"},
+	{BTConditionType::EnemyCurrentMagic,      "EnemyCurrentMagic",      u8"敵の現在の魔力残量"},
+	{BTConditionType::EnemyCurrentHeat,       "EnemyCurrentHeat",       u8"敵の現在のヒート値"},
+	{BTConditionType::EnemyCurrentDefense,    "EnemyCurrentDefense",    u8"敵の現在の防御魔法の耐久値"},
+	{BTConditionType::PlayerCurrentMagic,     "PlayerCurrentMagic",     u8"プレイヤーの現在の魔力残量"},
+	{BTConditionType::PlayerCurrentHeat,      "PlayerCurrentHeat",      u8"プレイヤーの現在のヒート値"},
+	{BTConditionType::PlayerCurrentDefense,   "PlayerCurrentDefense",   u8"プレイヤーの現在の防御魔法の耐久値"},
+	{BTConditionType::IsPlayerDefending,      "IsPlayerDefending",      u8"プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)"},
+	{BTConditionType::IncomingMagicCount,     "IncomingMagicCount",     u8"自身に向かって飛んできている魔法の数"},
+	{BTConditionType::IsBurst,                "IsBurst",                u8"バースト状態か"},
+	{BTConditionType::IsBreak,                "IsBreak",                u8"バリアブレイクをしたか"},
+	{BTConditionType::None,                   "None",                   u8"条件なし"},
+};
+
+struct BTActionInfo
+{
+	BTActionType type;
+	const char* id;		// JSONに保存する名前
+	const char* label;	// エディターの表示名
+};
+inline const BTActionInfo kActionInfos[] = {
+	{BTActionType::None,                 "None",                 u8"なし"},
+	{BTActionType::Idle,                 "Idle",                 u8"待機"},
+	{BTActionType::MoveForward,          "MoveForward",          u8"前進"},
+	{BTActionType::MoveBack,             "MoveBack",             u8"後退"},
+	{BTActionType::Right,                "Right",                u8"右"},
+	{BTActionType::Left,                 "Left",                 u8"左"},
+	{BTActionType::NormalMagicAttack,    "NormalMagicAttack",    u8"通常攻撃魔法"},
+	{BTActionType::RapidFire,            "RapidFire",            u8"連射魔法"},
+	{BTActionType::Intercept,            "Intercept",            u8"迎撃"},
+	{BTActionType::Guard,                "Guard",                u8"防御魔法展開"},
+	{BTActionType::DropGuard,            "DropGuard",            u8"防御魔法解除"},
 };
 
 // ノードデータ
@@ -109,6 +156,11 @@ public:
 	void RemoveLink(ed::LinkId id); // 矢印の削除
 	void UpdateParentNames();
 	
+	static std::string ConditionToId(int type);
+	static int ReadConditionType(const nlohmann::json& value);
+	static std::string ActionToId(int type);
+	static int ReadActionType(const nlohmann::json& value);
+
 	void Save(const std::string& path); // Jsonファイルに保存する
 	void Load(const std::string& path); // Jsonファイルを読み込む
 

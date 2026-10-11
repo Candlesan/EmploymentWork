@@ -228,6 +228,56 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
     return State::Failed;
 }
 
+// 防御魔法
+ActionBase::State GuardMagic::Run(float elapsedTime)
+{
+    // 防御魔法を起動する
+    owner->SetIsGaurd(true);
+    owner->GetDefenseMagic().SetIsActive(true);
+
+    if (owner->GetIsGaurd())
+    {
+        // まだエフェクトを出してなければ1回だけ生成する
+        if (!defenseEffect)
+        {
+            defenseEffect = CustomEffectManager::Instance().PlayEffect("Barreir", owner->GetPosition(), owner->GetAngle(), { 1.5f, 1.5f, 1.5f });
+        }
+        else
+        {
+            // 出してる間はプレイヤーに追従させる
+            defenseEffect->SetPosition(owner->GetDefenseMagic().GetDefensePosition());
+        }
+    }
+    else
+    {
+        // フラグが折れていたらエフェクトも止める
+        if (defenseEffect)
+        {
+            defenseEffect->Stop();
+            defenseEffect = nullptr;
+        }
+    }
+
+    return State::Run; // 張り続ける（ノードを「途中中断可」にして解除に乗り換えさせる）
+}
+
+// 防御解除
+ActionBase::State DropGuardMagic::Run(float elapsedTime)
+{
+    // 防御魔法を解除する
+    owner->SetIsGaurd(false);
+    owner->GetDefenseMagic().SetIsActive(false);
+
+    // 十分に回復したら終わる
+    const auto& s = owner->GetStatus();
+    if (s.currentMagic >= s.maxMagic * 0.6f &&
+        s.currentDefenseDurability >= s.maxDefenseDurability * 0.8f)
+    {
+        return State::Complete;
+    }
+    return State::Run;
+}
+
 // 迎撃
 ActionBase::State InterceptMagic::Run(float elapsedTime)
 {

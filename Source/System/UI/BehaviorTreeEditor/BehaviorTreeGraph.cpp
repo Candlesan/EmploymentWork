@@ -82,6 +82,70 @@ void BehaviorTreeGraph::UpdateParentNames()
 	}
 }
 
+// 番号 → 名前（保存用）
+std::string BehaviorTreeGraph::ConditionToId(int type)
+{
+	for (const auto& info : kConditionInfos)
+	{
+		if ((int)info.type == type) return info.id;
+	}
+	return "None"; // 見つからなければ条件なし扱い
+}
+
+// JSONの値 → 番号（読み込み用）
+int BehaviorTreeGraph::ReadConditionType(const nlohmann::json& value)
+{
+	// 新しい形式：名前で保存されている
+	if (value.is_string())
+	{
+		std::string id = value.get<std::string>();
+		for (const auto& info : kConditionInfos)
+		{
+			if (id == info.id) return (int)info.type;
+		}
+		return (int)BTConditionType::None;
+	}
+
+	// 古い形式：番号で保存されている
+	if (value.is_number_integer())
+	{
+		return value.get<int>();
+	}
+
+	return (int)BTConditionType::None;
+}
+
+std::string BehaviorTreeGraph::ActionToId(int type)
+{
+	for (const auto& info : kActionInfos)
+	{
+		if ((int)info.type == type) return info.id;
+	}
+	return "None"; // 見つからなければ条件なし扱い
+}
+
+int BehaviorTreeGraph::ReadActionType(const nlohmann::json& value)
+{
+	// 新しい形式：名前で保存されている
+	if (value.is_string())
+	{
+		std::string id = value.get<std::string>();
+		for (const auto& info : kActionInfos)
+		{
+			if (id == info.id) return (int)info.type;
+		}
+		return (int)BTActionType::None;
+	}
+
+	// 古い形式：番号で保存されている
+	if (value.is_number_integer())
+	{
+		return value.get<int>();
+	}
+
+	return (int)BTActionType::None;
+}
+
 // 保存
 void BehaviorTreeGraph::Save(const std::string& path)
 {
@@ -123,8 +187,8 @@ void BehaviorTreeGraph::Save(const std::string& path)
 		   {"priority", node.priority},
 		   {"StateName", node.name},
 		   {"position", {node.position.x, node.position.y}},
-		   {"actionType", (int)node.actionType},
-			{"interruptible", node.interruptible},
+		   {"actionType", ActionToId(static_cast<int>(node.actionType))},
+		   {"interruptible", node.interruptible},
 
 		   {"config", {
 		   {"animationName", node.config.animationName},
@@ -140,7 +204,7 @@ void BehaviorTreeGraph::Save(const std::string& path)
 		{
 			nodeJson["conditions"].push_back({
 				{"judgmentValue", cond.judgmentValue},
-				{"conditionType", cond.conditionType},
+				{"conditionType", ConditionToId(cond.conditionType)},
 				{"compareType", cond.compareType}
 			});
 		}
@@ -203,7 +267,9 @@ void BehaviorTreeGraph::Load(const std::string& path)
 			newNode.parentName = nodeJson.value("parentName", "");
 			newNode.selectRule = (BehaviorTree::SelectRule)nodeJson.value("selectRule", 0);
 			newNode.priority = nodeJson.value("priority", 1);
-			newNode.actionType = (BTActionType)nodeJson.value("actionType", BTActionType::None);
+			newNode.actionType = nodeJson.count("actionType") > 0
+				? static_cast<BTActionType>(ReadActionType(nodeJson["actionType"]))
+				: BTActionType::None;
 			newNode.interruptible = nodeJson.value("interruptible", false);
 
 			// conditionsデータが存在すれば読み込む
@@ -214,7 +280,9 @@ void BehaviorTreeGraph::Load(const std::string& path)
 					BTCondition c;
 					c.judgmentValue = cond.value("judgmentValue", 0.0f);
 					c.compareType =   cond.value("compareType", 0);
-					c.conditionType = cond.value("conditionType", 0);
+					c.conditionType = cond.count("conditionType") > 0
+						? ReadConditionType(cond["conditionType"])
+						: static_cast<int>(BTConditionType::None);
 					newNode.conditions.push_back(c);
 				}
 			}

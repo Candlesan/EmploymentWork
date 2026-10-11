@@ -28,7 +28,7 @@
     "nodes": [
         {
             "StateName": "Root",
-            "actionType": 0,
+            "actionType": "None",
             "conditions": [],
             "config": {
                 "animationName": "",
@@ -49,11 +49,11 @@
         },
         {
             "StateName": "待機",
-            "actionType": 1,
+            "actionType": "Idle",
             "conditions": [
                 {
                     "compareType": 0,
-                    "conditionType": 14,
+                    "conditionType": "None",
                     "judgmentValue": 0.0
                 }
             ],
@@ -76,11 +76,11 @@
         },
         {
             "StateName": "前進",
-            "actionType": 2,
+            "actionType": "MoveForward",
             "conditions": [
                 {
                     "compareType": 2,
-                    "conditionType": 0,
+                    "conditionType": "Distance",
                     "judgmentValue": 100.0
                 }
             ],
@@ -103,11 +103,11 @@
         },
         {
             "StateName": "後退",
-            "actionType": 3,
+            "actionType": "MoveBack",
             "conditions": [
                 {
                     "compareType": 3,
-                    "conditionType": 0,
+                    "conditionType": "Distance",
                     "judgmentValue": 50.0
                 }
             ],
@@ -130,7 +130,7 @@
         },
         {
             "StateName": "右",
-            "actionType": 4,
+            "actionType": "Right",
             "conditions": [],
             "config": {
                 "animationName": "AS_Run_Combat_F_R_90_Loop_Seq_0",
@@ -143,7 +143,7 @@
             "name": "右",
             "parentName": "横移動",
             "position": [
-                -342.0,
+                -326.0,
                 292.0
             ],
             "priority": 0,
@@ -151,7 +151,7 @@
         },
         {
             "StateName": "左",
-            "actionType": 5,
+            "actionType": "Left",
             "conditions": [],
             "config": {
                 "animationName": "AS_Run_Combat_F_L_90_Loop_Seq_0",
@@ -172,7 +172,7 @@
         },
         {
             "StateName": "横移動",
-            "actionType": 0,
+            "actionType": "None",
             "conditions": [],
             "config": {
                 "animationName": "",

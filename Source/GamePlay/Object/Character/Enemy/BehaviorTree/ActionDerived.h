@@ -1,7 +1,10 @@
 #pragma once
-#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/ActionBase.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
+#include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/ActionBase.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
+
+#include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 
 
 // 待機行動
@@ -102,6 +105,32 @@ private:
 	RapidMagic rapidMagic;
 	RapidMagic::RapidMagicConfig magicConfig;
 	float fireTimer = 0.0f;     // 撃ち続ける残り時間
+};
+
+// 防御魔法
+class GuardMagic : public ActionBase
+{
+public:
+	GuardMagic(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
+	void Abort() override
+	{
+		owner->SetIsGaurd(false);
+		owner->GetDefenseMagic().SetIsActive(false);
+		defenseEffect->Stop();
+		defenseEffect = nullptr;
+	}
+
+private:
+	CustomEffect* defenseEffect = nullptr;
+};
+
+// 防御解除（回復するまで張らない）
+class DropGuardMagic : public ActionBase
+{
+public:
+	DropGuardMagic(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
 };
 
 // 迎撃

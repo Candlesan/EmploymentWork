@@ -75,6 +75,7 @@ void Enemy::Initialize()
 
 	const std::string moveBTPath = "Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree.json";
 	const std::string attackBTPath = "Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree_Attack.json";
+	const std::string defenseBTPath = "Data/Json/Enemy/BehaviorTreeEditor/BehaviorTree_Defense.json";
 
 	// アニメ設定は2つ目を clearBefore=false にしないと、1つ目の分が消える
 	LoadAnimationData(moveBTPath, true);
@@ -87,6 +88,10 @@ void Enemy::Initialize()
 	attackGraph.Load(attackBTPath);
 	attackEditor.ApplyToTree(attackBT.GetTree(), this, attackGraph);
 	attackEditor.SetJsonPath(attackBTPath);
+
+	defenseGraph.Load(defenseBTPath);
+	defenseEditor.ApplyToTree(defenseBT.GetTree(), this, defenseGraph);
+	defenseEditor.SetJsonPath(defenseBTPath);
 
 	// 状態のアニメーションを読み込む
 	LoadAnimationData("Data/Json/Enemy/AnimationState/EnemyStates.json", false);
@@ -123,6 +128,7 @@ void Enemy::Update(float elapsedTime)
 	if (!isPreviewMode && AISwitch && !isForced)
 	{
 		moveBT.Update(elapsedTime);
+		defenseBT.Update(elapsedTime);
 
 		if (IsFullBodyAction())
 		{
@@ -192,6 +198,7 @@ void Enemy::DrawGUI()
 	// 実行中のAIのステート名
 	std::string moveStr = moveBT.GetActiveNode() ? moveBT.GetActiveNode()->GetName() : "";
 	std::string attackStr = attackBT.GetActiveNode() ? attackBT.GetActiveNode()->GetName() : "";
+	std::string defenseStr = defenseBT.GetActiveNode() ? defenseBT.GetActiveNode()->GetName() : "";
 
 	// 敵のパラメーター表示
 	if (showEnemyParameter)
@@ -199,6 +206,10 @@ void Enemy::DrawGUI()
 		ImGui::Begin(u8"エネミー");
 		{
 			ImGui::Checkbox(u8"敵の表示", &showEnemy);
+
+			ImGui::Text(u8"移動ステート %s", moveStr.c_str());
+			ImGui::Text(u8"攻撃ステート %s", attackStr.c_str());
+			ImGui::Text(u8"防御ステート %s", defenseStr.c_str());
 
 			float distans = GetDistanceToPlayer();
 			ImGui::Text(u8"プレイヤーとの距離: %f", distans);
@@ -287,11 +298,6 @@ void Enemy::DrawGUI()
 			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 			ImGui::Separator();
 
-			ImGui::Text(u8"移動ステート %s", moveStr.c_str());
-			ImGui::Text(u8"攻撃ステート %s", attackStr.c_str());
-			std::string animState = GetCurrentState();
-			ImGui::Text(u8"AnimState: %s", animState.c_str());
-
 			// トランスフォーム情報
 			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -343,13 +349,18 @@ void Enemy::DrawGUI()
 					attackEditor.Draw(attackGraph, attackBT, this);
 					ImGui::EndTabItem();
 				}
+				if (ImGui::BeginTabItem(u8"防御"))
+				{
+					defenseEditor.Draw(defenseGraph, defenseBT, this);
+					ImGui::EndTabItem();
+				}
 				ImGui::EndTabBar();
 			}
 		}
 		ImGui::End();
 
 		// シーケンサーを開くリクエストはどちらのエディターからも来る
-		for (BehaviorTreeEditor* editor : { &moveEditor, &attackEditor })
+		for (BehaviorTreeEditor* editor : { &moveEditor, &attackEditor, &defenseEditor })
 		{
 			if (editor->requestOpenSequencer)
 			{
@@ -578,7 +589,9 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 		if (status.isDown)
 		{
 			moveBT.Abort(); // この間はAIを動かさない
-			ChangeAnimationState("DownLoop");
+			attackBT.Abort(); // 攻撃をしない
+			defenseBT.Abort(); // バリアを消す
+			ChangeAnimationState("DownLoop"); // ダウン中のアニメーションをする
 			forcedState = ForcedState::Down;
 			return true;
 		}
@@ -587,6 +600,7 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 		{
 			moveBT.Abort();
 			attackBT.Abort();
+			defenseBT.Abort();
 			ChangeAnimationState(burstStarted ? "Burst" : "Break");
 			forcedState = burstStarted ? ForcedState::Burst : ForcedState::Break;
 			return true;

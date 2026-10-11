@@ -111,7 +111,7 @@ private:
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
 	// ── ビヘイビアツリー ──
-	void ClearActiveNode() { moveBT.Abort(); attackBT.Abort(); }
+	void ClearActiveNode() { moveBT.Abort(); attackBT.Abort(); defenseBT.Abort(); }
 	bool IsFullBodyAction();
 	bool UpdateForcedState(float elapsedTime);
 
@@ -148,6 +148,7 @@ private:
 	// ── ビヘイビアツリー ──
 	BehaviorTreeRunner moveBT; // 移動・回避・飛行用
 	BehaviorTreeRunner attackBT; // 攻撃用
+	BehaviorTreeRunner defenseBT; // 防御用
 	float runTimer = 0.0f;
 	bool AISwitch = false;
 
@@ -156,6 +157,8 @@ private:
 	BehaviorTreeEditor moveEditor;
 	BehaviorTreeGraph attackGraph;
 	BehaviorTreeEditor attackEditor;
+	BehaviorTreeGraph defenseGraph;
+	BehaviorTreeEditor defenseEditor;
 
 	// ── シーケンサー・プレビュー ──
 	AnimationSequencer animSequence;

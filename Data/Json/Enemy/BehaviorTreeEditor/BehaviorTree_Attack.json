@@ -16,7 +16,7 @@
     "nodes": [
         {
             "StateName": "Root",
-            "actionType": 0,
+            "actionType": "None",
             "conditions": [],
             "config": {
                 "animationName": "",
@@ -37,16 +37,16 @@
         },
         {
             "StateName": "通常攻撃魔法",
-            "actionType": 6,
+            "actionType": "NormalMagicAttack",
             "conditions": [
                 {
-                    "compareType": 3,
-                    "conditionType": 0,
-                    "judgmentValue": 150.0
+                    "compareType": 2,
+                    "conditionType": "PlayerCurrentMagic",
+                    "judgmentValue": 10.0
                 },
                 {
                     "compareType": 3,
-                    "conditionType": 3,
+                    "conditionType": "AttackCoolDown",
                     "judgmentValue": 0.0
                 }
             ],
@@ -69,21 +69,21 @@
         },
         {
             "StateName": "連射魔法",
-            "actionType": 7,
+            "actionType": "RapidFire",
             "conditions": [
                 {
-                    "compareType": 3,
-                    "conditionType": 8,
+                    "compareType": 2,
+                    "conditionType": "PlayerCurrentMagic",
                     "judgmentValue": 10.0
                 },
                 {
-                    "compareType": 2,
-                    "conditionType": 7,
+                    "compareType": 4,
+                    "conditionType": "IsBurst",
                     "judgmentValue": 0.0
                 },
                 {
                     "compareType": 4,
-                    "conditionType": 12,
+                    "conditionType": "IsBreak",
                     "judgmentValue": 0.0
                 }
             ],
@@ -106,22 +106,22 @@
         },
         {
             "StateName": "迎撃",
-            "actionType": 8,
+            "actionType": "Intercept",
             "conditions": [
                 {
                     "compareType": 2,
-                    "conditionType": 11,
-                    "judgmentValue": 0.10000000149011612
-                },
-                {
-                    "compareType": 0,
-                    "conditionType": 6,
-                    "judgmentValue": 50.0
+                    "conditionType": "IsPlayerDefending",
+                    "judgmentValue": 0.0
                 },
                 {
                     "compareType": 4,
-                    "conditionType": 12,
+                    "conditionType": "IsBurst",
                     "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 2,
+                    "conditionType": "EnemyCurrentDefense",
+                    "judgmentValue": 50.0
                 }
             ],
             "config": {

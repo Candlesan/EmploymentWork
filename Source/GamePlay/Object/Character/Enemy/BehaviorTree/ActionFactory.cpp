@@ -5,6 +5,7 @@
 
 ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::string& stateName)
 {
+	// ファクトリーでアクションを作る
 	switch (type)
 	{
 	case BTActionType::None:
@@ -44,6 +45,16 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new InterceptMagic(enemy, stateName);
 
 		break;
+	case BTActionType::Guard:
+		return new GuardMagic(enemy, stateName);
 
+		break;
+	case BTActionType::DropGuard:
+		return new DropGuardMagic(enemy, stateName);
+
+		break;
 	}
+
+	// 当てはまるものが無かったらnullptrを返す
+	return nullptr;
 }

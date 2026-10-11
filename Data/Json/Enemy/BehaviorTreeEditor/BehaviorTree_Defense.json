@@ -1,0 +1,99 @@
+{
+    "links": [
+        {
+            "from": "Root",
+            "to": "防御魔法展開"
+        },
+        {
+            "from": "Root",
+            "to": "防御魔法解除"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Root",
+            "actionType": "None",
+            "conditions": [],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "Root",
+            "parentName": "",
+            "position": [
+                -278.0,
+                20.0
+            ],
+            "priority": 1,
+            "selectRule": 2
+        },
+        {
+            "StateName": "防御魔法展開",
+            "actionType": "Guard",
+            "conditions": [
+                {
+                    "compareType": 4,
+                    "conditionType": "IsBurst",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": "IsBreak",
+                    "judgmentValue": 0.0
+                }
+            ],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": true,
+            "name": "防御魔法展開",
+            "parentName": "Root",
+            "position": [
+                -390.0,
+                132.0
+            ],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "防御魔法解除",
+            "actionType": "DropGuard",
+            "conditions": [
+                {
+                    "compareType": 2,
+                    "conditionType": "EnemyCurrentDefense",
+                    "judgmentValue": 20.0
+                },
+                {
+                    "compareType": 2,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 20.0
+                }
+            ],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "防御魔法解除",
+            "parentName": "Root",
+            "position": [
+                -182.0,
+                132.0
+            ],
+            "priority": 1,
+            "selectRule": 0
+        }
+    ]
+}

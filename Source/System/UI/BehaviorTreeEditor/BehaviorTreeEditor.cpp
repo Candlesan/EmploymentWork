@@ -371,20 +371,18 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 			node.name = nameBuf;
 
 		// ActionTypeの編集
-		const char* actionTypes[] = {
-			"None",
-			"Idle",
-			"MoveForward",
-			"MoveBack",
-			"MoveRight",
-			"MoveLeft",
-			"NormalMagicAttack",
-			"RapidFire",
-			"Intercept",
-		};
-		int currentActionType = (int)(node.actionType);
-		if (ImGui::Combo(u8"アクションの種類", &currentActionType, actionTypes, IM_ARRAYSIZE(actionTypes)))
-			node.actionType = (BTActionType)currentActionType;
+		// コンボの中身を表から作る
+		int current = 0;
+		for (int i = 0; i < IM_ARRAYSIZE(kActionInfos); ++i)
+			if ((int)kActionInfos[i].type == static_cast<int>(node.actionType)) current = i;
+
+		if (ImGui::BeginCombo(u8"アクションの種類", kActionInfos[current].label))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(kActionInfos); ++i)
+				if (ImGui::Selectable(kActionInfos[i].label, i == current))
+					node.actionType = static_cast<BTActionType>(kActionInfos[i].type);
+			ImGui::EndCombo();
+		}
 
 		// SelectRuleの編集
 		const char* ruleNames[] = {
@@ -465,25 +463,18 @@ void BehaviorTreeEditor::DrawInspector(BehaviorTreeGraph& graph)
 
 				auto& cond = node.conditions[i];
 
-				// 条件の名前のリスト
-				const char* conditionNames[] = {
-					u8"プレイヤーとの距離",
-					u8"ボスのHPの割合(%)",
-					u8"タイマー(秒)",
-					u8"攻撃のクールダウン",
-					u8"敵の現在の魔力残量",
-					u8"敵の現在のヒート値",
-					u8"敵の現在の防御魔法の耐久値",
-					u8"プレイヤーの現在の魔力残量",
-					u8"プレイヤーの現在のヒート値",
-					u8"プレイヤーの現在の防御魔法の耐久値",
-					u8"プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)",
-					u8"自身に向かって飛んできている魔法の数",
-					u8"バースト状態か",
-					u8"バリアブレイクをしたか",
-					u8"条件なし"
-				};
-				ImGui::Combo(u8"条件の種類", &cond.conditionType, conditionNames, IM_ARRAYSIZE(conditionNames));
+				// コンボの中身を表から作る
+				int current = 0;
+				for (int i = 0; i < IM_ARRAYSIZE(kConditionInfos); ++i)
+					if ((int)kConditionInfos[i].type == cond.conditionType) current = i;
+
+				if (ImGui::BeginCombo(u8"条件の種類", kConditionInfos[current].label))
+				{
+					for (int i = 0; i < IM_ARRAYSIZE(kConditionInfos); ++i)
+						if (ImGui::Selectable(kConditionInfos[i].label, i == current))
+							cond.conditionType = (int)kConditionInfos[i].type;
+					ImGui::EndCombo();
+				}
 
 				if (cond.conditionType != (int)BTConditionType::None)
 				{
