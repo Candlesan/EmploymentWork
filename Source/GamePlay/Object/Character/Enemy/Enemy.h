@@ -77,7 +77,7 @@ public:
 	//  ゲッター
 	// =========================================================================
 	// ── 基本パラメータ ──
-	float GetMoveSpeed() const { return moveSpeed; }
+	float GetMoveSpeed() const { return flightController.IsFlying() ? flightSpeed : moveSpeed; }
 	float GetTurnSpeed() const { return turnSpeed; }
 
 	// ── ステータス ──
@@ -132,6 +132,7 @@ private:
 
 	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;
+	float flightSpeed = 20.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
 	// ── アニメーション関係 ──
@@ -190,6 +191,10 @@ private:
 	float interceptRadius = 10.0f;			// 迎撃用の半径
 	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
 	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
+
+	// ── 飛行関係 ──
+	float hoverHeightOffset = 5.0f;
+	float hoverFollowRate = 1.0f;
 
 	// ── デバッグ発射用フラグ ──
 	bool onNormalMagic = false;

@@ -30,6 +30,8 @@ enum class BTConditionType
 	IsBreak,				// バリアが壊れたか
 	AvoidCoolDownTimer,		// 回避用のクールダウン
 	Random,					// 確率
+	IsFlying,					// 確率
+	PlayerIsFlying,					// 確率
 	Count,					// enumの総数
 };
 
@@ -67,6 +69,8 @@ enum class BTActionType
 	Guard,
 	DropGuard,
 	Avoid,
+	Flight,
+	Land,
 };
 
 struct BTConditionInfo
@@ -94,6 +98,8 @@ inline const BTConditionInfo kConditionInfos[] = {
 	{BTConditionType::IsBreak,                "IsBreak",                u8"バリアブレイクをしたか"},
 	{BTConditionType::AvoidCoolDownTimer,     "AvoidCoolDownTimer",     u8"回避用のクールダウンがあるか"},
 	{BTConditionType::Random,                 "Random",                 u8"確率"},
+	{BTConditionType::IsFlying,               "IsFlying",               u8"飛行中か"},
+	{BTConditionType::PlayerIsFlying,         "PlayerIsFlying",         u8"プレイヤーが飛行中か"},
 };
 
 struct BTActionInfo
@@ -115,6 +121,8 @@ inline const BTActionInfo kActionInfos[] = {
 	{BTActionType::Guard,                "Guard",                u8"防御魔法展開"},
 	{BTActionType::DropGuard,            "DropGuard",            u8"防御魔法解除"},
 	{BTActionType::Avoid,                "Avoid",                u8"回避"},
+	{BTActionType::Flight,               "Flight",               u8"飛行"},
+	{BTActionType::Land,                 "Land",                 u8"降下"},
 };
 
 // ノードデータ

@@ -93,8 +93,14 @@ bool FloatConditionJudgment::Judgment()
         currentValue = owner->GetStatus().isBreak ? 1.0f : 0.0f;
         break;
 
-    case BTConditionType::Random: // バリアブレイク中か
+    case BTConditionType::Random: // 確率
         currentValue = owner->GetRandomValue();
+        break;
+    case BTConditionType::IsFlying: // 飛行中か
+        currentValue = owner->GetFlightController().IsFlying() ? 1.0f : 0.0f;
+        break;
+    case BTConditionType::PlayerIsFlying: // プレイヤーが飛行中か
+        currentValue = player.GetFlightController().IsFlying() ? 1.0f : 0.0f;
         break;
     }
 

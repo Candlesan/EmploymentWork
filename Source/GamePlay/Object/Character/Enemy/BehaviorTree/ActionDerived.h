@@ -72,6 +72,37 @@ private:
 	DirectX::XMFLOAT3 avoidDir = { 0, 0, 1 }; // ‰ñ”ğ‚·‚éŒü‚«
 };
 
+// ”òs
+class Flight : public ActionBase
+{
+public:
+	Flight(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
+	void Abort() override
+	{
+		isStarted = false;
+	}
+
+private:
+	bool isStarted = false;
+	float targetHeight = 5.0f;
+};
+
+// ~‰º
+class Land : public ActionBase
+{
+public:
+	Land(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
+	void Abort() override
+	{
+		isStarted = false;
+	}
+
+private:
+	bool isStarted = false;
+};
+
 // ========= –‚–@ŠÖŒW =========
 // ’ÊíUŒ‚–‚–@
 class NormalMagicAttack : public ActionBase

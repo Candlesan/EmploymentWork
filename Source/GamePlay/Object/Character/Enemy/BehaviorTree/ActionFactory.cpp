@@ -57,6 +57,14 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new Avoid(enemy, stateName);
 
 		break;
+	case BTActionType::Flight:
+		return new Flight(enemy, stateName);
+
+		break;
+	case BTActionType::Land:
+		return new Land(enemy, stateName);
+
+		break;
 	}
 
 	// “–‚Ä‚Í‚Ü‚é‚à‚Ì‚ª–³‚©‚Á‚½‚çnullptr‚ð•Ô‚·

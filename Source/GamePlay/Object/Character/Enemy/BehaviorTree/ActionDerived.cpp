@@ -143,6 +143,50 @@ ActionBase::State Avoid::Run(float elpasedTime)
     return State::Run;
 }
 
+// 飛行
+ActionBase::State Flight::Run(float elapsedTime)
+{
+    FlightController& flight = owner->GetFlightController();
+
+    if (!isStarted)
+    {
+        owner->ChangeAnimationState(stateName);
+        flight.SetFlightMode(FlightMode::UP);
+        isStarted = true;
+    }
+
+    // 目標の高さまで上がったらホバー
+    if (owner->GetPosition().y >= targetHeight)
+    {
+        flight.SetFlightMode(FlightMode::Hover);
+        isStarted = false;
+        return State::Complete;
+    }
+
+    return State::Run;
+}
+
+// 降下
+ActionBase::State Land::Run(float elapsedTime)
+{
+    FlightController& flight = owner->GetFlightController();
+
+    if (!isStarted)
+    {
+        owner->ChangeAnimationState(stateName);
+        flight.SetFlightMode(FlightMode::Down);
+        isStarted = true;
+    }
+
+    if (!flight.IsFlying())
+    {
+        isStarted = false;
+        return State::Complete;
+    }
+
+    return State::Run;
+}
+
 // 通常攻撃魔法
 ActionBase::State NormalMagicAttack::Run(float elapsedTime)
 {

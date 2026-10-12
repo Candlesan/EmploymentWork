@@ -152,6 +152,9 @@ public:
 	// 回避中か
 	bool GetIsAvoid() const { return status.isAvoid; }
 	void SetIsAvoid(bool flag) { status.isAvoid = flag; }
+
+	FlightController& GetFlightController() { return flightController; }
+	const FlightController& GetFlightController() const { return flightController; }
 private:
 	// ----- 内部：移動・速度更新ヘルパー -----
 

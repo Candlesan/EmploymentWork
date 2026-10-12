@@ -172,6 +172,17 @@ void Enemy::Update(float elapsedTime)
 	// ステータス更新
 	UpdateStatus(elapsedTime);
 
+	// ホバー中はプレイヤーの高さに少しずつ合わせる
+	if (flightController.GetFlightMode() == FlightMode::Hover)
+	{
+		float targetY = Player::Instance().GetPosition().y + hoverHeightOffset; // 例: 0〜2 くらい
+		float diff = targetY - position.y;
+		velocity.y = diff * hoverFollowRate; // 例: 2.0f（大きいほど早く合わせる）
+	}
+
+	// 飛行更新
+	flightController.Update(this, elapsedTime);
+
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
@@ -502,7 +513,10 @@ DirectX::XMFLOAT3 Enemy::GetMoveDirection(const DirectX::XMFLOAT3& movePos) cons
 	DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR PPos = DirectX::XMLoadFloat3(&movePos);
 
-	DirectX::XMVECTOR Dir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(PPos, EPos));
+	DirectX::XMVECTOR Dir = DirectX::XMVectorSubtract(PPos, EPos);
+
+	Dir = DirectX::XMVectorSetY(Dir, 0.0f);
+	Dir = DirectX::XMVector3Normalize(Dir);
 
 	DirectX::XMFLOAT3 direction;
 	DirectX::XMStoreFloat3(&direction, Dir);
@@ -604,6 +618,7 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 			attackBT.Abort(); // 攻撃をしない
 			defenseBT.Abort(); // バリアを消す
 			ChangeAnimationState("DownLoop"); // ダウン中のアニメーションをする
+			flightController.SetFlightMode(FlightMode::Down);
 			forcedState = ForcedState::Down;
 			return true;
 		}
