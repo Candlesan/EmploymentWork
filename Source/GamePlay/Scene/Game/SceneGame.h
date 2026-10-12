@@ -10,6 +10,7 @@
 #include "Gameplay/Object/Stage/Stage.h"
 #include "GamePlay/Object/Character/Player/PlayerUI.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
+#include "GamePlay/Object/Character/Enemy/EnemyUI.h"
 #include "GamePlay/Object/Collision/CollisionManager.h"
 
 #include "System/Shader/FrameBuffer/FrameBuffer.h"
@@ -124,6 +125,7 @@ private:
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
 	PlayerUI playerUI;
+	EnemyUI enemyUI;
 	bool showUIEdlitor = true;
 	
 

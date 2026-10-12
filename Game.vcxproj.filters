@@ -618,6 +618,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\Base\JudgmentBase.h">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\EnemyUI.h">
+      <Filter>Source\GamepPlay\Object\Character\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -922,6 +925,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.cpp">
       <Filter>Source\GamepPlay\Object\Character\Enemy\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\EnemyUI.cpp">
+      <Filter>Source\GamepPlay\Object\Character\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -102,6 +102,7 @@ void SceneGame::Initialize()
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneGame.json");
 	playerUI.Initialize(uiCanvas);
+	enemyUI.Initialize(uiCanvas);
 }
 
 // 終了化
@@ -196,6 +197,8 @@ void SceneGame::Update(float elapsedTime)
 
 		playerUI.Update(Player::Instance().GetStatus());
 		playerUI.UpdateCrosshair(elapsedTime, player.GetLockOnSystem(), camera);
+
+		enemyUI.Update(enemy.get()->GetStatus());
 
 		uiEditor.Update(elapsedTime);
 		uiCanvas.Update(elapsedTime);

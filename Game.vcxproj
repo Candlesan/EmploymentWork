@@ -150,6 +150,7 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\Enemy.h" />
+    <ClInclude Include="Source\GamePlay\Object\Character\Enemy\EnemyUI.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\Player.h" />
     <ClInclude Include="Source\GamePlay\Object\Character\Player\PlayerUI.h" />
     <ClInclude Include="Source\GamePlay\Object\Collision\Collision.h" />
@@ -261,6 +262,7 @@
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\BehaviorTreeRunner.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\BehaviorTree\JudgmentDerived.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\Enemy.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Character\Enemy\EnemyUI.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\Player.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Character\Player\PlayerUI.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Collision\Collision.cpp" />
