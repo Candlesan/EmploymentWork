@@ -28,6 +28,8 @@ enum class BTConditionType
 	IncomingMagicCount,		// 自身に向かって飛んできている魔法の数 (迎撃判断用)
 	IsBurst,				// バースト状態か
 	IsBreak,				// バリアが壊れたか
+	AvoidCoolDownTimer,		// 回避用のクールダウン
+	Random,					// 確率
 	Count,					// enumの総数
 };
 
@@ -64,6 +66,7 @@ enum class BTActionType
 	Intercept,
 	Guard,
 	DropGuard,
+	Avoid,
 };
 
 struct BTConditionInfo
@@ -74,6 +77,7 @@ struct BTConditionInfo
 };
 
 inline const BTConditionInfo kConditionInfos[] = {
+	{BTConditionType::None,                   "None",                   u8"条件なし"},
 	{BTConditionType::Distance,               "Distance",               u8"プレイヤーとの距離"},
 	{BTConditionType::BossHpRate,             "BossHpRate",             u8"ボスのHPの割合(%)"},
 	{BTConditionType::timer,                  "timer",                  u8"タイマー(秒)"},
@@ -88,7 +92,8 @@ inline const BTConditionInfo kConditionInfos[] = {
 	{BTConditionType::IncomingMagicCount,     "IncomingMagicCount",     u8"自身に向かって飛んできている魔法の数"},
 	{BTConditionType::IsBurst,                "IsBurst",                u8"バースト状態か"},
 	{BTConditionType::IsBreak,                "IsBreak",                u8"バリアブレイクをしたか"},
-	{BTConditionType::None,                   "None",                   u8"条件なし"},
+	{BTConditionType::AvoidCoolDownTimer,     "AvoidCoolDownTimer",     u8"回避用のクールダウンがあるか"},
+	{BTConditionType::Random,                 "Random",                 u8"確率"},
 };
 
 struct BTActionInfo
@@ -109,6 +114,7 @@ inline const BTActionInfo kActionInfos[] = {
 	{BTActionType::Intercept,            "Intercept",            u8"迎撃"},
 	{BTActionType::Guard,                "Guard",                u8"防御魔法展開"},
 	{BTActionType::DropGuard,            "DropGuard",            u8"防御魔法解除"},
+	{BTActionType::Avoid,                "Avoid",                u8"回避"},
 };
 
 // ノードデータ

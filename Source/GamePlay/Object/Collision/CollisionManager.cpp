@@ -21,8 +21,11 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 	// aが魔法で、bがキャラクターの場合ダメージ
 	if (IsMagicTag(a.category) && IsCharacterTag(b.category))
 	{
+
 		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
 		Character* target = static_cast<Character*>(b.owner);
+
+		if (target->GetStatus().isAvoid) return; // 回避中は無敵（魔法を消さずにすり抜けさせる）
 
 		// 防御魔法を展開していないときにダメージ
 		if (!target->GetIsGaurd())

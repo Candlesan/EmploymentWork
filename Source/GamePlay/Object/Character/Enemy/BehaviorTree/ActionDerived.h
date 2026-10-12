@@ -55,6 +55,24 @@ private:
 	float timer = 0.0f;
 };
 
+// ‰ñ”ğ
+class Avoid : public ActionBase
+{
+public:
+	Avoid(Enemy* enemy, std::string stateName) : ActionBase(enemy, stateName) {}
+	ActionBase::State Run(float elapsedTime);
+	void Abort() override
+	{
+		owner->SetIsAvoid(false);
+		isStarted = false;
+	}
+
+private:
+	bool isStarted = false;
+	DirectX::XMFLOAT3 avoidDir = { 0, 0, 1 }; // ‰ñ”ğ‚·‚éŒü‚«
+};
+
+// ========= –‚–@ŠÖŒW =========
 // ’ÊíUŒ‚–‚–@
 class NormalMagicAttack : public ActionBase
 {

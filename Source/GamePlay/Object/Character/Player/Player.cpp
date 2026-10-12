@@ -453,14 +453,14 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
 				ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
 
-				if (isGuarding) {
+				if (status.isGuarding) {
 					ImGui::Text(u8"防衛状態: ガード中");
 				}
 				else {
 					ImGui::Text(u8"防衛状態: ガードなし");
 				}
 
-				if (isAvoid) {
+				if (status.isAvoid) {
 					ImGui::Text(u8"アクション状態: 回避中");
 				}
 				else {
@@ -670,7 +670,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// プレイヤーの当たり判定
-	if (!isAvoid)
+	if (!status.isAvoid)
 	{
 		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
@@ -1290,7 +1290,7 @@ void Player::UpdateStateTransitions(float elapsedTime)
 				{
 				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-				case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
+				case TransitionActionType::SetIsAvoid: status.isAvoid = (action.value != 0.0f); break;
 				}
 			}
 		}
@@ -1465,7 +1465,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 				{
 				case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 				case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-				case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
+				case TransitionActionType::SetIsAvoid: status.isAvoid = (action.value != 0.0f); break;
 				}
 			}
 		}
@@ -1548,7 +1548,7 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 							{
 							case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 							case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-							case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
+							case TransitionActionType::SetIsAvoid: status.isAvoid = (action.value != 0.0f); break;
 							}
 						}
 					}
@@ -1635,7 +1635,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 		bufferedButton |= gamePad.GetButtonDown();
 	}
 
-	isGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
+	status.isGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
 
 	// RBボタンの長押し判定
 	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
@@ -1720,7 +1720,7 @@ void Player::EnterSubGraph(const std::string& subGraphPath, const TransitionCont
 					{
 					case TransitionActionType::MoveSpeed: moveSpeed = action.value; break;
 					case TransitionActionType::TurnSpeed: turnSpeed = DirectX::XMConvertToRadians(action.value); break;
-					case TransitionActionType::SetIsAvoid: isAvoid = (action.value != 0.0f); break;
+					case TransitionActionType::SetIsAvoid: status.isAvoid = (action.value != 0.0f); break;
 					}
 				}
 			}

@@ -73,9 +73,6 @@ public:
 	float GetCurrentHeat() const { return status.currentHeat; } // 現在のヒート値を返す
 	float GetCurrentDefense() const { return status.currentDefenseDurability; } // 現在の防御魔法の耐久値を返す
 
-	bool GetIsGuarding() const { return isGuarding; }
-	bool GetIsAvoid() const { return isAvoid; }
-
 	LockOnSystem& GetLockOnSystem() { return lockOn; }
 	const LockOnSystem& GetLockOnSystem() const { return lockOn; }
 
@@ -162,9 +159,7 @@ private:
 	bool isStaminaEmpty = false;
 
 	// ── アクション状態のフラグ ──
-	bool isGuarding = false;
 	bool isHit = false;
-	bool isAvoid = false;
 
 	// ── ジャンプ関係 ──
 	bool jumpPressed = false;

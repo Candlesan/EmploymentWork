@@ -53,6 +53,10 @@ ActionBase* ActionFactory::Creat(BTActionType type, Enemy* enemy, const std::str
 		return new DropGuardMagic(enemy, stateName);
 
 		break;
+	case BTActionType::Avoid:
+		return new Avoid(enemy, stateName);
+
+		break;
 	}
 
 	// “–‚Ä‚Í‚Ü‚é‚à‚Ì‚ª–³‚©‚Á‚½‚çnullptr‚ð•Ô‚·

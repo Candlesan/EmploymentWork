@@ -156,6 +156,18 @@ void Enemy::Update(float elapsedTime)
 	{
 		attackCoolTimer -= elapsedTime;
 	}
+	if (avoidCoolDownTimer > 0.0f)
+	{
+		avoidCoolDownTimer -= elapsedTime;
+	}
+
+	// 一定時間ごとに乱数を振り直す
+	randomTimer -= elapsedTime;
+	if (randomTimer <= 0.0f)
+	{
+		randomValue = Mathf::RandomRange(0.0f, 100.0f);
+		randomTimer = randomInterval;
+	}
 
 	// ステータス更新
 	UpdateStatus(elapsedTime);

@@ -119,7 +119,7 @@
                     "judgmentValue": 0.0
                 },
                 {
-                    "compareType": 2,
+                    "compareType": 3,
                     "conditionType": "EnemyCurrentDefense",
                     "judgmentValue": 50.0
                 }

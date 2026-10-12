@@ -23,6 +23,10 @@
         {
             "from": "Root",
             "to": "横移動"
+        },
+        {
+            "from": "Root",
+            "to": "回避"
         }
     ],
     "nodes": [
@@ -190,6 +194,43 @@
             ],
             "priority": 3,
             "selectRule": 4
+        },
+        {
+            "StateName": "回避",
+            "actionType": "Avoid",
+            "conditions": [
+                {
+                    "compareType": 2,
+                    "conditionType": "IncomingMagicCount",
+                    "judgmentValue": 1.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "AvoidCoolDownTimer",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "Random",
+                    "judgmentValue": 50.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "interruptible": false,
+            "name": "回避",
+            "parentName": "Root",
+            "position": [
+                -550.0,
+                180.0
+            ],
+            "priority": 1,
+            "selectRule": 0
         }
     ]
 }

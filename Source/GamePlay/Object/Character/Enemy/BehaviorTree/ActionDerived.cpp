@@ -98,6 +98,51 @@ ActionBase::State MoveLeft::Run(float elapsedTime)
     return State::Run;
 }
 
+// 回避
+ActionBase::State Avoid::Run(float elpasedTime)
+{
+    if (!isStarted)
+    {
+        // 今の移動方向を回避方向にする
+        DirectX::XMFLOAT3 vel = owner->GetVelocity();
+        float len = sqrtf(vel.x * vel.x + vel.z * vel.z);
+
+        // 長さがあったら正規化する
+        if (len > 0.1f)
+        {
+            avoidDir = { vel.x / len, 0.0f, vel.z / len };
+        }
+        else
+        {
+            // 止まってるフレーズはプレイヤーに対して左右ランダム
+            DirectX::XMFLOAT3 toPlayer = owner->GetMoveDirection(Player::Instance().GetPosition());
+            float side = (rand() % 2 == 0) ? 1.0f : -1.0f;
+            avoidDir = { toPlayer.x * side, 0.0f, -toPlayer.z * side };
+        }
+
+        // 回避方向に身体を傾ける
+        DirectX::XMFLOAT3 angle = owner->GetAngle();
+        angle.y = atan2f(avoidDir.x, avoidDir.z);
+        owner->SetAngle(angle);
+
+        owner->ChangeAnimationState(stateName);
+        owner->SetIsAvoid(true);
+        isStarted = true;
+    }
+
+    owner->Move(avoidDir.x, avoidDir.z, owner->GetMoveSpeed());
+
+    // アニメーションが終わったら終了
+    if (owner->GetCurrentAnimationSeconds() >= owner->GetCurrentAnimationLength())
+    {
+        owner->SetIsAvoid(false);
+        isStarted = false;
+        owner->SetAvoidCoolDownTimer(1.0f);
+        return State::Complete;
+    }
+    return State::Run;
+}
+
 // 通常攻撃魔法
 ActionBase::State NormalMagicAttack::Run(float elapsedTime)
 {

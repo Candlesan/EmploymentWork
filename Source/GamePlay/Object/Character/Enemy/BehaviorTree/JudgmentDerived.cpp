@@ -53,7 +53,7 @@ bool FloatConditionJudgment::Judgment()
         currentValue = player.GetCurrentDefense();
         break;
     case BTConditionType::IsPlayerDefending: // プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)
-        currentValue = player.GetIsGuarding() ? 1.0f : 0.0f;
+        currentValue = player.GetIsGaurd() ? 1.0f : 0.0f;
         break;
     case BTConditionType::IncomingMagicCount: // 自身に向かって飛んできている魔法の数 (回避・迎撃判断用)
     {
@@ -76,7 +76,7 @@ bool FloatConditionJudgment::Judgment()
 
             // 内積をとる
             float Dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(moveDir, magicDir));
-            if (Dot > 0.0f)
+            if (Dot < 0.0f)
             {
                 count++; // 正だったらカウントを増やす
             }
@@ -91,6 +91,10 @@ bool FloatConditionJudgment::Judgment()
 
     case BTConditionType::IsBreak: // バリアブレイク中か
         currentValue = owner->GetStatus().isBreak ? 1.0f : 0.0f;
+        break;
+
+    case BTConditionType::Random: // バリアブレイク中か
+        currentValue = owner->GetRandomValue();
         break;
     }
 

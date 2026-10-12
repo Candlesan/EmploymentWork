@@ -1,19 +1,19 @@
-#pragma once
+ï»¿#pragma once
 
-// ƒVƒXƒeƒ€
+// ã‚·ã‚¹ãƒ†ãƒ 
 #include "System/Renderer/ModelRenderer/ModelRenderer.h"
 #include "System/UI/AnimationSequence/AnimationSequence.h"
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/UI/BehaviorTreeEditor/BehaviorTreeEditor.h"
 #include "System/Audio/AudioSource.h"
 
-// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg
+// ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 
-// ƒrƒwƒCƒrƒAƒcƒŠ[
+// ãƒ“ãƒ˜ã‚¤ãƒ“ã‚¢ãƒ„ãƒªãƒ¼
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/BehaviorTreeRunner.h"
 
-// –‚–@
+// é­”æ³•
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
@@ -27,13 +27,13 @@ class Enemy : public AnimationCharacter
 {
 public:
 	// =========================================================================
-	//  ƒRƒ“ƒXƒgƒ‰ƒNƒ^EƒfƒXƒgƒ‰ƒNƒ^
+	//  ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãƒ»ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	// =========================================================================
 	Enemy() {};
 	~Enemy();
 
 	// =========================================================================
-	//  ƒ‰ƒCƒtƒTƒCƒNƒ‹iƒQ[ƒ€‚ÌªŠ²‚Ì—¬‚êj
+	//  ãƒ©ã‚¤ãƒ•ã‚µã‚¤ã‚¯ãƒ«ï¼ˆã‚²ãƒ¼ãƒ ã®æ ¹å¹¹ã®æµã‚Œï¼‰
 	// =========================================================================
 	void Initialize();
 	void Update(float elapsedTime);
@@ -42,59 +42,63 @@ public:
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
 	// =========================================================================
-	//  ŠO•”ƒAƒNƒVƒ‡ƒ“EAI§Œä
+	//  å¤–éƒ¨ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãƒ»AIåˆ¶å¾¡
 	// =========================================================================
-	float GetCurrentMagic() const { return status.currentMagic; } // Œ»İ‚Ì–‚—Í—Ê‚ğ•Ô‚·
-	float GetCurrentHeat() const { return status.currentHeat; } // Œ»İ‚Ìƒq[ƒg’l‚ğ•Ô‚·
-	float GetCurrentDefense() const { return status.currentDefenseDurability; } // Œ»İ‚Ì–hŒä–‚–@‚Ì‘Ï‹v’l‚ğ•Ô‚·
+	float GetCurrentMagic() const { return status.currentMagic; } // ç¾åœ¨ã®é­”åŠ›é‡ã‚’è¿”ã™
+	float GetCurrentHeat() const { return status.currentHeat; } // ç¾åœ¨ã®ãƒ’ãƒ¼ãƒˆå€¤ã‚’è¿”ã™
+	float GetCurrentDefense() const { return status.currentDefenseDurability; } // ç¾åœ¨ã®é˜²å¾¡é­”æ³•ã®è€ä¹…å€¤ã‚’è¿”ã™
 
-	// ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğæ“¾
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã®è·é›¢ã‚’å–å¾—
 	float GetDistanceToPlayer() const;
 
-	// ƒ^[ƒQƒbƒg‚ÌÀ•W‚ÉŒü‚©‚Á‚Äù‰ñ‚·‚é
+	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®åº§æ¨™ã«å‘ã‹ã£ã¦æ—‹å›ã™ã‚‹
 	void LockAtTarget(float elapsedTime, const DirectX::XMFLOAT3& targetPos);
 
-	// ƒ^[ƒQƒbƒg‚Ì•ûŒü‚ğæ“¾‚·‚é(³‹K‰»Ï‚İ)
+	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ–¹å‘ã‚’å–å¾—ã™ã‚‹(æ­£è¦åŒ–æ¸ˆã¿)
 	DirectX::XMFLOAT3 GetMoveDirection(const DirectX::XMFLOAT3& movePos) const;
 
 	// =========================================================================
-	//  ƒZƒbƒ^[
+	//  ã‚»ãƒƒã‚¿ãƒ¼
 	// =========================================================================
-	// „Ÿ„Ÿ Šî–{ƒpƒ‰ƒ[ƒ^ „Ÿ„Ÿ
+	// â”€â”€ åŸºæœ¬ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ â”€â”€
 	void SetMoveSpeed(float s) { moveSpeed = s; }
 
-	// „Ÿ„Ÿ ƒXƒe[ƒ^ƒX „Ÿ„Ÿ
+	// â”€â”€ ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ â”€â”€
 	void SetHealth(float h) { status.currentHp = h; }
 	void SetMaxHealth(float h) { status.maxHp = h; }
 
-	// „Ÿ„Ÿ ƒ^ƒCƒ}[EAI§Œä „Ÿ„Ÿ
+	// â”€â”€ ã‚¿ã‚¤ãƒãƒ¼ãƒ»AIåˆ¶å¾¡ â”€â”€
 	void SetRunTimer(float timer) { runTimer = timer; }
 	void SetAttackCoolTimer(float timer) { attackCoolTimer = timer; }
+	void SetAvoidCoolDownTimer(float timer) { avoidCoolDownTimer = timer; }
+	void SetRandomValue(float value) { randomValue = value; }
 
 	// =========================================================================
-	//  ƒQƒbƒ^[
+	//  ã‚²ãƒƒã‚¿ãƒ¼
 	// =========================================================================
-	// „Ÿ„Ÿ Šî–{ƒpƒ‰ƒ[ƒ^ „Ÿ„Ÿ
+	// â”€â”€ åŸºæœ¬ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ â”€â”€
 	float GetMoveSpeed() const { return moveSpeed; }
 	float GetTurnSpeed() const { return turnSpeed; }
 
-	// „Ÿ„Ÿ ƒXƒe[ƒ^ƒX „Ÿ„Ÿ
+	// â”€â”€ ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ â”€â”€
 	float GetHealth() { return status.currentHp; }
 	float GetMaxHealth() { return status.maxHp; }
 
-	// „Ÿ„Ÿ ƒ^ƒCƒ}[Eí“¬ „Ÿ„Ÿ
-	float GetRunTimer() const { return runTimer; } // ÀsŠÔ
-	float GetAttackCoolTimer() const { return attackCoolTimer; } // UŒ‚‚ÌƒN[ƒ‹ƒ_ƒEƒ“
-	float GetIntercepRudius() const { return interceptRadius; } // Œ}Œ‚”ÍˆÍ‚Ì”¼Œa
+	// â”€â”€ ã‚¿ã‚¤ãƒãƒ¼ãƒ»æˆ¦é—˜ â”€â”€
+	float GetRunTimer() const { return runTimer; } // å®Ÿè¡Œæ™‚é–“
+	float GetAttackCoolTimer() const { return attackCoolTimer; } // æ”»æ’ƒã®ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³
+	float GetIntercepRudius() const { return interceptRadius; } // è¿æ’ƒç¯„å›²ã®åŠå¾„
+	float GetAvoidCoolDownTimer() const{ return avoidCoolDownTimer; }
+	float GetRandomValue() const { return randomValue; }
 
-	// „Ÿ„Ÿ ƒV[ƒPƒ“ƒT[Eƒ}ƒl[ƒWƒƒ[ „Ÿ„Ÿ
+	// â”€â”€ ã‚·ãƒ¼ã‚±ãƒ³ã‚µãƒ¼ãƒ»ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ â”€â”€
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
 	MagicManager& GetMagicManager() { return magicManager; }
 	DefenseMagic& GetDefenseMagic() { return defenseMagic; }
 
 protected:
 	// =========================================================================
-	//  eqŠÖŒW‚ÌƒI[ƒo[ƒ‰ƒCƒhiAnimationCharacter‚©‚ç‚ÌŒp³ŠÖ”j
+	//  è¦ªå­é–¢ä¿‚ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ï¼ˆAnimationCharacterã‹ã‚‰ã®ç¶™æ‰¿é–¢æ•°ï¼‰
 	// =========================================================================
 	std::shared_ptr<Model> GetModel() override { return enemy; }
 	const std::shared_ptr<Model> GetModel() const override { return enemy; }
@@ -103,56 +107,61 @@ protected:
 
 private:
 	// =========================================================================
-	//  “à•”ƒwƒ‹ƒp[ŠÖ”
+	//  å†…éƒ¨ãƒ˜ãƒ«ãƒ‘ãƒ¼é–¢æ•°
 	// =========================================================================
 
-	// „Ÿ„Ÿ ƒTƒEƒ“ƒh „Ÿ„Ÿ
+	// â”€â”€ ã‚µã‚¦ãƒ³ãƒ‰ â”€â”€
 	void UpdateSounds(const std::string& state);
 	AudioSource* GetOrLoadSound(const std::string& soundName);
 
-	// „Ÿ„Ÿ ƒrƒwƒCƒrƒAƒcƒŠ[ „Ÿ„Ÿ
+	// â”€â”€ ãƒ“ãƒ˜ã‚¤ãƒ“ã‚¢ãƒ„ãƒªãƒ¼ â”€â”€
 	void ClearActiveNode() { moveBT.Abort(); attackBT.Abort(); defenseBT.Abort(); }
 	bool IsFullBodyAction();
 	bool UpdateForcedState(float elapsedTime);
 
-	// „Ÿ„Ÿ ƒfƒoƒbƒO „Ÿ„Ÿ
+	// â”€â”€ ãƒ‡ãƒãƒƒã‚° â”€â”€
 	void ShowDebugSwitch();
 	void debugShot(float elapsedTime);
 
 private:
 	// =========================================================================
-	//  ƒƒ“ƒo•Ï”iƒWƒƒƒ“ƒ‹‚²‚Æ‚ÉƒOƒ‹[ƒv‰»j
+	//  ãƒ¡ãƒ³ãƒå¤‰æ•°ï¼ˆã‚¸ãƒ£ãƒ³ãƒ«ã”ã¨ã«ã‚°ãƒ«ãƒ¼ãƒ—åŒ–ï¼‰
 	// =========================================================================
-	// „Ÿ„Ÿ 3Dƒ‚ƒfƒ‹ „Ÿ„Ÿ
+	// â”€â”€ 3Dãƒ¢ãƒ‡ãƒ« â”€â”€
 	std::shared_ptr<Model> enemy;
 
-	// „Ÿ„Ÿ Šî–{ƒpƒ‰ƒ[ƒ^iˆÚ“®E‰ñ“]j „Ÿ„Ÿ
+	// â”€â”€ åŸºæœ¬ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ï¼ˆç§»å‹•ãƒ»å›è»¢ï¼‰ â”€â”€
 	float moveSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 
-	// „Ÿ„Ÿ ƒAƒjƒ[ƒVƒ‡ƒ“ŠÖŒW „Ÿ„Ÿ
+	// â”€â”€ ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é–¢ä¿‚ â”€â”€
 	std::vector<Model::NodePose> nodePoses;
 	std::vector<Model::NodePose> oldNodePoses;
 
-	// „Ÿ„Ÿ “–‚½‚è”»’èE‹——£İ’è „Ÿ„Ÿ
+	// â”€â”€ å½“ãŸã‚Šåˆ¤å®šãƒ»è·é›¢è¨­å®š â”€â”€
 	float debugOffset = 0.5;
 
-	// „Ÿ„Ÿ ƒ_ƒ[ƒWEí“¬ƒXƒe[ƒ^ƒX „Ÿ„Ÿ
+	// â”€â”€ ãƒ€ãƒ¡ãƒ¼ã‚¸ãƒ»æˆ¦é—˜ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ â”€â”€
 	float attackCoolTimer = 0.0f;
+	float avoidCoolDownTimer = 0.0f;
+
+	float randomValue = 0.0f;    // 0ã€œ100 ã®ä¹±æ•°
+	float randomTimer = 0.0f;    // æŒ¯ã‚Šç›´ã—ã¾ã§ã®æ™‚é–“
+	float randomInterval = 1.0f; // æŒ¯ã‚Šç›´ã™é–“éš”ï¼ˆç§’ï¼‰
 
 	enum class ForcedState { None, Down, GetUp, Burst, Break };
 	ForcedState forcedState = ForcedState::None;
 	bool wasBurstTrigger = false;
 	bool wasBreak = false;
 
-	// „Ÿ„Ÿ ƒrƒwƒCƒrƒAƒcƒŠ[ „Ÿ„Ÿ
-	BehaviorTreeRunner moveBT; // ˆÚ“®E‰ñ”ğE”òs—p
-	BehaviorTreeRunner attackBT; // UŒ‚—p
-	BehaviorTreeRunner defenseBT; // –hŒä—p
+	// â”€â”€ ãƒ“ãƒ˜ã‚¤ãƒ“ã‚¢ãƒ„ãƒªãƒ¼ â”€â”€
+	BehaviorTreeRunner moveBT; // ç§»å‹•ãƒ»å›é¿ãƒ»é£›è¡Œç”¨
+	BehaviorTreeRunner attackBT; // æ”»æ’ƒç”¨
+	BehaviorTreeRunner defenseBT; // é˜²å¾¡ç”¨
 	float runTimer = 0.0f;
 	bool AISwitch = false;
 
-	// „Ÿ„Ÿ ƒrƒwƒCƒrƒAƒcƒŠ[ƒGƒfƒBƒ^ „Ÿ„Ÿ
+	// â”€â”€ ãƒ“ãƒ˜ã‚¤ãƒ“ã‚¢ãƒ„ãƒªãƒ¼ã‚¨ãƒ‡ã‚£ã‚¿ â”€â”€
 	BehaviorTreeGraph moveGraph;
 	BehaviorTreeEditor moveEditor;
 	BehaviorTreeGraph attackGraph;
@@ -160,13 +169,13 @@ private:
 	BehaviorTreeGraph defenseGraph;
 	BehaviorTreeEditor defenseEditor;
 
-	// „Ÿ„Ÿ ƒV[ƒPƒ“ƒT[EƒvƒŒƒrƒ…[ „Ÿ„Ÿ
+	// â”€â”€ ã‚·ãƒ¼ã‚±ãƒ³ã‚µãƒ¼ãƒ»ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼ â”€â”€
 	AnimationSequencer animSequence;
 	AnimationSequencerEditor sequencerEditor;
 	bool isPreviewMode = false;
 	std::string editingState = "";
 
-	// „Ÿ„Ÿ –‚–@ŠÖŒW „Ÿ„Ÿ
+	// â”€â”€ é­”æ³•é–¢ä¿‚ â”€â”€
 	MagicManager magicManager;
 	NormalMagic::NormalMagicConfig normalMagicConfig;
 	NormalMagic normalMagic;
@@ -174,23 +183,23 @@ private:
 	RapidMagic rapidMagic;
 	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
-	float coolDownValue = 1.0f;				// ’ÊíUŒ‚–‚–@‚ÌƒN[ƒ‹ƒ_ƒEƒ“
-	float fullcChargeCoolDownValue = 3.0f;	// ƒtƒ‹ƒ`ƒƒ[ƒWƒVƒ‡ƒbƒgŒã‚ÌƒN[ƒ‹ƒ_ƒEƒ“
-	bool rapidInterval = 0.1f;				// ˜AË–‚–@‚Ì”­ËŠÔŠu
-	float magicRecoverDelay = 0.0f;			// –‚—Í‚ğ‰ñ•œ‚·‚é‚Ü‚Å‚Ì’x‰„
-	float interceptRadius = 10.0f;			// Œ}Œ‚—p‚Ì”¼Œa
-	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // Œ}Œ‚—p‚ÌƒIƒtƒZƒbƒgˆÊ’u
+	float coolDownValue = 1.0f;				// é€šå¸¸æ”»æ’ƒé­”æ³•ã®ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³
+	float fullcChargeCoolDownValue = 3.0f;	// ãƒ•ãƒ«ãƒãƒ£ãƒ¼ã‚¸ã‚·ãƒ§ãƒƒãƒˆå¾Œã®ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³
+	bool rapidInterval = 0.1f;				// é€£å°„é­”æ³•ã®ç™ºå°„é–“éš”
+	float magicRecoverDelay = 0.0f;			// é­”åŠ›ã‚’å›å¾©ã™ã‚‹ã¾ã§ã®é…å»¶
+	float interceptRadius = 10.0f;			// è¿æ’ƒç”¨ã®åŠå¾„
+	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // è¿æ’ƒç”¨ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆä½ç½®
 	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
 
-	// „Ÿ„Ÿ ƒfƒoƒbƒO”­Ë—pƒtƒ‰ƒO „Ÿ„Ÿ
+	// â”€â”€ ãƒ‡ãƒãƒƒã‚°ç™ºå°„ç”¨ãƒ•ãƒ©ã‚° â”€â”€
 	bool onNormalMagic = false;
 	bool onChargeMagic = false;
 	bool onRapidMagic = false;
 
-	// „Ÿ„Ÿ ƒTƒEƒ“ƒh „Ÿ„Ÿ
+	// â”€â”€ ã‚µã‚¦ãƒ³ãƒ‰ â”€â”€
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 
-	// „Ÿ„Ÿ ƒfƒoƒbƒOGUI•\¦ƒtƒ‰ƒO „Ÿ„Ÿ
+	// â”€â”€ ãƒ‡ãƒãƒƒã‚°GUIè¡¨ç¤ºãƒ•ãƒ©ã‚° â”€â”€
 	bool showbtEditor = true;
 	bool showEnemyParameter = true;
 	bool showEnemy = true;

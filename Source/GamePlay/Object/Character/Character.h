@@ -146,7 +146,12 @@ public:
 	const CharacterStatus& GetStatus() const { return status; }
 	void SetStatus(CharacterStatus& s) { status = s; }
 
+	// 自動照準システムを取得
 	LockOnSystem&  GetLockOnSystem() { return lockOn; }
+
+	// 回避中か
+	bool GetIsAvoid() const { return status.isAvoid; }
+	void SetIsAvoid(bool flag) { status.isAvoid = flag; }
 private:
 	// ----- 内部：移動・速度更新ヘルパー -----
 
