@@ -10,12 +10,14 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.10000000149011612,
                     "type": 6
                 }
             ],
             "fromState": "Entry",
             "priority": 0,
+            "toSlot": 0,
             "toState": "AS_Dodge_Combat_to_Run_F_0_Seq_0"
         },
         {
@@ -28,12 +30,14 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.0,
                     "type": 0
                 }
             ],
             "fromState": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
             "priority": 0,
+            "toSlot": 0,
             "toState": "Exit"
         },
         {
@@ -46,12 +50,14 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.6000000238418579,
                     "type": 6
                 }
             ],
             "fromState": "Entry",
             "priority": 1,
+            "toSlot": 0,
             "toState": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0"
         },
         {
@@ -64,25 +70,70 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.0,
                     "type": 0
                 }
             ],
             "fromState": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
             "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Dodge_Combat_Air_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Dodge_Combat_Air_F_0_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
             "toState": "Exit"
         }
     ],
     "nodes": [
         {
             "StateName": "Entry",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 -111.0,
                 89.0
@@ -92,13 +143,16 @@
         },
         {
             "StateName": "Exit",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 419.0,
                 89.0
@@ -108,13 +162,16 @@
         },
         {
             "StateName": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
+            "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
+            "mixRate": 0.0,
             "position": [
                 19.0,
                 57.0
@@ -124,16 +181,38 @@
         },
         {
             "StateName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+            "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": true
             },
+            "mixRate": 0.0,
             "position": [
                 17.0,
                 137.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Dodge_Combat_Air_F_0_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Dodge_Combat_Air_F_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                17.0,
+                217.0
             ],
             "subGraphPath": "",
             "type": 0

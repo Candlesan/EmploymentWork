@@ -6,7 +6,15 @@
             "colorB": 1.0,
             "colorG": 1.0,
             "colorR": 1.0,
-            "conditions": [],
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 18
+                }
+            ],
             "fromState": "Entry",
             "priority": 0,
             "toSlot": 0,
@@ -66,7 +74,7 @@
             },
             "mixRate": 0.0,
             "position": [
-                145.0,
+                163.0,
                 -7.0
             ],
             "subGraphPath": "",

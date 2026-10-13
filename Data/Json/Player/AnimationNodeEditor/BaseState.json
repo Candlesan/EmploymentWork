@@ -492,6 +492,63 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "State_Move"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 3,
+                    "value": 1.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 32,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "Fly",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Avoid"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 0,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "State_Avoid",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Fly"
         }
     ],
     "nodes": [
@@ -547,7 +604,7 @@
             "mixRate": 0.0,
             "position": [
                 -220.0,
-                537.0
+                553.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Avoid.json",
             "type": 1
