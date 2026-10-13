@@ -202,6 +202,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.IsBurst;
 			break;
 
+		case TransitionConditionType::MoveSpeed:
+			result = (ctx.MoveSpeed >= cond.threshold);
+			break;
+
 		case TransitionConditionType::Always:
 			result = true;
 			break;

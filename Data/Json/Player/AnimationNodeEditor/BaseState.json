@@ -141,7 +141,7 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 0.20000000298023224,
+                    "threshold": 0.0,
                     "type": 10
                 },
                 {
@@ -149,101 +149,13 @@
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.10000000149011612,
-                    "type": 14
-                }
-            ],
-            "fromState": "Fly",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "State_Move"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
+                    "type": 7
                 }
             ],
             "fromState": "Fly",
             "priority": 0,
             "toSlot": 0,
             "toState": "State_Idle"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 7
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
-                }
-            ],
-            "fromState": "Fly",
-            "priority": 1,
-            "toSlot": 0,
-            "toState": "AS_Run_Combat_Fast_Stop_Seq_0"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 1,
-                    "threshold": 0.0,
-                    "type": 8
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 6
-                },
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 7.0,
-                    "type": 7
-                }
-            ],
-            "fromState": "AS_Run_Combat_Fast_Stop_Seq_0",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "State_Move"
         },
         {
             "Actions": [],
@@ -523,6 +435,63 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "Fly"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 7.0,
+                    "type": 21
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "Fly",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Land"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "Land",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
         }
     ],
     "nodes": [
@@ -558,8 +527,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -204.0,
-                393.0
+                -220.0,
+                457.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
             "type": 1
@@ -577,8 +546,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -204.0,
-                473.0
+                -220.0,
+                537.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Avoid.json",
             "type": 1
@@ -596,30 +565,11 @@
             },
             "mixRate": 0.0,
             "position": [
-                -220.0,
-                -7.0
+                -191.0,
+                -71.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Fly.json",
             "type": 1
-        },
-        {
-            "StateName": "AS_Run_Combat_Fast_Stop_Seq_0",
-            "assetName": "",
-            "config": {
-                "animationName": "AS_Run_Combat_Fast_Stop_Seq_0",
-                "blendTime": 0.20000000298023224,
-                "loop": false,
-                "targetBoneName": "",
-                "useRootMotion": false,
-                "useRootMotionEx": true
-            },
-            "mixRate": 0.0,
-            "position": [
-                -63.0,
-                -23.0
-            ],
-            "subGraphPath": "",
-            "type": 0
         },
         {
             "StateName": "Down",
@@ -635,7 +585,7 @@
             "mixRate": 0.0,
             "position": [
                 49.0,
-                265.0
+                361.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Down.json",
             "type": 1
@@ -654,7 +604,7 @@
             "mixRate": 0.0,
             "position": [
                 -444.0,
-                217.0
+                329.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -672,8 +622,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -223.0,
-                -71.0
+                -671.0,
+                -231.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Burst.json",
             "type": 1
@@ -691,10 +641,29 @@
             },
             "mixRate": 0.0,
             "position": [
-                -380.0,
-                -39.0
+                -780.0,
+                -231.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Break.json",
+            "type": 1
+        },
+        {
+            "StateName": "Land",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -60.0,
+                -71.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Land.json",
             "type": 1
         }
     ]

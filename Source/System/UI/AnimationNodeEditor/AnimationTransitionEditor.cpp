@@ -739,6 +739,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "ButtonReleased",		TransitionConditionType::ButtonReleased },
 				{ "ButtonHeld",			TransitionConditionType::ButtonHeld },
 
+				{ "MoveSpeed",			TransitionConditionType::MoveSpeed },   
 				{ "MoveLengthOver",		TransitionConditionType::MoveLengthOver },
 				{ "MoveLengthUnder",	TransitionConditionType::MoveLengthUnder },   
 				{ "EnemyFromDistance",	TransitionConditionType::EnemyFromDistance },
@@ -791,6 +792,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionConditionType::MoveLengthOver:
 			case TransitionConditionType::MoveLengthUnder:
 			case TransitionConditionType::EnemyFromDistance:
+			case TransitionConditionType::MoveSpeed:
 				ImGui::DragFloat("Threshold", &cond.threshold, 0.01f);
 				break;
 

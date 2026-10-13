@@ -1061,6 +1061,60 @@
             "name": "AS_Run_Combat_Fast_Stop_Seq_0",
             "ranges": [],
             "speedKeys": []
+        },
+        {
+            "assetName": "Fly",
+            "events": [],
+            "name": "Fly",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "AS_Roll_Combat_to_Run_F_0_Seq_0",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_F_0_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.5,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.4583333432674408
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.9166666865348816
+                }
+            ]
+        },
+        {
+            "assetName": "Land",
+            "events": [],
+            "name": "Land",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.4583333432674408
+                },
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.9166666865348816
+                }
+            ]
         }
     ]
 }

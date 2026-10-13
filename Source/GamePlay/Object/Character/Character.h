@@ -213,7 +213,7 @@ protected:
 	DirectX::XMFLOAT3 velocity = { 0.0f, 0.0f, 0.0f };
 
 	// 移動関連
-	float maxMoveSpeed = 5.0f;   // 最大速度
+	float maxMoveSpeed = 20.0f;   // 最大速度
 	float moveVecX = 0.0f;   // 移動ベクトル（X軸方向）
 	float moveVecZ = 0.0f;   // 移動ベクトル（Z軸方向）
 

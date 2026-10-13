@@ -36,7 +36,7 @@ void Player::Initialize()
 
 	// パラメータ初期化
 	moveSpeed = 7.0f;
-	maxMoveSpeed = 7.0f;
+	maxMoveSpeed = 20.0f;
 	status.currentHp = 100.0f;
 	status.maxHp = 100.0f;
 	status.currentMagic = 100.0f;
@@ -1117,12 +1117,12 @@ void Player::InputMove(float elapsedTime)
 	if (flightController.IsFlying() && !normalMagic.IsFullCharged())
 	{
 		// 飛行中の移動速度
-		Move(moveVec.x, moveVec.z, 20.0f);
+		Move(moveVec.x, moveVec.z, flightSpeed);
 	}
 	else if (normalMagic.IsFullCharged() && flightController.IsFlying())
 	{
 		// 飛行中かつチャージ済み移動速度
-		Move(moveVec.x, moveVec.z, 15.0f);
+		Move(moveVec.x, moveVec.z, fullChargeSpeed);
 	}
 	else if (useRootMotion || useRootMotionEx)
 	{
@@ -1677,6 +1677,10 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsDown = status.isDown;
 	ctx.IsBurst = status.isBurstTrigger;
 	ctx.inputDir = CalculateRelativeInputDir();
+
+	// 移動速度を計算する
+	const DirectX::XMFLOAT3 v = GetVelocity();
+	ctx.MoveSpeed = sqrtf(v.x * v.x + v.z * v.z);
 
 	return ctx;
 }

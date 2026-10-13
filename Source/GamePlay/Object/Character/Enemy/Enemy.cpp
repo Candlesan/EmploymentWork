@@ -47,7 +47,7 @@ void Enemy::Initialize()
 
 	// パラメータ初期化
 	moveSpeed = 7.0f;
-	maxMoveSpeed = 7.0f;
+	maxMoveSpeed = 20.0f;
 	status.currentHp = 100.0f;
 	status.maxHp = 100.0f;
 	status.currentMagic = 100.0f;

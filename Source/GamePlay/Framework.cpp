@@ -11,6 +11,7 @@
 // シーン
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/Title/SceneTitle.h"
+#include "GamePlay/Scene/Game/SceneGame.h"
 #include "System/Audio/Audio.h"
 
 // 垂直同期間隔設定
@@ -36,7 +37,7 @@ Framework::Framework(HWND hWnd)
 	EffectManager::Instance().Initialize();
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneTitle);
+	SceneManager::Instance().ChangeScene(new SceneGame);
 
 
 	// 最初にボーダーレスのフルスクリーンを作る

@@ -30,8 +30,8 @@ enum class BTConditionType
 	IsBreak,				// バリアが壊れたか
 	AvoidCoolDownTimer,		// 回避用のクールダウン
 	Random,					// 確率
-	IsFlying,					// 確率
-	PlayerIsFlying,					// 確率
+	IsFlying,				// 自分が飛行中か
+	PlayerIsFlying,			// プレイヤーが飛んでいるか
 	Count,					// enumの総数
 };
 
