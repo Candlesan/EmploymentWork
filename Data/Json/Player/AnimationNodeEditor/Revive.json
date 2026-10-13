@@ -51,7 +51,7 @@
                 "loop": false,
                 "targetBoneName": "",
                 "useRootMotion": false,
-                "useRootMotionEx": false
+                "useRootMotionEx": true
             },
             "mixRate": 0.0,
             "position": [

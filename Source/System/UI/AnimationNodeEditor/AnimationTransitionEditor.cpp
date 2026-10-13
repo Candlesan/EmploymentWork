@@ -758,6 +758,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "IsDown",			TransitionConditionType::IsDown },
 				{ "IsBurst",			TransitionConditionType::IsBurst },
 				{ "IsDead",			TransitionConditionType::IsDead },
+				{ "currentHP",			TransitionConditionType::currentHP },
 
 				{ "Always",				TransitionConditionType::Always },
 			};
@@ -794,6 +795,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 			case TransitionConditionType::MoveLengthUnder:
 			case TransitionConditionType::EnemyFromDistance:
 			case TransitionConditionType::MoveSpeed:
+			case TransitionConditionType::currentHP:
 				ImGui::DragFloat("Threshold", &cond.threshold, 0.01f);
 				break;
 

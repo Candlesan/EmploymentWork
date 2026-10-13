@@ -102,7 +102,7 @@ void Enemy::Initialize()
 	sequencerEditor.SetWindowName("Enemy Sequencer");
 	animSequence.Load(seqPath);
 
-	ChangeAnimationState("Idle");
+	ChangeAnimationState(u8"待機");
 
 	normalMagic.Initialize();
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
@@ -121,6 +121,18 @@ void Enemy::Initialize()
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
+	// スタートボタンを押してAI起動
+	GamePad& gamePad = Input::Instance().GetGamePad();
+	if (gamePad.GetButtonDown() & GamePad::BTN_START)
+	{
+		AISwitch = true;
+		if (status.isDead)
+		{
+			status.currentHp = status.maxHp;
+			status.isDead = false; 
+		}
+	}
+
 	// ダウン状態か
 	bool isForced = UpdateForcedState(elapsedTime);
 
@@ -533,6 +545,18 @@ void Enemy::OnStateChanged(const std::string& oldState, const std::string& newSt
 {
 }
 
+void Enemy::OnDead()
+{
+	status.isDead = true;
+	forcedState = ForcedState::Dead;
+
+	moveBT.Abort();
+	attackBT.Abort();
+	defenseBT.Abort();
+	ChangeAnimationState("DownLoop"); // 倒れたままのアニメーション
+	flightController.SetFlightMode(FlightMode::Down);
+}
+
 
 // =========================================================================
 //  内部ヘルパー
@@ -660,6 +684,15 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 			forcedState = ForcedState::None;
 			return false;
 		}
+		return true;
+
+	case ForcedState::Dead:
+		// 死んでいる間は倒れたまま待つ
+		if (status.isDead) return true;
+
+		// 復活したら起き上がりアニメーション → 終わったら GetUp 側で戦闘再開
+		ChangeAnimationState("DownEnd");
+		forcedState = ForcedState::GetUp;
 		return true;
 	}
 	return false;

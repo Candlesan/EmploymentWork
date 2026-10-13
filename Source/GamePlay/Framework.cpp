@@ -75,15 +75,15 @@ Framework::~Framework()
 // 更新処理
 void Framework::Update(float elapsedTime)
 {
+#ifdef _DEBUG
 	bool isF1DownNow = (GetAsyncKeyState(VK_F1) & 0x8000);
-
 	// GUIの表示/非表示切り替え
-	if (isF1DownNow && !isF1PressedLastFrame) 
+	if (isF1DownNow && !isF1PressedLastFrame)
 	{
 		GUIDrawSwitch = !GUIDrawSwitch;
 	}
-
 	isF1PressedLastFrame = isF1DownNow;
+#endif
 
 	// IMGUIフレーム開始処理	
 	ImGuiRenderer::NewFrame();
@@ -113,16 +113,14 @@ void Framework::Render(float elapsedTime)
 	// シーン描画処理
 	SceneManager::Instance().Render();
 
+#if _DEBUG
 	// シーンGUI描画処理
 	if(GUIDrawSwitch)
 	SceneManager::Instance().DrawGUI();
 
-#if 0
-	// IMGUIデモウインドウ描画（IMGUI機能テスト用）
-	ImGui::ShowDemoWindow();
-#endif
 	// IMGUI描画
 	ImGuiRenderer::Render(dc);
+#endif
 
 	// 画面表示
 	Graphics::Instance().Present(syncInterval);

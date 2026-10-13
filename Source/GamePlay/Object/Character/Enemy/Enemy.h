@@ -105,6 +105,7 @@ protected:
 
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
+	void OnDead() override;
 private:
 	// =========================================================================
 	//  内部ヘルパー関数
@@ -150,7 +151,7 @@ private:
 	float randomTimer = 0.0f;    // 振り直しまでの時間
 	float randomInterval = 1.0f; // 振り直す間隔（秒）
 
-	enum class ForcedState { None, Down, GetUp, Burst, Break };
+	enum class ForcedState { None, Down, GetUp, Burst, Break, Dead };
 	ForcedState forcedState = ForcedState::None;
 	bool wasBurstTrigger = false;
 	bool wasBreak = false;

@@ -636,6 +636,55 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "Death"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 1.0,
+                    "type": 23
+                }
+            ],
+            "fromState": "Death",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Revive"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 7.0
+                },
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "Revive",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Idle"
         }
     ],
     "nodes": [

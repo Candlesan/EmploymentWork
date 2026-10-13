@@ -217,6 +217,11 @@ void Player::Finalize()
 void Player::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
+	if (gamePad.GetButtonDown() & GamePad::BTN_START)
+	{
+		status.isDead = false;
+		status.currentHp = status.maxHp;
+	}
 
 	// 今、文字入力中かどうかを取得
 	bool isTyping = ImGui::GetIO().WantCaptureKeyboard;
@@ -248,6 +253,7 @@ void Player::Update(float elapsedTime)
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	lockOn.Update(elapsedTime, camera.GetFront());
 
+#ifdef _DEBUG
 	if (!isTyping && !isPreviewMode)
 	{
 		// 移動処理
@@ -265,8 +271,25 @@ void Player::Update(float elapsedTime)
 	else if (isTyping && !isPreviewMode)
 	{
 		// もし普通にゲームしている最中に文字入力を始めたら、足踏みしないようにIdleに戻す
-		ChangeAnimationState("Idle");
+		ChangeAnimationState("State_Idle");
 	}
+#endif // _DEBUG
+
+#ifdef NDEBUG
+	// 移動処理
+	InputMove(elapsedTime);
+
+	// 飛行状態を更新
+	UpdateFly(elapsedTime);
+
+	// アニメーション遷移
+	UpdateStateTransitions(elapsedTime);
+
+	// 上半身のアニメーション遷移
+	UpdateUpperBodyTransitions(elapsedTime);
+#endif // NDEBUG
+
+
 
 	// プレビューモード用の強制ループ処理
 	if (isPreviewMode)
@@ -914,6 +937,7 @@ void Player::UpdateSounds(const std::string& state)
 // 飛行の更新処理
 void Player::UpdateFly(float elapsedTime)
 {
+	if (status.isDead) return;
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// 入力をまとめる
@@ -1109,7 +1133,7 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 // 入力処理
 void Player::InputMove(float elapsedTime)
 {
-	if (IsDownState()) return;
+	if (IsDownState() || status.isDead) return;
 
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -1678,6 +1702,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsBurst = status.isBurstTrigger;
 	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.IsDead = IsDead();
+	ctx.currentHP = status.currentHp;
 
 	// 移動速度を計算する
 	const DirectX::XMFLOAT3 v = GetVelocity();

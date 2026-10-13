@@ -37,6 +37,7 @@ enum class TransitionConditionType
 	IsBurst,			// バースト状態
 	MoveSpeed,			// 移動速度
 	IsDead,				// 今死んだか
+	currentHP,			// 現在の体力
 };
 
 enum class TransitionActionType
@@ -95,6 +96,7 @@ struct TransitionContext
 	float enemyFromdistance;
 	float HoldTime;
 	float MoveSpeed;
+	float currentHP;
 	int   buttonDown;
 	int   buttonHeld;
 	int   buttonUp;

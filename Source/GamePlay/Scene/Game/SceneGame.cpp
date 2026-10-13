@@ -279,9 +279,12 @@ void SceneGame::Render()
 			}
 		}
 
+#ifdef _DEBUG
 		player.RenderDebugPrimitive(shapeRenderer);
 		enemy->RenderDebugPrimitive(shapeRenderer);
 		stage->RenderDebugPrimitive(shapeRenderer);
+#endif // DEBUG
+
 	}
 
 	// 3Dモデル描画

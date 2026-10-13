@@ -71,6 +71,10 @@
         {
             "from": "空中横移動",
             "to": "空中左移動"
+        },
+        {
+            "from": "Root",
+            "to": "死亡"
         }
     ],
     "nodes": [
@@ -551,6 +555,33 @@
                 260.0
             ],
             "priority": 4,
+            "selectRule": 0
+        },
+        {
+            "StateName": "死亡",
+            "actionType": "None",
+            "conditions": [
+                {
+                    "compareType": 4,
+                    "conditionType": "IsDead",
+                    "judgmentValue": 0.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Knock_Down_Combat_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "死亡",
+            "parentName": "Root",
+            "position": [
+                -6.0,
+                116.0
+            ],
+            "priority": 1,
             "selectRule": 0
         }
     ]
