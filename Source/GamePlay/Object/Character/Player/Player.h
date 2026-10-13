@@ -93,7 +93,6 @@ protected:
 	// =========================================================================
 	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
 	// =========================================================================
-	void OnLanding() override;
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
 private:

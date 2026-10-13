@@ -73,15 +73,15 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		targetA->SetPosition(outPosA); // Collisionが計算してくれた座標をそのまま反映
 		targetB->SetPosition(outPosB);
 	}
-	// aがキャラクターでbがステージの時の押し戻し処理
-	else if (IsCharacterTag(a.category) && IsStageTag(b.category))
+	// aがキャラクターでbがエリアの時の押し戻し処理
+	else if (IsCharacterTag(a.category) && IsArenaTag(b.category))
 	{
 		Character* targetA = static_cast<Character*>(a.owner);
 
 		targetA->SetPosition(outPosA); // Collistionが計算してくれた座標をそのまま反映
 	}
 	// aが魔法系でbステージの処理
-	else if (IsMagicTag(a.category) && IsStageTag(b.category))
+	else if (IsMagicTag(a.category) && IsArenaTag(b.category))
 	{
 		MagicBase* magic = static_cast<MagicBase*>(a.owner);
 
@@ -97,9 +97,9 @@ bool CollisionManager::IsCharacterTag(CollisionTag tag)
 }
 
 // このタグはステージか？
-bool CollisionManager::IsStageTag(CollisionTag tag)
+bool CollisionManager::IsArenaTag(CollisionTag tag)
 {
-	return tag == CollisionTag::Stage;
+	return tag == CollisionTag::Arena;
 }
 
 // このタグは魔法系か？
@@ -127,7 +127,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 		static_cast<uint32_t>(CollisionTag::EnemyBody)|
 		static_cast<uint32_t>(CollisionTag::EnemyNormalMagic)|
 		static_cast<uint32_t>(CollisionTag::EnemyRapidMagic)|
-		static_cast<uint32_t>(CollisionTag::Stage);
+		static_cast<uint32_t>(CollisionTag::Arena);
 	playerBody.shape = HitBoxShape::Capsule;
 	playerBody.pos = player.GetPosition();
 	playerBody.dir = player.GetCapsuleDirection();
@@ -143,7 +143,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 		static_cast<uint32_t>(CollisionTag::PlayerBody)|
 		static_cast<uint32_t>(CollisionTag::PlayerNomalMagic)|
 		static_cast<uint32_t>(CollisionTag::PlayerRapidMagic)|
-		static_cast<uint32_t>(CollisionTag::Stage);
+		static_cast<uint32_t>(CollisionTag::Arena);
 	enemyBody.shape = HitBoxShape::Capsule;
 	enemyBody.pos = enemy.GetPosition();
 	enemyBody.dir = enemy.GetCapsuleDirection();
@@ -153,16 +153,16 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 	colliders.push_back(enemyBody);
 
 	// ステージ
-	Collider stageCollition;
-	stageCollition.category = CollisionTag::Stage;
-	stageCollition.targetMask = static_cast<uint32_t>(CollisionTag::None);
-	stageCollition.shape = HitBoxShape::Cylinder;
-	stageCollition.pos = stage.GetPosition();
-	stageCollition.dir = { 0.0f, 1.0f, 0.0f };
-	stageCollition.radius = stage.GetRadius();
-	stageCollition.height = stage.GetHeight();
-	stageCollition.owner = &stage;
-	colliders.push_back(stageCollition);
+	Collider areaCollition;
+	areaCollition.category = CollisionTag::Arena;
+	areaCollition.targetMask = static_cast<uint32_t>(CollisionTag::None);
+	areaCollition.shape = HitBoxShape::Cylinder;
+	areaCollition.pos = stage.GetPosition();
+	areaCollition.dir = { 0.0f, 1.0f, 0.0f };
+	areaCollition.radius = stage.GetRadius();
+	areaCollition.height = stage.GetHeight();
+	areaCollition.owner = &stage;
+	colliders.push_back(areaCollition);
 
 	// プレイヤーの魔法
 	MagicManager& playerMagicMgr = player.GetMagicManager();
@@ -218,7 +218,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 				static_cast<uint32_t>(CollisionTag::PlayerBody)|
 				static_cast<uint32_t>(CollisionTag::PlayerDefenseMagic) |
 				static_cast<uint32_t>(CollisionTag::PlayerNomalMagic) |
-				static_cast<uint32_t>(CollisionTag::Stage);
+				static_cast<uint32_t>(CollisionTag::Arena);
 
 		}
 		else// MagicKind::Rapid

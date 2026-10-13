@@ -95,7 +95,7 @@ void FlightController::Update(Character* character, float elapsedTime)
 		character->SetGravity(-9.8f);
 
 		// ’n–Ê‚É’…‚«‚»‚¤‚É‚È‚Á‚Ä‚é‚È‚ç”òsó‘Ô‚ðOFF‚É‚·‚é
-		if (character->GetPosition().y <= 0.05f)
+		if (character->IsGround())
 		{
 			currentMode = FlightMode::OFF;
 		}

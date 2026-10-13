@@ -670,9 +670,9 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// プレイヤーの当たり判定
+	DirectX::XMFLOAT4X4 capsuleTransform;
 	if (!status.isAvoid)
 	{
-		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
 		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
@@ -705,6 +705,9 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 		DirectX::XMFLOAT3 predicted = lockOn.GetPredictedPosition(position, rapidMagicConfig.speed);
 		renderer->DrawSphere(predicted, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
 	}
+
+	// スフィアキャストデバック表示
+	renderer->DrawCapsule(capsuleTransform, radius, stepOffset, {1.0f, 0.0f, 0.0f, 1.0f});
 }
 
 
@@ -1040,12 +1043,6 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 // =========================================================================
 //  親子関係のオーバーライド
 // =========================================================================
-
-//着地したときに呼ばれる
-void Player::OnLanding()
-{
-	jumpCount = 0;
-}
 
 // アニメーションのコールバック関数
 void Player::OnStateChanged(const std::string& oldState, const std::string& newState)

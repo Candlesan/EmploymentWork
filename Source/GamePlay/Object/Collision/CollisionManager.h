@@ -23,6 +23,7 @@ enum class CollisionTag : uint32_t
 	EnemyRapidMagic		= 1 << 6, // 敵の連射魔法
 	EnemyDefenseMagic	= 1 << 7, // 敵の防御魔法
 	Stage				= 1 << 8, // ステージ
+	Arena				= 1 << 9  // 移動範囲
 };
 
 // 当たり判定1つ分のデータ
@@ -51,7 +52,7 @@ private:
 
 	// ヘルパー関数
 	bool IsCharacterTag(CollisionTag tag);
-	bool IsStageTag(CollisionTag tag);
+	bool IsArenaTag(CollisionTag tag);
 	bool IsMagicTag(CollisionTag tag);
 	bool IsDefenseTag(CollisionTag tag);
 private:

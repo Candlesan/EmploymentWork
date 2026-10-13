@@ -1,12 +1,17 @@
 #pragma once
-#include <DirectXMath.h>
-#include <vector>
+// システム
 #include "System/Renderer/ModelRenderer/ModelRenderer.h"
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
-#include "GamePlay/Object/Collision/Collision.h"
+
+// ゲーム
 #include "GamePlay/Object/Flight/FlightController.h"
 #include "GamePlay/Object/LockOnSystem/LockOnSystem.h"
 
+#include <DirectXMath.h>
+#include <vector>
+
+// 前方宣言
+class Stage;
 
 // キャラクターの基本情報
 struct CharacterStatus
@@ -153,8 +158,11 @@ public:
 	bool GetIsAvoid() const { return status.isAvoid; }
 	void SetIsAvoid(bool flag) { status.isAvoid = flag; }
 
+	// 飛行を取得
 	FlightController& GetFlightController() { return flightController; }
 	const FlightController& GetFlightController() const { return flightController; }
+
+	void SetStage(const Stage* stage) { this->stage = stage; }
 private:
 	// ----- 内部：移動・速度更新ヘルパー -----
 
@@ -169,6 +177,8 @@ private:
 
 	// 垂直移動更新処理
 	void UpdateVerticalMove(float elapsedTime);
+
+	bool MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical);
 
 protected:
 	// ジャンプ処理（派生で呼ぶ）
@@ -226,5 +236,11 @@ protected:
 	float height = 2.0f;  // 高さ
 	float weight = 0.5f;  // 重さ
 
-	bool isGround = false; // 地面と接地しているか
+	bool isGround = true; // 地面と接地しているか
+
+	// 接地関係
+	const Stage* stage = nullptr;
+	float stepOffset = 0.3f; // 足元からの補正
+	float slopeLimit = DirectX::XMConvertToRadians(45.0f); // 角度で滑らせるか
+	float collisionRadius = 0.8f;
 };

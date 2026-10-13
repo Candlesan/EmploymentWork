@@ -52,9 +52,9 @@ private:
 	bool drawStage = true;
 
 	// ステージの大きさ
-	DirectX::XMFLOAT3 areaPosition = { 0.0f, 0.0f, 0.0f }; // 移動範囲の位置
+	DirectX::XMFLOAT3 areaPosition = { 0.0f, -10.0f, 0.0f }; // 移動範囲の位置
 	float areaRadius = 98.0f; // 移動範囲の半径
-	float areaHeight = 50.0f; // 移動範囲の高さ
+	float areaHeight = 60.0f; // 移動範囲の高さ
 	bool drawArea = true;
 
 	bool showStageParameter = true;

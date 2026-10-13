@@ -99,10 +99,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 14
+                    "threshold": 0.0,
+                    "type": 10
                 }
             ],
             "fromState": "State_Idle",

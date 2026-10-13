@@ -60,6 +60,10 @@ void SceneGame::Initialize()
 
 	player.SetEnemy(enemy.get());
 	player.GetLockOnSystem().Initialize(&player, enemy.get());
+
+	player.SetStage(stage.get());
+	enemy->SetStage(stage.get());
+
 	// ライト設定
 	DirectionalLight light;
 	// ここに ImGui で決めた数値をそのまま入れる
@@ -108,7 +112,10 @@ void SceneGame::Initialize()
 // 終了化
 void SceneGame::Finalize()
 {
-	Player::Instance().Finalize();
+	Player& player = Player::Instance();
+	player.SetStage(stage.get());
+	enemy->SetStage(stage.get());
+	player.Finalize();
 }
 
 // 更新処理
