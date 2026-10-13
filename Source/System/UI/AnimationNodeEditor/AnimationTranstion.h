@@ -36,6 +36,7 @@ enum class TransitionConditionType
 	IsDown,				// ダウン状態
 	IsBurst,			// バースト状態
 	MoveSpeed,			// 移動速度
+	IsDead,				// 今死んだか
 };
 
 enum class TransitionActionType
@@ -104,5 +105,6 @@ struct TransitionContext
 	bool IsFalling;
 	bool IsDown;
 	bool IsBurst;
+	bool IsDead;
 	RelativeInputDir inputDir;
 };

@@ -32,6 +32,7 @@ enum class BTConditionType
 	Random,					// 確率
 	IsFlying,				// 自分が飛行中か
 	PlayerIsFlying,			// プレイヤーが飛んでいるか
+	IsDead,					// 今死んだか
 	Count,					// enumの総数
 };
 
@@ -100,6 +101,7 @@ inline const BTConditionInfo kConditionInfos[] = {
 	{BTConditionType::Random,                 "Random",                 u8"確率"},
 	{BTConditionType::IsFlying,               "IsFlying",               u8"飛行中か"},
 	{BTConditionType::PlayerIsFlying,         "PlayerIsFlying",         u8"プレイヤーが飛行中か"},
+	{BTConditionType::IsDead,				  "IsDead",					u8"今死んだか"},
 };
 
 struct BTActionInfo

@@ -209,7 +209,15 @@ void Character::UpdateStatus(float elapsedTime)
 			status.isBurstTrigger = false;
 
 			// ヒート値があったら下げていく
-			status.currentHeat -= status.heatRecoverSpeed * elapsedTime;
+			if (status.isBuring)
+			{
+				status.currentHeat -= (status.heatRecoverSpeed * elapsedTime) * BurstCoolDownScale;
+			}
+			else
+			{
+				status.currentHeat -= status.heatRecoverSpeed * elapsedTime;
+
+			}
 
 			// ヒート値が0よりも低かったら
 			if (status.currentHeat <= 0.0f)

@@ -11,6 +11,10 @@
         {
             "from": "Root",
             "to": "迎撃"
+        },
+        {
+            "from": "Root",
+            "to": "魔力回復"
         }
     ],
     "nodes": [
@@ -33,20 +37,25 @@
                 130.0
             ],
             "priority": 1,
-            "selectRule": 2
+            "selectRule": 1
         },
         {
             "StateName": "通常攻撃魔法",
             "actionType": "NormalMagicAttack",
             "conditions": [
                 {
-                    "compareType": 2,
-                    "conditionType": "PlayerCurrentMagic",
-                    "judgmentValue": 10.0
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 30.0
                 },
                 {
                     "compareType": 3,
                     "conditionType": "AttackCoolDown",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": "IsPlayerDefending",
                     "judgmentValue": 0.0
                 }
             ],
@@ -57,25 +66,20 @@
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
-            "interruptible": true,
+            "interruptible": false,
             "name": "通常攻撃魔法",
             "parentName": "Root",
             "position": [
                 -150.0,
                 276.0
             ],
-            "priority": 1,
+            "priority": 2,
             "selectRule": 0
         },
         {
             "StateName": "連射魔法",
             "actionType": "RapidFire",
             "conditions": [
-                {
-                    "compareType": 2,
-                    "conditionType": "PlayerCurrentMagic",
-                    "judgmentValue": 10.0
-                },
                 {
                     "compareType": 4,
                     "conditionType": "IsBurst",
@@ -85,6 +89,11 @@
                     "compareType": 4,
                     "conditionType": "IsBreak",
                     "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 30.0
                 }
             ],
             "config": {
@@ -101,7 +110,7 @@
                 -22.0,
                 276.0
             ],
-            "priority": 1,
+            "priority": 2,
             "selectRule": 0
         },
         {
@@ -110,18 +119,13 @@
             "conditions": [
                 {
                     "compareType": 2,
-                    "conditionType": "IsPlayerDefending",
-                    "judgmentValue": 0.0
+                    "conditionType": "IncomingMagicCount",
+                    "judgmentValue": 1.0
                 },
                 {
-                    "compareType": 4,
-                    "conditionType": "IsBurst",
-                    "judgmentValue": 0.0
-                },
-                {
-                    "compareType": 3,
-                    "conditionType": "EnemyCurrentDefense",
-                    "judgmentValue": 50.0
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 10.0
                 }
             ],
             "config": {
@@ -136,6 +140,33 @@
             "parentName": "Root",
             "position": [
                 90.0,
+                276.0
+            ],
+            "priority": 3,
+            "selectRule": 0
+        },
+        {
+            "StateName": "魔力回復",
+            "actionType": "None",
+            "conditions": [
+                {
+                    "compareType": 1,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 10.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Idle_Combat_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "魔力回復",
+            "parentName": "Root",
+            "position": [
+                -262.0,
                 276.0
             ],
             "priority": 1,

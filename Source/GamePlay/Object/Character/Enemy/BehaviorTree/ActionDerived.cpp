@@ -226,6 +226,7 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
             info.target = &Player::Instance();
 
             normalMagic.Emit(&owner->GetMagicManager(), info, magicConfig);
+            owner->SetAttackCoolTimer(1.0f);
 
             hasFired = true;
         }
@@ -233,7 +234,6 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
         if (owner->GetOverlayAnimationSeconds()
             >= owner->GetOverlayAnimationLength())
         {
-            owner->SetAttackCoolTimer(Mathf::RandomRange(0.0f, 5.0f));
             owner->StopOverlayAnimation();
             phase = Phase::Start;
             return State::Complete;
@@ -302,9 +302,11 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         rapidMagic.Update(elapsedTime, &owner->GetMagicManager(), info, magicConfig, true);
 
         fireTimer -= elapsedTime;
-        if (fireTimer <= 0.0f)
+
+        // 射撃時間が終わったまたは魔力が足りなくなったら終了
+        if (fireTimer <= 0.0f || owner->GetCurrentMagic() <= owner->GetStatus().rapidFireMagicCost)
         {
-            owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
+            //owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
             owner->SetIsRapidFire(false);
             owner->StopOverlayAnimation();
             phase = Phase::Start;

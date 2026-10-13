@@ -95,6 +95,8 @@ protected:
 	// =========================================================================
 	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
+	// 死んだときに呼ばれる奴
+	void OnDead() override;
 private:
 	// コンストラクタ群（シングルトンなので隠す）
 	Player() {};

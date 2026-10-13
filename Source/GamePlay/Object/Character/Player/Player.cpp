@@ -407,7 +407,8 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
 				ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
 				ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
-				ImGui::DragFloat(u8"防御魔法を割った時の回復量", &status.heatRecoverOnBreak, 0.1f);
+				ImGui::DragFloat(u8"シールドブレイク時の回復量", &status.heatRecoverOnBreak, 0.1f);
+				ImGui::DragFloat(u8"バースト時の回復倍率", &BurstCoolDownScale, 0.1f);
 				ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
 				ImGui::Separator();
 
@@ -469,122 +470,118 @@ void Player::DrawGUI()
 			}
 
 			lockOn.DrawGUI();
+		}
 
-			if (ImGui::CollapsingHeader(u8"飛行", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"飛行", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::Text(u8"飛行中か: %s", flightController.IsFlying() ? "true" : "false");
+			ImGui::DragFloat(u8"飛行中の移動速度", &flightSpeed, 0.1f);
+		}
+
+		// 魔法関係
+		if (ImGui::CollapsingHeader(u8"通常魔法", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button(u8"保存##Normal"))
 			{
-				ImGui::Text(u8"飛行中か: %s", flightController.IsFlying() ? "true" : "false");
-				ImGui::DragFloat(u8"飛行中の移動速度", &flightSpeed, 0.1f);
+				normalMagicConfig.Save();
 			}
-
-			// 魔法関係
-			if (ImGui::CollapsingHeader(u8"通常魔法", ImGuiTreeNodeFlags_DefaultOpen))
+			ImGui::SameLine();
+			if (ImGui::Button(u8"読み込み##Normal"))
 			{
-				if (ImGui::Button(u8"保存##Normal"))
-				{
-					normalMagicConfig.Save();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button(u8"読み込み##Normal"))
-				{
-					normalMagicConfig.Load(); // JSONから読み込み
-				}
-				ImGui::Separator();
-
-				ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
-				ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
-				ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
-				ImGui::Separator();
-
-				ImGui::Text(u8"--- 通常撃ち ---");
-				ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
-				ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
-				ImGui::DragFloat(u8"通常の魔力消費量", &normalMagicConfig.normalMagicCost, 0.1f);
-				ImGui::Separator();
-
-				ImGui::Text(u8"--- チャージ撃ち  ---");
-				ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
-				ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
-				ImGui::DragFloat(u8"チャージの魔力消費量", &normalMagicConfig.chargeMagicCost, 0.1f);
-				ImGui::DragFloat(u8"フルチャージの維持中の魔力消費量", &normalMagicConfig.chargeHoldMagicCost, 0.1f);
-				ImGui::Separator();
-
-				ImGui::DragFloat3(u8"手元オフセット##normal", &normalMagicConfig.spawnOffset.x, 0.1f);
-				ImGui::Separator();
-
-				ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
-				ImGui::DragFloat(u8"フルチャージのクールダウン", &fullcChargeCoolDownValue, 0.1f);
-				ImGui::Separator();
-
-				normalMagic.DrawGUI(normalMagicConfig);
+				normalMagicConfig.Load(); // JSONから読み込み
 			}
+			ImGui::Separator();
 
-			if (ImGui::CollapsingHeader(u8"連射魔法", ImGuiTreeNodeFlags_DefaultOpen))
+			ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
+			ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
+			ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
+			ImGui::Separator();
+
+			ImGui::Text(u8"--- 通常撃ち ---");
+			ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
+			ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
+			ImGui::DragFloat(u8"通常の魔力消費量", &normalMagicConfig.normalMagicCost, 0.1f);
+			ImGui::Separator();
+
+			ImGui::Text(u8"--- チャージ撃ち  ---");
+			ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
+			ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
+			ImGui::DragFloat(u8"チャージの魔力消費量", &normalMagicConfig.chargeMagicCost, 0.1f);
+			ImGui::DragFloat(u8"フルチャージの維持中の魔力消費量", &normalMagicConfig.chargeHoldMagicCost, 0.1f);
+			ImGui::Separator();
+
+			ImGui::DragFloat3(u8"手元オフセット##normal", &normalMagicConfig.spawnOffset.x, 0.1f);
+			ImGui::Separator();
+
+			ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
+			ImGui::DragFloat(u8"フルチャージのクールダウン", &fullcChargeCoolDownValue, 0.1f);
+			ImGui::Separator();
+
+			normalMagic.DrawGUI(normalMagicConfig);
+		}
+
+		if (ImGui::CollapsingHeader(u8"連射魔法", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button(u8"保存##Rapid"))
 			{
-				if (ImGui::Button(u8"保存##Rapid"))
-				{
-					rapidMagicConfig.Save();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button(u8"読み込み##Rapid"))
-				{
-					rapidMagicConfig.Load(); // JSONから読み込み
-				}
-				ImGui::Separator();
-
-				ImGui::DragFloat(u8"発射間隔", &rapidMagicConfig.rapidInterval, 0.01f);
-				ImGui::DragFloat(u8"拡散", &rapidMagicConfig.diffusion, 0.1f);
-				ImGui::DragFloat(u8"生身へのダメージ", &rapidMagicConfig.damage, 0.1f);
-				ImGui::DragFloat(u8"防御魔法へのダメージ", &rapidMagicConfig.gaurdDamage, 0.1f);
-				ImGui::DragFloat(u8"魔法の速度", &rapidMagicConfig.speed, 0.1f);
-				ImGui::DragFloat(u8"魔力消費量", &status.rapidFireMagicCost, 0.1f);
-
-
-				ImGui::DragFloat3(u8"手元オフセット##rapid", &rapidMagicConfig.spawnOffset.x, 0.1f);
-				ImGui::Separator();
-
-				// 多分いらないはず
-				//ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
-				//ImGui::Separator();
-
-				rapidMagic.DrawGUI(rapidMagicConfig);
+				rapidMagicConfig.Save();
 			}
-
-			//　防御魔法
-			defenseMagic.DrawGUI();
-
-			// 当たり判定情報
-			if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
+			ImGui::SameLine();
+			if (ImGui::Button(u8"読み込み##Rapid"))
 			{
-				ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
-				ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
-				ImGui::DragFloat(u8"デバッグ用描画オフセット", &debugOffset, 0.1f);
+				rapidMagicConfig.Load(); // JSONから読み込み
 			}
+			ImGui::Separator();
 
-			// 武器のアタッチメント情報
-			if (ImGui::CollapsingHeader(u8"武器アタッチメント (手元・位置調整)", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::DragFloat3(u8"武器のローカル位置##1", &weapon.position.x, 0.01f);
-				ImGui::DragFloat3(u8"武器のローカル角度##1", &weapon.angle.x, 0.01f);
-				ImGui::DragFloat3(u8"武器のローカルスケール##1", &weapon.scale.x, 0.01f);
+			ImGui::DragFloat(u8"発射間隔", &rapidMagicConfig.rapidInterval, 0.01f);
+			ImGui::DragFloat(u8"拡散", &rapidMagicConfig.diffusion, 0.1f);
+			ImGui::DragFloat(u8"生身へのダメージ", &rapidMagicConfig.damage, 0.1f);
+			ImGui::DragFloat(u8"防御魔法へのダメージ", &rapidMagicConfig.gaurdDamage, 0.1f);
+			ImGui::DragFloat(u8"魔法の速度", &rapidMagicConfig.speed, 0.1f);
+			ImGui::DragFloat(u8"魔力消費量", &status.rapidFireMagicCost, 0.1f);
 
-				ImGui::DragFloat3(u8"攻撃判定の位置ズレ##1", &weapon.weaponHitOffset.x, 0.1f);
-				ImGui::DragFloat3(u8"攻撃判定の角度ズレ##1", &weapon.weaponAngleOffset.x, 0.1f);
-				ImGui::DragFloat(u8"攻撃判定の半径##1", &weapon.weaponRadius, 0.1f);
-				ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
 
-				ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
-				ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
-				ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
-				ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
-				ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
-			}
+			ImGui::DragFloat3(u8"手元オフセット##rapid", &rapidMagicConfig.spawnOffset.x, 0.1f);
+			ImGui::Separator();
 
-			// 移動時の背骨の傾き
-			if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::DragFloat(u8"しなりの強さ", &targetSpineAngle, 0.1f);
-				ImGui::DragFloat(u8"しなりの戻り速度", &spineAngleSpeed, 0.1f);
-			}
+			rapidMagic.DrawGUI(rapidMagicConfig);
+		}
+
+		//　防御魔法
+		defenseMagic.DrawGUI();
+
+		// 当たり判定情報
+		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
+			ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
+			ImGui::DragFloat(u8"デバッグ用描画オフセット", &debugOffset, 0.1f);
+		}
+
+		// 武器のアタッチメント情報
+		if (ImGui::CollapsingHeader(u8"武器アタッチメント (手元・位置調整)", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat3(u8"武器のローカル位置##1", &weapon.position.x, 0.01f);
+			ImGui::DragFloat3(u8"武器のローカル角度##1", &weapon.angle.x, 0.01f);
+			ImGui::DragFloat3(u8"武器のローカルスケール##1", &weapon.scale.x, 0.01f);
+
+			ImGui::DragFloat3(u8"攻撃判定の位置ズレ##1", &weapon.weaponHitOffset.x, 0.1f);
+			ImGui::DragFloat3(u8"攻撃判定の角度ズレ##1", &weapon.weaponAngleOffset.x, 0.1f);
+			ImGui::DragFloat(u8"攻撃判定の半径##1", &weapon.weaponRadius, 0.1f);
+			ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
+
+			ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
+			ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
+			ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
+			ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
+			ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
+		}
+
+		// 移動時の背骨の傾き
+		if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat(u8"しなりの強さ", &targetSpineAngle, 0.1f);
+			ImGui::DragFloat(u8"しなりの戻り速度", &spineAngleSpeed, 0.1f);
 		}
 		ImGui::End();
 	}
@@ -707,7 +704,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	}
 
 	// スフィアキャストデバック表示
-	renderer->DrawCapsule(capsuleTransform, radius, stepOffset, {1.0f, 0.0f, 0.0f, 1.0f});
+	//renderer->DrawCapsule(capsuleTransform, radius, stepOffset, {1.0f, 0.0f, 0.0f, 1.0f});
 }
 
 
@@ -1047,6 +1044,12 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 // アニメーションのコールバック関数
 void Player::OnStateChanged(const std::string& oldState, const std::string& newState)
 {
+}
+
+// 死んだときに呼ばれる奴
+void Player::OnDead()
+{
+	status.isDead = true; // 死亡フラグを立てる
 }
 
 
@@ -1674,6 +1677,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsDown = status.isDown;
 	ctx.IsBurst = status.isBurstTrigger;
 	ctx.inputDir = CalculateRelativeInputDir();
+	ctx.IsDead = IsDead();
 
 	// 移動速度を計算する
 	const DirectX::XMFLOAT3 v = GetVelocity();

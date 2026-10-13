@@ -26,10 +26,10 @@
             "parentName": "",
             "position": [
                 -278.0,
-                20.0
+                2.0
             ],
             "priority": 1,
-            "selectRule": 2
+            "selectRule": 1
         },
         {
             "StateName": "防御魔法展開",
@@ -44,6 +44,11 @@
                     "compareType": 4,
                     "conditionType": "IsBreak",
                     "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 30.0
                 }
             ],
             "config": {
@@ -68,14 +73,9 @@
             "actionType": "DropGuard",
             "conditions": [
                 {
-                    "compareType": 2,
-                    "conditionType": "EnemyCurrentDefense",
-                    "judgmentValue": 20.0
-                },
-                {
-                    "compareType": 2,
+                    "compareType": 3,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 20.0
+                    "judgmentValue": 30.0
                 }
             ],
             "config": {
@@ -89,10 +89,10 @@
             "name": "防御魔法解除",
             "parentName": "Root",
             "position": [
-                -182.0,
+                -198.0,
                 132.0
             ],
-            "priority": 1,
+            "priority": 2,
             "selectRule": 0
         }
     ]

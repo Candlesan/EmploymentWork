@@ -206,6 +206,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = (ctx.MoveSpeed >= cond.threshold);
 			break;
 
+		case TransitionConditionType::IsDead:
+			result = ctx.IsDead;
+			break;
+
 		case TransitionConditionType::Always:
 			result = true;
 			break;

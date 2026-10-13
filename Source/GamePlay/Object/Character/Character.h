@@ -59,6 +59,7 @@ struct CharacterStatus
 	bool isFlying = false;			// 飛行中か
 	bool isHovering = false;		// 滞空中か
 	bool isAvoid = false;			// 回避したか
+	bool isDead = false;			// 死亡したか
 };
 
 class Character
@@ -162,7 +163,11 @@ public:
 	FlightController& GetFlightController() { return flightController; }
 	const FlightController& GetFlightController() const { return flightController; }
 
+	// シーンゲームからもらってくるステージ
 	void SetStage(const Stage* stage) { this->stage = stage; }
+
+	// 今死んだか
+	bool IsDead() const { return status.isDead; }
 private:
 	// ----- 内部：移動・速度更新ヘルパー -----
 
@@ -243,4 +248,5 @@ protected:
 	float stepOffset = 0.3f; // 足元からの補正
 	float slopeLimit = DirectX::XMConvertToRadians(45.0f); // 角度で滑らせるか
 	float collisionRadius = 0.8f;
+	float BurstCoolDownScale = 1.0f; // バースト時のヒート値の回復倍率
 };
