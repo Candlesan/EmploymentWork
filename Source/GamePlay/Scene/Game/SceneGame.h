@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Gameplay/Scene/Manager/Scene.h"
 #include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-// ƒ‚ƒfƒ‹
+// ãƒ¢ãƒ‡ãƒ«
 #include "Gameplay/Object/Stage/Stage.h"
 #include "GamePlay/Object/Character/Player/PlayerUI.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
@@ -22,106 +22,113 @@
 #include "System/UI/UIEditor/UICanvas.h"
 
 
-// ƒQ[ƒ€ƒV[ƒ“
+// ã‚²ãƒ¼ãƒ ã‚·ãƒ¼ãƒ³
 class SceneGame : public Scene
 {
 public:
 	SceneGame() {};
 	~SceneGame() override {};
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize() override;
 
-	// I—¹‰»
+	// çµ‚äº†åŒ–
 	void Finalize() override;
 
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	void Update(float elapsedTime) override;
 
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	void Render() override;
 
-	// ƒVƒƒƒhƒEƒ}ƒbƒv•`‰æ
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—æç”»
 	void RenderShadowMap();
 
-	// GUI•`‰æ
+	// GUIæç”»
 	void DrawGUI() override;
+
+	// ç”»é¢æ¯”ç‡ä¿®æ­£é–¢æ•°
+	void OnResize(float width, float height);
+
+private:
 
 	void DrawModelMaterialEditor(const char* label, Character* character);
 
 	void Save(const std::string& path, Character* character);
 	void Load(const std::string& path, Character* character);
 
-	// ‰æ–Ê”ä—¦C³ŠÖ”
-	void OnResize(float width, float height);
-
-	// ƒfƒoƒbƒN•\¦‚ÌON/OFF‚ğØ‚è‘Ö‚¦‚éŠÖ”
+	// ãƒ‡ãƒãƒƒã‚¯è¡¨ç¤ºã®ON/OFFã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹é–¢æ•°
 	void ShowDebugSwitch();
+
+	DirectX::XMFLOAT3 CalcLightDirection() const;
 private:
-	// 3Dƒ‚ƒfƒ‹
+	// 3Dãƒ¢ãƒ‡ãƒ«
 	std::unique_ptr<Stage> stage;
 	std::unique_ptr<Enemy> enemy;
 
-	// ƒJƒƒ‰
+	// ã‚«ãƒ¡ãƒ©
 	std::unique_ptr<GameCamera> gameCamera;
 	std::unique_ptr<DebugCamera> debugCamera;
 
-	// ƒJƒƒ‰‚Ìƒ‚[ƒh’è‹`
+	// ã‚«ãƒ¡ãƒ©ã®ãƒ¢ãƒ¼ãƒ‰å®šç¾©
 	enum class CameraMode
 	{
-		Game,   // OlÌ‹“_
-		Debug   // ƒtƒŠ[ƒJƒƒ‰
+		Game,   // ä¸‰äººç§°è¦–ç‚¹
+		Debug   // ãƒ•ãƒªãƒ¼ã‚«ãƒ¡ãƒ©
 	};
-	CameraMode cameraMode = CameraMode::Game; // ‰Šúó‘Ô‚ÍƒQ[ƒ€—p
+	CameraMode cameraMode = CameraMode::Game; // åˆæœŸçŠ¶æ…‹ã¯ã‚²ãƒ¼ãƒ ç”¨
 	float cameraRange = 7.0f;
 	DirectX::XMFLOAT3 cameraAngle = { 0, 0, 0 };
 
 	LightManager lightManager;
+	float lightYaw = 170.677;   // æ–¹ä½è§’ï¼ˆåº¦ï¼‰  0ã€œ360
+	float lightPitch = 16.378;  // ä»°è§’ï¼ˆåº¦ï¼‰   0=åœ°å¹³ç·š, 90=çœŸä¸Š
 
 	float debugOffset = 0.5;
 
-	// ƒfƒoƒbƒN‹@”\
-	bool isPaused = false;      // ˆê’â~’†‚©
-	bool stepNextFrame = false; // 1ƒtƒŒ[ƒ€‚¾‚¯i‚ß‚é‚©
-	// ƒL[‚ÌƒGƒbƒWŒŸo—pi‘OƒtƒŒ[ƒ€‚Ì‰Ÿ‰ºó‘Ô‚ğ•Ûj
+	// ãƒ‡ãƒãƒƒã‚¯æ©Ÿèƒ½
+	bool isPaused = false;      // ä¸€æ™‚åœæ­¢ä¸­ã‹
+	bool stepNextFrame = false; // 1ãƒ•ãƒ¬ãƒ¼ãƒ ã ã‘é€²ã‚ã‚‹ã‹
+	// ã‚­ãƒ¼ã®ã‚¨ãƒƒã‚¸æ¤œå‡ºç”¨ï¼ˆå‰ãƒ•ãƒ¬ãƒ¼ãƒ ã®æŠ¼ä¸‹çŠ¶æ…‹ã‚’ä¿æŒï¼‰
 	bool wasF5DownLastFrame = false;
 	bool wasF6DownLastFrame = false;
 
-	float timeScale = 1.0f; // 1.0‚ª’ÊíA0.1‚ª10”{ƒXƒ[
+	float timeScale = 1.0f; // 1.0ãŒé€šå¸¸ã€0.1ãŒ10å€ã‚¹ãƒ­ãƒ¼
 	float baseTimeScale = 1.0f;
 
-	std::unique_ptr<SkyMap> skyMap; // ƒXƒJƒCƒ}ƒbƒv
+	std::unique_ptr<SkyMap> skyMap; // ã‚¹ã‚«ã‚¤ãƒãƒƒãƒ—
 
-	// PBR’²®—p
-	float pbrMetalness = 0.6f;
-	float pbrRoughness = 1.0f;
+	// PBRèª¿æ•´ç”¨
+	float pbrMetalness = 0.0f;
+	float pbrRoughness = 0.0f;
+	float ambientIntensity = 0.5;
 
-	// ƒVƒƒƒhƒEƒ}ƒbƒv’²®—p
-	float shadowAttenuation = 0.125f;
-	float shadowBias = 0.002f;
+	// ã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—èª¿æ•´ç”¨
+	float shadowAttenuation = 0;
+	float shadowBias = 0.006f;
 	DirectX::XMFLOAT4X4 lightViewProjection;
 
-	// ƒuƒ‹[ƒ€’²®—p
+	// ãƒ–ãƒ«ãƒ¼ãƒ èª¿æ•´ç”¨
 	std::unique_ptr<bloom> bloomer;
 	std::unique_ptr<framebuffer> framebuffers[8];
 	std::unique_ptr<fullscreen_quad> bit_block_transfer;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
-	float bloom_extraction = 1.0f;
-	float bloom_intensity = 0.29f;
+	float bloom_extraction = 0.7f;
+	float bloom_intensity = 0.01f;
 
-	// ƒp[ƒeƒBƒNƒ‹
+	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«
 	std::unique_ptr<Compute_Particle> particleManager;
 
-	// ƒRƒŠƒWƒ‡ƒ“ƒ}ƒl[ƒWƒƒ[
+	// ã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
 	CollisionManager collisonManager;
 	bool showDebugSphere = false;
 
-	// ƒGƒtƒFƒNƒgƒGƒfƒBƒ^[ŠÖŒW
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚¨ãƒ‡ã‚£ã‚¿ãƒ¼é–¢ä¿‚
 	std::unique_ptr<EffectEditor> effectEditor;
 	std::string effectName;
 	bool showEffectEditor = true;
 
-	// UIŠÖŒW
+	// UIé–¢ä¿‚
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
 	PlayerUI playerUI;
@@ -129,10 +136,10 @@ private:
 	bool showUIEdlitor = true;
 	
 
-	// ƒfƒoƒbƒNƒvƒŠƒ~ƒeƒBƒu‚Ì•`‰æ‚ÌON‚ÆOFF
+	// ãƒ‡ãƒãƒƒã‚¯ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®æç”»ã®ONã¨OFF
 	bool showDebugPrimitive = true;
 
-	// ƒfƒoƒbƒN—p‚ÌƒJƒƒ‰‚âÄ¶‘¬“x‚È‚Ç‚Ì•Ö—˜‹@”\‚ÌON/OFF
+	// ãƒ‡ãƒãƒƒã‚¯ç”¨ã®ã‚«ãƒ¡ãƒ©ã‚„å†ç”Ÿé€Ÿåº¦ãªã©ã®ä¾¿åˆ©æ©Ÿèƒ½ã®ON/OFF
 	bool showDebugOption = true; 
 
 	bool invertY = false;

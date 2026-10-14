@@ -67,11 +67,9 @@ void SceneGame::Initialize()
 	// ライト設定
 	DirectionalLight light;
 	// ここに ImGui で決めた数値をそのまま入れる
-	light.direction = { -0.882, -0.471f, 0.021f }; // 例：斜め上から
+	light.direction = CalcLightDirection(); // 例：斜め上から
 	light.color = { 1.0f, 1.0f, 1.0f }; // 白色
-
-	DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
-	DirectX::XMStoreFloat3(&light.direction, DirectX::XMVector3Normalize(vDir));
+	light.intensity = 2.0f;
 
 	lightManager.SetDirectionalLight(light);
 
@@ -243,6 +241,7 @@ void SceneGame::Render()
 	rc.pbrMetalness = pbrMetalness;
 	rc.pbrRoughness = pbrRoughness;
 	rc.lightManager = &lightManager;
+	rc.ambientIntensity = ambientIntensity;
 
 	// シャドウマップ準備
 	//RenderContextに対してシャドウマップの情報を格納する
@@ -385,7 +384,7 @@ void SceneGame::RenderShadowMap()
 
 		// ライトビュー行列を計算
 		// ライト方向の反対側にライトを配置
-		DirectX::XMFLOAT3 lightPos = { -lightDir.x * 50.0f, -lightDir.y * 50.0f, -lightDir.z * 50.0f };
+		DirectX::XMFLOAT3 lightPos = { -lightDir.x * 100.0f, -lightDir.y * 100.0f, -lightDir.z * 100.0f };
 		DirectX::XMFLOAT3 lightTarget = { 0, 0, 0 }; // 原点を向くようにする
 		DirectX::XMFLOAT3 lightEyeUp = { 0, 1, 0 }; // 上方向を向く
 
@@ -402,10 +401,10 @@ void SceneGame::RenderShadowMap()
 		//※調節する時近平面と遠平面の差が大きいとジャギが出やすい。
 		//※ジャギを抑えるには解像度を上げる・バイアスを小さくするなど
 		camera.SetOrthographic(
-			35.0,   // 横幅
-			35.0,   // 高さ
-			20.0f,    // 近平面
-			100.0f // 遠平面
+			70.0,   // 横幅
+			70.0,   // 高さ
+			40.0f,    // 近平面
+			160.0f // 遠平面
 		);
 
 		DirectX::XMFLOAT4X4 view = camera.GetView();
@@ -442,7 +441,10 @@ void SceneGame::RenderShadowMap()
 // GUI描画
 void SceneGame::DrawGUI()
 {
-	// プレイヤーを取得
+	Graphics& graphics = Graphics::Instance();
+	ShadowMap* shadowMap = graphics.GetShadowMap();
+	RenderContext rc;
+
 	Player& player = Player::Instance();
 
 	// デバック用の便利機能のON/Off
@@ -526,45 +528,30 @@ void SceneGame::DrawGUI()
 			{
 				DirectionalLight& light = lightManager.GetDirectionalLight();
 
-				// 1. GUIで値を操作
-				if (ImGui::DragFloat3(u8"ライトの向き", &light.direction.x, 0.01f, -1.0f, 1.0f))
-				{
-					// 2. 値が変更されたら、ベクトルを数学的に正しい状態（長さ1）に直す
-					DirectX::XMVECTOR vDir = DirectX::XMLoadFloat3(&light.direction);
+				// 方位と高さは別々に動く（お互いに影響しない）
+				ImGui::SliderFloat(u8"ライトの方位", &lightYaw, 0.0f, 360.0f);
+				ImGui::SliderFloat(u8"ライトの高さ", &lightPitch, 5.0f, 89.0f);
+				ImGui::DragFloat(u8"ライトの強さ", &light.intensity, 0.1f, 0.0f, 10.0f);
+				light.direction = CalcLightDirection();
 
-					// ベクトルの長さがほぼ0（全要素0など）でないかチェック
-					if (DirectX::XMVector3LengthSq(vDir).m128_f32[0] > 0.0001f)
-					{
-						vDir = DirectX::XMVector3Normalize(vDir);
-						DirectX::XMStoreFloat3(&light.direction, vDir);
-					}
-					else
-					{
-						// もし完全に0になったらデフォルトの向き（真下など）に戻す安全策
-						light.direction = { 0.0f, -1.0f, 0.0f };
-					}
-				}
+				// 確認用：実際の向き
+				ImGui::Text(u8"向き: %.3f, %.3f, %.3f", light.direction.x, light.direction.y, light.direction.z);
 
 				ImGui::ColorEdit3(u8"ライトの色", &light.color.x);
-
-				// 3. 補正した値をマネージャーにセット
-				lightManager.SetDirectionalLight(light);
 			}
 
 			if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat(u8"金属度", &pbrMetalness, 0.01f, -1.0f, 1.0f);
 				ImGui::DragFloat(u8"粗さ", &pbrRoughness, 0.01f, -1.0f, 1.0f);
+				ImGui::DragFloat(u8"環境光の強さ", &ambientIntensity, 0.1f, 0.0f, 10.0f);
 			}
 
 			if (ImGui::CollapsingHeader(u8"シャドウマップ", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				Graphics& graphics = Graphics::Instance();
-				ShadowMap* shadowMap = graphics.GetShadowMap();
-				RenderContext rc;
 
-				ImGui::SliderFloat(u8"影の減衰", &shadowAttenuation, 0.0f, 1.0f);
-				ImGui::SliderFloat(u8"シャドウバイアス", &shadowBias, 0.0f, 0.01f);
+				ImGui::DragFloat(u8"影の減衰", &shadowAttenuation, 0.001f, 0.0f, 1.0f);
+				ImGui::DragFloat(u8"シャドウバイアス", &shadowBias, 0.001f, 0.0f, 1.0f);
 
 				ImGui::Text(u8"テクスチャ");
 				ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
@@ -601,13 +588,6 @@ void SceneGame::DrawGUI()
 			// 日本語ラベルでモデルごとのマテリアルエディタを呼び出す
 			DrawModelMaterialEditor(u8"プレイヤー：服・髪のマテリアル", &player);
 			DrawModelMaterialEditor(u8"敵：体・鎧のマテリアル", enemy.get());
-		}
-		ImGui::End();
-
-		ImGui::Begin(u8"当たり判定");
-		{
-			// SceneGame.cpp の DrawGUI() の中
-			ImGui::Checkbox(u8"ジャスト回避テスト用の球を配置", &showDebugSphere);
 		}
 		ImGui::End();
 	}
@@ -648,7 +628,7 @@ void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
 				path,
 				MAX_PATH,
 				"JSON Files\0*.json\0\0",
-				u8"マテリアルを保存",
+				"マテリアルを保存",
 				"json") == DialogResult::OK)
 			{
 				Save(path, character);
@@ -662,7 +642,7 @@ void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
 				path,
 				MAX_PATH,
 				"JSON Files\0*.json\0\0",
-				u8"マテリアルを読み込む") == DialogResult::OK)
+				"マテリアルを読み込む") == DialogResult::OK)
 			{
 				Load(path, character);
 			}
@@ -673,8 +653,8 @@ void SceneGame::DrawModelMaterialEditor(const char* label, Character* character)
 		{
 			ImGui::PushID(static_cast<int>(i));
 			ImGui::Text(u8"マテリアル: %s", materials[i].name.c_str());
-			ImGui::SliderFloat(u8"粗さ", &materials[i].adjustRoughness, -1.0f, 1.0f);
-			ImGui::SliderFloat(u8"金属度", &materials[i].adjustMetalness, -1.0f, 1.0f);
+			ImGui::DragFloat(u8"粗さ", &materials[i].adjustRoughness, 0.1f, -1.0f, 1.0f);
+			ImGui::DragFloat(u8"金属度", &materials[i].adjustMetalness, 0.1f, -1.0f, 1.0f);
 			ImGui::PopID();
 		}
 	}
@@ -772,4 +752,15 @@ void SceneGame::ShowDebugSwitch()
 		showUIEdlitor = !showUIEdlitor;
 	}
 	wasF10DownLastFrame = f10Down;
+}
+
+DirectX::XMFLOAT3 SceneGame::CalcLightDirection() const
+{
+	float Yaw = DirectX::XMConvertToRadians(lightYaw);
+	float Pitch = DirectX::XMConvertToRadians(lightPitch);
+	return {
+		cosf(Pitch) * sinf(Yaw),
+		-sinf(Pitch),
+		cosf(Pitch) * cosf(Yaw)
+	};
 }

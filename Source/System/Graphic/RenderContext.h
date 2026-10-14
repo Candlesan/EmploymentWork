@@ -7,8 +7,8 @@
 //	シャドウマップ用情報
 struct ShadowMapData
 {
-	ID3D11ShaderResourceView* shadowMap;				//	シャドウマップテクスチャ
-	ID3D11SamplerState* shadowSampler;			// サンプラーステート
+	ID3D11ShaderResourceView*	shadowMap;				//	シャドウマップテクスチャ
+	ID3D11SamplerState*			shadowSampler;			// サンプラーステート
 	DirectX::XMFLOAT4X4			lightViewProjection;	//	ライトビュープロジェクション行列
 	DirectX::XMFLOAT4			shadowColor;			//	影の色
 	float						shadowBias;				//	深度比較用のオフセット値
@@ -26,4 +26,7 @@ struct RenderContext
 	// PBR用
 	float pbrMetalness = 0.0f;
 	float pbrRoughness = 0.0f;
+
+	// IBL用
+	float ambientIntensity = 1.0f; // 環境光の強さ
 };

@@ -62,7 +62,6 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     if (hasNormalTexture > 0)
     {
         float3 normal_map = normalTexture.Sample(samplerLinear, pin.texcoord);
-        //float3 normal_factor = sampled.xyz;
         normal_map = (normal_map * 2.0f) - 1.0f;
         normal_map = normalize(normal_map * float3(1.0f, 1.0f, 1.0f));
         N = normalize((normal_map.x * T) + (normal_map.y * B) + (normal_map.z * N));
@@ -74,8 +73,8 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     if (hasMetalnessRoughnessTexture > 0)
     {
         float4 sampled = metalnessRoughnessTexture.Sample(samplerLinear, pin.texcoord);
-        final_roughness *= 1.0 - sampled.a;
-        final_metalness *= sampled.r;
+        final_roughness *= sampled.g;
+        final_metalness *= sampled.b;
     }
 
 #if 1 // 確認用のコードなので本体は不要
@@ -113,16 +112,38 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
             float3 LC = lightColor.rgb/* * lightColor.a*/;
             DirectBRDF(diffuse_reflectance, F0, N, V, L, LC, final_roughness, diffuse, specular);
 
-            // 平行光源用シャドウマップ
-            float depth = shadow_map.Sample(shadow_sampler_state, pin.shadow_texcoord.xy).r;
-            //深度値を比較して壁かどうかを判定する
+            // 平行光源用シャドウマップ(PCF 3x3)
+            float2 shadow_size; // シャドウマップの大きさを計算する
             
-            if (pin.shadow_texcoord.z - depth > shadow_bias)
+            // GetDimensions:テクスチャの解像度（縦横のピクセル数/ミップレベルなど）を取得する関数
+            shadow_map.GetDimensions(shadow_size.x, shadow_size.y);
+            float2 texel = 1.0f / shadow_size;
+            
+            float shadow = 0.0f;
+            [unroll]
+            for (int y = -1; y <= 1; ++y)
             {
-                diffuse *= shadow_attenuation;
-                specular *= shadow_attenuation;
+                [unroll]
+                for (int x = -1; x <= 1; ++x)
+                {
+                    // シャドウマップから、少し位置をずらした場所の深度値を取り出して「赤成分(.r)」を取得する
+                    // これらを足し合わせると「隣と斜め隣のピクセルのUV座標が作れる」
+                    float depth = shadow_map.Sample(shadow_sampler_state, pin.shadow_texcoord.xy + float2(x, y) * texel).r;
+                    shadow += (pin.shadow_texcoord.z - depth > shadow_bias) ? 1.0f : 0.0f;
+                }
             }
+            shadow /= 9.0f; // 0 = 日なた, 1 = 完全に影
             
+            //深度値を比較して壁かどうかを判定する
+            //if (pin.shadow_texcoord.z - depth > shadow_bias)
+            //{
+            //    diffuse *= shadow_attenuation;
+            //    specular *= shadow_attenuation;
+            //}
+            
+            float atten = lerp(1.0f, shadow_attenuation, shadow);
+            diffuse *= atten;
+            specular *= atten;
             total_diffuse += diffuse;
             total_specular += specular;
         }
@@ -130,8 +151,8 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     
     // IBL処理
     float3 ambient = ambient_color.rgb * ambient_color.a;
-    total_diffuse += ambient * DiffuseIBL(N, V, roughness, diffuse_reflectance, F0, diffuse_iem, samplerLinear);
-    total_specular += ambient * SpecularIBL(N, V, roughness, F0, lut_ggx, specular_pmrem, samplerLinear); 
+    total_diffuse += ambient * DiffuseIBL(N, V, final_roughness, diffuse_reflectance, F0, diffuse_iem, samplerLinear);
+    total_specular += ambient * SpecularIBL(N, V, final_roughness, F0, lut_ggx, specular_pmrem, samplerLinear);
 
     // 遮蔽処理
     total_diffuse = lerp(total_diffuse, total_diffuse * occlusion_factor, occlusionStrength);

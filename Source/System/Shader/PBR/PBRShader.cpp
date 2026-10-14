@@ -89,7 +89,7 @@ void PBRShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
     CbMesh cbMesh{};
     cbMesh.materialColor = mesh.material->baseColor;
     cbMesh.emissiveColor = mesh.material->emissiveColor;
-    cbMesh.ambientColor = { 1, 1, 1, 1 };
+    cbMesh.ambientColor = { 1, 1, 1, rc.ambientIntensity };
     cbMesh.metalness = mesh.material->metalness;
     cbMesh.roughness = mesh.material->roughness;
     cbMesh.adjustMetalness = rc.pbrMetalness + mesh.material->adjustMetalness;

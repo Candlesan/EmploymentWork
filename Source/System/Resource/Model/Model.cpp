@@ -625,7 +625,7 @@ void Model::BuildMaterials(ID3D11Device* device, const std::filesystem::path& di
 			if (material.emissiveTextureFileName.empty())
 			{
 				// エミッシブダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF,
 					material.emissiveMap.GetAddressOf());
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			}
@@ -644,7 +644,7 @@ void Model::BuildMaterials(ID3D11Device* device, const std::filesystem::path& di
 			if (material.occlusionTextureFileName.empty())
 			{
 				// エミッシブダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF,
 					material.occlusionMap.GetAddressOf());
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			}
@@ -663,7 +663,7 @@ void Model::BuildMaterials(ID3D11Device* device, const std::filesystem::path& di
 			if (material.metalnessRoughnessTextureFileName.empty())
 			{
 				// エミッシブダミーテクスチャ作成
-				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFF7F7F,
+				HRESULT hr = GpuResourceUtils::CreateDummyTexture(device, 0xFFFFFFFF,
 					material.metalnessRoughnessMap.GetAddressOf());
 				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 			}

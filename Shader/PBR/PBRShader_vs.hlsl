@@ -32,7 +32,7 @@ VS_OUT main(
     
     //シャドウマップ用のパラメーター計算
     {
-        float4 wvpPos = mul(position, light_view_projection);
+        float4 wvpPos = mul(skinnedPosition, light_view_projection);
         wvpPos.xyz /= wvpPos.w;
         wvpPos.y = -wvpPos.y; // Y軸を反転
         wvpPos.xy = 0.5f * wvpPos.xy + 0.5f;

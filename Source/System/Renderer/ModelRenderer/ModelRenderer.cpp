@@ -60,9 +60,9 @@ void ModelRenderer::Render(const RenderContext& rc)
 		cbScene.lightDirection.x = directionalLight.direction.x;
 		cbScene.lightDirection.y = directionalLight.direction.y;
 		cbScene.lightDirection.z = directionalLight.direction.z;
-		cbScene.lightColor.x = directionalLight.color.x;
-		cbScene.lightColor.y = directionalLight.color.y;
-		cbScene.lightColor.z = directionalLight.color.z;
+		cbScene.lightColor.x = directionalLight.color.x * directionalLight.intensity;
+		cbScene.lightColor.y = directionalLight.color.y * directionalLight.intensity;
+		cbScene.lightColor.z = directionalLight.color.z * directionalLight.intensity;
 		const DirectX::XMFLOAT3& eye = rc.camera->GetEye();
 		cbScene.cameraPosition.x = eye.x;
 		cbScene.cameraPosition.y = eye.y;
