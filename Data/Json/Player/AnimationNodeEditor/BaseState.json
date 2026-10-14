@@ -601,6 +601,13 @@
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 22
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
                 }
             ],
             "fromState": "State_Avoid",
@@ -682,6 +689,120 @@
                 }
             ],
             "fromState": "Revive",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Idle"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                },
+                {
+                    "type": 2,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 22
+                }
+            ],
+            "fromState": "Fly",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Death_Air"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 0.0
+                },
+                {
+                    "type": 2,
+                    "value": 0.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 22
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 10
+                }
+            ],
+            "fromState": "State_Avoid",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Death_Air"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 1.0,
+                    "type": 23
+                }
+            ],
+            "fromState": "Death_Air",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Revive_Air"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 1,
+                    "value": 7.0
+                },
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "Revive_Air",
             "priority": 0,
             "toSlot": 0,
             "toState": "State_Idle"
@@ -895,6 +1016,44 @@
                 -23.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Revive.json",
+            "type": 1
+        },
+        {
+            "StateName": "Death_Air",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                113.0,
+                -103.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Death_Air.json",
+            "type": 1
+        },
+        {
+            "StateName": "Revive_Air",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                241.0,
+                -183.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Revive_Air.json",
             "type": 1
         }
     ]

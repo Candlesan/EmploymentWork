@@ -937,7 +937,6 @@ void Player::UpdateSounds(const std::string& state)
 // 飛行の更新処理
 void Player::UpdateFly(float elapsedTime)
 {
-	if (status.isDead) return;
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// 入力をまとめる
@@ -952,9 +951,10 @@ void Player::UpdateFly(float elapsedTime)
 	flightController.Update(this, elapsedTime);
 
 	// ダウン状態になると落下するようにする
-	if (status.isDown)
+	if (status.isDown || status.isDead)
 	{
 		flightController.SetFlightMode(FlightMode::OFF);
+		return;
 	}
 }
 
