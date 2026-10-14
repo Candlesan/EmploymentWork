@@ -144,7 +144,7 @@ void Character::UpdateStatus(float elapsedTime)
 			}
 
 		}
-		else if (status.isDown) // ダウン中は急速に回復させる
+		else if (status.isDown || isGround) // ダウン中は急速に回復させる
 		{
 			if (status.currentMagic < status.maxMagic)
 			{
