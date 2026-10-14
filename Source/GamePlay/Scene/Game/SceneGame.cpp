@@ -84,8 +84,8 @@ void SceneGame::Initialize()
 	bloomer->bloom_extraction_threshold = bloom_extraction;
 
 	// シャドウマップのパラメータ設定
-	shadowAttenuation = 0.125f;
-	shadowBias = 0.002f;
+	shadowAttenuation = 0;
+	shadowBias = 0.006f;
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
@@ -243,6 +243,9 @@ void SceneGame::Render()
 	rc.lightManager = &lightManager;
 	rc.ambientIntensity = ambientIntensity;
 
+	// シャドウマップ描画
+	RenderShadowMap();
+
 	// シャドウマップ準備
 	//RenderContextに対してシャドウマップの情報を格納する
 	ShadowMapData shadowData;
@@ -254,8 +257,6 @@ void SceneGame::Render()
 	shadowData.shadowAttenuation = shadowAttenuation;
 	rc.shadowMapData = &shadowData;
 
-	// シャドウマップ描画
-	RenderShadowMap();
 
 	// デバック描画
 	{
@@ -388,7 +389,7 @@ void SceneGame::RenderShadowMap()
 		DirectX::XMFLOAT3 lightTarget = { 0, 0, 0 }; // 原点を向くようにする
 		DirectX::XMFLOAT3 lightEyeUp = { 0, 1, 0 }; // 上方向を向く
 
-		// ★追加：ライトが真上または真下（Y軸とほぼ平行）を向いているかチェック
+		// ライトが真上または真下（Y軸とほぼ平行）を向いているかチェック
 		// 内積に近い判定。0.99f 以上の場合はほぼ重なっているとみなす
 		if (fabsf(lightDir.y) > 0.999f) {
 			// 真上・真下を向いているときは、仮の上方向を「前」にする
@@ -401,10 +402,10 @@ void SceneGame::RenderShadowMap()
 		//※調節する時近平面と遠平面の差が大きいとジャギが出やすい。
 		//※ジャギを抑えるには解像度を上げる・バイアスを小さくするなど
 		camera.SetOrthographic(
-			70.0,   // 横幅
-			70.0,   // 高さ
+			200,   // 横幅
+			200,   // 高さ
 			40.0f,    // 近平面
-			160.0f // 遠平面
+			200.0f // 遠平面
 		);
 
 		DirectX::XMFLOAT4X4 view = camera.GetView();

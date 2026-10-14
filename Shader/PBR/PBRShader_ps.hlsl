@@ -18,7 +18,7 @@ Texture2D lut_ggx : register(t35);
 
 // シャドウマップ
 Texture2D shadow_map : register(t5);
-SamplerState shadow_sampler_state : register(s5);
+SamplerComparisonState shadow_sampler_state : register(s5);
 
 
 float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
@@ -31,7 +31,6 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
         tex_color.rgb = pow(tex_color.rgb, GammaFactor);
         base_color *= tex_color;
         clip(base_color.a - alphaCutoff);
-
     }
     
     // 自己発光色を取得
@@ -77,12 +76,12 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
         final_metalness *= sampled.b;
     }
 
-#if 1 // 確認用のコードなので本体は不要
+#if 1
     final_roughness = clamp(final_roughness + adjustroughness, 0.0001f, 1.0f);
     final_metalness = clamp(final_metalness + adjustmetalness, 0.0001f, 1.0f);
 #endif
 
-     // 光の遮蔽値を取得
+    // 光の遮蔽値を取得
     float occlusion_factor = 1.0f;
     if (hasOcclusionTexture > 0)
     {
@@ -96,7 +95,7 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     // 入射光のうち拡散反射になる割合
     float3 diffuse_reflectance = lerp(albedo.rgb, 0.0f, final_metalness);
     
-    // 垂直反射時のフレネル反射率（非金属でも最低は4%は鏡面反射する）
+    // 垂直反射時のフレネル反射率
     float3 F0 = lerp(0.04f, albedo.rgb, final_metalness);
     
     // 視線ベクトル
@@ -105,43 +104,37 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
     // 直接光のシェーディング
     float3 total_diffuse = 0, total_specular = 0;
     {
-        // 並行光源の処理
+        // 平行光源の処理
         {
             float3 diffuse = (float3) 0, specular = (float3) 0;
             float3 L = normalize(lightDirection.xyz);
-            float3 LC = lightColor.rgb/* * lightColor.a*/;
+            float3 LC = lightColor.rgb;
             DirectBRDF(diffuse_reflectance, F0, N, V, L, LC, final_roughness, diffuse, specular);
 
-            // 平行光源用シャドウマップ(PCF 3x3)
-            float2 shadow_size; // シャドウマップの大きさを計算する
-            
-            // GetDimensions:テクスチャの解像度（縦横のピクセル数/ミップレベルなど）を取得する関数
+            float shadow = 0.0f;
+            float compareDepth = pin.shadow_texcoord.z - shadow_bias;
+
+            // 平行光源用シャドウマップのサイズ取得
+            float2 shadow_size;
             shadow_map.GetDimensions(shadow_size.x, shadow_size.y);
             float2 texel = 1.0f / shadow_size;
-            
-            float shadow = 0.0f;
+
+            // 3x3 Hardware PCF サンプリング
             [unroll]
             for (int y = -1; y <= 1; ++y)
             {
                 [unroll]
                 for (int x = -1; x <= 1; ++x)
                 {
-                    // シャドウマップから、少し位置をずらした場所の深度値を取り出して「赤成分(.r)」を取得する
-                    // これらを足し合わせると「隣と斜め隣のピクセルのUV座標が作れる」
-                    float depth = shadow_map.Sample(shadow_sampler_state, pin.shadow_texcoord.xy + float2(x, y) * texel).r;
-                    shadow += (pin.shadow_texcoord.z - depth > shadow_bias) ? 1.0f : 0.0f;
+                    float2 uvOffset = pin.shadow_texcoord.xy + float2(x, y) * texel;
+                    shadow += shadow_map.SampleCmpLevelZero(shadow_sampler_state, uvOffset, compareDepth);
                 }
             }
-            shadow /= 9.0f; // 0 = 日なた, 1 = 完全に影
+            shadow /= 9.0f; // SampleCmp は日なたで 1.0、影で 0.0 を返す
             
-            //深度値を比較して壁かどうかを判定する
-            //if (pin.shadow_texcoord.z - depth > shadow_bias)
-            //{
-            //    diffuse *= shadow_attenuation;
-            //    specular *= shadow_attenuation;
-            //}
+            float shadow_factor = 1.0f - shadow; // 影の強さ (1.0 = 完全な影)
+            float atten = lerp(1.0f, shadow_attenuation, shadow_factor);
             
-            float atten = lerp(1.0f, shadow_attenuation, shadow);
             diffuse *= atten;
             specular *= atten;
             total_diffuse += diffuse;

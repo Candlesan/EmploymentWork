@@ -58,7 +58,7 @@ ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
     // BorderColorをFLT_MAXにしてシャドウマップ範囲外を「影なし」扱いにする
     // -------------------------------------------------------
     D3D11_SAMPLER_DESC samplerDesc{};
-    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
     samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
     samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
     samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
@@ -70,6 +70,9 @@ ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
     samplerDesc.BorderColor[3] = FLT_MAX;
     samplerDesc.MinLOD = 0;
     samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    // 比較関数を設定する
+    samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
 
     hr = device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));

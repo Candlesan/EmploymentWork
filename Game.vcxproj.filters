@@ -1018,9 +1018,6 @@
     <FxCompile Include="Shader\PBR\PBRShader_vs.hlsl">
       <Filter>Shader\PBR</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\PBR\PBRShader_ps.hlsl">
-      <Filter>Shader\PBR</Filter>
-    </FxCompile>
     <FxCompile Include="Shader\SkyMap\SkyMap_VS.hlsl">
       <Filter>Shader\SkyMap</Filter>
     </FxCompile>
@@ -1101,6 +1098,9 @@
     </FxCompile>
     <FxCompile Include="Shader\UIFill\UIFillPS.hlsl">
       <Filter>Shader\UIFill</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\PBR\PBRShader_ps.hlsl">
+      <Filter>Shader\PBR</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

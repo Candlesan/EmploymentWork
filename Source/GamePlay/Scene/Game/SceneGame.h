@@ -82,7 +82,7 @@ private:
 
 	LightManager lightManager;
 	float lightYaw = 170.677;   // 方位角（度）  0〜360
-	float lightPitch = 16.378;  // 仰角（度）   0=地平線, 90=真上
+	float lightPitch = 60.0;  // 仰角（度）   0=地平線, 90=真上
 
 	float debugOffset = 0.5;
 
