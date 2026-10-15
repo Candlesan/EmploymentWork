@@ -331,7 +331,13 @@ ActionBase::State GuardMagic::Run(float elapsedTime)
         // まだエフェクトを出してなければ1回だけ生成する
         if (!defenseEffect)
         {
-            defenseEffect = CustomEffectManager::Instance().PlayEffect("Barreir", owner->GetPosition(), owner->GetAngle(), { 1.5f, 1.5f, 1.5f });
+            DirectX::XMFLOAT3 angle = {
+                DirectX::XMConvertToDegrees(owner->GetAngle().x),
+                DirectX::XMConvertToDegrees(owner->GetAngle().y),
+                DirectX::XMConvertToDegrees(owner->GetAngle().z)
+            };
+
+            defenseEffect = CustomEffectManager::Instance().PlayEffect("Barreir", owner->GetPosition(), angle, { 1.5f, 1.5f, 1.5f });
         }
         else
         {

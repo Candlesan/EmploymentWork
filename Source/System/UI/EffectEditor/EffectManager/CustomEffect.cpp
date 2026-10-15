@@ -52,8 +52,6 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
             rNode.trail->Initialize();
         }
     }
-
-    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 // エフェクト再生

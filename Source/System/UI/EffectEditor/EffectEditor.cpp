@@ -344,7 +344,6 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 
-    float alpha = 1.0f;
     for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
         auto& node = currentConfig.nodes[i];
@@ -357,6 +356,8 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
         // 
         if (effectTimer < node.delayTime) continue;
         float meshActiveTime = effectTimer - node.delayTime;
+
+        float alpha = 1.0f;
 
         if (rNode.meshModel && meshActiveTime <= node.lifeTime)
         {

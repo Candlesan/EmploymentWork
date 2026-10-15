@@ -54,6 +54,8 @@ Framework::Framework(HWND hWnd)
 	{
 		currentScene->OnResize(w, h);
 	}
+
+	srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 // デストラクタ

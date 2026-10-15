@@ -236,6 +236,12 @@ void EffectConfig::Load(const std::string& filePath)
                 nodes.push_back(node);
             }
         }
+
+        // ノードが１つも無い時既定のノードを入れる
+        if (nodes.empty())
+        {
+            nodes.push_back(NodeConfig{});
+        }
     }
     catch (const nlohmann::json::exception& e)
     {

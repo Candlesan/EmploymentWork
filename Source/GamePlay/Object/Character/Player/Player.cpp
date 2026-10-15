@@ -874,7 +874,12 @@ void Player::MagicInput(float elapsedTime)
 		// まだエフェクトを出してなければ1回だけ生成する
 		if (!barrierEffect)
 		{
-			barrierEffect = CustomEffectManager::Instance().PlayEffect("Barreir", position, angle, { 1.5f, 1.5f, 1.5f });
+			DirectX::XMFLOAT3 effectAngle = {
+				DirectX::XMConvertToDegrees(angle.x),
+				DirectX::XMConvertToDegrees(angle.y),
+				DirectX::XMConvertToDegrees(angle.z)
+			};
+			barrierEffect = CustomEffectManager::Instance().PlayEffect("Barreir", position, effectAngle, { 1.5f, 1.5f, 1.5f });
 		}
 		else
 		{
