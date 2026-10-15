@@ -70,7 +70,6 @@ Stage::Stage()
 	}
 
 	// ƒ‚ƒfƒ‹‘S‘Ì‚ÌAABB
-	DirectX::XMFLOAT3 volumeMin, volumeMax;
 	DirectX::XMStoreFloat3(&volumeMin, VolumeMin);
 	DirectX::XMStoreFloat3(&volumeMax, VolumeMax);
 

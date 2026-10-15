@@ -85,7 +85,7 @@ void SceneGame::Initialize()
 
 	// シャドウマップのパラメータ設定
 	shadowAttenuation = 0;
-	shadowBias = 0.006f;
+	shadowBias = 0.001f;
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
@@ -380,32 +380,34 @@ void SceneGame::RenderShadowMap()
 		// 最初のカメラの情報を保存する
 		camera.SaveCamera();
 
+
 		// ライト方向を取得
 		DirectX::XMFLOAT3 lightDir = lightManager.GetDirectionalLight().direction;
 
-		// ライトビュー行列を計算
-		// ライト方向の反対側にライトを配置
-		DirectX::XMFLOAT3 lightPos = { -lightDir.x * 100.0f, -lightDir.y * 100.0f, -lightDir.z * 100.0f };
-		DirectX::XMFLOAT3 lightTarget = { 0, 0, 0 }; // 原点を向くようにする
+		// ステージの大きさに収める
+		DirectX::XMFLOAT3 vmin = stage->GetVolumeMin();
+		DirectX::XMFLOAT3 vmax = stage->GetVolumeMax();
+
+		// ステージの大きさを計算する
+		DirectX::XMVECTOR Min = DirectX::XMLoadFloat3(&vmin);
+		DirectX::XMVECTOR Max = DirectX::XMLoadFloat3(&vmax);
+		DirectX::XMVECTOR Center = DirectX::XMVectorScale(DirectX::XMVectorAdd(Min, Max), 0.5f);
+		float radius = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(Max, Center)));
+
+		DirectX::XMVECTOR L = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&lightDir));
+		DirectX::XMFLOAT3 lightPos, lightTarget;
+		DirectX::XMStoreFloat3(&lightPos, DirectX::XMVectorSubtract(Center, DirectX::XMVectorScale(L, radius)));
+		DirectX::XMStoreFloat3(&lightTarget, Center);
+
 		DirectX::XMFLOAT3 lightEyeUp = { 0, 1, 0 }; // 上方向を向く
 
-		// ライトが真上または真下（Y軸とほぼ平行）を向いているかチェック
-		// 内積に近い判定。0.99f 以上の場合はほぼ重なっているとみなす
-		if (fabsf(lightDir.y) > 0.999f) {
-			// 真上・真下を向いているときは、仮の上方向を「前」にする
-			lightEyeUp = { 0, 0, 1 };
-		}
-
+		// 計算した内容をセットする
 		camera.SetLookAt(lightPos, lightTarget, lightEyeUp);
-
-		// ライトプロジェクション行列を計算
-		//※調節する時近平面と遠平面の差が大きいとジャギが出やすい。
-		//※ジャギを抑えるには解像度を上げる・バイアスを小さくするなど
 		camera.SetOrthographic(
-			200,   // 横幅
-			200,   // 高さ
-			40.0f,    // 近平面
-			200.0f // 遠平面
+			radius * 1.2f,   // 横幅：アリーナの直径
+			radius * 1.2f,   // 高さ
+			0.0f,            // 近平面：ライト位置から
+			radius * 1.2f    // 遠平面：アリーナの反対側まで
 		);
 
 		DirectX::XMFLOAT4X4 view = camera.GetView();

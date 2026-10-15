@@ -34,6 +34,9 @@ public:
 	const DirectX::XMFLOAT3& GetPosition() const { return areaPosition; } // ˆÚ“®”ÍˆÍ‚Ì’†~ˆÊ’u
 	float GetRadius() const { return areaRadius; } // ˆÚ“®”ÍˆÍ‚Ì”¼Œa
 	float GetHeight() const { return areaHeight; } // ˆÚ“®”ÍˆÍ‚Ì‚‚³
+
+	const DirectX::XMFLOAT3& GetVolumeMin() const { return volumeMin; }
+	const DirectX::XMFLOAT3& GetVolumeMax() const { return volumeMax; }
 private:
 	std::shared_ptr<Model> stage;
 	std::vector<Collision::Triangle> triangles;
@@ -58,4 +61,7 @@ private:
 	bool drawArea = true;
 
 	bool showStageParameter = true;
+
+	DirectX::XMFLOAT3 volumeMin;
+	DirectX::XMFLOAT3 volumeMax;
 };
