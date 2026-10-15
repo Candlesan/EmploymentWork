@@ -115,10 +115,6 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
 // 更新処理
 void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 {
-
-    //　ノードごとに走査する
-    bool anyNodeActive = false; // まだ再生しているノードがあるか
-
     float maxDuration = 0.0f;
 
     // エフェクト全体の時間を進める
@@ -130,21 +126,22 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 
     prevSpawnPos = testSpawnPos;
 
+    for (auto& rNode : runtimeNodes)
+    {
+        if (rNode.particleManager)
+        {
+            // パーティクルの計算を進める
+            rNode.particleManager->Update(dc, delta, elapsedTime);
+        }
+    }
+
+    // 再生中じゃなければここで終了
+    if (!isPlaying) return;
 
     for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
     {
         auto& node = currentConfig.nodes[i];
         auto& rNode = runtimeNodes[i];
-
-
-        // パーティクルの計算を進める
-        if (rNode.particleManager)
-        {
-            rNode.particleManager->Update(dc, delta, elapsedTime);
-        }
-
-        // 再生中じゃなければここで終了
-        if (!isPlaying) return;
 
         if (!node.visible) continue;
 

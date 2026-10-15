@@ -130,7 +130,6 @@ void CustomEffect::Update(float elapsedTime)
 
     for (auto& node : runTimeNodes)
     {
-        if (!node.config.visible) continue;
 
         // UVスクロールの時間を進める
         node.currentUvOffset.x += node.config.uvScrollSpeed.x * elapsedTime;
@@ -144,6 +143,8 @@ void CustomEffect::Update(float elapsedTime)
         {
             node.particleManager->Update(dc, delta, elapsedTime);
         }
+
+        if (!node.config.visible) continue;
 
         // パーティクル
         if (node.config.type == RenderType::Particle)

@@ -28,14 +28,7 @@ enum class RenderType
 	None = 3
 };
 
-// 拡大縮小のモード
-enum class ScaleMode
-{
-	Fixed,			// 固定
-	UniformEasing,	// 単一イージング
-};
-
-// フェードの速度
+// Lerpの速度
 enum class SpeedType
 {
 	Slow3 = 0,	// 低速3
@@ -45,6 +38,13 @@ enum class SpeedType
 	Fast1,		// 高速1
 	Fast2,		// 高速2
 	Fast3,		// 高速3
+};
+
+// 拡大縮小のモード
+enum class ScaleMode
+{
+	Fixed,			// 固定
+	UniformEasing,	// 単一イージング
 };
 
 // 色のモード
@@ -155,6 +155,8 @@ struct NodeConfig
 	float widthStart = 1.0f;											// 先端
 	float widthMiddle = 1.0f;											// 中央
 	float widthEnd = 0.0f;												// 末端
+
+	// 親から継承するパラメーター
 };
 
 // 1つのVFXアセット
