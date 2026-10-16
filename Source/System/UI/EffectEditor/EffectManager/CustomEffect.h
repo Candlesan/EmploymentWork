@@ -17,6 +17,10 @@ public:
 	// 初期化
 	void Initialize(ID3D11Device* device, const EffectConfig& config);
 
+	// 再生中に設定値だけを差し替える（エディターのプレビュー用）
+	// ノード数・描画方法・モデルやテクスチャのパスが変わっていたら false を返す（作り直しが必要）
+	bool ApplyConfig(const EffectConfig& newConfig);
+
 	// エフェクト再生
 	void Play(
 		DirectX::XMFLOAT3 position,

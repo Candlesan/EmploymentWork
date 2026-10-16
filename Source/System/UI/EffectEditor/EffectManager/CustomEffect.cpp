@@ -54,6 +54,37 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
     }
 }
 
+// 再生中に設定値だけを差し替える（エディターのプレビュー用）
+bool CustomEffect::ApplyConfig(const EffectConfig& newConfig)
+{
+    // ノード数が変わっていたら作り直しが必要
+    if (newConfig.nodes.size() != runTimeNodes.size()) return false;
+
+    for (size_t i = 0; i < newConfig.nodes.size(); ++i)
+    {
+        const auto& newNode = newConfig.nodes[i];
+        const auto& oldNode = runTimeNodes[i].config;
+
+        // リソースに関わる値が変わっていたら作り直しが必要
+        if (newNode.type != oldNode.type ||
+            newNode.meshPath != oldNode.meshPath ||
+            newNode.texturePath != oldNode.texturePath ||
+            newNode.noisePath != oldNode.noisePath)
+        {
+            return false;
+        }
+    }
+
+    // 数値だけの変更なので、そのまま差し替える
+    config = newConfig;
+    for (size_t i = 0; i < newConfig.nodes.size(); ++i)
+    {
+        runTimeNodes[i].config = newConfig.nodes[i];
+    }
+
+    return true;
+}
+
 // エフェクト再生
 void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
 {
@@ -188,9 +219,10 @@ void CustomEffect::Update(float elapsedTime)
                     float t = activeTime / node.config.lifeTime;
                     float easeT = Mathf::EaseCurve(t, node.config.scaleUniformStartSpeed, node.config.scaleUniformEndSpeed);
 
-                    finalScale.x = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.y = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.z = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                    float uniform = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                    finalScale.x = this->scale.x * uniform;
+                    finalScale.y = this->scale.y * uniform;
+                    finalScale.z = this->scale.z * uniform;
                 }
                 break;
                 }
@@ -551,8 +583,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
                     float actualEnd = pConfig.scaleUniformEnd
                         + Mathf::RandomRange(-pConfig.scaleUniformEndRandom, pConfig.scaleUniformEndRandom);
 
-                    data.scaleUniformStart = actualStart;
-                    data.scaleUniformEnd = actualEnd;
+                    data.scaleUniformStart = this->scale.x * actualStart;
+                    data.scaleUniformEnd = this->scale.x * actualEnd;
                     data.scale_param.x = scaleEasingSpeed;
                     data.scale_param.y = pConfig.lifeTime;
                     break;

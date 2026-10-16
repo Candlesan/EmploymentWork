@@ -12,11 +12,13 @@
 #include <windows.h>
 #include <algorithm>
 
+class CustomEffect;
+
 class EffectEditor
 {
 public:
-	EffectEditor() = default;
-	~EffectEditor() = default;
+	EffectEditor();
+	~EffectEditor();
 
 	// 初期化
 	void Initialize(ID3D11Device* device);
@@ -41,44 +43,17 @@ private:
 	void DrawNodeList();
 
 	// ヘルパー関数
-	void EmitParticles(float elapsedTime);
-	void SyncRuntimeNodes();
+	void RebuildPreview(); // 今の設定でプレビュー用のエフェクトを作り直す
+
 private:
-	// エディター再生・プレビュー用の1ノード分リソース
-	struct RuntimeNode
-	{
-		std::shared_ptr<Model> meshModel = nullptr;  // そのノード専用の3Dモデル
-		std::shared_ptr<Trail> trail = nullptr;      // そのノード専用のトレイル
-		std::unique_ptr<Compute_Particle> particleManager;	// パーティクル制御
-		DirectX::XMFLOAT2 currentUvOffset = { 0.0f, 0.0f }; // UV加算用
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
-
-		// メッシュ描画用のワールド行列
-		DirectX::XMFLOAT4X4 worldTransform = {
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		}; 
-
-		float spawnTimer = 0.0f;											// 毎フレーム進める発生計算用タイマー
-		DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };					// 色のランダム(計算用)
-		DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };					// 始点の色(計算用)
-		DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };					// 終点の色(計算用)
-		float meshUniformStartScale = 1.0f;									// 始点の拡大率(計算用)
-		float meshUniformEndScale = 1.0f;									// 終点の拡大率(計算用)
-	};
-
 	EffectConfig currentConfig; // 現在調整中の設定データ
-	
-	std::vector<RuntimeNode> runtimeNodes;        // 各ノード専用のリソース配列！
+
+	// プレビュー再生用のエフェクト（本番と同じ CustomEffect を使う）
+	std::unique_ptr<CustomEffect> preview;
 
 	// 再生状態
-	bool isPlaying = false;
 	DirectX::XMFLOAT3 testSpawnPos = { 0.0f, 1.0f, 0.0f };
-	DirectX::XMFLOAT3 prevSpawnPos = { 0.0f, 1.0f, 0.0f }; // 前フレームの位置
-	DirectX::XMFLOAT3 delta = { 0.0f, 0.0f, 0.0f };
-	float effectTimer = 0.0f;	// エフェクト開始からの経過時間
+	bool isTestMove = false;	// テスト位置を中心に円を描いて動かすか（トレイルの確認用）
+	float testMoveTimer = 0.0f;	// 円運動用のタイマー
 	int selectedNodeIndex = 0; // 選択中のノード
 };
