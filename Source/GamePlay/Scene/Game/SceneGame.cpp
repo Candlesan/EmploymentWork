@@ -280,9 +280,12 @@ void SceneGame::Render()
 		}
 
 #ifdef _DEBUG
-		player.RenderDebugPrimitive(shapeRenderer);
-		enemy->RenderDebugPrimitive(shapeRenderer);
-		stage->RenderDebugPrimitive(shapeRenderer);
+		if (showModel)
+		{
+			player.RenderDebugPrimitive(shapeRenderer);
+			enemy->RenderDebugPrimitive(shapeRenderer);
+			stage->RenderDebugPrimitive(shapeRenderer);
+		}
 #endif // DEBUG
 
 	}
@@ -293,9 +296,12 @@ void SceneGame::Render()
 		framebuffers[0]->activate(dc);
 
 		// ===== モデル =====
-		stage->Render(rc, modelRenderer); // ステージ描画
-		player.Render(rc, modelRenderer); // プレイヤー描画
-		enemy->Render(rc, modelRenderer); // エネミー描画		
+		if (showModel)
+		{
+			stage->Render(rc, modelRenderer); // ステージ描画
+			player.Render(rc, modelRenderer); // プレイヤー描画
+			enemy->Render(rc, modelRenderer); // エネミー描画		
+		}
 
 		// 全モデル描画
 		modelRenderer->Render(rc); 
@@ -345,8 +351,11 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
-		uiEditor.Render(dc);
-		uiCanvas.Render(dc);
+		if (showUI)
+		{
+			uiEditor.Render(dc);
+			uiCanvas.Render(dc);
+		}
 	}
 }
 
@@ -593,6 +602,18 @@ void SceneGame::DrawGUI()
 			DrawModelMaterialEditor(u8"敵：体・鎧のマテリアル", enemy.get());
 		}
 		ImGui::End();
+
+		ImGui::Begin(u8"表示");
+		if (ImGui::Button(u8"モデル全非表示"))
+		{
+			showModel = !showModel;
+		}
+		if (ImGui::Button(u8"UI全非表示"))
+		{
+			showUI = !showUI;
+		}
+		ImGui::End();
+
 	}
 
 	// エフェクトエディターの表示

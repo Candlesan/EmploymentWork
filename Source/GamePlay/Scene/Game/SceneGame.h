@@ -84,18 +84,6 @@ private:
 	float lightYaw = 0.0f;   // 方位角（度）  0〜360
 	float lightPitch = 40.0;  // 仰角（度）   0=地平線, 90=真上
 
-	float debugOffset = 0.5;
-
-	// デバック機能
-	bool isPaused = false;      // 一時停止中か
-	bool stepNextFrame = false; // 1フレームだけ進めるか
-	// キーのエッジ検出用（前フレームの押下状態を保持）
-	bool wasF5DownLastFrame = false;
-	bool wasF6DownLastFrame = false;
-
-	float timeScale = 1.0f; // 1.0が通常、0.1が10倍スロー
-	float baseTimeScale = 1.0f;
-
 	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 
 	// PBR調整用
@@ -136,6 +124,17 @@ private:
 	bool showUIEdlitor = true;
 	
 
+	// ----- デバック機能 -----
+	bool isPaused = false;      // 一時停止中か
+	bool stepNextFrame = false; // 1フレームだけ進めるか
+
+	// キーのエッジ検出用（前フレームの押下状態を保持）
+	bool wasF5DownLastFrame = false;
+	bool wasF6DownLastFrame = false;
+
+	float timeScale = 1.0f; // 1.0が通常、0.1が10倍スロー
+	float baseTimeScale = 1.0f;
+
 	// デバックプリミティブの描画のONとOFF
 	bool showDebugPrimitive = true;
 
@@ -143,4 +142,7 @@ private:
 	bool showDebugOption = true; 
 
 	bool invertY = false;
+
+	bool showModel = true; // モデルを表示するか
+	bool showUI = true; // UIを表示するか
 };
