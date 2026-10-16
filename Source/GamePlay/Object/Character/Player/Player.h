@@ -5,6 +5,8 @@
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionEditor.h"
 #include "System/UI/AnimationNodeEditor/AnimationTransitionGraph.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
 #include "System/Audio/AudioSource.h"
 
 // ゲームオブジェクト
@@ -20,7 +22,6 @@
 
 // 前方宣言
 class Enemy;
-class CustomEffect;
 
 class Player : public AnimationCharacter
 {
@@ -241,7 +242,7 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 
 	// エフェクト関係
-	CustomEffect* barrierEffect = nullptr; // 防御魔法のエフェクト
+	EffectHandle barrierEffect = InvalidEffect; // 防御魔法のエフェクト
 
 	// ── デバック ──
 	bool showAnimarionTransitionEditor = true;

@@ -27,60 +27,36 @@ void CustomEffectManager::LoadEffectConfig(const std::string& effectName, const 
 }
 
 // エフェクト再生
-CustomEffect* CustomEffectManager::PlayEffect(const std::string& effectName, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
+EffectHandle CustomEffectManager::PlayEffect(const std::string& effectName, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
 {
-	// エフェクト名で検索する
 	auto it = effectConfigs.find(effectName);
+	if (it == effectConfigs.end()) return InvalidEffect; // エフェクトが無かったら0を返す
 
-	// 見つからなかったら処理をしない
-	if (it == effectConfigs.end()) return nullptr;
-
-	// 新しくエフェクトを作る
-	auto effect = new CustomEffect();
-
-	// 読み込んでおいた設定とデバイスを渡して初期化する
+	auto effect = std::make_unique<CustomEffect>();
 	effect->Initialize(device, it->second);
-
-	// エフェクトを再生する
 	effect->Play(position, angle, scale);
 
-	// 再生中のエフェクトをリストに追加する
-	activeEffects.push_back(effect);
-
-	return effect;
+	EffectHandle handle = nextHandle++;
+	activeEffects[handle] = std::move(effect);
+	return handle;
 }
 
 // 更新処理
 void CustomEffectManager::Update(float elapsedTime)
 {
-	// 破棄するエフェクトを一時的にためるリスト
-	std::vector<CustomEffect*> removes;
-
-	// 全エフェクトを更新する
-	for (auto& effect : activeEffects)
+	// 終わったものをループしながら消す
+	for (auto it = activeEffects.begin(); it != activeEffects.end();)
 	{
-		effect->Update(elapsedTime);
-
-		// 終了しているエフェクトが無いか確認する
-		if (effect->IsFinished())
+		it->second->Update(elapsedTime);
+		
+		if (it->second->IsFinished())
 		{
-			removes.push_back(effect); // 破棄リストに追加
+			it = activeEffects.erase(it); // 次の要素を消す
 		}
-	}
-
-	// パーティクルを更新する
-	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
-
-	// 更新が終わった後に削除処理をする
-	for (auto& effect : removes)
-	{
-		auto it = std::find(activeEffects.begin(), activeEffects.end(), effect);
-		if (it != activeEffects.end())
+		else
 		{
-			activeEffects.erase(it); // リストから除外
+			++it;
 		}
-
-		delete effect; // エフェクトを解放
 	}
 }
 
@@ -88,7 +64,7 @@ void CustomEffectManager::Update(float elapsedTime)
 void CustomEffectManager::Render(RenderContext& rc)
 {
 	// 全再生中のエフェクトを描画する
-	for (auto effect : activeEffects)
+	for (auto& [handle, effect] : activeEffects)
 	{
 		effect->Render(rc);
 	}
@@ -112,7 +88,7 @@ void CustomEffectManager::RenderMeshVFX(ModelRenderer* modelRenderer)
 	shader->Begin(rc);
 
 	// 全再生中のメッシュVFXを描画する
-	for (auto effect : activeEffects)
+	for (auto& [handle, effect] : activeEffects)
 	{
 		effect->RenderMeshVFX(shader, rc);
 	}
@@ -123,10 +99,6 @@ void CustomEffectManager::RenderMeshVFX(ModelRenderer* modelRenderer)
 // 全クリア
 void CustomEffectManager::Clear()
 {
-	for (auto effects : activeEffects)
-	{
-		delete effects;
-	}
 	activeEffects.clear();
 	effectConfigs.clear();
 }
@@ -141,4 +113,34 @@ std::unique_ptr<CustomEffect> CustomEffectManager::CreateEffect(const std::strin
 	effect->Initialize(device, it->second);
 
 	return effect;
+}
+
+bool CustomEffectManager::Exists(EffectHandle handle) const
+{
+	return activeEffects.find(handle) != activeEffects.end();
+}
+
+void CustomEffectManager::Stop(EffectHandle handle)
+{
+	auto it = activeEffects.find(handle);
+	if (it == activeEffects.end()) return; // 既に終わってたら何もしない
+	it->second->Stop(); // CustomEffectのStopを呼ぶ
+}
+
+void CustomEffectManager::SetPosition(EffectHandle handle, const DirectX::XMFLOAT3& position)
+{
+	auto it = activeEffects.find(handle);
+	if (it != activeEffects.end()) it->second->SetPosition(position);
+}
+
+void CustomEffectManager::SetAngle(EffectHandle handle, const DirectX::XMFLOAT3& angle)
+{
+	auto it = activeEffects.find(handle);
+	if (it != activeEffects.end()) it->second->SetAngle(angle);
+}
+
+void CustomEffectManager::SetScale(EffectHandle handle, const DirectX::XMFLOAT3& scale)
+{
+	auto it = activeEffects.find(handle);
+	if (it != activeEffects.end()) it->second->SetScale(scale);
 }

@@ -166,12 +166,13 @@ public:
 	{
 		owner->SetIsGaurd(false);
 		owner->GetDefenseMagic().SetIsActive(false);
-		defenseEffect->Stop();
-		defenseEffect = nullptr;
+		effectManager.Stop(defenseEffect);
+		defenseEffect = InvalidEffect;
 	}
 
 private:
-	CustomEffect* defenseEffect = nullptr;
+	EffectHandle defenseEffect = InvalidEffect;
+	CustomEffectManager& effectManager = CustomEffectManager::Instance();
 };
 
 // –hŒä‰ğœi‰ñ•œ‚·‚é‚Ü‚Å’£‚ç‚È‚¢j
