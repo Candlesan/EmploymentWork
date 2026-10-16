@@ -52,59 +52,58 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
             rNode.trail->Initialize();
         }
     }
+}
 
-    srand(static_cast<unsigned int>(time(nullptr)));
+// 再生中に設定値だけを差し替える（エディターのプレビュー用）
+bool CustomEffect::ApplyConfig(const EffectConfig& newConfig)
+{
+    // ノード数が変わっていたら作り直しが必要
+    if (newConfig.nodes.size() != runTimeNodes.size()) return false;
+
+    for (size_t i = 0; i < newConfig.nodes.size(); ++i)
+    {
+        const auto& newNode = newConfig.nodes[i];
+        const auto& oldNode = runTimeNodes[i].config;
+
+        // リソースに関わる値が変わっていたら作り直しが必要
+        if (newNode.type != oldNode.type ||
+            newNode.meshPath != oldNode.meshPath ||
+            newNode.texturePath != oldNode.texturePath ||
+            newNode.noisePath != oldNode.noisePath)
+        {
+            return false;
+        }
+    }
+
+    // 数値だけの変更なので、そのまま差し替える
+    config = newConfig;
+    for (size_t i = 0; i < newConfig.nodes.size(); ++i)
+    {
+        runTimeNodes[i].config = newConfig.nodes[i];
+    }
+
+    return true;
 }
 
 // エフェクト再生
 void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
 {
-	this->position = position;
-	this->scale = scale;
-	this->angle = angle;
+    this->position = position;
+    this->scale = scale;
+    this->angle = angle;
 
     // 初回の計算で暴発しないようにする
     prevPosition = position;
 
-	effectTimer = 0.0f; // タイマーを0にする
-	isPlaying = true; // 再生中にする
+    effectTimer = 0.0f; // タイマーを0にする
+    isPlaying = true; // 再生中にする
 
     for (auto& node : runTimeNodes)
     {
-        if (node.config.type == RenderType::Particle)
-        {
-            node.config.spawnTimer = node.config.spawnInterval;
-        }
-
-        if (node.config.type == RenderType::Mesh && node.config.scaleMode == ScaleMode::UniformEasing)
-        {
-            // 始点の拡大率を計算する
-            node.config.meshUniformStartScale = node.config.scaleUniformStart + Mathf::RandomRange(-node.config.scaleUniformStartRandom, node.config.scaleUniformStartRandom); // 始点の中心 + 振れ幅
-            node.config.meshUniformEndScale = node.config.scaleUniformEnd + Mathf::RandomRange(-node.config.scaleUniformEndRandom, node.config.scaleUniformEndRandom); // 終点の中心 + 振れ幅
-        }
-
-        if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Random)
-        {
-            // 色をランダムで取得する
-            node.config.meshRandomColor.x = Mathf::RandomRange(node.config.colorMin.x, node.config.colorMax.x);
-            node.config.meshRandomColor.y = Mathf::RandomRange(node.config.colorMin.y, node.config.colorMax.y);
-            node.config.meshRandomColor.z = Mathf::RandomRange(node.config.colorMin.z, node.config.colorMax.z);
-            node.config.meshRandomColor.w = Mathf::RandomRange(node.config.colorMin.w, node.config.colorMax.w);
-        }
-        else if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Easing)
-        {
-            // 始点の色を指定した範囲でランダムに取得
-            node.config.meshStartColor.x = Mathf::RandomRange(node.config.colorStartMin.x, node.config.colorStartMax.x);
-            node.config.meshStartColor.y = Mathf::RandomRange(node.config.colorStartMin.y, node.config.colorStartMax.y);
-            node.config.meshStartColor.z = Mathf::RandomRange(node.config.colorStartMin.z, node.config.colorStartMax.z);
-            node.config.meshStartColor.w = Mathf::RandomRange(node.config.colorStartMin.w, node.config.colorStartMax.w);
-
-            // 終点の色を指定した範囲でランダムに取得
-            node.config.meshEndColor.x = Mathf::RandomRange(node.config.colorEndMin.x, node.config.colorEndMax.x);
-            node.config.meshEndColor.y = Mathf::RandomRange(node.config.colorEndMin.y, node.config.colorEndMax.y);
-            node.config.meshEndColor.z = Mathf::RandomRange(node.config.colorEndMin.z, node.config.colorEndMax.z);
-            node.config.meshEndColor.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
-        }
+        node.localTime = 0.0f;
+        node.started = false;
+        node.emitting = false;
+        node.finished = false;
     }
 }
 
@@ -116,7 +115,7 @@ void CustomEffect::Update(float elapsedTime)
     // タイマー更新
     effectTimer += elapsedTime;
 
-    float maxDuration = 0.0f;
+    bool allFinished = true; // 全部のノードが終わったか
 
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 
@@ -130,8 +129,6 @@ void CustomEffect::Update(float elapsedTime)
 
     for (auto& node : runTimeNodes)
     {
-        if (!node.config.visible) continue;
-
         // UVスクロールの時間を進める
         node.currentUvOffset.x += node.config.uvScrollSpeed.x * elapsedTime;
         node.currentUvOffset.y += node.config.uvScrollSpeed.y * elapsedTime;
@@ -145,18 +142,63 @@ void CustomEffect::Update(float elapsedTime)
             node.particleManager->Update(dc, delta, elapsedTime);
         }
 
-        // パーティクル
-        if (node.config.type == RenderType::Particle)
-        {
-            if (node.config.duration > maxDuration) maxDuration = node.config.duration;
-        }
-        // メッシュVFX
-        else if (node.config.type == RenderType::Mesh)
-        {
-            if (effectTimer < node.config.delayTime) continue;
+        if (!node.config.visible || node.finished) continue; // 非表示またはそのノードが終わったら飛ばす
 
+        allFinished = false; // まだ終わってないノードある
+
+
+        if (!node.started)
+        {
+            if (effectTimer < node.config.delayTime) continue; // 待機時間内ならスキップ
+
+            // 待機時間が終わったらスタートする
+            node.started = true;
+            node.localTime = effectTimer - node.config.delayTime;
+            BeginNodeCycle(node); // エフェクトの設定をする
+        }
+        else
+        {
+            node.localTime += elapsedTime; // 既に始まってる
+        }
+
+        // ループ処理
+        const bool isParticle = (node.config.type == RenderType::Particle);
+
+        // パーティクルはエフェクト全体の生存時間で、それ以外は特殊で寿命で判定を取る
+        const float cycle = isParticle ? node.config.duration : node.config.lifeTime; 
+
+        // 周期が0以上でノードごとの再生時間が周期よりも大きかったら
+        if (cycle > 0.0f && node.localTime >= cycle) // 0は無限とする
+        {
+            // ループを設定したら
+            if (node.config.isLoop)
+            {
+                // ループ：巻き戻して次の周期へ
+                node.localTime = fmodf(node.localTime, cycle);
+                BeginNodeCycle(node); // 周期ごとに生成する
+            }
+            else if (isParticle)
+            {
+                // ループしないパーティクルは発生を止めて最後のパーティクルが消えるまで待つ
+                node.emitting = false;
+                if (node.localTime >= cycle + node.config.lifeTime)
+                {
+                    node.finished = true;
+                }
+            }
+            else
+            {
+               // ループしないメッシュ・トレイル：終わり
+                node.finished = true;
+                continue;
+            }
+        }
+
+        // メッシュVFX
+       if (node.config.type == RenderType::Mesh)
+        {
             // メッシュノードごとの発生からの経過時間を計算
-            float activeTime = effectTimer - node.config.delayTime;
+            float activeTime = node.localTime;
             float t = activeTime; // 物理計算用の時間
 
             if (node.meshModel)
@@ -177,9 +219,10 @@ void CustomEffect::Update(float elapsedTime)
                     float t = activeTime / node.config.lifeTime;
                     float easeT = Mathf::EaseCurve(t, node.config.scaleUniformStartSpeed, node.config.scaleUniformEndSpeed);
 
-                    finalScale.x = Mathf::Lerp(node.config.meshUniformStartScale, node.config.meshUniformEndScale, easeT);
-                    finalScale.y = Mathf::Lerp(node.config.meshUniformStartScale, node.config.meshUniformEndScale, easeT);
-                    finalScale.z = Mathf::Lerp(node.config.meshUniformStartScale, node.config.meshUniformEndScale, easeT);
+                    float uniform = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                    finalScale.x = this->scale.x * uniform;
+                    finalScale.y = this->scale.y * uniform;
+                    finalScale.z = this->scale.z * uniform;
                 }
                 break;
                 }
@@ -216,15 +259,11 @@ void CustomEffect::Update(float elapsedTime)
                 DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
 
                 node.worldTransform = worldTransform;
-
-                if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
             }
         }
         // トレイル
         else if (node.config.type == RenderType::Trail)
         {
-            if (effectTimer < node.config.delayTime) continue;
-
             DirectX::XMFLOAT3 root = {
                 this->position.x,
                 this->position.y,
@@ -242,41 +281,14 @@ void CustomEffect::Update(float elapsedTime)
                 node.trail->SetWidthScales(node.config.widthStart, node.config.widthMiddle, node.config.widthEnd);
                 node.trail->Update(root, tip);
             }
-
-            if (node.config.lifeTime > maxDuration) maxDuration = node.config.lifeTime;
         }
     } 
 
     EmitParticles(elapsedTime);
 
-    // 寿命を進める
-    if (maxDuration > 0.0f && effectTimer >= maxDuration)
+    if (allFinished)
     {
-        bool isLoop = false;
-
-        for (const auto& node : runTimeNodes)
-        {
-            if (node.config.type == RenderType::Particle && node.config.isLoop)
-            {
-                isLoop = true;
-                break;
-            }
-            else if (node.config.type == RenderType::Mesh && node.config.isLoop)
-            {
-                isLoop = true;
-                break;
-            }
-
-        }
-
-        if (isLoop)
-        {
-            effectTimer = 0.0f; // ループ
-        }
-        else
-        {
-            isPlaying = false; // 再生終了
-        }
+        isPlaying = false; // 再生終了
     }
 }
 
@@ -287,7 +299,7 @@ void CustomEffect::Render(RenderContext& rc)
     {
         for (const auto& node : runTimeNodes)
         {
-            if (!node.config.visible) continue;
+            if (!node.config.visible || node.finished) continue; // 非表示または終了していたら飛ばす
 
             // パーティクルの描画
             if (node.particleManager)
@@ -311,102 +323,99 @@ void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
 
     ID3D11DeviceContext* dc = rc.deviceContext;
 
-
     for (auto& rNode : runTimeNodes)
     {
         if (isPlaying && rNode.meshModel)
         {
-            if (!rNode.config.visible) continue;
+            if (!rNode.config.visible || rNode.finished || !rNode.started) continue;
 
             if (rNode.config.type == RenderType::Mesh)
             {
-                float activeTime = effectTimer - rNode.config.delayTime;
-                if (effectTimer >= rNode.config.delayTime && activeTime <= rNode.config.lifeTime)
+                float activeTime = rNode.localTime;
+
+                // テクスチャをセット
+                shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
+                shader->SetDistortionPower(rNode.config.distortionPower);
+
+                // フェードインの計算
+                float alpha = 1.0f;
+                if (rNode.config.IsFadeIn && rNode.config.fadeInTime > 0.0001f && activeTime <= rNode.config.fadeInTime)
                 {
-                    // テクスチャをセット
-                    shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
-                    shader->SetDistortionPower(rNode.config.distortionPower);
+                    // 現在の進行度を求める
+                    float t = activeTime / rNode.config.fadeInTime;
+                    alpha = Mathf::EaseCurve(t, rNode.config.fadeInStartSpeed, rNode.config.fadeInEndSpeed);
+                }
+                // フェードアウトの計算
+                else if (rNode.config.IsFadeOut && rNode.config.fadeOutTime > 0.0001f)
+                {
+                    // 進行度を求める
+                    float fadeStartTime = rNode.config.lifeTime - rNode.config.fadeOutTime;
 
-                    // フェードインの計算
-                    float alpha = 1.0f;
-                    if (rNode.config.IsFadeIn && rNode.config.fadeInTime > 0.0001f && activeTime <= rNode.config.fadeInTime)
+                    if (activeTime >= fadeStartTime)
                     {
-                        // 現在の進行度を求める
-                        float t = activeTime / rNode.config.fadeInTime;
-                        alpha = Mathf::EaseCurve(t, rNode.config.fadeInStartSpeed, rNode.config.fadeInEndSpeed);
+                        float t = (activeTime - fadeStartTime) / rNode.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
+                        alpha = 1.0f - Mathf::EaseCurve(t, rNode.config.fadeOutStartSpeed, rNode.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
                     }
-                    // フェードアウトの計算
-                    else if (rNode.config.IsFadeOut && rNode.config.fadeOutTime > 0.0001f)
-                    {
-                        // 進行度を求める
-                        float fadeStartTime = rNode.config.lifeTime - rNode.config.fadeOutTime;
+                }
 
-                        if (activeTime >= fadeStartTime)
-                        {
-                            float t = (activeTime - fadeStartTime) / rNode.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
-                            alpha = 1.0f - Mathf::EaseCurve(t, rNode.config.fadeOutStartSpeed, rNode.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
-                        }
-                    }
+                // 0.0～1.0の範囲に収める
+                alpha = Mathf::Clamp(alpha);
 
-                    // 0.0～1.0の範囲に収める
-                    alpha = Mathf::Clamp(alpha);
+                DirectX::XMFLOAT2 noiseUvOffset = {
+                    rNode.config.noiseUvOffset.x * activeTime,
+                    rNode.config.noiseUvOffset.y * activeTime
+                };
+                shader->SetNoiseUvOffset(noiseUvOffset);
+                shader->SetBlendMode(rNode.config.blendMode);
 
-                    DirectX::XMFLOAT2 noiseUvOffset = {
-                        rNode.config.noiseUvOffset.x * effectTimer,
-                        rNode.config.noiseUvOffset.y * effectTimer
-                    };
-                    shader->SetNoiseUvOffset(noiseUvOffset);
-                    shader->SetBlendMode(rNode.config.blendMode);
+                // タイプごとに色の計算をする
+                DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+                switch (rNode.config.colorMode)
+                {
+                case ColorMode::Fixed: // 固定色
+                    finalColor = rNode.config.color;
 
-                    // タイプごとに色の計算をする
-                    DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-                    switch (rNode.config.colorMode)
-                    {
-                    case ColorMode::Fixed: // 固定色
-                        finalColor = rNode.config.color;
+                    break;
+                case ColorMode::Random: // ランダム
+                    finalColor = rNode.meshRandomColor;
 
-                        break;
-                    case ColorMode::Random: // ランダム
-                        finalColor = rNode.config.meshRandomColor;
+                    break;
+                case ColorMode::Easing: // イージング
+                {
+                    // 進行度を求める
+                    float t = activeTime / rNode.config.lifeTime;
 
-                        break;
-                    case ColorMode::Easing: // イージング
-                    {
-                        // 進行度を求める
-                        float t = activeTime / rNode.config.lifeTime;
+                    // イージング速度を求める
+                    float easeT = Mathf::EaseCurve(t, rNode.config.colorStartSpeed, rNode.config.colorEndSpeed);
 
-                        // イージング速度を求める
-                        float easeT = Mathf::EaseCurve(t, rNode.config.colorStartSpeed, rNode.config.colorEndSpeed);
+                    // Lerpを掛けて進行度にあ和得て色を変化させる
+                    finalColor.x = Mathf::Lerp(rNode.meshStartColor.x, rNode.meshEndColor.x, easeT);
+                    finalColor.y = Mathf::Lerp(rNode.meshStartColor.y, rNode.meshEndColor.y, easeT);
+                    finalColor.z = Mathf::Lerp(rNode.meshStartColor.z, rNode.meshEndColor.z, easeT);
+                    finalColor.w = Mathf::Lerp(rNode.meshStartColor.w, rNode.meshEndColor.w, easeT);
 
-                        // Lerpを掛けて進行度にあ和得て色を変化させる
-                        finalColor.x = Mathf::Lerp(rNode.config.meshStartColor.x, rNode.config.meshEndColor.x, easeT);
-                        finalColor.y = Mathf::Lerp(rNode.config.meshStartColor.y, rNode.config.meshEndColor.y, easeT);
-                        finalColor.z = Mathf::Lerp(rNode.config.meshStartColor.z, rNode.config.meshEndColor.z, easeT);
-                        finalColor.w = Mathf::Lerp(rNode.config.meshStartColor.w, rNode.config.meshEndColor.w, easeT);
+                    break;
+                }
+                }
 
-                        break;
-                    }
-                    }
-
-                    finalColor.w *= alpha;
-                    shader->SetColor(finalColor); // このノード固有の色
-                    shader->SetUvOffset(rNode.currentUvOffset);
+                finalColor.w *= alpha;
+                shader->SetColor(finalColor); // このノード固有の色
+                shader->SetUvOffset(rNode.currentUvOffset);
 
 
-                    for (const auto& mesh : rNode.meshModel->GetMeshes())
-                    {
-                        // 頂点バッファ・インデックスバッファをセット
-                        UINT stride = sizeof(Model::Vertex);
-                        UINT offset = 0;
-                        dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-                        dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-                        dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                for (const auto& mesh : rNode.meshModel->GetMeshes())
+                {
+                    // 頂点バッファ・インデックスバッファをセット
+                    UINT stride = sizeof(Model::Vertex);
+                    UINT offset = 0;
+                    dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+                    dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+                    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-                        // 行列とパラメータを定数バッファに更新して描画コール
-                        shader->SetWorldTransForm(rNode.worldTransform);
-                        shader->Update(rc, mesh);
-                        dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
-                    }
+                    // 行列とパラメータを定数バッファに更新して描画コール
+                    shader->SetWorldTransForm(rNode.worldTransform);
+                    shader->Update(rc, mesh);
+                    dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
                 }
             }
         }
@@ -450,23 +459,20 @@ void CustomEffect::EmitParticles(float elapsedTime)
     {
         // パーティクルノード以外、または非表示ノードはスキップ
         if (node.config.type != RenderType::Particle) continue;
-        if (!node.config.visible) continue;
+        if (!node.config.visible || node.finished) continue;
 
         auto& pConfig = node.config;
 
-        if (effectTimer < node.config.delayTime) continue;
-
-        float activeTime = effectTimer - node.config.delayTime;
-        if (node.config.duration > 0.0f && activeTime >= node.config.duration) continue;
+        if (!node.emitting) continue; // パーティクル生成していないときは処理を飛ばす
 
         // ノード個別のタイマーを進める
-        pConfig.spawnTimer += elapsedTime;
+        node.spawnTimer += elapsedTime;
 
         float rand = Mathf::RandFloat();
 
-        if (pConfig.spawnTimer >=pConfig.spawnInterval)
+        if (node.spawnTimer >=pConfig.spawnInterval)
         {
-           pConfig.spawnTimer -=pConfig.spawnInterval;
+            node.spawnTimer -=pConfig.spawnInterval;
 
             // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
             if (node.particleManager && !pConfig.texturePath.empty())
@@ -577,8 +583,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
                     float actualEnd = pConfig.scaleUniformEnd
                         + Mathf::RandomRange(-pConfig.scaleUniformEndRandom, pConfig.scaleUniformEndRandom);
 
-                    data.scaleUniformStart = actualStart;
-                    data.scaleUniformEnd = actualEnd;
+                    data.scaleUniformStart = this->scale.x * actualStart;
+                    data.scaleUniformEnd = this->scale.x * actualEnd;
                     data.scale_param.x = scaleEasingSpeed;
                     data.scale_param.y = pConfig.lifeTime;
                     break;
@@ -639,5 +645,44 @@ void CustomEffect::EmitParticles(float elapsedTime)
                 node.particleManager->Emit(data);
             }
         }
+    }
+}
+
+void CustomEffect::BeginNodeCycle(RuntimeNode& node)
+{
+    if (node.config.type == RenderType::Particle)
+    {
+        node.spawnTimer = node.config.spawnInterval;
+        node.emitting = true;
+    }
+
+    if (node.config.type == RenderType::Mesh && node.config.scaleMode == ScaleMode::UniformEasing)
+    {
+        // 始点の拡大率を計算する
+        node.meshUniformStartScale = node.config.scaleUniformStart + Mathf::RandomRange(-node.config.scaleUniformStartRandom, node.config.scaleUniformStartRandom); // 始点の中心 + 振れ幅
+        node.meshUniformEndScale = node.config.scaleUniformEnd + Mathf::RandomRange(-node.config.scaleUniformEndRandom, node.config.scaleUniformEndRandom); // 終点の中心 + 振れ幅
+    }
+
+    if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Random)
+    {
+        // 色をランダムで取得する
+        node.meshRandomColor.x = Mathf::RandomRange(node.config.colorMin.x, node.config.colorMax.x);
+        node.meshRandomColor.y = Mathf::RandomRange(node.config.colorMin.y, node.config.colorMax.y);
+        node.meshRandomColor.z = Mathf::RandomRange(node.config.colorMin.z, node.config.colorMax.z);
+        node.meshRandomColor.w = Mathf::RandomRange(node.config.colorMin.w, node.config.colorMax.w);
+    }
+    else if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Easing)
+    {
+        // 始点の色を指定した範囲でランダムに取得
+        node.meshStartColor.x = Mathf::RandomRange(node.config.colorStartMin.x, node.config.colorStartMax.x);
+        node.meshStartColor.y = Mathf::RandomRange(node.config.colorStartMin.y, node.config.colorStartMax.y);
+        node.meshStartColor.z = Mathf::RandomRange(node.config.colorStartMin.z, node.config.colorStartMax.z);
+        node.meshStartColor.w = Mathf::RandomRange(node.config.colorStartMin.w, node.config.colorStartMax.w);
+
+        // 終点の色を指定した範囲でランダムに取得
+        node.meshEndColor.x = Mathf::RandomRange(node.config.colorEndMin.x, node.config.colorEndMax.x);
+        node.meshEndColor.y = Mathf::RandomRange(node.config.colorEndMin.y, node.config.colorEndMax.y);
+        node.meshEndColor.z = Mathf::RandomRange(node.config.colorEndMin.z, node.config.colorEndMax.z);
+        node.meshEndColor.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
     }
 }

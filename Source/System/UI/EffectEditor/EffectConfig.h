@@ -28,14 +28,7 @@ enum class RenderType
 	None = 3
 };
 
-// 拡大縮小のモード
-enum class ScaleMode
-{
-	Fixed,			// 固定
-	UniformEasing,	// 単一イージング
-};
-
-// フェードの速度
+// Lerpの速度
 enum class SpeedType
 {
 	Slow3 = 0,	// 低速3
@@ -45,6 +38,13 @@ enum class SpeedType
 	Fast1,		// 高速1
 	Fast2,		// 高速2
 	Fast3,		// 高速3
+};
+
+// 拡大縮小のモード
+enum class ScaleMode
+{
+	Fixed,			// 固定
+	UniformEasing,	// 単一イージング
 };
 
 // 色のモード
@@ -68,7 +68,6 @@ struct NodeConfig
 	float delayTime = 0.0f;												// パーティクルを生成するまでの時間
 	float duration = 1.0f;												// エフェクト全体の生存時間
 	float spawnInterval = 1.0f;											// 次のパーティクルを出すまでの間隔(秒)
-	float spawnTimer = 0.0f;											// 毎フレーム進める発生計算用タイマー
 	int blendMode = 0;													// 0: Alpha, 1: Add
 	bool isLoop = true;													// ループするか
 
@@ -144,17 +143,14 @@ struct NodeConfig
 	std::string meshPath = "";											// モデルパス
 	std::string noisePath = "";											// ノイズテクスチャパス
 	float distortionPower = 0.0f;										// 歪みの強さ
-	DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };					// 色のランダム(計算用)
-	DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };					// 始点の色(計算用)
-	DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };					// 終点の色(計算用)
-	float meshUniformStartScale = 1.0f;									// 始点の拡大率(計算用)
-	float meshUniformEndScale = 1.0f;									// 終点の拡大率(計算用)
 
 	// [Trail用]
 	float width = 1.0f;													
 	float widthStart = 1.0f;											// 先端
 	float widthMiddle = 1.0f;											// 中央
 	float widthEnd = 0.0f;												// 末端
+
+	// 親から継承するパラメーター
 };
 
 // 1つのVFXアセット

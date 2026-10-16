@@ -753,6 +753,8 @@ void Player::MagicInput(float elapsedTime)
 	MagicBase* targetMagic = nullptr;
 	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
 
+	auto& effectManager = CustomEffectManager::Instance();
+
 	// 迎撃
 	if (status.isIntercept && !status.isDown)
 	{
@@ -871,15 +873,20 @@ void Player::MagicInput(float elapsedTime)
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
 
-		// まだエフェクトを出してなければ1回だけ生成する
-		if (!barrierEffect)
+		// まだ生きているかを確認する
+		if (!effectManager.Exists(barrierEffect))
 		{
-			barrierEffect = CustomEffectManager::Instance().PlayEffect("Barreir", position, angle, { 1.5f, 1.5f, 1.5f });
+			DirectX::XMFLOAT3 effectAngle = {
+				DirectX::XMConvertToDegrees(angle.x),
+				DirectX::XMConvertToDegrees(angle.y),
+				DirectX::XMConvertToDegrees(angle.z)
+			};
+			barrierEffect = CustomEffectManager::Instance().PlayEffect("Barreir", position, effectAngle, { 1.5f, 1.5f, 1.5f });
 		}
 		else
 		{
 			// 出してる間はプレイヤーに追従させる
-			barrierEffect->SetPosition(defenseMagic.GetDefensePosition());
+			effectManager.SetPosition(barrierEffect, defenseMagic.GetDefensePosition());
 		}
 	}
 	else
@@ -890,8 +897,8 @@ void Player::MagicInput(float elapsedTime)
 		// ボタンを離したら止めて、ポインタも空に戻す
 		if (barrierEffect)
 		{
-			barrierEffect->Stop();
-			barrierEffect = nullptr;
+			effectManager.Stop(barrierEffect);
+			barrierEffect = InvalidEffect;
 		}
 	}
 }

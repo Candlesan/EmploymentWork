@@ -4,12 +4,12 @@
 #include "GamePlay/Object/Magic/MagicInfor.h"
 
 #include "System/Effect/Effect.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
 
 #include <memory>
 #include <string>
 
-// ‘O•ûéŒ¾
-class CustomEffect;
 
 class MagicProjectile : public MagicBase
 {
@@ -48,6 +48,7 @@ private:
 
 	MagicInfo config;
 
-	CustomEffect* customEffect = nullptr;
+	EffectHandle customEffect = InvalidEffect;
+	CustomEffectManager& effectManager = CustomEffectManager::Instance();
 	std::string effectName = "";
 };

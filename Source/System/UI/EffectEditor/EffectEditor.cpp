@@ -1,27 +1,20 @@
 #include "EffectEditor.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
 #include "System/UI/Dialog/Dialog.h"
 #include "System/Graphic/Graphics.h"
 #include "System/Shader/meshVFX/meshVFX.h"
 #include "System/Core/Mathf.h"
 
 #include <imgui.h>
-#include <ctime>
-#include <cstdlib>
+
+// CustomEffect の定義が見える場所でコンストラクタ・デストラクタを定義する（unique_ptr のため）
+EffectEditor::EffectEditor() = default;
+EffectEditor::~EffectEditor() = default;
 
 // 初期化
 void EffectEditor::Initialize(ID3D11Device* device)
 {
-    SyncRuntimeNodes();
-
-    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
-    {
-        auto& rNode = runtimeNodes[i];
-
-        // パーティクルマネージャーの初期化
-        rNode.particleManager = std::make_unique<Compute_Particle>(device);
-    }
-
-    srand(static_cast<unsigned int>(time(nullptr)));
+    RebuildPreview();
 }
 
 // GUI描画
@@ -47,6 +40,17 @@ void EffectEditor::DrawGUI()
     {
         PlayTestEffect(testSpawnPos);
     }
+    ImGui::SameLine();
+
+    // 停止ボタン
+    if (ImGui::Button(u8"停止"))
+    {
+        if (preview) preview->Stop();
+    }
+    ImGui::SameLine();
+
+    // トレイルの確認用に、テスト位置を中心に円を描いて動かす
+    ImGui::Checkbox(u8"円を描いて動かす", &isTestMove);
 
     // 選択中のノードを参照で受け取る
     auto& selectedNode = currentConfig.nodes[selectedNodeIndex];
@@ -68,397 +72,89 @@ void EffectEditor::DrawGUI()
 void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
 {
     testSpawnPos = spawnPosition;
-    isPlaying = true;
+    testMoveTimer = 0.0f;
 
-    // 各種タイマーをリセット！
-    effectTimer = 0.0f;
+    // 前の再生で残っている粒子を消してから作り直す
+    if (preview) preview->Stop();
+    RebuildPreview();
 
-    for (auto& node : currentConfig.nodes)
-    {
-        if (node.type == RenderType::Particle)
-        {
-            node.spawnTimer = node.spawnInterval;
-        }
-
-        if (node.type == RenderType::Mesh && node.scaleMode == ScaleMode::UniformEasing)
-        {
-            // 始点の拡大率を計算する
-            node.meshUniformStartScale = node.scaleUniformStart + Mathf::RandomRange(-node.scaleUniformStartRandom, node.scaleUniformStartRandom); // 始点の中心 + 振れ幅
-            node.meshUniformEndScale = node.scaleUniformEnd + Mathf::RandomRange(-node.scaleUniformEndRandom, node.scaleUniformEndRandom); // 終点の中心 + 振れ幅
-        }
-
-        if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Random)
-        {
-            // 色をランダムで取得する
-            node.meshRandomColor.x = Mathf::RandomRange(node.colorMin.x, node.colorMax.x);
-            node.meshRandomColor.y = Mathf::RandomRange(node.colorMin.y, node.colorMax.y);
-            node.meshRandomColor.z = Mathf::RandomRange(node.colorMin.z, node.colorMax.z);
-            node.meshRandomColor.w = Mathf::RandomRange(node.colorMin.w, node.colorMax.w);
-        }
-        else if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Easing)
-        {
-            // 始点の色を指定した範囲でランダムに取得
-            node.meshStartColor.x = Mathf::RandomRange(node.colorStartMin.x, node.colorStartMax.x);
-            node.meshStartColor.y = Mathf::RandomRange(node.colorStartMin.y, node.colorStartMax.y);
-            node.meshStartColor.z = Mathf::RandomRange(node.colorStartMin.z, node.colorStartMax.z);
-            node.meshStartColor.w = Mathf::RandomRange(node.colorStartMin.w, node.colorStartMax.w);
-
-            // 終点の色を指定した範囲でランダムに取得
-            node.meshEndColor.x = Mathf::RandomRange(node.colorEndMin.x, node.colorEndMax.x);
-            node.meshEndColor.y = Mathf::RandomRange(node.colorEndMin.y, node.colorEndMax.y);
-            node.meshEndColor.z = Mathf::RandomRange(node.colorEndMin.z, node.colorEndMax.z);
-            node.meshEndColor.w = Mathf::RandomRange(node.colorEndMin.w, node.colorEndMax.w);
-        }
-    }
+    // 本番と同じ CustomEffect で再生する（角度0・等倍）
+    preview->Play(testSpawnPos, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 }
 
 // 更新処理
 void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
 {
+    if (!preview) return;
 
-    //　ノードごとに走査する
-    bool anyNodeActive = false; // まだ再生しているノードがあるか
-
-    float maxDuration = 0.0f;
-
-    // エフェクト全体の時間を進める
-    effectTimer += elapsedTime;
-
-    delta.x = testSpawnPos.x - prevSpawnPos.x;
-    delta.y = testSpawnPos.y - prevSpawnPos.y;
-    delta.z = testSpawnPos.z - prevSpawnPos.z;
-
-    prevSpawnPos = testSpawnPos;
-
-
-    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
+    // GUIで変えた値をプレビューに反映する
+    // モデル・テクスチャ・描画方法・ノード数が変わっていたら作り直す
+    if (!preview->ApplyConfig(currentConfig))
     {
-        auto& node = currentConfig.nodes[i];
-        auto& rNode = runtimeNodes[i];
+        bool wasPlaying = !preview->IsFinished();
 
+        preview->Stop();
+        RebuildPreview();
 
-        // パーティクルの計算を進める
-        if (rNode.particleManager)
+        // 再生中だったら、作り直したエフェクトで再生し直す
+        if (wasPlaying)
         {
-            rNode.particleManager->Update(dc, delta, elapsedTime);
-        }
-
-        // 再生中じゃなければここで終了
-        if (!isPlaying) return;
-
-        if (!node.visible) continue;
-
-        // UVスクロールの時間を進める
-        rNode.currentUvOffset.x += node.uvScrollSpeed.x * elapsedTime;
-        rNode.currentUvOffset.y += node.uvScrollSpeed.y * elapsedTime;
-        rNode.currentUvOffset.x = fmodf(rNode.currentUvOffset.x, 1.0f);
-        rNode.currentUvOffset.y = fmodf(rNode.currentUvOffset.y, 1.0f);
-
-        float nodeTotalTime = 0.0f;
-        if (node.type == RenderType::Particle)
-        {
-            // パーティクルの場合：発生遅延 ＋ 存続時間 ＋ 寿命
-            nodeTotalTime = node.delayTime + node.duration + node.lifeTime;
-        }
-        else
-        {
-            // メッシュ・トレイルの場合：発生遅延 ＋ 寿命
-            nodeTotalTime = node.delayTime + node.lifeTime;
-        }
-
-        // ここで全ノード共通で maxDuration を更新する！
-        if (nodeTotalTime > maxDuration)
-        {
-            maxDuration = nodeTotalTime;
-        }
-
-        // メッシュの処理
-        if (node.type == RenderType::Mesh)
-        {
-            if (effectTimer < node.delayTime) continue;
-
-            if (rNode.meshModel)
-            {
-                float activeTime = effectTimer - node.delayTime;
-
-                DirectX::XMFLOAT3 finalScale = { 1, 1, 1 };
-                switch (node.scaleMode)
-                {
-                case ScaleMode::Fixed:
-                    // 拡大時間経過で大きく/小さくする
-                    // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
-                    finalScale.x = node.scale.x + (node.scaleVelocity.x * activeTime) + (0.5f * node.scaleAcceleration.x * activeTime * activeTime);
-                    finalScale.y = node.scale.y + (node.scaleVelocity.y * activeTime) + (0.5f * node.scaleAcceleration.y * activeTime * activeTime);
-                    finalScale.z = node.scale.z + (node.scaleVelocity.z * activeTime) + (0.5f * node.scaleAcceleration.z * activeTime * activeTime);
-
-                    break;
-                case ScaleMode::UniformEasing:
-                {
-                    float t = activeTime / node.lifeTime;
-                    float easeT = Mathf::EaseCurve(t, node.scaleUniformStartSpeed, node.scaleUniformEndSpeed);
-
-                    finalScale.x = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.y = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.z = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                }
-                    break;
-                }
-
-
-                // マイナスにならないようにガード
-                finalScale.x = (std::max)(0.0f, finalScale.x);
-                finalScale.y = (std::max)(0.0f, finalScale.y);
-                finalScale.z = (std::max)(0.0f, finalScale.z);
-
-                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(finalScale.x, finalScale.y, finalScale.z);
-
-                // 回転
-                DirectX::XMFLOAT3 currentRot = {
-                            node.rotation.x + (node.rotationVelocity.x * activeTime) + (0.5f * node.rotationAcceleration.x * activeTime * activeTime),
-                            node.rotation.y + (node.rotationVelocity.y * activeTime) + (0.5f * node.rotationAcceleration.y * activeTime * activeTime),
-                            node.rotation.z + (node.rotationVelocity.z * activeTime) + (0.5f * node.rotationAcceleration.z * activeTime * activeTime)
-                };
-                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-                    DirectX::XMConvertToRadians(currentRot.x),
-                    DirectX::XMConvertToRadians(currentRot.y),
-                    DirectX::XMConvertToRadians(currentRot.z)
-                );
-
-                // 位置
-                DirectX::XMFLOAT3 currentPos = {
-                            node.position.x + (node.positionVelocity.x * activeTime) + (0.5f * node.positionAcceleration.x * activeTime * activeTime),
-                            node.position.y + (node.positionVelocity.y * activeTime) + (0.5f * node.positionAcceleration.y * activeTime * activeTime),
-                            node.position.z + (node.positionVelocity.z * activeTime) + (0.5f * node.positionAcceleration.z * activeTime * activeTime)
-                };
-
-                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(
-                    testSpawnPos.x + currentPos.x,
-                    testSpawnPos.y + currentPos.y,
-                    testSpawnPos.z + currentPos.z
-                );
-
-                // トランスフォーム行列を合成してモデルに適用
-                DirectX::XMFLOAT4X4 worldTransform;
-                DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
-                rNode.worldTransform = worldTransform;
-            }
-        }
-        // トレイルの処理
-        else if (node.type == RenderType::Trail)
-        {
-            if (effectTimer < node.delayTime) continue;
-
-            // エフェクト時間経過に合わせて、テスト位置を中心に円を描くように座標を計算する
-            float speed = 5.0f; // 速度
-            float radius = 1.5f; // 円の半径
-            float currentAngle = effectTimer * speed;
-
-            // 根本と先端を求める
-            DirectX::XMFLOAT3 root = {
-            testSpawnPos.x + cosf(currentAngle) * radius,
-            testSpawnPos.y,
-            testSpawnPos.z + sinf(currentAngle) * radius
-            };
-
-            DirectX::XMFLOAT3 tip = {
-                root.x,
-                root.y + node.width, // 幅（太さ）分だけ上にする
-                root.z
-            };
-
-            // Trailクラスに過去座標として記録させる
-            if (rNode.trail)
-            {
-                rNode.trail->SetWidthScales(node.widthStart, node.widthMiddle, node.widthEnd);
-                rNode.trail->Update(root, tip);
-            }
-        }
-
-    }
-
-    // EmitParticle内で全ノードを回して生成する
-    EmitParticles(elapsedTime);
-
-    if (maxDuration > 0.0f && effectTimer >= maxDuration)
-    {
-        // 選択中またはどれか一つでもループがオンになっているか
-        bool isLoop = false;
-        for (const auto& node : currentConfig.nodes)
-        {
-            if (node.type == RenderType::Particle && node.isLoop)
-            {
-                isLoop = true;
-                break;
-            }
-            else if (node.type == RenderType::Mesh && node.isLoop)
-            {
-                isLoop = true;
-                break;
-            }
-        }
-
-        if (isLoop)
-        {
-            effectTimer = 0.0f; // ループリセット
-        }
-        else
-        {
-            isPlaying = false;  // 再生終了
+            preview->Play(testSpawnPos, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
         }
     }
 
+    // テスト位置を中心に円を描くように動かす
+    DirectX::XMFLOAT3 position = testSpawnPos;
+    if (isTestMove)
+    {
+        testMoveTimer += elapsedTime;
+
+        float speed = 5.0f;  // 速度
+        float radius = 1.5f; // 円の半径
+        float currentAngle = testMoveTimer * speed;
+
+        position.x += cosf(currentAngle) * radius;
+        position.z += sinf(currentAngle) * radius;
+    }
+    preview->SetPosition(position);
+
+    preview->Update(elapsedTime);
 }
 
 // 描画処理
 void EffectEditor::Render(const RenderContext& rc, ModelRenderer* modelRenderer)
 {
-    if (isPlaying)
-    {
-        for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
-        {
-            auto& node = currentConfig.nodes[i];
-            if (i >= runtimeNodes.size()) break;
-            auto& rNode = runtimeNodes[i];
+    if (!preview) return;
 
-            if (!node.visible) continue;
-
-            // パーティクルの描画
-            if (rNode.particleManager)
-            {
-                rNode.particleManager->Render(rc);
-            }
-
-            if (node.type == RenderType::Trail && rNode.trail)
-            {
-                rNode.trail->Render(rc);
-            }
-        }
-    }
+    // CustomEffect::Render は const でない RenderContext を受け取るのでコピーして渡す
+    RenderContext previewRc = rc;
+    preview->Render(previewRc);
 }
 
 // メッシュVFX描画
 void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 {
-    if (!isPlaying) return;
+    if (!preview) return;
 
     // シェーダーの開始処理（パイプライン設定）
     auto* shader = dynamic_cast<meshVFX*>(modelRenderer->GetShader(ShaderId::MeshVFX));
     if (!shader) return;
 
-    ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+    RenderContext rc;
+    rc.deviceContext = Graphics::Instance().GetDeviceContext();
+    rc.renderState = Graphics::Instance().GetRenderState();
+    rc.camera = &CameraManager::Instance().GetMainCamera(); // カメラ参照
 
-    float alpha = 1.0f;
-    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
-    {
-        auto& node = currentConfig.nodes[i];
-        if (i >= runtimeNodes.size()) break;
-        auto& rNode = runtimeNodes[i];
+    shader->Begin(rc);
+    preview->RenderMeshVFX(shader, rc);
+    shader->End(rc);
+}
 
-        // 表示されてなくて描画方式がmesh出ないときは最初から
-        if (!node.visible || node.type != RenderType::Mesh) continue;
-
-        // 
-        if (effectTimer < node.delayTime) continue;
-        float meshActiveTime = effectTimer - node.delayTime;
-
-        if (rNode.meshModel && meshActiveTime <= node.lifeTime)
-        {
-            // このノード専用のパラメータをシェーダーにセット
-            shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
-            shader->SetDistortionPower(node.distortionPower);
-
-            // フェードインの計算
-            if (node.IsFadeIn && node.fadeInTime > 0.0001f && meshActiveTime <= node.fadeInTime)
-            {
-                // 現在の進行度を求める
-                float t = meshActiveTime / node.fadeInTime;
-                alpha = Mathf::EaseCurve(t, node.fadeInStartSpeed, node.fadeInEndSpeed);
-            }
-            // フェードアウトの計算
-            else if (node.IsFadeOut && node.fadeOutTime > 0.0001f)
-            {
-                // 進行度を求める
-                float fadeStartTime = node.lifeTime - node.fadeOutTime;
-
-                if (meshActiveTime >= fadeStartTime)
-                {
-                    float t = (meshActiveTime - fadeStartTime) / node.fadeOutTime; // 0.0 ~ 1.0 に正規化
-                    alpha = 1.0f - Mathf::EaseCurve(t, node.fadeOutStartSpeed, node.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
-                }
-            }
-
-            // 0.0～1.0の範囲に収める
-            alpha = Mathf::Clamp(alpha);
-
-            // ノイズテクスチャの移動値を計算する
-            DirectX::XMFLOAT2 noiseUvOffset = {
-                node.noiseUvOffset.x * meshActiveTime,
-                node.noiseUvOffset.y * meshActiveTime
-            };
-            shader->SetNoiseUvOffset(noiseUvOffset);
-            shader->SetBlendMode(node.blendMode);
-
-            // タイプごとに色の計算をする
-            DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-            switch (node.colorMode)
-            {
-            case ColorMode::Fixed: // 固定色
-                finalColor = node.color;
-
-                break;
-            case ColorMode::Random: // ランダム
-                finalColor = node.meshRandomColor;
-
-                break;
-            case ColorMode::Easing: // イージング
-            {
-                // 進行度を求める
-                float t = meshActiveTime / node.lifeTime;
-
-                // イージング速度を求める
-                float easeT = Mathf::EaseCurve(t, node.colorStartSpeed, node.colorEndSpeed);
-
-                // Lerpを掛けて進行度にあ和得て色を変化させる
-                finalColor.x = Mathf::Lerp(node.meshStartColor.x, node.meshEndColor.x, easeT);
-                finalColor.y = Mathf::Lerp(node.meshStartColor.y, node.meshEndColor.y, easeT);
-                finalColor.z = Mathf::Lerp(node.meshStartColor.z, node.meshEndColor.z, easeT);
-                finalColor.w = Mathf::Lerp(node.meshStartColor.w, node.meshEndColor.w, easeT);
-
-                break;
-            }
-            }
-
-            finalColor.w *= alpha;
-            shader->SetColor(finalColor); // このノード固有の色
-
-            shader->SetUvOffset(rNode.currentUvOffset);
-
-            // モデル内の各メッシュを即時描画
-            RenderContext rc;
-            rc.deviceContext = dc;
-            rc.renderState = Graphics::Instance().GetRenderState();
-            rc.camera = &CameraManager::Instance().GetMainCamera(); // カメラ参照
-
-            shader->Begin(rc);
-
-            for (const auto& mesh : rNode.meshModel->GetMeshes())
-            {
-                // 頂点バッファ・インデックスバッファをセット
-                UINT stride = sizeof(Model::Vertex);
-                UINT offset = 0;
-                dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-                dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-                dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-                // 行列とパラメータを定数バッファに更新して描画コール！
-                shader->SetWorldTransForm(rNode.worldTransform);
-                shader->Update(rc, mesh);
-                dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
-            }
-
-            shader->End(rc);
-        }
-    }
+// 今の設定でプレビュー用のエフェクトを作り直す
+void EffectEditor::RebuildPreview()
+{
+    preview = std::make_unique<CustomEffect>();
+    preview->Initialize(Graphics::Instance().GetDevice(), currentConfig);
 }
 
 // UIの描画パーツ
@@ -598,17 +294,8 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                         pathStr = pathStr.substr(pos);
                     }
 
+                    // パスが変わるとプレビューが自動で作り直される（Update の ApplyConfig）
                     currentConfig.nodes[selectedNodeIndex].texturePath = pathStr;
-
-                    if (runtimeNodes[selectedNodeIndex].particleManager)
-                    {
-                        runtimeNodes[selectedNodeIndex].particleManager->SetTexture(
-                            pathStr,
-                            { (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[1] }
-                        );
-                    }
-
-                    SyncRuntimeNodes();
                 }
             }
             ImGui::SameLine();
@@ -621,11 +308,6 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 if (ImGui::Button(u8"テクスチャ解除##TextuerClear"))
                 {
                     node.texturePath = "";
-
-                    if (runtimeNodes[selectedNodeIndex].particleManager)
-                    {
-                        runtimeNodes[selectedNodeIndex].particleManager->SetTexture("", { 1, 1 });
-                    }
                 }
             }
 
@@ -677,13 +359,8 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             }
 
 
-            if (ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", node.splitCount))
-            {
-                // 分割数の数値をいじった瞬間にGPU側の設定も更新する
-                if (runtimeNodes[selectedNodeIndex].particleManager && !node.texturePath.empty()) {
-                    runtimeNodes[selectedNodeIndex].particleManager->SetTexture(node.texturePath, { (UINT)node.splitCount[0], (UINT)node.splitCount[1] });
-                }
-            }
+            // 分割数は粒子を出すたびに CustomEffect 側で GPU に設定される
+            ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", node.splitCount);
 
             ImGui::SliderInt(u8"コマ番号##Particle", &node.spriteType, 0, 15);
             ImGui::DragFloat2(u8"UVスクロール速度(X,Y)##Particle", &node.uvScrollSpeed.x, 0.01f, -10.0f, 10.0f, "%.2f");
@@ -767,14 +444,6 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                         if (pos != std::string::npos) pathStr = pathStr.substr(pos);
 
                         node.meshPath = pathStr;
-                        ID3D11Device* device = Graphics::Instance().GetDevice();
-
-                        SyncRuntimeNodes();
-
-                        if (selectedNodeIndex < runtimeNodes.size())
-                        {
-                            runtimeNodes[selectedNodeIndex].meshModel = std::make_shared<Model>(device, pathStr.c_str());
-                        }
                     }
                 }
                 ImGui::SameLine();
@@ -788,13 +457,6 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                     {
                         // 設定データのパスをクリア
                         node.meshPath = "";
-
-                        // 実際に保持している 3Dモデルポインタを nullptr で解放
-                        SyncRuntimeNodes(); // 安全のためサイズ同期
-                        if (selectedNodeIndex < runtimeNodes.size())
-                        {
-                            runtimeNodes[selectedNodeIndex].meshModel = nullptr;
-                        }
                     }
                 }
                 ImGui::Separator();
@@ -880,28 +542,15 @@ void EffectEditor::DrawFileToolbar()
         {
             currentConfig.Load(filepath);
 
-            SyncRuntimeNodes();
-
             // 読み込んだノード数を超えていたら安全な範囲に戻す
             if (selectedNodeIndex >= static_cast<int>(currentConfig.nodes.size()))
             {
                 selectedNodeIndex = 0;
             }
 
-            if (runtimeNodes[selectedNodeIndex].particleManager && !currentConfig.nodes[selectedNodeIndex].texturePath.empty())
-            {
-                runtimeNodes[selectedNodeIndex].particleManager->SetTexture(
-                    currentConfig.nodes[selectedNodeIndex].texturePath,
-                    { (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[0], (UINT)currentConfig.nodes[selectedNodeIndex].splitCount[1] }
-                );
-            }
-
-            // メッシュパスが有効ならモデルもリロード
-            if (!currentConfig.nodes[selectedNodeIndex].meshPath.empty())
-            {
-                ID3D11Device* device = Graphics::Instance().GetDevice();
-                runtimeNodes[selectedNodeIndex].meshModel = std::make_shared<Model>(device, currentConfig.nodes[selectedNodeIndex].meshPath.c_str());
-            }
+            // 前のファイルのプレビューを止めて、読み込んだ設定で作り直す
+            if (preview) preview->Stop();
+            RebuildPreview();
         }
     }
 }
@@ -917,7 +566,7 @@ void EffectEditor::DrawNodeList()
         currentConfig.nodes.push_back(newNode);
         selectedNodeIndex = static_cast<int>(currentConfig.nodes.size() - 1);
 
-        SyncRuntimeNodes();
+        // ノード数が変わるので、プレビューは Update で自動的に作り直される
     }
     ImGui::SameLine();
 
@@ -927,11 +576,12 @@ void EffectEditor::DrawNodeList()
         if (ImGui::Button(u8"- 選択ノード削除"))
         {
             currentConfig.nodes.erase(currentConfig.nodes.begin() + selectedNodeIndex);
+
             if (selectedNodeIndex >= currentConfig.nodes.size())
             {
                 selectedNodeIndex = static_cast<int>(currentConfig.nodes.size()) - 1;
             }
-            SyncRuntimeNodes();
+            // ノード数が変わるので、プレビューは Update で自動的に作り直される
         }
     }
     ImGui::Separator();
@@ -977,266 +627,4 @@ void EffectEditor::DrawNodeList()
         ImGui::PopID();
     }
     ImGui::Separator();
-}
-
-// エフェクトを出す
-void EffectEditor::EmitParticles(float elapsedTime)
-{
-    // 全ノードを順番にチェックして発生させる
-    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
-    {
-        auto& cNode = currentConfig.nodes[i];
-        auto& rNode = runtimeNodes[i];
-
-        // パーティクルノード以外、または非表示ノードはスキップ
-        if (cNode.type != RenderType::Particle || !cNode.visible) continue;
-        if (effectTimer < cNode.delayTime) continue;
-
-        float activeTime = effectTimer - cNode.delayTime;
-        if (cNode.duration > 0.0f && activeTime >= cNode.duration) continue;
-
-        // ノード個別のタイマーを進める
-        cNode.spawnTimer += elapsedTime;
-
-        if (cNode.spawnTimer >= cNode.spawnInterval)
-        {
-            cNode.spawnTimer -= cNode.spawnInterval;
-
-            // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
-            if (rNode.particleManager && !cNode.texturePath.empty())
-            {
-                rNode.particleManager->SetTexture(cNode.texturePath, { (UINT)cNode.splitCount[0], (UINT)cNode.splitCount[1] });
-            }
-
-            // 生成数分 for 文で回す
-            for (int emitIdx = 0; emitIdx < cNode.emitCount; emitIdx++)
-            {
-                compute_particle_system::emit_particle_data data;
-                data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-                // パーティクルのデータを送る
-                data.parameter.x = static_cast<float>(cNode.spriteType); // コマ番号
-                data.parameter.y = cNode.lifeTime; // 寿命
-                data.parameter.z = cNode.uvScrollSpeed.x; // x軸のUVスクロール
-                data.parameter.w = cNode.uvScrollSpeed.y; // y軸のUVスクロール
-
-                // フェードのスピードを設定する
-                int packedSpeed =
-                    (cNode.fadeInStartSpeed)
-                    | (cNode.fadeInEndSpeed << 4)
-                    | (cNode.fadeOutStartSpeed << 8)
-                    | (cNode.fadeOutEndSpeed << 12);
-
-                data.fade_param.x = cNode.IsFadeIn ? cNode.fadeInTime : 0.0f;
-                data.fade_param.y = cNode.IsFadeOut ? cNode.fadeOutTime : 0.0f;
-                data.fade_param.z = cNode.lifeTime;
-                data.fade_param.w = static_cast<float>(packedSpeed);
-
-
-                // 位置
-                data.position = {
-                   cNode.position.x + (cNode.positionRange.x * Mathf::RandFloat()),
-                   cNode.position.y + (cNode.positionRange.y * Mathf::RandFloat()),
-                   cNode.position.z + (cNode.positionRange.z * Mathf::RandFloat()),
-                   1.0f
-                };
-                // 初速度
-                data.posVelocity = {
-                    cNode.positionVelocity.x + (cNode.positionVelocityRange.x * Mathf::RandFloat()),
-                    cNode.positionVelocity.y + (cNode.positionVelocityRange.y * Mathf::RandFloat()),
-                    cNode.positionVelocity.z + (cNode.positionVelocityRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
-                // 加速度
-                data.posAcceleration = {
-                    cNode.positionAcceleration.x + (cNode.positionAccelerationRange.x * Mathf::RandFloat()),
-                    cNode.positionAcceleration.y + (cNode.positionAccelerationRange.y * Mathf::RandFloat()),
-                    cNode.positionAcceleration.z + (cNode.positionAccelerationRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
-
-                // 回転
-                data.rotation = {
-                    DirectX::XMConvertToRadians(cNode.rotation.x + (cNode.rotationRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(cNode.rotation.y + (cNode.rotationRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(cNode.rotation.z + (cNode.rotationRange.z * Mathf::RandFloat())),
-                    cNode.isBillboard ? 1.0f : 0.0f
-                };
-                data.rotVelocity = {
-                    DirectX::XMConvertToRadians(cNode.rotationVelocity.x + (cNode.rotationVelocityRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(cNode.rotationVelocity.y + (cNode.rotationVelocityRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(cNode.rotationVelocity.z + (cNode.rotationVelocityRange.z * Mathf::RandFloat())),
-                    0.0f
-                };
-                data.rotAcceleration = {
-                    DirectX::XMConvertToRadians(cNode.rotationAcceleration.x + (cNode.rotationAccelerationRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(cNode.rotationAcceleration.y + (cNode.rotationAccelerationRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(cNode.rotationAcceleration.z + (cNode.rotationAccelerationRange.z * Mathf::RandFloat())),
-                    0.0f
-                };
-
-                int scaleEasingSpeed =
-                    (cNode.scaleUniformStartSpeed)
-                    | (cNode.scaleUniformEndSpeed << 4);
-
-                // 拡大
-                switch (cNode.scaleMode)
-                {
-                case ScaleMode::Fixed: // 固定
-                    data.scale = {
-                        std::max(0.0f, cNode.scale.x + (cNode.scaleRange.x * Mathf::RandFloat())),
-                        std::max(0.0f, cNode.scale.y + (cNode.scaleRange.y * Mathf::RandFloat())),
-                        1.0f, 0.0f
-                    };
-                    data.scaleVelocity = {
-                        cNode.scaleVelocity.x + (cNode.scaleVelocityRange.x * Mathf::RandFloat()),
-                        cNode.scaleVelocity.y + (cNode.scaleVelocityRange.y * Mathf::RandFloat()),
-                        cNode.scaleVelocity.z + (cNode.scaleVelocityRange.z * Mathf::RandFloat()),
-                        0.0f
-                    };
-                    data.scaleAcceleration = {
-                        cNode.scaleAcceleration.x + (cNode.scaleAccelerationRange.x * Mathf::RandFloat()),
-                        cNode.scaleAcceleration.y + (cNode.scaleAccelerationRange.y * Mathf::RandFloat()),
-                        cNode.scaleAcceleration.z + (cNode.scaleAccelerationRange.z * Mathf::RandFloat()),
-                        0.0f
-                    };
-
-                    data.scale_param.x = -1.0f; // イージング無しのフラグ
-
-                    break;
-                case ScaleMode::UniformEasing: // 単一イージング
-
-                    // 中心 ± 振れ幅の範囲でランダムに実際の値を決める
-                    float actualStart = cNode.scaleUniformStart
-                        + Mathf::RandomRange(-cNode.scaleUniformStartRandom, cNode.scaleUniformStartRandom);
-                    float actualEnd = cNode.scaleUniformEnd
-                        + Mathf::RandomRange(-cNode.scaleUniformEndRandom, cNode.scaleUniformEndRandom);
-
-                    data.scaleUniformStart = actualStart;
-                    data.scaleUniformEnd = actualEnd;
-                    data.scale_param.x = scaleEasingSpeed;
-                    data.scale_param.y = cNode.lifeTime;
-                    break;
-                }
-
-                int colorEasingSpeed =
-                    (cNode.colorStartSpeed)
-                    | (cNode.colorEndSpeed << 4);
-
-                // 色
-                switch (cNode.colorMode)
-                {
-                case ColorMode::Fixed: // 固定
-                    data.color = cNode.color;
-                    data.start_color = cNode.color;
-                    data.end_color = cNode.color;
-                    data.color_param.x = -1.0f; // イージング無しのフラグ
-                    data.color_param.y = cNode.lifeTime;
-
-                    break;
-
-                case ColorMode::Random: // ランダム
-                    // 色をランダムで取得してcolorに入れる
-                    data.color.x = Mathf::RandomRange(cNode.colorMin.x, cNode.colorMax.x);
-                    data.color.y = Mathf::RandomRange(cNode.colorMin.y, cNode.colorMax.y);
-                    data.color.z = Mathf::RandomRange(cNode.colorMin.z, cNode.colorMax.z);
-                    data.color.w = Mathf::RandomRange(cNode.colorMin.w, cNode.colorMax.w);
-
-                    data.start_color = data.color;
-                    data.end_color = data.color;
-                    data.color_param.x = -1.0f;
-                    data.color_param.y = cNode.lifeTime;
-
-
-                    break;
-
-                case ColorMode::Easing: // イージング
-                {
-                    // 始点の色を指定した範囲でランダムに取得
-                    data.start_color.x = Mathf::RandomRange(cNode.colorStartMin.x, cNode.colorStartMax.x);
-                    data.start_color.y = Mathf::RandomRange(cNode.colorStartMin.y, cNode.colorStartMax.y);
-                    data.start_color.z = Mathf::RandomRange(cNode.colorStartMin.z, cNode.colorStartMax.z);
-                    data.start_color.w = Mathf::RandomRange(cNode.colorStartMin.w, cNode.colorStartMax.w);
-
-                    // 終点の色を指定した範囲でランダムに取得
-                    data.end_color.x = Mathf::RandomRange(cNode.colorEndMin.x, cNode.colorEndMax.x);
-                    data.end_color.y = Mathf::RandomRange(cNode.colorEndMin.y, cNode.colorEndMax.y);
-                    data.end_color.z = Mathf::RandomRange(cNode.colorEndMin.z, cNode.colorEndMax.z);
-                    data.end_color.w = Mathf::RandomRange(cNode.colorEndMin.w, cNode.colorEndMax.w);
-
-                    data.color_param.x = colorEasingSpeed;
-                    data.color_param.y = cNode.lifeTime;
-
-                    break;
-                }
-                }
-
-
-                rNode.particleManager->Emit(data);
-            }
-
-        }
-    }
-}
-
-// ノード数に合わせて runtimeNodes のサイズやリソースを更新する関数
-void EffectEditor::SyncRuntimeNodes()
-{
-    ID3D11Device* device = Graphics::Instance().GetDevice();
-    runtimeNodes.resize(currentConfig.nodes.size());
-
-    for (size_t i = 0; i < currentConfig.nodes.size(); ++i)
-    {
-        auto& node = currentConfig.nodes[i];
-        auto& rNode = runtimeNodes[i];
-
-        if (node.type == RenderType::Particle && !rNode.particleManager)
-        {
-            rNode.particleManager = std::make_unique<Compute_Particle>(device);
-
-            if (!node.texturePath.empty())
-            {
-                D3D11_TEXTURE2D_DESC texture2d_desc;
-                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
-                HRESULT hr = GpuResourceUtils::LoadTexture(device, node.texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
-
-                rNode.shaderResourceView = srv;
-            }
-        }
-        // メッシュの場合、モデルが未ロード or パスが変わっていたらロード
-        if (node.type == RenderType::Mesh && !node.meshPath.empty())
-        {
-            if (!rNode.meshModel)
-            {
-                rNode.meshModel = std::make_shared<Model>(device, node.meshPath.c_str());
-            }
-
-            if (!node.texturePath.empty())
-            {
-                D3D11_TEXTURE2D_DESC texture2d_desc;
-                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
-                HRESULT hr = GpuResourceUtils::LoadTexture(device, node.texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
-
-                rNode.shaderResourceView = srv;
-            }
-
-            if (!node.noisePath.empty())
-            {
-                D3D11_TEXTURE2D_DESC texture2d_desc;
-                Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
-                HRESULT hr = GpuResourceUtils::LoadTexture(device, node.noisePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
-
-                rNode.noiseShaderResourceView = srv;
-            }
-        }
-        // トレイルの場合、未初期化なら生成
-        else if (node.type == RenderType::Trail)
-        {
-            if (!rNode.trail)
-            {
-                rNode.trail = std::make_shared<Trail>();
-                rNode.trail->Initialize();
-            }
-        }
-    }
 }

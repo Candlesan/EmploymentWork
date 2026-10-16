@@ -328,15 +328,21 @@ ActionBase::State GuardMagic::Run(float elapsedTime)
 
     if (owner->GetIsGaurd())
     {
-        // まだエフェクトを出してなければ1回だけ生成する
-        if (!defenseEffect)
+        // まだ生きているか確認する
+        if (!effectManager.Exists(defenseEffect))
         {
-            defenseEffect = CustomEffectManager::Instance().PlayEffect("Barreir", owner->GetPosition(), owner->GetAngle(), { 1.5f, 1.5f, 1.5f });
+            DirectX::XMFLOAT3 angle = {
+                DirectX::XMConvertToDegrees(owner->GetAngle().x),
+                DirectX::XMConvertToDegrees(owner->GetAngle().y),
+                DirectX::XMConvertToDegrees(owner->GetAngle().z)
+            };
+
+            defenseEffect = CustomEffectManager::Instance().PlayEffect("Barreir", owner->GetPosition(), angle, { 1.5f, 1.5f, 1.5f });
         }
         else
         {
             // 出してる間はプレイヤーに追従させる
-            defenseEffect->SetPosition(owner->GetDefenseMagic().GetDefensePosition());
+            effectManager.SetPosition(defenseEffect,owner->GetDefenseMagic().GetDefensePosition());
         }
     }
     else
@@ -344,8 +350,8 @@ ActionBase::State GuardMagic::Run(float elapsedTime)
         // フラグが折れていたらエフェクトも止める
         if (defenseEffect)
         {
-            defenseEffect->Stop();
-            defenseEffect = nullptr;
+            effectManager.Stop(defenseEffect);
+            defenseEffect = InvalidEffect;
         }
     }
 

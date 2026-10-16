@@ -60,7 +60,7 @@ void MagicProjectile::Update(float elapsedTime)
 
 		if (customEffect)
 		{
-			customEffect->SetPosition(position);
+			effectManager.SetPosition(customEffect, position);
 		}
 
 		if (Magic != nullptr && magicHandle != -1)
@@ -152,8 +152,8 @@ void MagicProjectile::OnTerminate()
 
 	if (customEffect)
 	{
-		customEffect->Stop();
-		customEffect = nullptr;
+		effectManager.Stop(customEffect);
+		customEffect = InvalidEffect;
 	}
 
 	// ©•ª‚ğíœ

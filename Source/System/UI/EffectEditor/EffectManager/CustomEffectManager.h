@@ -5,8 +5,11 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <DirectXMath.h>
+
+using EffectHandle = int; // 0は無効になる
+constexpr EffectHandle InvalidEffect = 0;
 
 class CustomEffectManager
 {
@@ -24,12 +27,9 @@ public:
 	// Jsonファイルの読み込み/キャッシュ
 	void LoadEffectConfig(const std::string& effectName, const std::string& filePath);
 
-	// エフェクト再生
-	CustomEffect* PlayEffect(
-		const std::string& effectName,
-		DirectX::XMFLOAT3 position,
-		DirectX::XMFLOAT3 angle = {0.0f, 0.0f, 0.0f},
-		DirectX::XMFLOAT3 scale = {1.0f, 1.0f, 1.0f});
+	// エフェクト再生関数
+	EffectHandle PlayEffect(const std::string& effectName,
+		DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale);
 
 	// 更新処理
 	void Update(float elapsedTime);
@@ -44,12 +44,22 @@ public:
 	// 設定済みにのエフェクトをインスタンス化してポインタを返す関数
 	std::unique_ptr<CustomEffect> CreateEffect(const std::string& effectName);
 
+	bool Exists(EffectHandle handle) const; // まだ生きているか
+	void Stop(EffectHandle handle);	// 停止関数
+	void SetPosition(EffectHandle handle, const DirectX::XMFLOAT3& position);
+	void SetAngle(EffectHandle handle, const DirectX::XMFLOAT3& angle);
+	void SetScale(EffectHandle handle, const DirectX::XMFLOAT3& scale);
+
 private:
 	CustomEffectManager() = default;
 	~CustomEffectManager() { Clear(); }
 
 private:
 	ID3D11Device* device;
+
 	std::unordered_map<std::string, EffectConfig> effectConfigs; // キャッシュ用の箱
-	std::vector<CustomEffect*> activeEffects; // 現在再生中のエフェクト一覧
+
+	// Effekseerみたいにハンドルに変更
+	std::map<EffectHandle, std::unique_ptr<CustomEffect>> activeEffects;
+	EffectHandle nextHandle = 1;
 };

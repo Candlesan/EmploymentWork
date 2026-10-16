@@ -26,7 +26,6 @@ void EffectConfig::Save(const std::string& filePath)
         n["delayTime"] = node.delayTime;
         n["duration"] = node.duration;
         n["spawnInterval"] = node.spawnInterval;
-        n["spawnTimer"] = node.spawnTimer;
         n["isLoop"] = node.isLoop;
 
         // フェードイン
@@ -158,7 +157,6 @@ void EffectConfig::Load(const std::string& filePath)
                 node.spawnInterval = nodeJson.value("spawnInterval", 0.1f);
                 node.duration =  nodeJson.value("duration", 1.0f);
                 node.delayTime = nodeJson.value("delayTime", 0.0f);
-                node.spawnTimer = 0.0f;
                 node.blendMode = nodeJson.value("blendMode", 0.0f);
 
                 // フェードイン
@@ -235,6 +233,12 @@ void EffectConfig::Load(const std::string& filePath)
                 // 読み込んだノードを追加
                 nodes.push_back(node);
             }
+        }
+
+        // ノードが１つも無い時既定のノードを入れる
+        if (nodes.empty())
+        {
+            nodes.push_back(NodeConfig{});
         }
     }
     catch (const nlohmann::json::exception& e)
