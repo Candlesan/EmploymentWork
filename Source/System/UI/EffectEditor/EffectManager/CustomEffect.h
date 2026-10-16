@@ -45,10 +45,6 @@ public:
 	void SetAngle(const DirectX::XMFLOAT3& rot) { this->angle = rot; }
 	void SetScale(const DirectX::XMFLOAT3& scl) { this->scale = scl; }
 
-
-private:
-	void EmitParticles(float elapsedTime);
-
 private:
 	// 実行時（再生中）の1ノード分のインスタンス
 	struct RuntimeNode
@@ -69,14 +65,18 @@ private:
 			0, 0, 0, 1
 		};
 
-		float spawnTimer = 0.0f;											// 毎フレーム進める発生計算用タイマー
-		DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };					// 色のランダム(計算用)
-		DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };					// 始点の色(計算用)
-		DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };					// 終点の色(計算用)
-		float meshUniformStartScale = 1.0f;									// 始点の拡大率(計算用)
-		float meshUniformEndScale = 1.0f;									// 終点の拡大率(計算用)
-	};
+		float spawnTimer = 0.0f;							// 毎フレーム進める発生計算用タイマー
+		DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };	// 色のランダム(計算用)
+		DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };	// 始点の色(計算用)
+		DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };	// 終点の色(計算用)
+		float meshUniformStartScale = 1.0f;					// 始点の拡大率(計算用)
+		float meshUniformEndScale = 1.0f;					// 終点の拡大率(計算用)
 
+		float localTime = 0.0f; // このノードの経過時間
+		bool started = false;	// delayTime を過ぎたか
+		bool emitting = false;	// パーティクルは発生中か
+		bool finished = false;	// このノードはもう終わったか
+	};
 
 	EffectConfig config;
 	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
@@ -88,5 +88,10 @@ private:
 
 	float effectTimer = 0.0f; // 経過時間
 	bool isPlaying = false; // エフェクト再生中か
-	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列！
+	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列
+
+private:
+	void EmitParticles(float elapsedTime);
+	void BeginNodeCycle(RuntimeNode& node);
+
 };
