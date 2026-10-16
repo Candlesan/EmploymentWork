@@ -3,6 +3,39 @@
 #include <windows.h>
 
 
+int EffectConfig::GenerateNodeId() const
+{
+    int maxId = 0;
+    for (const auto& node : nodes)
+    {
+        if (node.id > maxId) maxId = node.id;
+    }
+    return maxId + 1;
+}
+
+int EffectConfig::FindNodeIndex(int id) const
+{
+    for (size_t i = 0; i < nodes.size(); ++i)
+    {
+        if (nodes[i].id == id) return static_cast<int>(i);
+    }
+    return -1;
+}
+
+bool EffectConfig::IsDescendant(int candidateId, int ancestorId) const
+{
+    int index = FindNodeIndex(candidateId);
+
+    // ノード数より多く上にたどったらループしているので打ち切る（壊れたデータ対策）
+    for (size_t step = 0; index != -1 && step < nodes.size(); ++step)
+    {
+        int parentId = nodes[index].parentId;
+        if (parentId == ancestorId) return true;
+        index = FindNodeIndex(parentId);
+    }
+    return false;
+}
+
 // 保存
 void EffectConfig::Save(const std::string& filePath)
 {
@@ -14,7 +47,11 @@ void EffectConfig::Save(const std::string& filePath)
     for (auto& node : nodes)
     {
         json n;
+
         // 基本情報
+        n["id"] = node.id;
+        n["parentId"] = node.parentId;
+
         n["name"] = node.name;
         n["type"] = static_cast<int>(node.type); // RenderType
         n["visible"] = node.visible;
@@ -137,6 +174,10 @@ void EffectConfig::Load(const std::string& filePath)
                 NodeConfig node;
 
                 // ノード基本情報
+
+                node.id = nodeJson.value("id", 0);
+                node.parentId = nodeJson.value("parentId", -1);
+
                 node.name = nodeJson.value("name", "Node");
                 node.type = static_cast<RenderType>(nodeJson.value("type", 0));
                 node.visible = nodeJson.value("visible", true);
@@ -171,10 +212,9 @@ void EffectConfig::Load(const std::string& filePath)
                 node.fadeOutStartSpeed = nodeJson.value("fadeOutStartSpeed", 3);
                 node.fadeOutEndSpeed = nodeJson.value("fadeOutEndSpeed", 3);
 
+                // UVスクロール
                 if (nodeJson.find("uvScrollSpeed") != nodeJson.end()) node.uvScrollSpeed = { nodeJson["uvScrollSpeed"][0], nodeJson["uvScrollSpeed"][1] };
                 if (nodeJson.find("noiseUvOffset") != nodeJson.end()) node.noiseUvOffset = { nodeJson["noiseUvOffset"][0], nodeJson["noiseUvOffset"][1] };
-
-                // カラー
 
                 // 位置
                 if (nodeJson.find("position") != nodeJson.end()) node.position = { nodeJson["position"][0], nodeJson["position"][1], nodeJson["position"][2] };

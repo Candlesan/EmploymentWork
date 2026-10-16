@@ -58,6 +58,9 @@ enum class ColorMode
 // ノード設定
 struct NodeConfig 
 {
+	int id = 0;															// ノードを区別する番号
+	int parentId = -1;													// 親ノードのid(-1 = エフェクト直下)
+
 	std::string name = "New Node";										// ノードの表示名
 	RenderType type = RenderType::Particle;								// ノードの種類
 	bool visible = true;												// エディターでの表示/非表示フラグ
@@ -163,10 +166,20 @@ struct EffectConfig
 	EffectConfig()
 	{
 		NodeConfig defaultNode;
+		defaultNode.id = 1;
 		defaultNode.name = "Node";
 		defaultNode.type = RenderType::Particle;
 		nodes.push_back(defaultNode);
 	}
+
+	// 新しいノード用に、まだ使われていないidを返す（今ある最大値の＋１）
+	int GenerateNodeId() const;
+
+	// idから配列の何番目かを探す
+	int FindNodeIndex(int id) const;
+
+	// candidateId のノードが ancestorId の子孫か（親をたどって ancestorId に着いたら子孫）
+	bool IsDescendant(int candidateId, int ancestorId) const;
 
 	void Save(const std::string& filepath);
 	void Load(const std::string& filepath);

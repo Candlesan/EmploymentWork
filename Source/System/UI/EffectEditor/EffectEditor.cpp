@@ -163,6 +163,35 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
     ImGui::Checkbox(u8"このノードを表示する##VisibleCheck", &node.visible);
     ImGui::Separator();
 
+    // 親ノードの選択
+    std::string currentParentName = u8"なし（エフェクト直下）";
+    int parentIndex = currentConfig.FindNodeIndex(node.parentId);
+    if (parentIndex != -1) currentParentName = currentConfig.nodes[parentIndex].name;
+
+    if (ImGui::BeginCombo(u8"親ノード##Parent", currentParentName.c_str()))
+    {
+        if (ImGui::Selectable(u8"なし（エフェクト直下）", node.parentId == -1))
+        {
+            node.parentId = -1;
+        }
+
+        for (const auto& candidate : currentConfig.nodes)
+        {
+            // 自分自身と、自分の子孫は親にできない（ループ防止）
+            if (candidate.id == node.id) continue;
+            if (currentConfig.IsDescendant(candidate.id, node.id)) continue;
+
+            ImGui::PushID(candidate.id);
+            if (ImGui::Selectable(candidate.name.c_str(), node.parentId == candidate.id))
+            {
+                node.parentId = candidate.id;
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::Separator();
+
     if (ImGui::BeginTabBar(u8"ParticleTabs"))
     {
         //　共通タブ
@@ -561,6 +590,7 @@ void EffectEditor::DrawNodeList()
     if (ImGui::Button(u8"+ ノード追加"))
     {
         NodeConfig newNode;
+        newNode.id = currentConfig.GenerateNodeId();
         newNode.name = "Node " + std::to_string(currentConfig.nodes.size() + 1);
         newNode.type = RenderType::Particle;
         currentConfig.nodes.push_back(newNode);
@@ -575,8 +605,18 @@ void EffectEditor::DrawNodeList()
     {
         if (ImGui::Button(u8"- 選択ノード削除"))
         {
-            currentConfig.nodes.erase(currentConfig.nodes.begin() + selectedNodeIndex);
+            // removedは参照でeraseした後は使えないのでコピーしておく
+            const NodeConfig& removed = currentConfig.nodes[selectedNodeIndex];
+            int removedId = removed.id;
+            int removedParentId = removed.parentId;
 
+            // 消すノードの子を1つ上の親に付け替える
+            for (auto& node : currentConfig.nodes)
+            {
+                if (node.parentId == removedId) node.parentId = removedParentId;
+            }
+
+            currentConfig.nodes.erase(currentConfig.nodes.begin() + selectedNodeIndex);
             if (selectedNodeIndex >= currentConfig.nodes.size())
             {
                 selectedNodeIndex = static_cast<int>(currentConfig.nodes.size()) - 1;
@@ -613,8 +653,19 @@ void EffectEditor::DrawNodeList()
 
         ImGui::SameLine();
 
+        // 親をたどって深さを数える（ループ対策で最大ノード数まで）
+        int depth = 0;
+        int p = currentConfig.FindNodeIndex(node.parentId);
+        while (p != -1 && depth < static_cast<int>(currentConfig.nodes.size()))
+        {
+            ++depth;
+            p = currentConfig.FindNodeIndex(currentConfig.nodes[p].parentId);
+        }
+
+        std::string label(depth * 2, ' ');   // 深さ1つにつき空白2つ
+
         // ノードの選択ラベル
-        std::string label = u8"[スプライト] ";
+        label += u8"[スプライト] ";
         if (node.type == RenderType::Mesh) label = u8"[モデル] ";
         else if (node.type == RenderType::Trail) label = u8"[トレイル] ";
         label += node.name;

@@ -60,6 +60,7 @@
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
+            "id": 1,
             "isBillboard": true,
             "isLoop": true,
             "lifeTime": 1.0,
@@ -70,6 +71,7 @@
                 0.0,
                 0.0
             ],
+            "parentId": -1,
             "position": [
                 0.0,
                 0.0,
@@ -234,7 +236,7 @@
                 1.0
             ],
             "colorStartSpeed": 3,
-            "delayTime": 0.5,
+            "delayTime": 0.0,
             "distortionPower": 0.0,
             "duration": 1.0,
             "emitCount": 1,
@@ -244,6 +246,7 @@
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
+            "id": 2,
             "isBillboard": true,
             "isLoop": true,
             "lifeTime": 1.0,
@@ -254,9 +257,10 @@
                 0.0,
                 0.0
             ],
+            "parentId": 1,
             "position": [
                 0.0,
-                3.0,
+                0.0,
                 0.0
             ],
             "positionAcceleration": [
