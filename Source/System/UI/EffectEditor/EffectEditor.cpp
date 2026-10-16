@@ -73,41 +73,46 @@ void EffectEditor::PlayTestEffect(const DirectX::XMFLOAT3& spawnPosition)
     // 各種タイマーをリセット！
     effectTimer = 0.0f;
 
-    for (auto& node : currentConfig.nodes)
+    for (int i = 0; i < currentConfig.nodes.size(); ++i)
     {
+        if (i >= runtimeNodes.size()) break;
+
+        auto& node = currentConfig.nodes[i];
+        auto& rNode = runtimeNodes[i];
+
         if (node.type == RenderType::Particle)
         {
-            node.spawnTimer = node.spawnInterval;
+            rNode.spawnTimer = node.spawnInterval;
         }
 
         if (node.type == RenderType::Mesh && node.scaleMode == ScaleMode::UniformEasing)
         {
             // 始点の拡大率を計算する
-            node.meshUniformStartScale = node.scaleUniformStart + Mathf::RandomRange(-node.scaleUniformStartRandom, node.scaleUniformStartRandom); // 始点の中心 + 振れ幅
-            node.meshUniformEndScale = node.scaleUniformEnd + Mathf::RandomRange(-node.scaleUniformEndRandom, node.scaleUniformEndRandom); // 終点の中心 + 振れ幅
+            rNode.meshUniformStartScale = node.scaleUniformStart + Mathf::RandomRange(-node.scaleUniformStartRandom, node.scaleUniformStartRandom); // 始点の中心 + 振れ幅
+            rNode.meshUniformEndScale = node.scaleUniformEnd + Mathf::RandomRange(-node.scaleUniformEndRandom, node.scaleUniformEndRandom); // 終点の中心 + 振れ幅
         }
 
         if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Random)
         {
             // 色をランダムで取得する
-            node.meshRandomColor.x = Mathf::RandomRange(node.colorMin.x, node.colorMax.x);
-            node.meshRandomColor.y = Mathf::RandomRange(node.colorMin.y, node.colorMax.y);
-            node.meshRandomColor.z = Mathf::RandomRange(node.colorMin.z, node.colorMax.z);
-            node.meshRandomColor.w = Mathf::RandomRange(node.colorMin.w, node.colorMax.w);
+            rNode.meshRandomColor.x = Mathf::RandomRange(node.colorMin.x, node.colorMax.x);
+            rNode.meshRandomColor.y = Mathf::RandomRange(node.colorMin.y, node.colorMax.y);
+            rNode.meshRandomColor.z = Mathf::RandomRange(node.colorMin.z, node.colorMax.z);
+            rNode.meshRandomColor.w = Mathf::RandomRange(node.colorMin.w, node.colorMax.w);
         }
         else if (node.type == RenderType::Mesh && node.colorMode == ColorMode::Easing)
         {
             // 始点の色を指定した範囲でランダムに取得
-            node.meshStartColor.x = Mathf::RandomRange(node.colorStartMin.x, node.colorStartMax.x);
-            node.meshStartColor.y = Mathf::RandomRange(node.colorStartMin.y, node.colorStartMax.y);
-            node.meshStartColor.z = Mathf::RandomRange(node.colorStartMin.z, node.colorStartMax.z);
-            node.meshStartColor.w = Mathf::RandomRange(node.colorStartMin.w, node.colorStartMax.w);
+            rNode.meshStartColor.x = Mathf::RandomRange(node.colorStartMin.x, node.colorStartMax.x);
+            rNode.meshStartColor.y = Mathf::RandomRange(node.colorStartMin.y, node.colorStartMax.y);
+            rNode.meshStartColor.z = Mathf::RandomRange(node.colorStartMin.z, node.colorStartMax.z);
+            rNode.meshStartColor.w = Mathf::RandomRange(node.colorStartMin.w, node.colorStartMax.w);
 
             // 終点の色を指定した範囲でランダムに取得
-            node.meshEndColor.x = Mathf::RandomRange(node.colorEndMin.x, node.colorEndMax.x);
-            node.meshEndColor.y = Mathf::RandomRange(node.colorEndMin.y, node.colorEndMax.y);
-            node.meshEndColor.z = Mathf::RandomRange(node.colorEndMin.z, node.colorEndMax.z);
-            node.meshEndColor.w = Mathf::RandomRange(node.colorEndMin.w, node.colorEndMax.w);
+            rNode.meshEndColor.x = Mathf::RandomRange(node.colorEndMin.x, node.colorEndMax.x);
+            rNode.meshEndColor.y = Mathf::RandomRange(node.colorEndMin.y, node.colorEndMax.y);
+            rNode.meshEndColor.z = Mathf::RandomRange(node.colorEndMin.z, node.colorEndMax.z);
+            rNode.meshEndColor.w = Mathf::RandomRange(node.colorEndMin.w, node.colorEndMax.w);
         }
     }
 }
@@ -194,9 +199,9 @@ void EffectEditor::Update(ID3D11DeviceContext* dc, float elapsedTime)
                     float t = activeTime / node.lifeTime;
                     float easeT = Mathf::EaseCurve(t, node.scaleUniformStartSpeed, node.scaleUniformEndSpeed);
 
-                    finalScale.x = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.y = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.z = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+                    finalScale.x = Mathf::Lerp(rNode.meshUniformStartScale, rNode.meshUniformEndScale, easeT);
+                    finalScale.y = Mathf::Lerp(rNode.meshUniformStartScale, rNode.meshUniformEndScale, easeT);
+                    finalScale.z = Mathf::Lerp(rNode.meshUniformStartScale, rNode.meshUniformEndScale, easeT);
                 }
                     break;
                 }
@@ -405,7 +410,7 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
 
                 break;
             case ColorMode::Random: // ランダム
-                finalColor = node.meshRandomColor;
+                finalColor = rNode.meshRandomColor;
 
                 break;
             case ColorMode::Easing: // イージング
@@ -417,10 +422,10 @@ void EffectEditor::RenderMeshVFX(ModelRenderer* modelRenderer)
                 float easeT = Mathf::EaseCurve(t, node.colorStartSpeed, node.colorEndSpeed);
 
                 // Lerpを掛けて進行度にあ和得て色を変化させる
-                finalColor.x = Mathf::Lerp(node.meshStartColor.x, node.meshEndColor.x, easeT);
-                finalColor.y = Mathf::Lerp(node.meshStartColor.y, node.meshEndColor.y, easeT);
-                finalColor.z = Mathf::Lerp(node.meshStartColor.z, node.meshEndColor.z, easeT);
-                finalColor.w = Mathf::Lerp(node.meshStartColor.w, node.meshEndColor.w, easeT);
+                finalColor.x = Mathf::Lerp(rNode.meshStartColor.x, rNode.meshEndColor.x, easeT);
+                finalColor.y = Mathf::Lerp(rNode.meshStartColor.y, rNode.meshEndColor.y, easeT);
+                finalColor.z = Mathf::Lerp(rNode.meshStartColor.z, rNode.meshEndColor.z, easeT);
+                finalColor.w = Mathf::Lerp(rNode.meshStartColor.w, rNode.meshEndColor.w, easeT);
 
                 break;
             }
@@ -703,6 +708,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             if (ImGui::Combo(u8"描画方法##RenderTypeCombo", &currentType, renderTypeItems, IM_ARRAYSIZE(renderTypeItems)))
             {
                 node.type = static_cast<RenderType>(currentType);
+                SyncRuntimeNodes();
             }
             ImGui::Separator();
 
@@ -876,6 +882,8 @@ void EffectEditor::DrawFileToolbar()
             "ファイルを開く",
             hwnd) == DialogResult::OK)
         {
+            runtimeNodes.clear(); // 読み込む前にruntimeNodesを空にする
+
             currentConfig.Load(filepath);
 
             SyncRuntimeNodes();
@@ -925,6 +933,8 @@ void EffectEditor::DrawNodeList()
         if (ImGui::Button(u8"- 選択ノード削除"))
         {
             currentConfig.nodes.erase(currentConfig.nodes.begin() + selectedNodeIndex);
+            runtimeNodes.erase(runtimeNodes.begin() + selectedNodeIndex); // 選択したノードを消す
+
             if (selectedNodeIndex >= currentConfig.nodes.size())
             {
                 selectedNodeIndex = static_cast<int>(currentConfig.nodes.size()) - 1;
@@ -994,11 +1004,11 @@ void EffectEditor::EmitParticles(float elapsedTime)
         if (cNode.duration > 0.0f && activeTime >= cNode.duration) continue;
 
         // ノード個別のタイマーを進める
-        cNode.spawnTimer += elapsedTime;
+        rNode.spawnTimer += elapsedTime;
 
-        if (cNode.spawnTimer >= cNode.spawnInterval)
+        if (rNode.spawnTimer >= cNode.spawnInterval)
         {
-            cNode.spawnTimer -= cNode.spawnInterval;
+            rNode.spawnTimer -= cNode.spawnInterval;
 
             // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
             if (rNode.particleManager && !cNode.texturePath.empty())

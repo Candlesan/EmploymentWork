@@ -61,12 +61,20 @@ private:
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView; // テクスチャ用のシェーダーリソースビュー
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> noiseShaderResourceView; // ノイズテクスチャ用シェーダーリソースビュー
 
+		// メッシュ描画用のワールド行列
 		DirectX::XMFLOAT4X4 worldTransform = {
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1
 		};
+
+		float spawnTimer = 0.0f;											// 毎フレーム進める発生計算用タイマー
+		DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };					// 色のランダム(計算用)
+		DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };					// 始点の色(計算用)
+		DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };					// 終点の色(計算用)
+		float meshUniformStartScale = 1.0f;									// 始点の拡大率(計算用)
+		float meshUniformEndScale = 1.0f;									// 終点の拡大率(計算用)
 	};
 
 
@@ -82,4 +90,3 @@ private:
 	bool isPlaying = false; // エフェクト再生中か
 	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列！
 };
-
