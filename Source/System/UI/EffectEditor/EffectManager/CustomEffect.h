@@ -81,6 +81,7 @@ private:
 		bool started = false;	// delayTime を過ぎたか
 		bool emitting = false;	// パーティクルは発生中か
 		bool finished = false;	// このノードはもう終わったか
+		bool trailNeedsReset = false;
 	};
 
 	EffectConfig config;
@@ -98,7 +99,7 @@ private:
 
 private:
 	void EmitParticles(float elapsedTime);
-	void BeginNodeCycle(RuntimeNode& node);
+	void BeginNodeCycle(RuntimeNode& node, bool isFirstCycle);
 
 	DirectX::XMMATRIX ComputeLocalMatrix(const RuntimeNode& node) const;
 	DirectX::XMMATRIX ComputeEffectMatrix() const;

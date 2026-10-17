@@ -104,7 +104,7 @@ void Trail::Render(const RenderContext& rc)
 		else
 		{
 			// 後半: widthMiddle -> widthEnd への変化
-			scale = widthMiddle + (widthEnd - widthMiddle) * ((uvV * 0.5f) * 2.0f);
+			scale = widthMiddle + (widthEnd - widthMiddle) * ((uvV - 0.5f) * 2.0f);
 		}
 
 		// 根本と先端の元座標を取得
@@ -183,9 +183,8 @@ bool Trail::SetTexture(const std::string& texturePath)
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
 
 	// パスが変わっていないなら、重いロード処理をスキップする！
-	static std::string currentPath = "";
-	if (currentPath == texturePath && shaderResourceView != nullptr) return true;
-	currentPath = texturePath;
+	if (currentTexturePath == texturePath && shaderResourceView != nullptr) return true;
+	currentTexturePath = texturePath;
 
 	try
 	{
@@ -203,4 +202,14 @@ bool Trail::SetTexture(const std::string& texturePath)
 	shaderResourceView = srv;
 
 	return true;
+}
+
+// 全部の点を同じ位置で止める関数
+void Trail::Reset(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip)
+{
+	for (int i = 0; i < MAX_POLYGON; ++i)
+	{
+		trailPositions[0][i] = root;
+		trailPositions[1][i] = tip;
+	}
 }

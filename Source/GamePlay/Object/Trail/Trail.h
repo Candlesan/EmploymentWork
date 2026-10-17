@@ -27,6 +27,8 @@ public:
 		widthMiddle = middle;
 		widthEnd = end;
 	}
+
+	void Reset(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip);
 private:
 	// シーン定数バッファ
 	struct CBScene
@@ -64,4 +66,6 @@ private:
 	float widthStart = 1.0f;
 	float widthMiddle = 1.0f;
 	float widthEnd = 0.0f;
+
+	std::string currentTexturePath;
 };

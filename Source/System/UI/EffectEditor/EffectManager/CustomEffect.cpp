@@ -51,6 +51,12 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
         {
             rNode.trail = std::make_shared<Trail>();
             rNode.trail->Initialize();
+
+            // ノードでテクスチャが選ばれていれば差し替える(からの時はデフォルトのテクスチャを使う)
+            if (!nodeConfig.texturePath.empty())
+            {
+                rNode.trail->SetTexture(nodeConfig.texturePath);
+            }
         }
     }
 
@@ -193,7 +199,7 @@ void CustomEffect::Update(float elapsedTime)
             // 待機時間が終わったらスタートする
             node.started = true;
             node.localTime = effectTimer - node.config.delayTime;
-            BeginNodeCycle(node); // エフェクトの設定をする
+            BeginNodeCycle(node, true); // エフェクトの設定をする
         }
         else
         {
@@ -214,7 +220,7 @@ void CustomEffect::Update(float elapsedTime)
             {
                 // ループ：巻き戻して次の周期へ
                 node.localTime = fmodf(node.localTime, cycle);
-                BeginNodeCycle(node); // 周期ごとに生成する
+                BeginNodeCycle(node, false); // 周期ごとに生成する
             }
             else if (isParticle)
             {
@@ -256,22 +262,31 @@ void CustomEffect::Update(float elapsedTime)
         if (node.config.type == RenderType::Trail && node.trail &&
             node.config.visible && node.started && !node.finished)
         {
-            DirectX::XMFLOAT3 root = {
-                this->position.x,
-                this->position.y,
-                this->position.z
-            };
+            const auto& w = node.worldTransform;
+
+            // 根本 = ノードの位置
+            DirectX::XMFLOAT3 root = { w._41, w._42, w._43 };
 
             DirectX::XMFLOAT3 tip = {
-                root.x,
-                root.y + node.config.width,
-                root.z
+                root.x + w._21 * node.config.width,
+                root.y + w._22 * node.config.width,
+                root.z + w._23 * node.config.width
             };
 
             if (node.trail)
             {
                 node.trail->SetWidthScales(node.config.widthStart, node.config.widthMiddle, node.config.widthEnd);
-                node.trail->Update(root, tip);
+
+                if (node.trailNeedsReset)
+                {
+                    node.trail->Reset(root, tip);
+                    node.trailNeedsReset = false;
+                }
+                else
+                {
+                    node.trail->SetColor(node.config.color);
+                    node.trail->Update(root, tip);
+                }
             }
         }
     }
@@ -642,11 +657,13 @@ void CustomEffect::EmitParticles(float elapsedTime)
     }
 }
 
-void CustomEffect::BeginNodeCycle(RuntimeNode& node)
+void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
 {
     if (node.config.type == RenderType::Particle)
     {
+        if(isFirstCycle)
         node.spawnTimer = node.config.spawnInterval;
+
         node.emitting = true;
     }
 
@@ -678,6 +695,11 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node)
         node.meshEndColor.y = Mathf::RandomRange(node.config.colorEndMin.y, node.config.colorEndMax.y);
         node.meshEndColor.z = Mathf::RandomRange(node.config.colorEndMin.z, node.config.colorEndMax.z);
         node.meshEndColor.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
+    }
+
+    if (node.config.type == RenderType::Trail)
+    {
+        node.trailNeedsReset = true;
     }
 }
 
