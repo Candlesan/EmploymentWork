@@ -77,6 +77,7 @@ private:
 		float meshUniformEndScale = 1.0f;					// 終点の拡大率(計算用)
 
 		float localTime = 0.0f; // このノードの経過時間
+		int parentIndex = -1;   // 親が runTimeNodes の何番目か（-1 = 親なし）
 		bool started = false;	// delayTime を過ぎたか
 		bool emitting = false;	// パーティクルは発生中か
 		bool finished = false;	// このノードはもう終わったか
@@ -93,9 +94,12 @@ private:
 	float effectTimer = 0.0f; // 経過時間
 	bool isPlaying = false; // エフェクト再生中か
 	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列
+	std::vector<int> updateOrder;
 
 private:
 	void EmitParticles(float elapsedTime);
 	void BeginNodeCycle(RuntimeNode& node);
 
+	DirectX::XMMATRIX ComputeLocalMatrix(const RuntimeNode& node) const;
+	DirectX::XMMATRIX ComputeEffectMatrix() const;
 };

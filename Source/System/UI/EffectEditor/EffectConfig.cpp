@@ -280,6 +280,29 @@ void EffectConfig::Load(const std::string& filePath)
         {
             nodes.push_back(NodeConfig{});
         }
+
+        // id が無い・重複している古いデータに id を振り直す
+        for (size_t i = 0; i < nodes.size(); ++i)
+        {
+            bool duplicated = false;
+            for (size_t j = 0; j < i; ++j)
+            {
+                if (nodes[j].id == nodes[i].id) { duplicated = true; break; }
+            }
+            if (nodes[i].id <= 0 || duplicated)
+            {
+                nodes[i].id = GenerateNodeId();
+            }
+        }
+
+        // 存在しない親を指していたら、親なしに戻す
+        for (auto& node : nodes)
+        {
+            if (node.parentId != -1 && FindNodeIndex(node.parentId) == -1)
+            {
+                node.parentId = -1;
+            }
+        }
     }
     catch (const nlohmann::json::exception& e)
     {

@@ -18,6 +18,7 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
     // ノードの数だけ配列の枠を確保する
     runTimeNodes.resize(config.nodes.size());
 
+    // 各インスタンスを作る
     for (size_t i = 0; i < config.nodes.size(); ++i)
     {
         auto& nodeConfig = config.nodes[i];
@@ -52,6 +53,43 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
             rNode.trail->Initialize();
         }
     }
+
+    // 親のidを配列の番号に変換しておく
+    for (auto& rNode : runTimeNodes)
+    {
+        rNode.parentIndex = config.FindNodeIndex(rNode.config.parentId);
+    }
+
+    // 親が先・子が後になる順番を作る（親が並んでいる順番から追加していく）
+    updateOrder.clear();
+
+    // 下の行の意味はrunTimeNodes.size()個の要素を持つstd::vector<bool>を作っていて、
+    //全ての要素をfalseで初期化するという意味
+    std::vector<bool>added(runTimeNodes.size(), false); // 各要素を追加済みかの印
+    for (size_t pass = 0; pass < runTimeNodes.size(); ++pass)
+    {
+        for (size_t i = 0; i < runTimeNodes.size(); ++i)
+        {
+            if (added[i]) continue; // 追加済みならスキップする
+            int p = runTimeNodes[i].parentIndex;
+            if (p == -1 || added[p])
+            {
+                // 親が存在しないか、親が追加済みなら、処理順に追加して追加済みとして記録する
+                updateOrder.push_back(static_cast<int>(i));
+                added[i] = true;
+            }
+        }
+    }
+
+    // 万が一ループしていて並べられなかったノードは、親なし扱いで最後に積む
+    for (size_t i = 0; i < runTimeNodes.size(); ++i)
+    {
+        if (!added[i])
+        {
+            runTimeNodes[i].parentIndex = -1;
+            updateOrder.push_back(static_cast<int>(i));
+        }
+    }
 }
 
 // 再生中に設定値だけを差し替える（エディターのプレビュー用）
@@ -69,7 +107,8 @@ bool CustomEffect::ApplyConfig(const EffectConfig& newConfig)
         if (newNode.type != oldNode.type ||
             newNode.meshPath != oldNode.meshPath ||
             newNode.texturePath != oldNode.texturePath ||
-            newNode.noisePath != oldNode.noisePath)
+            newNode.noisePath != oldNode.noisePath ||
+            newNode.parentId != oldNode.parentId)
         {
             return false;
         }
@@ -127,6 +166,7 @@ void CustomEffect::Update(float elapsedTime)
     // 前回の位置を保存する
     prevPosition = this->position;
 
+    // 1回目のループ（時間を進める）
     for (auto& node : runTimeNodes)
     {
         // UVスクロールの時間を進める
@@ -145,7 +185,6 @@ void CustomEffect::Update(float elapsedTime)
         if (!node.config.visible || node.finished) continue; // 非表示またはそのノードが終わったら飛ばす
 
         allFinished = false; // まだ終わってないノードある
-
 
         if (!node.started)
         {
@@ -193,76 +232,29 @@ void CustomEffect::Update(float elapsedTime)
                 continue;
             }
         }
+    } 
 
-        // メッシュVFX
-       if (node.config.type == RenderType::Mesh)
+    DirectX::XMMATRIX effectMatrix = ComputeEffectMatrix();
+
+    // ２回目のループ（行列を作る）
+    for (int i : updateOrder)
+    {
+        auto& node = runTimeNodes[i];
+
+        // 親のワールド行列(親なしならエフェクト全体の行列)
+        DirectX::XMMATRIX parentWorld = effectMatrix;
+        if (node.parentIndex != -1)
         {
-            // メッシュノードごとの発生からの経過時間を計算
-            float activeTime = node.localTime;
-            float t = activeTime; // 物理計算用の時間
-
-            if (node.meshModel)
-            {
-                DirectX::XMFLOAT3 finalScale = { 1, 1, 1 };
-                switch (node.config.scaleMode)
-                {
-                case ScaleMode::Fixed:
-                    // 拡大時間経過で大きく/小さくする
-                    // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
-                    finalScale.x = this->scale.x * (node.config.scale.x + (node.config.scaleVelocity.x * activeTime) + (0.5f * node.config.scaleAcceleration.x * activeTime * activeTime));
-                    finalScale.y = this->scale.y * (node.config.scale.y + (node.config.scaleVelocity.y * activeTime) + (0.5f * node.config.scaleAcceleration.y * activeTime * activeTime));
-                    finalScale.z = this->scale.z * (node.config.scale.z + (node.config.scaleVelocity.z * activeTime) + (0.5f * node.config.scaleAcceleration.z * activeTime * activeTime));
-
-                    break;
-                case ScaleMode::UniformEasing:
-                {
-                    float t = activeTime / node.config.lifeTime;
-                    float easeT = Mathf::EaseCurve(t, node.config.scaleUniformStartSpeed, node.config.scaleUniformEndSpeed);
-
-                    float uniform = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
-                    finalScale.x = this->scale.x * uniform;
-                    finalScale.y = this->scale.y * uniform;
-                    finalScale.z = this->scale.z * uniform;
-                }
-                break;
-                }
-
-                // マイナスにならないようにガード
-                finalScale.x = (std::max)(0.0f, finalScale.x);
-                finalScale.y = (std::max)(0.0f, finalScale.y);
-                finalScale.z = (std::max)(0.0f, finalScale.z);
-
-                DirectX::XMMATRIX S = DirectX::XMMatrixScaling(finalScale.x, finalScale.y, finalScale.z);
-
-                // 回転（初期回転 ＋ 初期角度 ＋ 自転・回転速度 ＋ 回転加速度）
-                DirectX::XMFLOAT3 currentRot = {
-                    this->angle.x + (node.config.rotation.x + (node.config.rotationVelocity.x * t) + (0.5f * node.config.rotationAcceleration.x * t * t)),
-                    this->angle.y + (node.config.rotation.y + (node.config.rotationVelocity.y * t) + (0.5f * node.config.rotationAcceleration.y * t * t)),
-                    this->angle.z + (node.config.rotation.z + (node.config.rotationVelocity.z * t) + (0.5f * node.config.rotationAcceleration.z * t * t))
-                };
-                DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
-                    DirectX::XMConvertToRadians(currentRot.x),
-                    DirectX::XMConvertToRadians(currentRot.y),
-                    DirectX::XMConvertToRadians(currentRot.z)
-                );
-
-                // 位置（Play時のエフェクト発生位置 ＋ ノード初期位置 ＋ 移動速度 ＋ 移動加速度）
-                DirectX::XMFLOAT3 currentPos = {
-                    this->position.x + node.config.position.x + (node.config.positionVelocity.x * t) + (0.5f * node.config.positionAcceleration.x * t * t),
-                    this->position.y + node.config.position.y + (node.config.positionVelocity.y * t) + (0.5f * node.config.positionAcceleration.y * t * t),
-                    this->position.z + node.config.position.z + (node.config.positionVelocity.z * t) + (0.5f * node.config.positionAcceleration.z * t * t)
-                };
-                DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(currentPos.x, currentPos.y, currentPos.z);
-
-                // 行列を合成してモデルに適用
-                DirectX::XMFLOAT4X4 worldTransform;
-                DirectX::XMStoreFloat4x4(&worldTransform, S * R * T);
-
-                node.worldTransform = worldTransform;
-            }
+            parentWorld = DirectX::XMLoadFloat4x4(&runTimeNodes[node.parentIndex].worldTransform);
         }
+
+        // 非表示・まだ始まっていない・終わったノードも子のために行列は計算しておく
+        DirectX::XMMATRIX world = ComputeLocalMatrix(node) * parentWorld;
+        DirectX::XMStoreFloat4x4(&node.worldTransform, world);
+
         // トレイル
-        else if (node.config.type == RenderType::Trail)
+        if (node.config.type == RenderType::Trail && node.trail &&
+            node.config.visible && node.started && !node.finished)
         {
             DirectX::XMFLOAT3 root = {
                 this->position.x,
@@ -282,7 +274,7 @@ void CustomEffect::Update(float elapsedTime)
                 node.trail->Update(root, tip);
             }
         }
-    } 
+    }
 
     EmitParticles(elapsedTime);
 
@@ -503,12 +495,14 @@ void CustomEffect::EmitParticles(float elapsedTime)
                 data.fade_param.z = pConfig.lifeTime;
                 data.fade_param.w = static_cast<float>(packedSpeed);
 
+                // 発生位置をワールド行列からとる
+                DirectX::XMFLOAT3 origin = { node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
 
                 // 位置
                 data.position = {
-                  this->position.x + pConfig.position.x + (pConfig.positionRange.x * Mathf::RandFloat()),
-                  this->position.y + pConfig.position.y + (pConfig.positionRange.y * Mathf::RandFloat()),
-                  this->position.z + pConfig.position.z + (pConfig.positionRange.z * Mathf::RandFloat()),
+                 origin.x + (pConfig.positionRange.x * Mathf::RandFloat()),
+                 origin.y + (pConfig.positionRange.y * Mathf::RandFloat()),
+                 origin.z + (pConfig.positionRange.z * Mathf::RandFloat()),
                    1.0f
                 };
                 // 初速度
@@ -685,4 +679,88 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node)
         node.meshEndColor.z = Mathf::RandomRange(node.config.colorEndMin.z, node.config.colorEndMax.z);
         node.meshEndColor.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
     }
+}
+
+// ノード自身の行列（親やエフェクトは含めない）
+DirectX::XMMATRIX CustomEffect::ComputeLocalMatrix(const RuntimeNode& node) const
+{
+    const auto& c = node.config;
+    float t = node.localTime;
+
+    // パーティクルは「どこから出すか」だけ。速度や大きさはパーティクル1つ1つの値なので行列にはいれない
+    if (c.type == RenderType::Particle)
+    {
+        return DirectX::XMMatrixTranslation(c.position.x, c.position.y, c.position.z);
+    }
+
+    // 大きさ
+    DirectX::XMFLOAT3 s = { 1, 1, 1 };
+    if (c.type == RenderType::Mesh)
+    {
+        switch (node.config.scaleMode)
+        {
+        case ScaleMode::Fixed:
+            // 拡大時間経過で大きく/小さくする
+            // scale = 初期拡大 + (拡大速度 * t) + (0.5 * 拡大加速度 * t^2)　物理の計算らしい
+            s.x = c.scale.x + (c.scaleVelocity.x * t) + (0.5f * c.scaleAcceleration.x * t * t);
+            s.y = c.scale.y + (c.scaleVelocity.y * t) + (0.5f * c.scaleAcceleration.y * t * t);
+            s.z = c.scale.z + (c.scaleVelocity.z * t) + (0.5f * c.scaleAcceleration.z * t * t);
+
+            break;
+        case ScaleMode::UniformEasing:
+        {
+            float progress = (c.lifeTime > 0.0f) ? t / c.lifeTime : 0.0f;
+            float easeT = Mathf::EaseCurve(progress, node.config.scaleUniformStartSpeed, node.config.scaleUniformEndSpeed);
+
+            float uniform = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
+            s.x = uniform;
+            s.y = uniform;
+            s.z = uniform;
+        }
+        break;
+        }
+    }
+
+    // マイナスにならないようにガード
+    s.x = (std::max)(0.0f, s.x);
+    s.y = (std::max)(0.0f, s.y);
+    s.z = (std::max)(0.0f, s.z);
+
+    // 回転（初期回転 ＋ 速度 + 加速度）
+    DirectX::XMFLOAT3 r = {
+        c.rotation.x + c.rotationVelocity.x * t + 0.5f * c.rotationAcceleration.x * t * t,
+        c.rotation.y + c.rotationVelocity.y * t + 0.5f * c.rotationAcceleration.y * t * t,
+        c.rotation.z + c.rotationVelocity.z * t + 0.5f * c.rotationAcceleration.z * t * t
+    };
+
+    // 位置（初期位置 ＋ 速度 + 加速度）
+    DirectX::XMFLOAT3 p = {
+        c.position.x  + (node.config.positionVelocity.x * t) + (0.5f * node.config.positionAcceleration.x * t * t),
+        c.position.y  + (node.config.positionVelocity.y * t) + (0.5f * node.config.positionAcceleration.y * t * t),
+        c.position.z  + (node.config.positionVelocity.z * t) + (0.5f * node.config.positionAcceleration.z * t * t)
+    };
+
+    DirectX::XMMATRIX S = DirectX::XMMatrixScaling(s.x, s.y, s.z);
+    DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+        DirectX::XMConvertToRadians(r.x),
+        DirectX::XMConvertToRadians(r.y),
+        DirectX::XMConvertToRadians(r.z)
+    );
+    DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(p.x, p.y, p.z);
+
+    return S * R * T;
+}
+
+// エフェクト全体の行列
+DirectX::XMMATRIX CustomEffect::ComputeEffectMatrix() const
+{
+    DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+    DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(
+        DirectX::XMConvertToRadians(angle.x),
+        DirectX::XMConvertToRadians(angle.y),
+        DirectX::XMConvertToRadians(angle.z)
+    );
+    DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+    return S * R * T;
 }

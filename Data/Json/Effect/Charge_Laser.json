@@ -72,7 +72,7 @@
             ],
             "position": [
                 0.0,
-                -1.0,
+                0.0,
                 0.0
             ],
             "positionAcceleration": [
@@ -257,7 +257,7 @@
             ],
             "position": [
                 0.0,
-                27.399999618530273,
+                28.399999618530273,
                 0.0
             ],
             "positionAcceleration": [
@@ -442,7 +442,7 @@
             ],
             "position": [
                 0.0,
-                -1.0,
+                0.0,
                 0.0
             ],
             "positionAcceleration": [
@@ -627,7 +627,7 @@
             ],
             "position": [
                 0.0,
-                0.0,
+                1.0,
                 0.0
             ],
             "positionAcceleration": [
