@@ -661,8 +661,10 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
 {
     if (node.config.type == RenderType::Particle)
     {
-        if(isFirstCycle)
-        node.spawnTimer = node.config.spawnInterval;
+        if (isFirstCycle)
+        {
+            node.spawnTimer = node.config.spawnInterval;
+        }
 
         node.emitting = true;
     }
@@ -697,7 +699,7 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
         node.meshEndColor.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
     }
 
-    if (node.config.type == RenderType::Trail)
+    if (node.config.type == RenderType::Trail && isFirstCycle)
     {
         node.trailNeedsReset = true;
     }
