@@ -157,6 +157,65 @@ void EffectEditor::RebuildPreview()
     preview->Initialize(Graphics::Instance().GetDevice(), currentConfig);
 }
 
+// ノード1つと、その子をツリーで描く
+void EffectEditor::DrawNodeTreeItem(int index, int depth)
+{
+    // 壊れたデータでループしていても止まるように、深さに上限をつける
+    if (depth > static_cast<int>(currentConfig.nodes.size())) return;
+
+    auto& node = currentConfig.nodes[index];
+
+    ImGui::PushID(node.id); // ID被り防止
+
+    // 目玉（表示/非表示の切り替え）
+    if (ImGui::Button(node.visible ? u8"o" : u8"-", ImVec2(28, 0)))
+    {
+        node.visible = !node.visible;
+    }
+    ImGui::SameLine();
+
+    // 子がいるか調べる
+    bool hasChild = false;
+    for (const auto& other : currentConfig.nodes)
+    {
+        if (other.parentId == node.id) { hasChild = true; break; }
+    }
+
+    // フラグ
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth
+        | ImGuiTreeNodeFlags_DefaultOpen;
+    if (!hasChild)                   flags |= ImGuiTreeNodeFlags_Leaf;     // 子がいなければ矢印なし
+    if (selectedNodeIndex == index)  flags |= ImGuiTreeNodeFlags_Selected; // 選択中ならハイライト
+
+    // 表示名（種類 + 名前）
+    std::string label = u8"[スプライト] ";
+    if (node.type == RenderType::Mesh)  label = u8"[モデル] ";
+    else if (node.type == RenderType::Trail) label = u8"[軌跡] ";
+    else if (node.type == RenderType::Ring)  label = u8"[リング] ";
+    else if (node.type == RenderType::None)  label = u8"[無し] ";
+    label += node.name;
+
+    bool open = ImGui::TreeNodeEx("##node", flags, "%s", label.c_str());
+
+    // クリックで選択（開閉に関係なく TreeNodeEx の直後で見る）
+    if (ImGui::IsItemClicked()) selectedNodeIndex = index;
+
+    // ツリーを開いていたら子を描く
+    if (open)
+    {
+        for (int i = 0; i < static_cast<int>(currentConfig.nodes.size()); ++i)
+        {
+            if (currentConfig.nodes[i].parentId == node.id)
+            {
+                DrawNodeTreeItem(i, depth + 1);
+            }
+        }
+        ImGui::TreePop();
+    }
+
+    ImGui::PopID();
+}
+
 // UIの描画パーツ
 void EffectEditor::DrawNodeInspector(NodeConfig& node)
 {
@@ -400,13 +459,27 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
         // カラータブ
         if (ImGui::BeginTabItem(u8"描画"))
         {
+            // 画面に出す順番と、それぞれの RenderType（番号は JSON と互換のため変えない）
+            const RenderType renderTypeOrder[] = {
+                RenderType::None,
+                RenderType::Particle,
+                RenderType::Mesh,
+                RenderType::Trail,
+                RenderType::Ring,
+            };
             const char* renderTypeItems[] = {
+                u8"無し",
                 u8"スプライト",
                 u8"モデル",
                 u8"軌跡",
-                u8"無し"
+                u8"リング",
             };
-            int currentType = static_cast<int>(node.type);
+
+            int currentType = 0;
+            for (int i = 0; i < IM_ARRAYSIZE(renderTypeOrder); ++i)
+            {
+                if (renderTypeOrder[i] == node.type) { currentType = i; break; }
+            }
 
             if (ImGui::Combo(u8"描画方法##RenderTypeCombo", &currentType, renderTypeItems, IM_ARRAYSIZE(renderTypeItems)))
             {
@@ -534,6 +607,33 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 ImGui::DragFloat(u8"中央", &node.widthMiddle, 0.01f, 0.0f, 5.0f);
                 ImGui::DragFloat(u8"末端(尻)", &node.widthEnd, 0.01f, 0.0f, 5.0f);
             }
+            else if (node.type == RenderType::Ring)
+            {
+                ImGui::SliderInt(u8"頂点数##Ring", &node.ringDivision, 3, 128);
+                ImGui::Separator();
+
+                ImGui::DragFloat(u8"中心比率", &node.ringCenterRatio, 0.01f);
+                ImGui::Separator();
+
+                ImGui::Text(u8"外輪");
+                ImGui::Text(u8"位置");
+                ImGui::SameLine();
+                ImGui::DragFloat2(u8"##Outer", &node.ringOuter.x, 0.01f);
+                ImGui::Separator();
+
+                ImGui::Text(u8"内輪");
+                ImGui::Text(u8"位置");
+                ImGui::SameLine();
+                ImGui::DragFloat2(u8"##Inner", &node.ringInner.x, 0.01f);
+                ImGui::Separator();
+
+                ImGui::DragFloat(u8"開始角度##Ring", &node.ringStartAngle, 1.0f, -360.0f, 360.0f);
+                ImGui::DragFloat(u8"終了角度##Ring", &node.ringEndAngle, 1.0f, -360.0f, 360.0f);
+
+                ImGui::ColorEdit4(u8"外輪色", &node.ringOuterColor.x);
+                ImGui::ColorEdit4(u8"中心色", &node.ringCenterColor.x);
+                ImGui::ColorEdit4(u8"内輪色", &node.ringInnerColor.x);
+            }
 
             ImGui::EndTabItem();
         }
@@ -626,56 +726,13 @@ void EffectEditor::DrawNodeList()
     }
     ImGui::Separator();
 
-    // ノード一覧
-    for (int i = 0; i < currentConfig.nodes.size(); i++)
+    // ノード一覧（親なしのノードから順に、子をツリーで描く）
+    for (int i = 0; i < static_cast<int>(currentConfig.nodes.size()); ++i)
     {
-        auto& node = currentConfig.nodes[i];
-        bool isSelected = (selectedNodeIndex == i);
-
-        ImGui::PushID(i); // ID被り防止
-
-        // 表示 / 非表示 切り替えボタン（目アイコン風）
-        const char* eyeIcon = node.visible ? u8" [ON] " : u8"[OFF]";
-        if (node.visible)
+        if (currentConfig.nodes[i].parentId == -1)
         {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); // 緑色
+            DrawNodeTreeItem(i, 0);
         }
-        else
-        {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.2f, 0.2f, 1.0f)); // 赤色
-        }
-
-        if (ImGui::Button(eyeIcon))
-        {
-            node.visible = !node.visible;
-        }
-        ImGui::PopStyleColor();
-
-        ImGui::SameLine();
-
-        // 親をたどって深さを数える（ループ対策で最大ノード数まで）
-        int depth = 0;
-        int p = currentConfig.FindNodeIndex(node.parentId);
-        while (p != -1 && depth < static_cast<int>(currentConfig.nodes.size()))
-        {
-            ++depth;
-            p = currentConfig.FindNodeIndex(currentConfig.nodes[p].parentId);
-        }
-
-        std::string label(depth * 2, ' ');   // 深さ1つにつき空白2つ
-
-        // ノードの選択ラベル
-        label += u8"[スプライト] ";
-        if (node.type == RenderType::Mesh) label = u8"[モデル] ";
-        else if (node.type == RenderType::Trail) label = u8"[トレイル] ";
-        label += node.name;
-
-        if (ImGui::Selectable(label.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick))
-        {
-            selectedNodeIndex = i;
-        }
-
-        ImGui::PopID();
     }
     ImGui::Separator();
 }

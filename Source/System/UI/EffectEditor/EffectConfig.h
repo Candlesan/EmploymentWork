@@ -25,7 +25,8 @@ enum class RenderType
 	Particle = 0, // 2Dビルボード
 	Mesh = 1, // 3DメッシュVFX
 	Trail = 2, // 軌跡
-	None = 3
+	Ring = 4, // リング
+	None = 3,
 };
 
 // Lerpの速度
@@ -153,7 +154,16 @@ struct NodeConfig
 	float widthMiddle = 1.0f;											// 中央
 	float widthEnd = 0.0f;												// 末端
 
-	// 親から継承するパラメーター
+	// [Ring用]
+	int ringDivision = 32;												// 分割数(何角形で円をつくるか)
+	DirectX::XMFLOAT2 ringOuter = { 1.0f, 0.0f };						// 外輪 (X = 半径, Y = 高さ)
+	DirectX::XMFLOAT2 ringInner = { 0.5f, 0.0f };						// 内輪 (X = 半径, Y = 高さ)
+	float ringStartAngle = 0.0f;										// 開始角度(度)
+	float ringEndAngle = 360.0f;										// 終了角度(度)。180で半円
+	float ringCenterRatio = 0.5f;										// 中心の位置（0 = 外輪, 1 = 内輪）
+	DirectX::XMFLOAT4 ringOuterColor = { 1, 1, 1, 1 };
+	DirectX::XMFLOAT4 ringCenterColor = { 1, 1, 1, 1 };
+	DirectX::XMFLOAT4 ringInnerColor = { 1, 1, 1, 1 };
 };
 
 // 1つのVFXアセット

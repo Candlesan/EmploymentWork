@@ -33,6 +33,8 @@ public:
 		noiseShaderResourceView = noiseSrv;
 	}
 
+	void SetUseVertexColor(bool use) { useVertexColor = use ? 1.0f : 0.0f; }
+	float useVertexColor = 0.0f;
 private:
 	// シーン定数バッファ
 	struct CBScene
@@ -51,7 +53,8 @@ private:
 		DirectX::XMFLOAT2   uvOffset;            // UVオフセット
 		DirectX::XMFLOAT2   noiseUvOffset;	     // 歪みのオフセット
 		float               distortionPower;	 // 歪みの強さ
-		float               padding[3];			// 16バイト境界のアライメント調整
+		float useVertexColor;  
+		float padding[2];      
 	};
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>		vertexShader;

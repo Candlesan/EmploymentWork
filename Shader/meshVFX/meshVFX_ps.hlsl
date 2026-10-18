@@ -19,5 +19,5 @@ float4 main(VS_OUT pin) : SV_TARGET
 	// テクスチャ空画像の色を取得
     float4 texColor = spriteTexture.Sample(spriteSampler, finalUV);
 	
-    return texColor * vfxColor;
+    return texColor * pin.color;
 }

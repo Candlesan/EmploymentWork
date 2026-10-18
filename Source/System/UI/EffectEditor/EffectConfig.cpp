@@ -124,20 +124,33 @@ void EffectConfig::Save(const std::string& filePath)
         n["colorStartSpeed"] = node.colorStartSpeed;
         n["colorEndSpeed"] = node.colorEndSpeed;
 
-        // 固有パラメータ
+        // 固有パラメータ郡
+        // [Particle用]
         n["texturePath"] = node.texturePath;
         n["splitCount"] = { node.splitCount[0], node.splitCount[1] };
         n["spriteType"] = node.spriteType;
         n["isBillboard"] = node.isBillboard;
 
+        // [Mesh用]
         n["meshPath"] = node.meshPath;
         n["noisePath"] = node.noisePath;
         n["distortionPower"] = node.distortionPower;
 
+        // [Trail用]
         n["width"] = node.width;
         n["widthStart"] = node.widthStart;
         n["widthMiddle"] = node.widthMiddle;
         n["widthEnd"] = node.widthEnd;
+
+        // [Ring用]
+        n["ringDivision"] = node.ringDivision;
+        n["ringOuter"] = { node.ringOuter.x, node.ringOuter.x };
+        n["ringInner"] = { node.ringInner.x, node.ringInner.y };
+        n["ringStartAngle"] = node.ringStartAngle;
+        n["ringEndAngle"] = node.ringEndAngle;
+        n["ringInnerColor"] = { node.ringInnerColor.x, node.ringInnerColor.y, node.ringInnerColor.z, node.ringInnerColor.w };
+        n["ringCenterColor"] = { node.ringCenterColor.x, node.ringCenterColor.y, node.ringCenterColor.z, node.ringCenterColor.w };
+        n["ringOuterColor"] = { node.ringOuterColor.x, node.ringOuterColor.y, node.ringOuterColor.z, node.ringOuterColor.w };
 
         j["nodes"].push_back(n);
     }
@@ -261,13 +274,25 @@ void EffectConfig::Load(const std::string& filePath)
                 node.colorStartSpeed = nodeJson.value("colorStartSpeed", 0.0f);
                 node.colorEndSpeed = nodeJson.value("colorEndSpeed", 0.0f);
 
+                // [Mesh用]
                 node.meshPath = nodeJson.value("meshPath", "");
                 node.distortionPower = nodeJson.value("distortionPower", 0.0f);
 
+                // [Trail用]
                 node.width = nodeJson.value("width", 1.0f);
                 node.widthStart = nodeJson.value("widthStart", 1.0f);
                 node.widthMiddle = nodeJson.value("widthMiddle", 1.0f);
                 node.widthEnd = nodeJson.value("widthEnd", 0.0f);
+
+                // [Ring用]
+                node.ringDivision = nodeJson.value("ringDivision", 32); // 最低で3個にしておく多分3角形になるはず
+                if (nodeJson.find("ringInner") != nodeJson.end()) node.ringInner = { nodeJson["ringInner"][0], nodeJson["ringInner"][1] };
+                if (nodeJson.find("ringOuter") != nodeJson.end()) node.ringOuter = { nodeJson["ringOuter"][0], nodeJson["ringOuter"][1] };
+                node.ringStartAngle = nodeJson.value("ringStartAngle  ", 0.0f);
+                node.ringEndAngle = nodeJson.value("ringEndAngle    ", 360.0f);
+                if (nodeJson.find("ringOuterColor") != nodeJson.end()) node.ringOuterColor = { nodeJson["ringOuterColor"][0], nodeJson["ringOuterColor"][1], nodeJson["ringOuterColor"][2], nodeJson["ringOuterColor"][3] };
+                if (nodeJson.find("ringCenterColor") != nodeJson.end()) node.ringCenterColor = { nodeJson["ringCenterColor"][0], nodeJson["ringCenterColor"][1], nodeJson["ringCenterColor"][2], nodeJson["ringCenterColor"][3] };
+                if (nodeJson.find("ringInnerColor") != nodeJson.end()) node.ringInnerColor = { nodeJson["ringInnerColor"][0], nodeJson["ringInnerColor"][1], nodeJson["ringInnerColor"][2], nodeJson["ringInnerColor"][3] };
 
 
                 // 読み込んだノードを追加

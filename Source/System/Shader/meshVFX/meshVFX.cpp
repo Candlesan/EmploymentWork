@@ -83,6 +83,7 @@ void meshVFX::Update(const RenderContext& rc, const Model::Mesh& mesh)
 	meshVFXCB meshVFX{};
 	DirectX::XMStoreFloat4x4(&meshVFX.worldViewProjection, WVP);
 	meshVFX.vfxColor = vfxColor;
+	meshVFX.useVertexColor = useVertexColor;
 	meshVFX.uvOffset = uvOffset;
 	meshVFX.noiseUvOffset = noiseUvOffset;
 	meshVFX.distortionPower = distortionPower;

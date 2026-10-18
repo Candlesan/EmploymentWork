@@ -15,6 +15,7 @@ cbuffer MeshVfxBuffer : register(b0)
     float4 vfxColor;                        // エフェクトのメインカラー
     float2 uvOffset;                        // UVスクロール用オフセット(X,Y)
     float2 noiseUvOffset;                   // ノイズ用オフセット
-    float distortionPower;                 // 歪みの強さ
-    float2 padding; 
+    float distortionPower;                  // 歪みの強さ
+    float useVertexColor;                   // 1 = tangent を頂点カラーとして使う（リング用）
+    float padding;  
 }

@@ -58,6 +58,14 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
                 rNode.trail->SetTexture(nodeConfig.texturePath);
             }
         }
+        else if (nodeConfig.type == RenderType::Ring)
+        {
+            rNode.ringMesh = CreateRingMesh(device, nodeConfig);
+            if (!nodeConfig.texturePath.empty())
+                rNode.shaderResourceView = TextureResourceManager::Instance().GetOrLoad(device, nodeConfig.texturePath);
+            if (!nodeConfig.noisePath.empty())
+                rNode.noiseShaderResourceView = TextureResourceManager::Instance().GetOrLoad(device, nodeConfig.noisePath);
+        }
     }
 
     // 親のidを配列の番号に変換しておく
@@ -114,7 +122,28 @@ bool CustomEffect::ApplyConfig(const EffectConfig& newConfig)
             newNode.meshPath != oldNode.meshPath ||
             newNode.texturePath != oldNode.texturePath ||
             newNode.noisePath != oldNode.noisePath ||
-            newNode.parentId != oldNode.parentId)
+            newNode.parentId != oldNode.parentId ||
+            newNode.ringDivision != oldNode.ringDivision ||
+            newNode.ringInner.x != oldNode.ringInner.x ||
+            newNode.ringInner.y != oldNode.ringInner.y ||
+            newNode.ringOuter.x != oldNode.ringOuter.x ||
+            newNode.ringOuter.y != oldNode.ringOuter.y ||
+            newNode.ringStartAngle != oldNode.ringStartAngle ||
+            newNode.ringEndAngle != oldNode.ringEndAngle ||
+            newNode.ringCenterRatio != oldNode.ringCenterRatio||
+            newNode.ringInnerColor.x != oldNode.ringInnerColor.x ||
+            newNode.ringInnerColor.y != oldNode.ringInnerColor.y ||
+            newNode.ringInnerColor.z != oldNode.ringInnerColor.z ||
+            newNode.ringInnerColor.w != oldNode.ringInnerColor.w ||
+            newNode.ringCenterColor.x != oldNode.ringCenterColor.x ||
+            newNode.ringCenterColor.y != oldNode.ringCenterColor.y ||
+            newNode.ringCenterColor.z != oldNode.ringCenterColor.z ||
+            newNode.ringCenterColor.w != oldNode.ringCenterColor.w ||
+            newNode.ringOuterColor.x != oldNode.ringOuterColor.x ||
+            newNode.ringOuterColor.y != oldNode.ringOuterColor.y ||
+            newNode.ringOuterColor.z != oldNode.ringOuterColor.z ||
+            newNode.ringOuterColor.w != oldNode.ringOuterColor.w 
+            )
         {
             return false;
         }
@@ -332,99 +361,98 @@ void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
 
     for (auto& rNode : runTimeNodes)
     {
-        if (isPlaying && rNode.meshModel)
+        // メッシュとリング以外はここでは描かない
+        const bool isMesh = (rNode.config.type == RenderType::Mesh && rNode.meshModel);
+        const bool isRing = (rNode.config.type == RenderType::Ring && rNode.ringMesh);
+        if (!isMesh && !isRing) continue;
+
+        if (!rNode.config.visible || rNode.finished || !rNode.started) continue;
+
+        float activeTime = rNode.localTime;
+
+        // テクスチャをセット
+        shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
+        shader->SetDistortionPower(rNode.config.distortionPower);
+
+
+        // フェードインの計算
+        float alpha = 1.0f;
+        if (rNode.config.IsFadeIn && rNode.config.fadeInTime > 0.0001f && activeTime <= rNode.config.fadeInTime)
         {
-            if (!rNode.config.visible || rNode.finished || !rNode.started) continue;
+            // 現在の進行度を求める
+            float t = activeTime / rNode.config.fadeInTime;
+            alpha = Mathf::EaseCurve(t, rNode.config.fadeInStartSpeed, rNode.config.fadeInEndSpeed);
+        }
+        // フェードアウトの計算
+        else if (rNode.config.IsFadeOut && rNode.config.fadeOutTime > 0.0001f)
+        {
+            // 進行度を求める
+            float fadeStartTime = rNode.config.lifeTime - rNode.config.fadeOutTime;
 
-            if (rNode.config.type == RenderType::Mesh)
+            if (activeTime >= fadeStartTime)
             {
-                float activeTime = rNode.localTime;
-
-                // テクスチャをセット
-                shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
-                shader->SetDistortionPower(rNode.config.distortionPower);
-
-                // フェードインの計算
-                float alpha = 1.0f;
-                if (rNode.config.IsFadeIn && rNode.config.fadeInTime > 0.0001f && activeTime <= rNode.config.fadeInTime)
-                {
-                    // 現在の進行度を求める
-                    float t = activeTime / rNode.config.fadeInTime;
-                    alpha = Mathf::EaseCurve(t, rNode.config.fadeInStartSpeed, rNode.config.fadeInEndSpeed);
-                }
-                // フェードアウトの計算
-                else if (rNode.config.IsFadeOut && rNode.config.fadeOutTime > 0.0001f)
-                {
-                    // 進行度を求める
-                    float fadeStartTime = rNode.config.lifeTime - rNode.config.fadeOutTime;
-
-                    if (activeTime >= fadeStartTime)
-                    {
-                        float t = (activeTime - fadeStartTime) / rNode.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
-                        alpha = 1.0f - Mathf::EaseCurve(t, rNode.config.fadeOutStartSpeed, rNode.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
-                    }
-                }
-
-                // 0.0～1.0の範囲に収める
-                alpha = Mathf::Clamp(alpha);
-
-                DirectX::XMFLOAT2 noiseUvOffset = {
-                    rNode.config.noiseUvOffset.x * activeTime,
-                    rNode.config.noiseUvOffset.y * activeTime
-                };
-                shader->SetNoiseUvOffset(noiseUvOffset);
-                shader->SetBlendMode(rNode.config.blendMode);
-
-                // タイプごとに色の計算をする
-                DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-                switch (rNode.config.colorMode)
-                {
-                case ColorMode::Fixed: // 固定色
-                    finalColor = rNode.config.color;
-
-                    break;
-                case ColorMode::Random: // ランダム
-                    finalColor = rNode.meshRandomColor;
-
-                    break;
-                case ColorMode::Easing: // イージング
-                {
-                    // 進行度を求める
-                    float t = activeTime / rNode.config.lifeTime;
-
-                    // イージング速度を求める
-                    float easeT = Mathf::EaseCurve(t, rNode.config.colorStartSpeed, rNode.config.colorEndSpeed);
-
-                    // Lerpを掛けて進行度にあ和得て色を変化させる
-                    finalColor.x = Mathf::Lerp(rNode.meshStartColor.x, rNode.meshEndColor.x, easeT);
-                    finalColor.y = Mathf::Lerp(rNode.meshStartColor.y, rNode.meshEndColor.y, easeT);
-                    finalColor.z = Mathf::Lerp(rNode.meshStartColor.z, rNode.meshEndColor.z, easeT);
-                    finalColor.w = Mathf::Lerp(rNode.meshStartColor.w, rNode.meshEndColor.w, easeT);
-
-                    break;
-                }
-                }
-
-                finalColor.w *= alpha;
-                shader->SetColor(finalColor); // このノード固有の色
-                shader->SetUvOffset(rNode.currentUvOffset);
-
-
-                for (const auto& mesh : rNode.meshModel->GetMeshes())
-                {
-                    // 頂点バッファ・インデックスバッファをセット
-                    UINT stride = sizeof(Model::Vertex);
-                    UINT offset = 0;
-                    dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-                    dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-                    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-                    // 行列とパラメータを定数バッファに更新して描画コール
-                    shader->SetWorldTransForm(rNode.worldTransform);
-                    shader->Update(rc, mesh);
-                    dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
-                }
+                float t = (activeTime - fadeStartTime) / rNode.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
+                alpha = 1.0f - Mathf::EaseCurve(t, rNode.config.fadeOutStartSpeed, rNode.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
             }
+        }
+
+        // 0.0～1.0の範囲に収める
+        alpha = Mathf::Clamp(alpha);
+
+        DirectX::XMFLOAT2 noiseUvOffset = {
+            rNode.config.noiseUvOffset.x * activeTime,
+            rNode.config.noiseUvOffset.y * activeTime
+        };
+        shader->SetNoiseUvOffset(noiseUvOffset);
+        shader->SetBlendMode(rNode.config.blendMode);
+
+        // タイプごとに色の計算をする
+        DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        switch (rNode.config.colorMode)
+        {
+        case ColorMode::Fixed: // 固定色
+            finalColor = rNode.config.color;
+
+            break;
+        case ColorMode::Random: // ランダム
+            finalColor = rNode.meshRandomColor;
+
+            break;
+        case ColorMode::Easing: // イージング
+        {
+            // 進行度を求める
+            float t = activeTime / rNode.config.lifeTime;
+
+            // イージング速度を求める
+            float easeT = Mathf::EaseCurve(t, rNode.config.colorStartSpeed, rNode.config.colorEndSpeed);
+
+            finalColor.x = Mathf::Lerp(rNode.meshStartColor.x, rNode.meshEndColor.x, easeT);
+            finalColor.y = Mathf::Lerp(rNode.meshStartColor.y, rNode.meshEndColor.y, easeT);
+            finalColor.z = Mathf::Lerp(rNode.meshStartColor.z, rNode.meshEndColor.z, easeT);
+            finalColor.w = Mathf::Lerp(rNode.meshStartColor.w, rNode.meshEndColor.w, easeT);
+
+            break;
+        }
+        }
+
+        finalColor.w *= alpha;                        // ← フェードを透明度に掛ける
+        shader->SetColor(finalColor);                 // ← このノードの色を渡す
+        shader->SetUvOffset(rNode.currentUvOffset);   // ← UV スクロールを渡す
+
+        shader->SetUseVertexColor(isRing);   // リングのときだけ頂点カラーを使う
+
+        // Lerpを掛けて進行度にあ和得て色を変化させる
+        // 種類ごとに描く
+        if (isMesh)
+        {
+            for (const auto& mesh : rNode.meshModel->GetMeshes())
+            {
+                DrawVFXMesh(dc, shader, rc, rNode, mesh);
+            }
+        }
+        else
+        {
+            DrawVFXMesh(dc, shader, rc, rNode, *rNode.ringMesh);
         }
     }
 }
@@ -719,7 +747,7 @@ DirectX::XMMATRIX CustomEffect::ComputeLocalMatrix(const RuntimeNode& node) cons
 
     // 大きさ
     DirectX::XMFLOAT3 s = { 1, 1, 1 };
-    if (c.type == RenderType::Mesh)
+    if (c.type == RenderType::Mesh || c.type == RenderType::Ring)
     {
         switch (node.config.scaleMode)
         {
@@ -787,4 +815,93 @@ DirectX::XMMATRIX CustomEffect::ComputeEffectMatrix() const
     DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
     return S * R * T;
+}
+
+// リングの形をメッシュとして作る
+std::shared_ptr<Model::Mesh> CustomEffect::CreateRingMesh(ID3D11Device* device, const NodeConfig& c)
+{
+    auto mesh = std::make_shared<Model::Mesh>();
+
+    int division = (std::max)(3, c.ringDivision);
+    float start = DirectX::XMConvertToRadians(c.ringStartAngle);
+    float end = DirectX::XMConvertToRadians(c.ringEndAngle);
+
+    // 中心は外輪と内輪の間（比率で決める）
+    DirectX::XMFLOAT2 center = {
+        c.ringOuter.x + (c.ringInner.x - c.ringOuter.x) * c.ringCenterRatio,
+        c.ringOuter.y + (c.ringInner.y - c.ringOuter.y) * c.ringCenterRatio
+    };
+
+    // 頂点：分割ごとに「外側・内側」の2つ
+    for (int i = 0; i <= division; ++i)
+    {
+        float u = static_cast<float>(i) / division; // 円周上の点を等間隔に配置するために0.0f～1.0に標準化する
+        float angle = start + (end - start) * u; // 開始から終了までの線形補間
+        float cs = cosf(angle);
+        float sn = sinf(angle);
+
+        Model::Vertex outer;
+        outer.position = { cs * c.ringOuter.x, c.ringOuter.y, sn * c.ringOuter.x };
+        outer.texcoord = { u, 0.0f };
+        outer.tangent = c.ringOuterColor;          // ← 色を tangent に入れる
+        mesh->vertices.push_back(outer);
+
+        Model::Vertex mid;
+        mid.position = { cs * center.x, center.y, sn * center.x };
+        mid.texcoord = { u, c.ringCenterRatio };
+        mid.tangent = c.ringCenterColor;
+        mesh->vertices.push_back(mid);
+
+        Model::Vertex inner;
+        inner.position = { cs * c.ringInner.x, c.ringInner.y, sn * c.ringInner.x };
+        inner.texcoord = { u, 1.0f };
+        inner.tangent = c.ringInnerColor;
+        mesh->vertices.push_back(inner);
+    }
+
+    // インデックス：1区画を三角形2枚で埋める（裏からも見えるように両面つくる）
+    for (int i = 0; i < division; ++i)
+    {
+        uint32_t a = i * 3, b = (i + 1) * 3;   // 各角度の先頭（外輪）の番号
+        for (int band = 0; band < 2; ++band)
+        {
+            uint32_t p0 = a + band, p1 = b + band;        // 外側の辺
+            uint32_t q0 = a + band + 1, q1 = b + band + 1; // 内側の辺
+            mesh->indices.insert(mesh->indices.end(), { p0, p1, q0,  q0, p1, q1 }); // 表
+            mesh->indices.insert(mesh->indices.end(), { p0, q0, p1,  q0, q1, p1 }); // 裏
+        }
+    }
+
+    // 頂点バッファ
+    D3D11_BUFFER_DESC vbDesc = {};
+    vbDesc.ByteWidth = static_cast<UINT>(sizeof(Model::Vertex) * mesh->vertices.size());
+    vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    D3D11_SUBRESOURCE_DATA vbData = { mesh->vertices.data() };
+    device->CreateBuffer(&vbDesc, &vbData, mesh->vertexBuffer.GetAddressOf());
+
+    // インデックスバッファ
+    D3D11_BUFFER_DESC ibDesc = {};
+    ibDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * mesh->indices.size());
+    ibDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    D3D11_SUBRESOURCE_DATA ibData = { mesh->indices.data() };
+    device->CreateBuffer(&ibDesc, &ibData, mesh->indexBuffer.GetAddressOf());
+
+    return mesh;
+}
+
+void CustomEffect::DrawVFXMesh(ID3D11DeviceContext* dc, meshVFX* shader, RenderContext& rc, RuntimeNode& node, const Model::Mesh& mesh)
+{
+    // 頂点バッファ・インデックスバッファをセット
+    UINT stride = sizeof(Model::Vertex);
+    UINT offset = 0;
+    dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+    dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    // 行列とパラメータを定数バッファに更新して描画コール
+    shader->SetWorldTransForm(node.worldTransform);
+    shader->Update(rc, mesh);
+    dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }

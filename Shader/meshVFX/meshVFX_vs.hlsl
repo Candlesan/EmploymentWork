@@ -11,6 +11,10 @@ VS_OUT main(
     vout.position = mul(position, worldViewProjection);
     vout.color = vfxColor;
     vout.texcoord = texcoord;
-
+    
+    // リングのときだけ tangent を頂点カラーとして掛ける（モデルは 1,1,1,1 のまま）
+    float4 vertexColor = lerp(float4(1, 1, 1, 1), tangent, useVertexColor);
+    vout.color = vfxColor * vertexColor;
+    
     return vout;
 }

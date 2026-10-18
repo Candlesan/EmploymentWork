@@ -34,7 +34,6 @@ public:
 	void Render(RenderContext& rc);
 	void RenderMeshVFX(meshVFX* shader, RenderContext& rc);
 
-
 	// エフェクト終了関数
 	bool IsFinished();
 
@@ -82,6 +81,7 @@ private:
 		bool emitting = false;	// パーティクルは発生中か
 		bool finished = false;	// このノードはもう終わったか
 		bool trailNeedsReset = false;
+		std::shared_ptr<Model::Mesh> ringMesh;
 	};
 
 	EffectConfig config;
@@ -97,10 +97,18 @@ private:
 	std::vector<RuntimeNode> runTimeNodes; // 複数ノードに対応した配列
 	std::vector<int> updateOrder;
 
+
 private:
 	void EmitParticles(float elapsedTime);
 	void BeginNodeCycle(RuntimeNode& node, bool isFirstCycle);
 
 	DirectX::XMMATRIX ComputeLocalMatrix(const RuntimeNode& node) const;
 	DirectX::XMMATRIX ComputeEffectMatrix() const;
+
+	// リングの形をメッシュとして作る
+	static std::shared_ptr<Model::Mesh> CreateRingMesh(ID3D11Device* device, const NodeConfig& c);
+
+	// メッシュ1つ分を描く（モデルの各メッシュ・リングで共通）
+	void DrawVFXMesh(ID3D11DeviceContext* dc, meshVFX* shader, RenderContext& rc,
+		RuntimeNode& node, const Model::Mesh& mesh);
 };

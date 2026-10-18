@@ -44,7 +44,7 @@ private:
 
 	// ヘルパー関数
 	void RebuildPreview(); // 今の設定でプレビュー用のエフェクトを作り直す
-
+	void DrawNodeTreeItem(int index, int depth);
 private:
 	EffectConfig currentConfig; // 現在調整中の設定データ
 
