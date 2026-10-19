@@ -12,7 +12,7 @@ public:
 	void Initialize();
 
 	// 更新処理
-	void Update(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip);
+	void Update(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip, float elapsedTime, float length);
 
 	// 描画処理
 	void Render(const RenderContext& rc);
@@ -20,6 +20,7 @@ public:
 	// ゲッターセッター
 	bool SetTexture(const std::string& texturePath);
 	void SetColor(DirectX::XMFLOAT4 c) { color = c; }
+	void SetBlendMode(int mode) { blendMode = mode; }
 
 	// 前・中・後ろの倍率をセットする関数
 	void SetWidthScales(float start, float middle, float end) {
@@ -55,7 +56,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 	D3D11_TEXTURE2D_DESC trail_texture2d_desc;
 
-	static const int MAX_POLYGON = 16;
+	static const int MAX_POLYGON = 128;
 	DirectX::XMFLOAT3 trailPositions[2][MAX_POLYGON];
 	bool spline;
 	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
@@ -66,6 +67,12 @@ private:
 	float widthStart = 1.0f;
 	float widthMiddle = 1.0f;
 	float widthEnd = 0.0f;
+
+	float sampleTimer = 0.0f; // 前の点を記録してからの時間
+	int blendMode = 1; // ０：半透明、　１：加算
+
+	float pointAge[MAX_POLYGON] = {};      // 各点が何秒前に記録されたか
+	float trailLength = 0.0f;              // Render で使うので覚えておく
 
 	std::string currentTexturePath;
 };

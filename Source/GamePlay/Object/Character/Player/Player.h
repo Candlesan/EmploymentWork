@@ -125,7 +125,7 @@ private:
 	void UpdateTimers(float elapsedTime);
 	void UpdateLockAt(float elapsedTime);
 	void CalculateStatusParameters();
-	void CalculationRootAndTip();
+	//void CalculationRootAndTip();
 	void CalculateSpineRotation(float elapsedTime);
 
 	// 音を取得（無ければ自動ロード）する関数

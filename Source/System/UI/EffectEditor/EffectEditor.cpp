@@ -483,7 +483,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
             if (ImGui::Combo(u8"描画方法##RenderTypeCombo", &currentType, renderTypeItems, IM_ARRAYSIZE(renderTypeItems)))
             {
-                node.type = static_cast<RenderType>(currentType);
+                node.type = renderTypeOrder[currentType];
             }
             ImGui::Separator();
 
@@ -601,7 +601,10 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             else if (node.type == RenderType::Trail)
             {
                 // トレイル用テクスチャ読込 ＆ 幅設定
+                ImGui::DragFloat(u8"長さ(秒)", &node.trailLength, 0.01f);
                 ImGui::DragFloat(u8"幅(太さ)", &node.width, 0.1f);
+                ImGui::Separator();
+
                 ImGui::Text(u8"【幅スケール (形状)】");
                 ImGui::DragFloat(u8"先端(頭)", &node.widthStart, 0.01f, 0.0f, 5.0f);
                 ImGui::DragFloat(u8"中央", &node.widthMiddle, 0.01f, 0.0f, 5.0f);

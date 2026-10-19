@@ -304,7 +304,7 @@ void Player::Update(float elapsedTime)
 	UpdateVelocity(elapsedTime);
 
 	// 根本と剣先を求める関数
-	CalculationRootAndTip();
+	//CalculationRootAndTip();
 
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
@@ -2008,26 +2008,26 @@ void Player::CalculateStatusParameters()
 }
 
 // 剣先と根本を求める関数
-void Player::CalculationRootAndTip()
-{
-	for (int i = 0; i < 2; ++i)
-	{
-		// 剣の根本・先端の座標を計算
-		DirectX::XMVECTOR RootOffset = DirectX::XMLoadFloat3(&rootOffset);
-		DirectX::XMVECTOR TipOffset = DirectX::XMLoadFloat3(&tipOffset);
-
-		DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&weapon.transform);
-
-		DirectX::XMVECTOR Root = DirectX::XMVector3TransformCoord(RootOffset, W);
-		DirectX::XMVECTOR Tip = DirectX::XMVector3TransformCoord(TipOffset, W);
-
-		DirectX::XMFLOAT3 rootF3, tipF3;
-		DirectX::XMStoreFloat3(&rootF3, Root);
-		DirectX::XMStoreFloat3(&tipF3, Tip);
-
-		trail.Update(rootF3, tipF3);
-	}
-}
+//void Player::CalculationRootAndTip()
+//{
+//	for (int i = 0; i < 2; ++i)
+//	{
+//		// 剣の根本・先端の座標を計算
+//		DirectX::XMVECTOR RootOffset = DirectX::XMLoadFloat3(&rootOffset);
+//		DirectX::XMVECTOR TipOffset = DirectX::XMLoadFloat3(&tipOffset);
+//
+//		DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&weapon.transform);
+//
+//		DirectX::XMVECTOR Root = DirectX::XMVector3TransformCoord(RootOffset, W);
+//		DirectX::XMVECTOR Tip = DirectX::XMVector3TransformCoord(TipOffset, W);
+//
+//		DirectX::XMFLOAT3 rootF3, tipF3;
+//		DirectX::XMStoreFloat3(&rootF3, Root);
+//		DirectX::XMStoreFloat3(&tipF3, Tip);
+//
+//		trail.Update(rootF3, tipF3);
+//	}
+//}
 
 // 移動時の背骨の回転角度を求める関数
 void Player::CalculateSpineRotation(float elapsedTime)

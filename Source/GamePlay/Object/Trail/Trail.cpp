@@ -65,18 +65,41 @@ void Trail::Initialize()
 }
 
 // 更新処理
-void Trail::Update(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip)
+void Trail::Update(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip, float elapsedTime, float length)
 {
-	// 過去の軌跡を一つ後ろにずらす
-	for (int i = MAX_POLYGON - 1; i > 0; --i)
+	trailLength = length;
+
+	// 全部の点を古い値にする
+	for (int i = 0; i < MAX_POLYGON; ++i)
 	{
-		trailPositions[0][i] = trailPositions[0][i - 1]; // 根本を一つ後ろへ
-		trailPositions[1][i] = trailPositions[1][i - 1]; // 先端を一つ後ろへ
+		pointAge[i] += elapsedTime;
+	}
+
+	// 点を記録する間隔（長さを点の数で割る）
+	float interval = (length > 0.0f) ? length / (MAX_POLYGON - 1) : 0.0f;
+
+	// 時間を進める
+	sampleTimer += elapsedTime;
+
+	// 間隔分時間がたったら、過去の点を一つずらす
+	if (sampleTimer >= interval)
+	{
+		// 余りを次の周期に引き継いでリセットする
+		sampleTimer = (interval > 0.0f) ? fmodf(sampleTimer, interval) : 0.0f;
+
+		// 過去の軌跡を一つ後ろにずらす
+		for (int i = MAX_POLYGON - 1; i > 0; --i)
+		{
+			trailPositions[0][i] = trailPositions[0][i - 1]; // 根本を一つ後ろへ
+			trailPositions[1][i] = trailPositions[1][i - 1]; // 先端を一つ後ろへ
+			pointAge[i] = pointAge[i - 1];   // ← 年齢も一緒にずらす
+		}
 	}
 
 	// 剣の根元の座標を取得し最新の頂点座標を保存
 	trailPositions[0][0] = root;
 	trailPositions[1][0] = tip;
+	pointAge[0] = 0.0f;
 }
 
 // 描画処理
@@ -92,7 +115,10 @@ void Trail::Render(const RenderContext& rc)
 
 	for (int i = 0; i < MAX_POLYGON; ++i)
 	{
-		float uvV = (float)i / (MAX_POLYGON - 1); // 0が新しい端、1が古い端
+		// 長さが決まっていれば「何秒前か ÷ 長さ」、0 なら今まで通り番号で決める
+		float uvV = (trailLength > 0.0f)
+			? (std::min)(pointAge[i] / trailLength, 1.0f)
+			: static_cast<float>(i) / (MAX_POLYGON - 1);
 
 		// uvV(0.0～1,0)の位置に応じて前・中・後ろの倍率を補間計算
 		float scale = 1.0f;
@@ -158,9 +184,14 @@ void Trail::Render(const RenderContext& rc)
 		rc.renderState->GetDepthStencilState(DepthState::TestOnly),
 		0);
 
-	dc->OMSetBlendState(
-		rc.renderState->GetBlendState(BlendState::Additive), // 加算ブレンド
-		nullptr, 0xFFFFFFFF);
+	if (blendMode == 1) // 加算合成
+	{
+		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Additive), nullptr, 0xFFFFFFFF);
+	}
+	else // 通常半透明
+	{
+		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
+	}
 
 	// 描画
 	dc->Draw(MAX_POLYGON * 2, 0);
@@ -212,4 +243,7 @@ void Trail::Reset(DirectX::XMFLOAT3 root, DirectX::XMFLOAT3 tip)
 		trailPositions[0][i] = root;
 		trailPositions[1][i] = tip;
 	}
+
+	sampleTimer = 0.0f;
+	pointAge[0] = 0.0f;
 }

@@ -305,6 +305,8 @@ void CustomEffect::Update(float elapsedTime)
             if (node.trail)
             {
                 node.trail->SetWidthScales(node.config.widthStart, node.config.widthMiddle, node.config.widthEnd);
+                node.trail->SetBlendMode(node.config.blendMode);
+                node.trail->SetColor(ComputeNodeColor(node));
 
                 if (node.trailNeedsReset)
                 {
@@ -313,8 +315,7 @@ void CustomEffect::Update(float elapsedTime)
                 }
                 else
                 {
-                    node.trail->SetColor(node.config.color);
-                    node.trail->Update(root, tip);
+                    node.trail->Update(root, tip, elapsedTime, node.config.trailLength);
                 }
             }
         }
@@ -370,79 +371,19 @@ void CustomEffect::RenderMeshVFX(meshVFX* shader, RenderContext& rc)
 
         float activeTime = rNode.localTime;
 
-        // テクスチャをセット
-        shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
-        shader->SetDistortionPower(rNode.config.distortionPower);
-
-
-        // フェードインの計算
-        float alpha = 1.0f;
-        if (rNode.config.IsFadeIn && rNode.config.fadeInTime > 0.0001f && activeTime <= rNode.config.fadeInTime)
-        {
-            // 現在の進行度を求める
-            float t = activeTime / rNode.config.fadeInTime;
-            alpha = Mathf::EaseCurve(t, rNode.config.fadeInStartSpeed, rNode.config.fadeInEndSpeed);
-        }
-        // フェードアウトの計算
-        else if (rNode.config.IsFadeOut && rNode.config.fadeOutTime > 0.0001f)
-        {
-            // 進行度を求める
-            float fadeStartTime = rNode.config.lifeTime - rNode.config.fadeOutTime;
-
-            if (activeTime >= fadeStartTime)
-            {
-                float t = (activeTime - fadeStartTime) / rNode.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
-                alpha = 1.0f - Mathf::EaseCurve(t, rNode.config.fadeOutStartSpeed, rNode.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
-            }
-        }
-
-        // 0.0～1.0の範囲に収める
-        alpha = Mathf::Clamp(alpha);
-
         DirectX::XMFLOAT2 noiseUvOffset = {
             rNode.config.noiseUvOffset.x * activeTime,
             rNode.config.noiseUvOffset.y * activeTime
         };
+
         shader->SetNoiseUvOffset(noiseUvOffset);
         shader->SetBlendMode(rNode.config.blendMode);
+        shader->SetCurrentTextures(rNode.shaderResourceView.Get(), rNode.noiseShaderResourceView.Get());
+        shader->SetDistortionPower(rNode.config.distortionPower);
+        shader->SetColor(ComputeNodeColor(rNode));  // ← このノードの色を渡す
+        shader->SetUvOffset(rNode.currentUvOffset); // ← UV スクロールを渡す
+        shader->SetUseVertexColor(isRing);          // リングのときだけ頂点カラーを使う
 
-        // タイプごとに色の計算をする
-        DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-        switch (rNode.config.colorMode)
-        {
-        case ColorMode::Fixed: // 固定色
-            finalColor = rNode.config.color;
-
-            break;
-        case ColorMode::Random: // ランダム
-            finalColor = rNode.meshRandomColor;
-
-            break;
-        case ColorMode::Easing: // イージング
-        {
-            // 進行度を求める
-            float t = activeTime / rNode.config.lifeTime;
-
-            // イージング速度を求める
-            float easeT = Mathf::EaseCurve(t, rNode.config.colorStartSpeed, rNode.config.colorEndSpeed);
-
-            finalColor.x = Mathf::Lerp(rNode.meshStartColor.x, rNode.meshEndColor.x, easeT);
-            finalColor.y = Mathf::Lerp(rNode.meshStartColor.y, rNode.meshEndColor.y, easeT);
-            finalColor.z = Mathf::Lerp(rNode.meshStartColor.z, rNode.meshEndColor.z, easeT);
-            finalColor.w = Mathf::Lerp(rNode.meshStartColor.w, rNode.meshEndColor.w, easeT);
-
-            break;
-        }
-        }
-
-        finalColor.w *= alpha;                        // ← フェードを透明度に掛ける
-        shader->SetColor(finalColor);                 // ← このノードの色を渡す
-        shader->SetUvOffset(rNode.currentUvOffset);   // ← UV スクロールを渡す
-
-        shader->SetUseVertexColor(isRing);   // リングのときだけ頂点カラーを使う
-
-        // Lerpを掛けて進行度にあ和得て色を変化させる
-        // 種類ごとに描く
         if (isMesh)
         {
             for (const auto& mesh : rNode.meshModel->GetMeshes())
@@ -704,7 +645,11 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
         node.meshUniformEndScale = node.config.scaleUniformEnd + Mathf::RandomRange(-node.config.scaleUniformEndRandom, node.config.scaleUniformEndRandom); // 終点の中心 + 振れ幅
     }
 
-    if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Random)
+    const bool usesColor = (node.config.type == RenderType::Mesh ||
+        node.config.type == RenderType::Trail ||
+        node.config.type == RenderType::Ring);
+
+    if (usesColor && node.config.colorMode == ColorMode::Random)
     {
         // 色をランダムで取得する
         node.meshRandomColor.x = Mathf::RandomRange(node.config.colorMin.x, node.config.colorMax.x);
@@ -712,7 +657,7 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
         node.meshRandomColor.z = Mathf::RandomRange(node.config.colorMin.z, node.config.colorMax.z);
         node.meshRandomColor.w = Mathf::RandomRange(node.config.colorMin.w, node.config.colorMax.w);
     }
-    else if (node.config.type == RenderType::Mesh && node.config.colorMode == ColorMode::Easing)
+    else if (usesColor && node.config.colorMode == ColorMode::Easing)
     {
         // 始点の色を指定した範囲でランダムに取得
         node.meshStartColor.x = Mathf::RandomRange(node.config.colorStartMin.x, node.config.colorStartMax.x);
@@ -904,4 +849,66 @@ void CustomEffect::DrawVFXMesh(ID3D11DeviceContext* dc, meshVFX* shader, RenderC
     shader->SetWorldTransForm(node.worldTransform);
     shader->Update(rc, mesh);
     dc->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+}
+
+// 色とフェードをメッシュVFXに掛ける関数
+DirectX::XMFLOAT4 CustomEffect::ComputeNodeColor(const RuntimeNode& node) const
+{
+    // フェードインの計算
+    float alpha = 1.0f;
+    float activeTime = node.localTime;
+    if (node.config.IsFadeIn && node.config.fadeInTime > 0.0001f && activeTime <= node.config.fadeInTime)
+    {
+        // 現在の進行度を求める
+        float t = activeTime / node.config.fadeInTime;
+        alpha = Mathf::EaseCurve(t, node.config.fadeInStartSpeed, node.config.fadeInEndSpeed);
+    }
+    // フェードアウトの計算
+    else if (node.config.IsFadeOut && node.config.fadeOutTime > 0.0001f)
+    {
+        // 進行度を求める
+        float fadeStartTime = node.config.lifeTime - node.config.fadeOutTime;
+
+        if (activeTime >= fadeStartTime)
+        {
+            float t = (activeTime - fadeStartTime) / node.config.fadeOutTime; // 0.0 ~ 1.0 に正規化
+            alpha = 1.0f - Mathf::EaseCurve(t, node.config.fadeOutStartSpeed, node.config.fadeOutEndSpeed); // 1.0を引いて1.0～0.0のイージングにする
+        }
+    }
+
+    // 0.0～1.0の範囲に収める
+    alpha = Mathf::Clamp(alpha);
+
+
+    // タイプごとに色の計算をする
+    DirectX::XMFLOAT4 finalColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+    switch (node.config.colorMode)
+    {
+    case ColorMode::Fixed: // 固定色
+        finalColor = node.config.color;
+
+        break;
+    case ColorMode::Random: // ランダム
+        finalColor = node.meshRandomColor;
+
+        break;
+    case ColorMode::Easing: // イージング
+    {
+        // 進行度を求める
+        float t = activeTime / node.config.lifeTime;
+
+        // イージング速度を求める
+        float easeT = Mathf::EaseCurve(t, node.config.colorStartSpeed, node.config.colorEndSpeed);
+
+        finalColor.x = Mathf::Lerp(node.meshStartColor.x, node.meshEndColor.x, easeT);
+        finalColor.y = Mathf::Lerp(node.meshStartColor.y, node.meshEndColor.y, easeT);
+        finalColor.z = Mathf::Lerp(node.meshStartColor.z, node.meshEndColor.z, easeT);
+        finalColor.w = Mathf::Lerp(node.meshStartColor.w, node.meshEndColor.w, easeT);
+
+        break;
+    }
+    }
+
+    finalColor.w *= alpha; // ← フェードを透明度に掛ける
+    return finalColor;
 }

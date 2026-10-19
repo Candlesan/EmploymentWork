@@ -153,6 +153,7 @@ struct NodeConfig
 	float widthStart = 1.0f;											// 先端
 	float widthMiddle = 1.0f;											// 中央
 	float widthEnd = 0.0f;												// 末端
+	float trailLength = 0.3f;											// 帯の長さ(秒)
 
 	// [Ring用]
 	int ringDivision = 32;												// 分割数(何角形で円をつくるか)

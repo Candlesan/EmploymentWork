@@ -141,6 +141,7 @@ void EffectConfig::Save(const std::string& filePath)
         n["widthStart"] = node.widthStart;
         n["widthMiddle"] = node.widthMiddle;
         n["widthEnd"] = node.widthEnd;
+        n["trailLength"] = node.trailLength;
 
         // [Ringóp]
         n["ringDivision"] = node.ringDivision;
@@ -283,6 +284,7 @@ void EffectConfig::Load(const std::string& filePath)
                 node.widthStart = nodeJson.value("widthStart", 1.0f);
                 node.widthMiddle = nodeJson.value("widthMiddle", 1.0f);
                 node.widthEnd = nodeJson.value("widthEnd", 0.0f);
+                node.trailLength = nodeJson.value("trailLength", 0.3f);
 
                 // [Ringóp]
                 node.ringDivision = nodeJson.value("ringDivision", 32); // ç≈í·Ç≈3å¬Ç…ÇµÇƒÇ®Ç≠ëΩï™3äpå`Ç…Ç»ÇÈÇÕÇ∏

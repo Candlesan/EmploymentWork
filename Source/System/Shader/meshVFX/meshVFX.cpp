@@ -48,16 +48,6 @@ void meshVFX::Begin(const RenderContext& rc)
 
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestOnly), 0);
 
-	// 半透明ブレンド
-	if (blendMode == 1) // 加算合成 (Additive)
-	{
-		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Additive), nullptr, 0xFFFFFFFF);
-	}
-	else // 通常半透明 (Transparency)
-	{
-		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
-	}
-
 	// 定数バッファ
 	ID3D11Buffer* cbs[] =
 	{
@@ -74,6 +64,17 @@ void meshVFX::Begin(const RenderContext& rc)
 void meshVFX::Update(const RenderContext& rc, const Model::Mesh& mesh)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
+
+	// ブレンドモードの設定
+	// 半透明ブレンド
+	if (blendMode == 1) // 加算合成 (Additive)
+	{
+		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Additive), nullptr, 0xFFFFFFFF);
+	}
+	else // 通常半透明 (Transparency)
+	{
+		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
+	}
 
 	DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&worldTransform); // 自身のワールド座標を使う
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.camera->GetView());
@@ -99,6 +100,9 @@ void meshVFX::Update(const RenderContext& rc, const Model::Mesh& mesh)
 void meshVFX::End(const RenderContext& rc)
 {
 	ID3D11DeviceContext* dc = rc.deviceContext;
+
+	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
+	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
 
 	dc->VSSetShader(nullptr, nullptr, 0);
 	dc->PSSetShader(nullptr, nullptr, 0);

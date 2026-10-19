@@ -111,4 +111,7 @@ private:
 	// メッシュ1つ分を描く（モデルの各メッシュ・リングで共通）
 	void DrawVFXMesh(ID3D11DeviceContext* dc, meshVFX* shader, RenderContext& rc,
 		RuntimeNode& node, const Model::Mesh& mesh);
+
+	// 色とフェードをメッシュVFXに掛ける関数
+	DirectX::XMFLOAT4 ComputeNodeColor(const RuntimeNode& node) const;
 };
