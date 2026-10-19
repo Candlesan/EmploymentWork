@@ -186,8 +186,13 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     finalColor.a *= saturate(alpha);
     data.renderColor = finalColor;
     
-    //  深度ソート値算出
-    header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;
+    //  深度ソート値算出(相対位置モードやったらワールド座標に戻してから)
+    float3 worldPos = data.position.xyz;
+    if (local_space != 0)
+    {
+        worldPos = mul(float4(worldPos, 1), parent_world).xyz;
+    }
+        header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;
 
     //  更新情報を格納
     particle_header_buffer[header_index] = header;

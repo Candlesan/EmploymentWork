@@ -211,12 +211,6 @@ void CustomEffect::Update(float elapsedTime)
         node.currentUvOffset.x = fmodf(node.currentUvOffset.x, 1.0f);
         node.currentUvOffset.y = fmodf(node.currentUvOffset.y, 1.0f);
 
-        // パーティクルの計算を進める
-        if (node.particleManager)
-        {
-            node.particleManager->Update(dc, delta, elapsedTime);
-        }
-
         if (!node.config.visible || node.finished) continue; // 非表示またはそのノードが終わったら飛ばす
 
         allFinished = false; // まだ終わってないノードある
@@ -319,6 +313,19 @@ void CustomEffect::Update(float elapsedTime)
                 }
             }
         }
+    }
+
+    // パーティクルの計算を進める
+    for (auto& node : runTimeNodes)
+    {
+        if (!node.particleManager) continue;
+
+        bool local = (node.config.particleFollowMode == 1);
+        node.particleManager->SetParent(node.worldTransform, local);
+
+        // 相対位置モードは行列でついていくので移動差分は計算しない
+        DirectX::XMFLOAT3 d = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : delta;
+        node.particleManager->Update(dc, d, elapsedTime);
     }
 
     EmitParticles(elapsedTime);
@@ -446,6 +453,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
 
         float rand = Mathf::RandFloat();
 
+        const bool local = (pConfig.particleFollowMode == 1);
+
         if (node.spawnTimer >=pConfig.spawnInterval)
         {
             node.spawnTimer -=pConfig.spawnInterval;
@@ -480,7 +489,9 @@ void CustomEffect::EmitParticles(float elapsedTime)
                 data.fade_param.w = static_cast<float>(packedSpeed);
 
                 // 発生位置をワールド行列からとる
-                DirectX::XMFLOAT3 origin = { node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
+                // 発生位置：相対位置モードならノードの原点から、そうでなければワールド座標で
+                DirectX::XMFLOAT3 origin = local ? DirectX::XMFLOAT3{ 0, 0, 0 }
+                : DirectX::XMFLOAT3{ node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
 
                 // 位置
                 data.position = {
@@ -504,11 +515,13 @@ void CustomEffect::EmitParticles(float elapsedTime)
                     0.0f
                 };
 
+                DirectX::XMFLOAT3 baseAngle = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : this->angle;
+
                 // 回転
                 data.rotation = {
-                    DirectX::XMConvertToRadians(this->angle.x + (pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat()))),
-                    DirectX::XMConvertToRadians(this->angle.y + (pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat()))),
-                    DirectX::XMConvertToRadians(this->angle.z + (pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat()))),
+                    DirectX::XMConvertToRadians(baseAngle.x + (pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat()))),
+                    DirectX::XMConvertToRadians(baseAngle.y + (pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat()))),
+                    DirectX::XMConvertToRadians(baseAngle.z + (pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat()))),
                     pConfig.isBillboard ? 1.0f : 0.0f
                 };
                 data.rotVelocity = {

@@ -147,6 +147,7 @@ struct NodeConfig
 	std::string meshPath = "";											// モデルパス
 	std::string noisePath = "";											// ノイズテクスチャパス
 	float distortionPower = 0.0f;										// 歪みの強さ
+	int particleFollowMode = 0;											// 0:生成時のみ（その場に出現）1:常に親に追従
 
 	// [Trail用]
 	float width = 1.0f;													

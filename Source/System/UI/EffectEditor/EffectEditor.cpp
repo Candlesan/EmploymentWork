@@ -270,6 +270,13 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::DragFloat(u8"ê∂ê¨ä‘äu(ïb)##Particle", &node.spawnInterval, 0.01f, 0.01f, 5.0f, "%.2fs");
             ImGui::DragFloat(u8"ë∂ë±éûä‘(ïb)##Particle", &node.duration, 0.1f, 0.0f, 60.0f, u8"%.1fs (0=ñ≥å¿)");
             ImGui::DragFloat(u8"î≠ê∂íxâÑ(ïb)##Particle", &node.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
+            ImGui::Separator();
+
+            if (node.type == RenderType::Particle)
+            {
+                const char* followItems[] = { u8"ê∂ê¨éûÇÃÇ›", u8"èÌÇ…í«è]" };
+                ImGui::Combo(u8"êeÇ÷ÇÃí«è]", &node.particleFollowMode, followItems, IM_ARRAYSIZE(followItems));
+            }
 
             ImGui::EndTabItem();
         }

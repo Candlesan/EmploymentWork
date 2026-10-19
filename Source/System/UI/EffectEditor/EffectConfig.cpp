@@ -130,6 +130,7 @@ void EffectConfig::Save(const std::string& filePath)
         n["splitCount"] = { node.splitCount[0], node.splitCount[1] };
         n["spriteType"] = node.spriteType;
         n["isBillboard"] = node.isBillboard;
+        n["particleFollowMode"] = node.particleFollowMode;
 
         // [Mesh—p]
         n["meshPath"] = node.meshPath;
@@ -274,6 +275,9 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("colorEndMax") != nodeJson.end()) node.colorEndMax = { nodeJson["colorEndMax"][0], nodeJson["colorEndMax"][1], nodeJson["colorEndMax"][2], nodeJson["colorEndMax"][3] };
                 node.colorStartSpeed = nodeJson.value("colorStartSpeed", 0.0f);
                 node.colorEndSpeed = nodeJson.value("colorEndSpeed", 0.0f);
+
+                // [Particle—p]
+                node.particleFollowMode = nodeJson.value("particleFollowMode", 0);
 
                 // [Mesh—p]
                 node.meshPath = nodeJson.value("meshPath", "");

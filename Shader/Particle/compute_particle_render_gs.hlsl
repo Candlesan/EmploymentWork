@@ -126,10 +126,28 @@ void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
     }
 
 	//  ワールド行列生成
+    float3 position = particle_data_buffer[vertex_id].position.xyz;
     float4x4 scale_matrix = matrix_scaling(scale);
     float4x4 rotation_matrix = mul(base_matrix, matrix_rotation_roll_pitch_yaw(particle_data_buffer[vertex_id].rotation.xyz));
     float4x4 translation_matrix = matrix_translation(particle_data_buffer[vertex_id].position.xyz);
-    float4x4 world_matrix = mul(mul(scale_matrix, rotation_matrix), translation_matrix);
+    float4x4 world_matrix;
+    
+    if (local_space != 0 && particle_data_buffer[vertex_id].rotation.w > 0.5f)
+    {
+        // 相対位置　＋　ビルボード：位置だけ親行列を動かして、向きはカメラに向けたまま
+        float3 worldPos = mul(float4(position, 1), parent_world).xyz;
+        world_matrix = mul(mul(scale_matrix, rotation_matrix), matrix_translation(worldPos));
+    }
+    else if (local_space != 0)
+    {
+        // 相対位置　＋ビルボード無し：粒の行列ごと親の行列で動かす（親と一緒に回る）
+        world_matrix = mul(mul(mul(scale_matrix, rotation_matrix), matrix_translation(position)), parent_world);
+    }
+    else
+    {
+        world_matrix = mul(mul(scale_matrix, rotation_matrix), translation_matrix);
+    }
+    
     float4x4 world_view_projection_matrix = mul(world_matrix, viewProjection);
 
     //  各種情報取得

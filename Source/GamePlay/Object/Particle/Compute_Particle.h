@@ -26,6 +26,12 @@ public:
 
 	// ゲッターセッター
 	bool SetTexture(const std::string& texturePath, DirectX::XMUINT2 splitCount = { 1, 1 });
+
+	void SetParent(const DirectX::XMFLOAT4X4& world, bool local)
+	{
+		if (system) system->set_parent(world, local);
+	}
+	
 private:
 	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
 

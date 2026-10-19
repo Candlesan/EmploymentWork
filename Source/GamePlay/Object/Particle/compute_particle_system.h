@@ -116,6 +116,11 @@ public:
         UINT total_emit_count;		            //	現在のフレームでのパーティクル総生成数
 
         DirectX::XMFLOAT3 parent_delta;      // 親の位置
+
+        DirectX::XMFLOAT4X4 parent_world; // 親のワールド行列
+        UINT local_space; // 1 = 相対位置で動かして、描くときに parent_world 
+
+        UINT padding[3];
     };
 
     //	DispatchIndirect用構造体
@@ -188,6 +193,12 @@ public:
         shader_resource_view = srv;
         texture_split_count = split_count;
     }
+
+    void set_parent(const DirectX::XMFLOAT4X4& world, bool local)
+    {
+        parent_world = world;
+        local_space = local;
+    }
 private:
     UINT num_particles;
     UINT num_emit_particles;
@@ -219,4 +230,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader;
     Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometry_shader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader;
+
+    DirectX::XMFLOAT4X4 parent_world = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
+    bool local_space = false;
 };

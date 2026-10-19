@@ -120,6 +120,10 @@ cbuffer COMPUTE_PARTICLE_COMMON_CONSTANT_BUFFER : register(b10)
     uint total_emit_count; // 生成予定のパーティクル数
     
     float3 parent_delta; // 親の位置
+    
+    row_major float4x4 parent_world; // 親のワールド行列
+    uint local_space; // 1 = 相対位置モード
+    uint common_padding;
 };
 
 //=========================================================================================
