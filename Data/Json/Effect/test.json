@@ -52,7 +52,7 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 1.0,
+            "duration": 0.0,
             "emitCount": 1,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
@@ -63,7 +63,7 @@
             "id": 1,
             "isBillboard": true,
             "isLoop": true,
-            "lifeTime": 1.0,
+            "lifeTime": 5.0,
             "meshPath": "",
             "name": "Node",
             "noisePath": "",
@@ -72,6 +72,7 @@
                 0.0
             ],
             "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 0.0,
@@ -95,13 +96,42 @@
             "positionVelocity": [
                 0.0,
                 0.0,
-                0.0
+                1.0
             ],
             "positionVelocityRange": [
                 0.0,
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -169,13 +199,14 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 1.0,
+            "spawnInterval": 5.0,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
-            "texturePath": "",
+            "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
+            "trailLength": 0.30000001192092896,
             "type": 0,
             "uvScrollSpeed": [
                 0.0,
@@ -190,7 +221,7 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
-            "blendMode": 0,
+            "blendMode": 1,
             "color": [
                 1.0,
                 1.0,
@@ -246,22 +277,23 @@
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "id": 2,
+            "id": 3,
             "isBillboard": true,
             "isLoop": true,
             "lifeTime": 1.0,
             "meshPath": "",
-            "name": "Node 2",
+            "name": "Node 3",
             "noisePath": "",
             "noiseUvOffset": [
                 0.0,
                 0.0
             ],
             "parentId": 1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
-                0.0,
-                0.0
+                -0.5,
+                -1.0
             ],
             "positionAcceleration": [
                 0.0,
@@ -288,6 +320,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -361,8 +422,9 @@
                 1
             ],
             "spriteType": 0,
-            "texturePath": "",
-            "type": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
+            "trailLength": 1.0,
+            "type": 2,
             "uvScrollSpeed": [
                 0.0,
                 0.0

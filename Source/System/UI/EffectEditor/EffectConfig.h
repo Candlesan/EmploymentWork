@@ -141,7 +141,8 @@ struct NodeConfig
 	std::string texturePath = "";										// 使うpng画像
 	int splitCount[2] = { 1, 1 };										// 画像の分割数（X, Y。デフォルトは4x4）
 	int spriteType = 0;													// コマ番号
-	bool isBillboard = true;											// ビルボードするか
+	int billboardType = 1;												// 0:なし 1:ビルボード 2:速度方向に伸ばす
+	float stretchScale = 0.1f;											// 速度方向に伸ばす量
 
 	// [Mesh用]
 	std::string meshPath = "";											// モデルパス

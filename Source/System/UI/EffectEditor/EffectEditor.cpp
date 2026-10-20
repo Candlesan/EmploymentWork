@@ -408,8 +408,12 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
             ImGui::Separator();
 
-
-            ImGui::Checkbox(u8"ビルボード##Particle", &node.isBillboard);
+            const char* billboardItems[] = { u8"なし", u8"ビルボード", u8"速度方向に伸ばす" };
+            ImGui::Combo(u8"ビルボード##Particle", &node.billboardType, billboardItems, IM_ARRAYSIZE(billboardItems));
+            if (node.billboardType == 2)
+            {
+                ImGui::DragFloat(u8"伸ばす量##Stretch", &node.stretchScale, 0.01f, 0.0f, 10.0f);
+            }
             ImGui::Separator();
 
             const char* blendItems[] = { u8"通常半透明 (Alpha)", u8"加算 (Additive)" };

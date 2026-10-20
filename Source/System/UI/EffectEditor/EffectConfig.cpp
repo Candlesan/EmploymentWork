@@ -129,8 +129,9 @@ void EffectConfig::Save(const std::string& filePath)
         n["texturePath"] = node.texturePath;
         n["splitCount"] = { node.splitCount[0], node.splitCount[1] };
         n["spriteType"] = node.spriteType;
-        n["isBillboard"] = node.isBillboard;
         n["particleFollowMode"] = node.particleFollowMode;
+        n["billboardType"] = node.billboardType;
+        n["stretchScale"] = node.stretchScale;
 
         // [Mesh用]
         n["meshPath"] = node.meshPath;
@@ -209,7 +210,6 @@ void EffectConfig::Load(const std::string& filePath)
                 node.emitCount = nodeJson.value("emitCount", 1);
                 node.lifeTime  = nodeJson.value("lifeTime", 1.0f);
                 node.isLoop    = nodeJson.value("isLoop", true);
-                node.isBillboard   = nodeJson.value("isBillboard", true);
                 node.spawnInterval = nodeJson.value("spawnInterval", 0.1f);
                 node.duration =  nodeJson.value("duration", 1.0f);
                 node.delayTime = nodeJson.value("delayTime", 0.0f);
@@ -278,6 +278,11 @@ void EffectConfig::Load(const std::string& filePath)
 
                 // [Particle用]
                 node.particleFollowMode = nodeJson.value("particleFollowMode", 0);
+                if (nodeJson.find("billboardType") != nodeJson.end())
+                    node.billboardType = nodeJson["billboardType"];
+                else
+                    node.billboardType = nodeJson.value("isBillboard", true) ? 1 : 0;
+                node.stretchScale = nodeJson.value("stretchScale", 0.1f);
 
                 // [Mesh用]
                 node.meshPath = nodeJson.value("meshPath", "");
@@ -299,6 +304,7 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("ringOuterColor") != nodeJson.end()) node.ringOuterColor = { nodeJson["ringOuterColor"][0], nodeJson["ringOuterColor"][1], nodeJson["ringOuterColor"][2], nodeJson["ringOuterColor"][3] };
                 if (nodeJson.find("ringCenterColor") != nodeJson.end()) node.ringCenterColor = { nodeJson["ringCenterColor"][0], nodeJson["ringCenterColor"][1], nodeJson["ringCenterColor"][2], nodeJson["ringCenterColor"][3] };
                 if (nodeJson.find("ringInnerColor") != nodeJson.end()) node.ringInnerColor = { nodeJson["ringInnerColor"][0], nodeJson["ringInnerColor"][1], nodeJson["ringInnerColor"][2], nodeJson["ringInnerColor"][3] };
+
 
 
                 // 読み込んだノードを追加
@@ -334,6 +340,8 @@ void EffectConfig::Load(const std::string& filePath)
                 node.parentId = -1;
             }
         }
+
+
     }
     catch (const nlohmann::json::exception& e)
     {

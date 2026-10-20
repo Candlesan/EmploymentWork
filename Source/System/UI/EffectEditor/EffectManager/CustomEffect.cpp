@@ -522,7 +522,7 @@ void CustomEffect::EmitParticles(float elapsedTime)
                     DirectX::XMConvertToRadians(baseAngle.x + (pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat()))),
                     DirectX::XMConvertToRadians(baseAngle.y + (pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat()))),
                     DirectX::XMConvertToRadians(baseAngle.z + (pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat()))),
-                    pConfig.isBillboard ? 1.0f : 0.0f
+                    static_cast<float>(pConfig.billboardType)
                 };
                 data.rotVelocity = {
                     DirectX::XMConvertToRadians(pConfig.rotationVelocity.x + (pConfig.rotationVelocityRange.x * Mathf::RandFloat())),
@@ -580,6 +580,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
                     data.scale_param.y = pConfig.lifeTime;
                     break;
                 }
+                data.scale_param.z = pConfig.stretchScale; // 速度方向に伸ばす量
+
 
                 int colorEasingSpeed =
                     (pConfig.colorStartSpeed)

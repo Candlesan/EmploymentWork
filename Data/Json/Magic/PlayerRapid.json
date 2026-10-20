@@ -1,0 +1,1524 @@
+{
+    "effectName": "NewEffect",
+    "nodes": [
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 1,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                0.5098039507865906
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.20000000298023224,
+            "duration": 1.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 1,
+            "isBillboard": true,
+            "isLoop": true,
+            "lifeTime": 0.0,
+            "meshPath": "Data\\Sprite\\Particle\\model\\Sphere.gltf",
+            "name": "本体",
+            "noisePath": "Data\\Sprite\\Particle\\texture\\aurora01.png",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": -1,
+            "particleFollowMode": 0,
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                10.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                180.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.25,
+                0.23000000417232513,
+                0.8700000047683716
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 1.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
+            "trailLength": 0.30000001192092896,
+            "type": 1,
+            "uvScrollSpeed": [
+                0.10000000149011612,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 1,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 1.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 2,
+            "isBillboard": false,
+            "isLoop": true,
+            "lifeTime": 1.0,
+            "meshPath": "",
+            "name": "トレイル1",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": 1,
+            "particleFollowMode": 0,
+            "position": [
+                0.0,
+                1.0,
+                2.5
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 1.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
+            "trailLength": 1.0,
+            "type": 2,
+            "uvScrollSpeed": [
+                0.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 1,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 1.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 3,
+            "isBillboard": true,
+            "isLoop": true,
+            "lifeTime": 1.0,
+            "meshPath": "",
+            "name": "トレイル2",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": 1,
+            "particleFollowMode": 0,
+            "position": [
+                1.0,
+                -1.0,
+                2.5
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                0.0,
+                1.0
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 1.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
+            "trailLength": 1.0,
+            "type": 2,
+            "uvScrollSpeed": [
+                0.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 1,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 1.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 4,
+            "isBillboard": true,
+            "isLoop": true,
+            "lifeTime": 1.0,
+            "meshPath": "",
+            "name": "トレイル3",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": 1,
+            "particleFollowMode": 0,
+            "position": [
+                -1.0,
+                -1.0,
+                2.5
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 1.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
+            "trailLength": 1.0,
+            "type": 2,
+            "uvScrollSpeed": [
+                0.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 1,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 1.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 5,
+            "isBillboard": true,
+            "isLoop": true,
+            "lifeTime": 1.0,
+            "meshPath": "",
+            "name": "オーラ",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": 1,
+            "particleFollowMode": 0,
+            "position": [
+                0.0,
+                0.0,
+                1.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                0.5882353186607361
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                0.0,
+                0.7573244571685791,
+                1.0,
+                0.5411764979362488
+            ],
+            "ringOuter": [
+                1.7899999618530273,
+                1.7899999618530273
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                0.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                -90.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 1.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\Aura.png",
+            "trailLength": 0.30000001192092896,
+            "type": 4,
+            "uvScrollSpeed": [
+                0.029999999329447746,
+                0.10000000149011612
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 0,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 1.0,
+            "emitCount": 1,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 6,
+            "isBillboard": true,
+            "isLoop": true,
+            "lifeTime": 100.0,
+            "meshPath": "",
+            "name": "光球",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": 1,
+            "particleFollowMode": 1,
+            "position": [
+                0.0,
+                0.0,
+                0.699999988079071
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                1.0,
+                0.5,
+                1.0
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 100.0,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\Particle_Soft.png",
+            "trailLength": 0.30000001192092896,
+            "type": 0,
+            "uvScrollSpeed": [
+                0.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        },
+        {
+            "IsFadeIn": false,
+            "IsFadeOut": false,
+            "blendMode": 0,
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorEndSpeed": 3,
+            "colorMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorMode": 0,
+            "colorStartMax": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartMin": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "colorStartSpeed": 3,
+            "delayTime": 0.0,
+            "distortionPower": 0.0,
+            "duration": 1.0,
+            "emitCount": 100,
+            "fadeInEndSpeed": 3,
+            "fadeInStartSpeed": 3,
+            "fadeInTime": 0.0,
+            "fadeOutEndSpeed": 3,
+            "fadeOutStartSpeed": 3,
+            "fadeOutTime": 0.0,
+            "id": 7,
+            "isBillboard": true,
+            "isLoop": true,
+            "lifeTime": 3.0,
+            "meshPath": "",
+            "name": "キラキラ",
+            "noisePath": "",
+            "noiseUvOffset": [
+                0.0,
+                0.0
+            ],
+            "parentId": 1,
+            "particleFollowMode": 1,
+            "position": [
+                0.0,
+                0.0,
+                -3.0
+            ],
+            "positionAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionRange": [
+                0.10000000149011612,
+                0.10000000149011612,
+                0.10000000149011612
+            ],
+            "positionVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "positionVelocityRange": [
+                10.0,
+                10.0,
+                10.0
+            ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
+            "rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotationVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                0.10000000149011612,
+                0.10000000149011612,
+                0.10000000149011612
+            ],
+            "scaleAcceleration": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleAccelerationRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleMode": 0,
+            "scaleRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleUniformEnd": 1.0,
+            "scaleUniformEndRandom": 0.0,
+            "scaleUniformEndSpeed": 3,
+            "scaleUniformStart": 1.0,
+            "scaleUniformStartRandom": 0.0,
+            "scaleUniformStartSpeed": 3,
+            "scaleVelocity": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scaleVelocityRange": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "spawnInterval": 0.5,
+            "splitCount": [
+                1,
+                1
+            ],
+            "spriteType": 0,
+            "texturePath": "Data\\Sprite\\Particle\\texture\\star_01.png",
+            "trailLength": 0.30000001192092896,
+            "type": 0,
+            "uvScrollSpeed": [
+                0.0,
+                0.0
+            ],
+            "visible": true,
+            "width": 1.0,
+            "widthEnd": 0.0,
+            "widthMiddle": 1.0,
+            "widthStart": 1.0
+        }
+    ]
+}

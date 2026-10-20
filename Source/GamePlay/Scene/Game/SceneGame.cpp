@@ -192,7 +192,7 @@ void SceneGame::Update(float elapsedTime)
 		ShowDebugSwitch();
 
 		// エフェクトエディターの更新
-		effectEditor->Update(Graphics::Instance().GetDeviceContext(), elapsedTime);
+		effectEditor->Update(Graphics::Instance().GetDeviceContext(), delta);
 
 		// エフェクト更新処理 
 		EffectManager::Instance().Update(delta);
@@ -205,8 +205,8 @@ void SceneGame::Update(float elapsedTime)
 
 		enemyUI.Update(enemy.get()->GetStatus());
 
-		uiEditor.Update(elapsedTime);
-		uiCanvas.Update(elapsedTime);
+		uiEditor.Update(delta);
+		uiCanvas.Update(delta);
 	}
 }
 

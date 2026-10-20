@@ -59,7 +59,7 @@ private:
 	static const int MAX_POLYGON = 128;
 	DirectX::XMFLOAT3 trailPositions[2][MAX_POLYGON];
 	bool spline;
-	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
+	DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 
 	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
 

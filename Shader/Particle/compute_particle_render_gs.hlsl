@@ -107,10 +107,70 @@ void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
     
     float4x4 base_matrix;
     
-    // wにいれたフラグが0.5f以上ならビルボードする
-    if (particle_data_buffer[vertex_id].rotation.w > 0.5f)
+    particle_data p = particle_data_buffer[vertex_id];
+    float billboardType = p.rotation.w; // 0:なし 1:ビルボード 2:速度方向に伸ばす
+    
+    // 速度方向に伸ばす
+    if (billboardType > 1.5f)
     {
-        //  ビルボード行列生成(ビュー行列の逆行列で良い。ただし移動値はいらない)
+        // ワールド座標の位置と速度（相対位置モードでは親の行列で直す）
+        float3 worldPos = p.position.xyz;
+        float3 velocity = p.posVelocity.xyz;
+        if (local_space != 0)
+        {
+            worldPos = mul(float4(worldPos, 1), parent_world).xyz; // ワールド行列と親の行列を掛け算してxyzだけ取り出す
+            velocity = mul(float4(velocity, 0), parent_world).xyz; // 速度やから向きだけを取り出す
+        }
+        
+        float speed = length(velocity);
+        float3 dir = (speed > 0.0001f) ? velocity / speed : float3(0, 1, 0); // 止まっていたら上向き
+        
+        // カメラへの向き(逆ビュー行列の移動成分がカメラの位置)
+        float3 cameraPos = inverseView._41_42_43;
+        float3 toCamera = normalize(cameraPos - worldPos); // カメラの位置
+        
+        // 幅の向き = 進む向きとカメラへの向きは直角
+        float3 side = cross(dir, toCamera);
+        float sideLen = length(side);
+        side = (sideLen > 0.0001f) ? side / sideLen : float3(1, 0, 0); // 真正面から見ているときの保険
+        
+        float width = scale.x;
+        float length_ = scale.y + speed * p.scale_param.z; // scale_param.zは伸ばす量
+        
+        // 粒の位置が先頭になるように、四角形の中心をうしろ
+        float3 center = worldPos - dir * (length_ * 0.5f);
+        
+        static const float2 corners[4] =
+        {
+            float2(-0.5f, -0.5f),
+            float2(+0.5f, -0.5f),
+            float2(-0.5f, +0.5f),
+            float2(+0.5f, +0.5f)
+        };
+        static const float2 uvs[4] =
+        {
+            float2(0, 0),
+            float2(1, 0),
+            float2(0, 1),
+            float2(1, 1)
+        };
+
+        for (uint i = 0; i < 4; i++)
+        {
+            float3 v = center + side * (corners[i].x * width) + dir * (corners[i].y * length_);
+
+            PS_IN element;
+            element.position = mul(float4(v, 1), viewProjection);
+            element.texcoord = p.texcoord.xy + p.texcoord.zw * uvs[i];
+            element.color = p.renderColor;
+            output.Append(element);
+        }
+        output.RestartStrip();
+        return;
+    }
+    else if (particle_data_buffer[vertex_id].rotation.w > 0.5f)
+    {
+        // ビルボード行列生成(ビュー行列の逆行列で良い。ただし移動値はいらない)
         base_matrix = inverseView;
         base_matrix._41_42_43 = float3(0, 0, 0);
         base_matrix._44 = 1.0f;
