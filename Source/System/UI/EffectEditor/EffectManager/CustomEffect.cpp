@@ -501,18 +501,35 @@ void CustomEffect::EmitParticles(float elapsedTime)
                    1.0f
                 };
                 // 初速度
-                data.posVelocity = {
-                   pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
-                   pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
-                   pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
-                    0.0f
-                };
+                if (pConfig.emitShape == 1)
+                {
+                    // ランダムな向き　×　ランダムな速さ（全方向に飛ばす）
+                    float z = Mathf::RandFloat(); // -1～1
+                    float theta = Mathf::RandomRange(0.0f, DirectX::XM_2PI);
+                    float r = sqrtf((std::max)(0.0f, 1.0f - z * z));
+                    float speed = Mathf::RandomRange(pConfig.burstSpeedMin, pConfig.burstSpeedMax);
+                    data.posVelocity = {
+                        pConfig.positionVelocity.x + r * cosf(theta) * speed,
+                        pConfig.positionVelocity.y + r * sinf(theta) * speed,
+                        pConfig.positionVelocity.z + z * speed,
+                        0.0f
+                    };
+                }
+                else
+                {
+                    data.posVelocity = {
+                        pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
+                        pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
+                        pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
+                         0.0f
+                    };
+                }
                 // 加速度
                 data.posAcceleration = {
                    pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * Mathf::RandFloat()),
                    pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * Mathf::RandFloat()),
                    pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * Mathf::RandFloat()),
-                    0.0f
+                   pConfig.drag
                 };
 
                 DirectX::XMFLOAT3 baseAngle = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : this->angle;

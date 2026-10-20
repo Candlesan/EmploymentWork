@@ -652,6 +652,26 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::EndTabItem();
         }
 
+        if (ImGui::BeginTabItem(u8"生成方法"))
+        {
+            const char* emitShapeItems[] = { u8"箱", u8"放射" };
+            ImGui::Combo(u8"生成方法", &node.emitShape, emitShapeItems, IM_ARRAYSIZE(emitShapeItems));
+            ImGui::Separator();
+
+            if (node.emitShape == 0)
+            {
+
+            }
+            else if (node.emitShape == 1)
+            {
+                ImGui::DragFloat(u8"最小速度##emitShape", &node.burstSpeedMin, 0.01f);
+                ImGui::DragFloat(u8"最大速度##emitShape", &node.burstSpeedMax, 0.01f);
+                ImGui::DragFloat(u8"空気抵抗##emitShape", &node.drag, 0.01f, 0.0f);
+            }
+
+            ImGui::EndTabItem();
+        }
+
         ImGui::EndTabBar();
     }
 }

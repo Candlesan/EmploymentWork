@@ -136,6 +136,14 @@ struct NodeConfig
 	int colorStartSpeed = static_cast<int>(SpeedType::Linear);			// 生成されてからの速度
 	int colorEndSpeed = static_cast<int>(SpeedType::Linear);			// 生存時間が終わるにつれての速度
 
+	// 生成方法
+	int emitShape = 0;													// 0:箱 1:放射
+
+	// 球
+	float drag = 0.0f;													// 空気抵抗
+	float burstSpeedMin = 0.0f;											// 最低初速度
+	float burstSpeedMax = 1.0f;											// 最大初速度
+
 	// --- 描画タイプごとの固有パラメータ ---
 	// [Particle用]
 	std::string texturePath = "";										// 使うpng画像

@@ -124,6 +124,14 @@ void EffectConfig::Save(const std::string& filePath)
         n["colorStartSpeed"] = node.colorStartSpeed;
         n["colorEndSpeed"] = node.colorEndSpeed;
 
+        // 生成方法
+        n["emitShape"] = node.emitShape;
+
+        // 球
+        n["burstSpeedMin"] = node.burstSpeedMin;
+        n["burstSpeedMax"] = node.burstSpeedMax;
+        n["drag"] = node.drag;
+
         // 固有パラメータ郡
         // [Particle用]
         n["texturePath"] = node.texturePath;
@@ -275,6 +283,15 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("colorEndMax") != nodeJson.end()) node.colorEndMax = { nodeJson["colorEndMax"][0], nodeJson["colorEndMax"][1], nodeJson["colorEndMax"][2], nodeJson["colorEndMax"][3] };
                 node.colorStartSpeed = nodeJson.value("colorStartSpeed", 0.0f);
                 node.colorEndSpeed = nodeJson.value("colorEndSpeed", 0.0f);
+
+                // 生成方法
+                node.emitShape = nodeJson.value("emitShape", 0);
+
+                // 球
+                node.burstSpeedMin = nodeJson.value("burstSpeedMin", 0.0f);
+                node.burstSpeedMax = nodeJson.value("burstSpeedMax", 1.0f);
+                node.drag = nodeJson.value("drag", 0.0f);
+
 
                 // [Particle用]
                 node.particleFollowMode = nodeJson.value("particleFollowMode", 0);

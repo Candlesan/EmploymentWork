@@ -85,6 +85,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     // --- 位置 ---
     // 速度更新
     data.posVelocity.xyz += data.posAcceleration.xyz * elapsed_time;
+    data.posVelocity.xyz *= exp(-data.posAcceleration.w * elapsed_time); // 空気抵抗
 
     // 位置更新
     data.position.xyz += data.posVelocity.xyz * elapsed_time;
