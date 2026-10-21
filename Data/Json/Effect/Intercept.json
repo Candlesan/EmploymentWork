@@ -5,7 +5,7 @@
             "IsFadeIn": false,
             "IsFadeOut": true,
             "billboardType": 2,
-            "blendMode": 0,
+            "blendMode": 1,
             "burstSpeedMax": 30.0,
             "burstSpeedMin": 15.0,
             "color": [
@@ -227,7 +227,7 @@
             "IsFadeIn": false,
             "IsFadeOut": true,
             "billboardType": 1,
-            "blendMode": 0,
+            "blendMode": 1,
             "burstSpeedMax": 1.0,
             "burstSpeedMin": 0.0,
             "color": [

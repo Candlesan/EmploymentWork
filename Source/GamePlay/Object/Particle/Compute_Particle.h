@@ -32,6 +32,7 @@ public:
 		if (system) system->set_parent(world, local);
 	}
 	
+	void SetBlendMode(int mode) { blendMode = mode; }
 private:
 	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
 
@@ -47,4 +48,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> sceneConstantBuffer;
 
 	std::unique_ptr<compute_particle_system> system;
+	int blendMode = 0; // 0:半透明 1:加算
 };

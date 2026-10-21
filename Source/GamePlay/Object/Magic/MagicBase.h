@@ -93,7 +93,6 @@ public:
 	// 防御魔法へのダメージ
 	float GetGuardDamage() const { return guardDamage; }
 	void SetGuardDamage(float d) { guardDamage = d; }
-
 protected:
 	// 行列更新処理 
 	void UpdateTransform();

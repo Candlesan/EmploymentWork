@@ -4,7 +4,10 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
-            "blendMode": 0,
+            "billboardType": 0,
+            "blendMode": 1,
+            "burstSpeedMax": 1.0,
+            "burstSpeedMin": 0.0,
             "color": [
                 1.0,
                 1.0,
@@ -52,17 +55,19 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 0.5,
+            "drag": 0.0,
+            "duration": 1.5,
             "emitCount": 1,
+            "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
             "fadeInTime": 0.0,
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": false,
+            "id": 1,
             "isLoop": false,
-            "lifeTime": 0.5,
+            "lifeTime": 1.5,
             "meshPath": "",
             "name": "Node",
             "noisePath": "",
@@ -70,6 +75,8 @@
                 0.0,
                 0.0
             ],
+            "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 0.0,
@@ -100,6 +107,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -167,14 +203,15 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 0.5,
-            "spawnTimer": 0.0,
+            "spawnInterval": 1.5,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
+            "stretchScale": 0.10000000149011612,
             "texturePath": "Data\\Sprite\\Particle\\texture\\mc_white.png",
+            "trailLength": 0.30000001192092896,
             "type": 0,
             "uvScrollSpeed": [
                 0.0,
@@ -189,7 +226,10 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
-            "blendMode": 0,
+            "billboardType": 1,
+            "blendMode": 1,
+            "burstSpeedMax": 1.0,
+            "burstSpeedMin": 0.0,
             "color": [
                 0.0,
                 0.29019609093666077,
@@ -237,17 +277,19 @@
             "colorStartSpeed": 3,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "duration": 0.5,
+            "drag": 0.0,
+            "duration": 1.5,
             "emitCount": 1,
+            "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
             "fadeInTime": 0.0,
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": true,
+            "id": 2,
             "isLoop": false,
-            "lifeTime": 0.5,
+            "lifeTime": 1.5,
             "meshPath": "",
             "name": "Node 2",
             "noisePath": "",
@@ -255,6 +297,8 @@
                 0.0,
                 0.0
             ],
+            "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 0.0,
@@ -285,6 +329,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -352,14 +425,15 @@
                 0.0,
                 0.0
             ],
-            "spawnInterval": 0.5,
-            "spawnTimer": 0.0,
+            "spawnInterval": 1.5,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
+            "stretchScale": 0.10000000149011612,
             "texturePath": "Data\\Sprite\\Particle\\texture\\Particle_Soft.png",
+            "trailLength": 0.30000001192092896,
             "type": 0,
             "uvScrollSpeed": [
                 0.0,

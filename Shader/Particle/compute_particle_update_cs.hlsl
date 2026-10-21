@@ -193,7 +193,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     {
         worldPos = mul(float4(worldPos, 1), parent_world).xyz;
     }
-        header.depth = mul(float4(data.position.xyz, 1), viewProjection).w;
+    header.depth = mul(float4(worldPos, 1), viewProjection).w;
 
     //  XVî•ñ‚ğŠi”[
     particle_header_buffer[header_index] = header;

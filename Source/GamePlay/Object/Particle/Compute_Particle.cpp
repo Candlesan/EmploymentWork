@@ -61,13 +61,17 @@ void Compute_Particle::Render(const RenderContext& rc)
     dc->OMSetDepthStencilState(
         rc.renderState->GetDepthStencilState(DepthState::TestOnly),
         0);
-    //dc->OMSetDepthStencilState(
-    //    nullptr,
-    //    0);
 
-    dc->OMSetBlendState(
-        rc.renderState->GetBlendState(BlendState::Additive), // 加算ブレンド
-        nullptr, 0xFFFFFFFF);
+    // ブレンドモードの設定
+    // 半透明ブレンド
+    if (blendMode == 1) // 加算合成 (Additive)
+    {
+        dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Additive), nullptr, 0xFFFFFFFF);
+    }
+    else // 通常半透明 (Transparency)
+    {
+        dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
+    }
 
     // 描画
     system->render(dc);
