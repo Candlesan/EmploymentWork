@@ -424,7 +424,6 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::Checkbox(u8"フェードイン", &node.IsFadeIn);
             if (node.IsFadeIn)
             {
-                node.IsFadeIn = true;
                 ImGui::DragFloat(u8"終了時間##FadeIn", &node.fadeInTime, 0.1f);
                 ImGui::Separator();
 
@@ -442,7 +441,6 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::Checkbox(u8"フェードアウト", &node.IsFadeOut);
             if (node.IsFadeOut)
             {
-                node.IsFadeOut = true;
                 ImGui::DragFloat(u8"終了時間##FadeOut", &node.fadeOutTime, 0.1f);
                 ImGui::Separator();
 
@@ -457,6 +455,13 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 node.IsFadeOut = false;
             }
 
+            const char* dissolveItems[] = { u8"無し", u8"ディゾルブ",  u8"トゥーン調ディゾルブ" };
+            ImGui::Combo(u8"ディゾルブ", &node.dissolveMode, dissolveItems, IM_ARRAYSIZE(dissolveItems));
+            if (node.dissolveMode == 1 || node.dissolveMode == 2)
+            {
+                ImGui::DragFloat(u8"輪郭のぼかし幅", &node.dissolveSoftness, 0.01f, 0.0f, 1.0f);
+                ImGui::Separator();
+            }
 
             // 分割数は粒子を出すたびに CustomEffect 側で GPU に設定される
             ImGui::InputInt2(u8"画像分割数(X,Y)##Particle", node.splitCount);
@@ -467,7 +472,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::EndTabItem();
         }
 
-        // カラータブ
+        // 描画タブ
         if (ImGui::BeginTabItem(u8"描画"))
         {
             // 画面に出す順番と、それぞれの RenderType（番号は JSON と互換のため変えない）

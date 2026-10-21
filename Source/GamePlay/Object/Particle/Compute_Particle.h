@@ -33,6 +33,12 @@ public:
 	}
 	
 	void SetBlendMode(int mode) { blendMode = mode; }
+
+	void SetDissolve(int mode, float value)
+	{
+		if (system)system->set_dissolve(mode, value);
+	}
+
 private:
 	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
 

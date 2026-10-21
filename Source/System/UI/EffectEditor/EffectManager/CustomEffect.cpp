@@ -322,8 +322,8 @@ void CustomEffect::Update(float elapsedTime)
 
         bool local = (node.config.particleFollowMode == 1);
         node.particleManager->SetParent(node.worldTransform, local);
-        // ブレンドモード設定
         node.particleManager->SetBlendMode(node.config.blendMode);
+        node.particleManager->SetDissolve(node.config.dissolveMode, node.config.dissolveSoftness);
 
         // 相対位置モードは行列でついていくので移動差分は計算しない
         DirectX::XMFLOAT3 d = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : delta;

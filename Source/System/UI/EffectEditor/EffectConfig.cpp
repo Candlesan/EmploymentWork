@@ -163,6 +163,10 @@ void EffectConfig::Save(const std::string& filePath)
         n["ringCenterColor"] = { node.ringCenterColor.x, node.ringCenterColor.y, node.ringCenterColor.z, node.ringCenterColor.w };
         n["ringOuterColor"] = { node.ringOuterColor.x, node.ringOuterColor.y, node.ringOuterColor.z, node.ringOuterColor.w };
 
+        // ディゾルブ
+        n["dissolveMode"] = node.dissolveMode;
+        n["dissolveSoftness"] = node.dissolveSoftness;
+
         j["nodes"].push_back(n);
     }
 
@@ -322,7 +326,9 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("ringCenterColor") != nodeJson.end()) node.ringCenterColor = { nodeJson["ringCenterColor"][0], nodeJson["ringCenterColor"][1], nodeJson["ringCenterColor"][2], nodeJson["ringCenterColor"][3] };
                 if (nodeJson.find("ringInnerColor") != nodeJson.end()) node.ringInnerColor = { nodeJson["ringInnerColor"][0], nodeJson["ringInnerColor"][1], nodeJson["ringInnerColor"][2], nodeJson["ringInnerColor"][3] };
 
-
+                // ディゾルブ
+                node.dissolveMode = nodeJson.value("dissolveMode", 0);
+                node.dissolveSoftness = nodeJson.value("dissolveSoftness", 0.05f);
 
                 // 読み込んだノードを追加
                 nodes.push_back(node);

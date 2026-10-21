@@ -175,6 +175,10 @@ struct NodeConfig
 	DirectX::XMFLOAT4 ringOuterColor = { 1, 1, 1, 1 };
 	DirectX::XMFLOAT4 ringCenterColor = { 1, 1, 1, 1 };
 	DirectX::XMFLOAT4 ringInnerColor = { 1, 1, 1, 1 };
+
+	// ディゾルブ
+	int dissolveMode = 0; // 0:無し 1:ディゾルブ 2:トゥーン調ディゾルブ
+	float dissolveSoftness = 0.05f; // 輪郭の暈し幅（０でパきっとした感じ、おおきい程リアル）
 };
 
 // 1つのVFXアセット

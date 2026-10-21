@@ -123,6 +123,10 @@ cbuffer COMPUTE_PARTICLE_COMMON_CONSTANT_BUFFER : register(b10)
     
     row_major float4x4 parent_world; // 親のワールド行列
     uint local_space; // 1 = 相対位置モード
+    
+    uint dissolve_mode; // ディゾルブ処理をするか
+    float dissolve_softness; // 輪郭の暈し幅
+    
     uint common_padding;
 };
 

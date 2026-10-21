@@ -199,6 +199,8 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		constant.parent_delta = parent_delta;
 		constant.parent_world = parent_world;
 		constant.local_space = local_space;
+		constant.dissolve_mode = dissolve_mode;
+		constant.dissolve_softness = dissolve_softness;
 		immediate_context->UpdateSubresource(common_constant_buffer.Get(), 0, nullptr, &constant, 0, 0);
 	}
 
@@ -338,6 +340,7 @@ void compute_particle_system::render(ID3D11DeviceContext* immediate_context)
 	immediate_context->GSSetShaderResources(1, 1, particle_header_shader_resource_view.GetAddressOf());
 
 	immediate_context->GSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
+	immediate_context->PSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
 
 	//	バッファクリア
 	ID3D11Buffer* clear_buffer[] = { nullptr };

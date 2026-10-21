@@ -120,7 +120,10 @@ public:
         DirectX::XMFLOAT4X4 parent_world; // 親のワールド行列
         UINT local_space; // 1 = 相対位置で動かして、描くときに parent_world 
 
-        UINT padding[3];
+        UINT dissolve_mode;
+        float dissolve_softness;
+
+        UINT padding[1];
     };
 
     //	DispatchIndirect用構造体
@@ -199,6 +202,12 @@ public:
         parent_world = world;
         local_space = local;
     }
+
+    void set_dissolve(int mode, float value)
+    {
+        dissolve_mode = mode;
+        dissolve_softness = value;
+    }
 private:
     UINT num_particles;
     UINT num_emit_particles;
@@ -233,4 +242,7 @@ private:
 
     DirectX::XMFLOAT4X4 parent_world = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
     bool local_space = false;
+
+    int dissolve_mode = 0;
+    float dissolve_softness = 0.05f;
 };
