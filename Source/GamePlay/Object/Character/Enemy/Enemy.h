@@ -189,7 +189,7 @@ private:
 	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン
 	bool rapidInterval = 0.1f;				// 連射魔法の発射間隔
 	float magicRecoverDelay = 0.0f;			// 魔力を回復するまでの遅延
-	float interceptRadius = 10.0f;			// 迎撃用の半径
+	float interceptRadius = 50.0f;			// 迎撃用の半径
 	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
 	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
 

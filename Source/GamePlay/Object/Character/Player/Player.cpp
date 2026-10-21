@@ -78,6 +78,7 @@ void Player::Initialize()
 
 	InitializeHeadDirection(); // 頭の向きを初期化
 	CustomEffectManager::Instance().LoadEffectConfig("Barrier", "Data/Json/Effect/Barrier.json");
+	CustomEffectManager::Instance().LoadEffectConfig("Intercept", "Data/Json/Effect/Intercept.json");
 }
 
 // シーケンサーの初期化
@@ -573,6 +574,11 @@ void Player::DrawGUI()
 		//　防御魔法
 		defenseMagic.DrawGUI();
 
+		if (ImGui::CollapsingHeader(u8"迎撃", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat(u8"迎撃をする距離", &interceptRadius, 0.1f);
+		}
+
 		// 当たり判定情報
 		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -780,7 +786,7 @@ void Player::MagicInput(float elapsedTime)
 			DirectX::XMStoreFloat3(&interceptDir, DirectX::XMVector3Normalize(dir));
 		}
 	}
-
+	
 	bool isHold = (rbButtonHoldTime > RB_THRESHOLD);
 	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
@@ -859,7 +865,10 @@ void Player::MagicInput(float elapsedTime)
 		{
 			RecoverMagic(targetMagic->GetMagicmagicRefund());
 			if (targetMagic->GetIsAlive())
+			{
+				CustomEffectManager::Instance().PlayEffect("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1,1 });
 				targetMagic->OnTerminate();
+			}
 		}
 	}
 	else

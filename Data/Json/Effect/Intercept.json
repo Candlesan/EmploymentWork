@@ -55,7 +55,7 @@
             "colorStartSpeed": 6,
             "delayTime": 0.0,
             "distortionPower": 0.0,
-            "drag": 10.0,
+            "drag": 7.0,
             "duration": 1.0,
             "emitCount": 100,
             "emitShape": 1,
@@ -79,7 +79,7 @@
             "particleFollowMode": 0,
             "position": [
                 0.0,
-                10.0,
+                0.0,
                 0.0
             ],
             "positionAcceleration": [
@@ -167,9 +167,9 @@
                 0.0
             ],
             "scale": [
-                0.10000000149011612,
-                0.10000000149011612,
-                0.10000000149011612
+                0.20000000298023224,
+                0.20000000298023224,
+                0.20000000298023224
             ],
             "scaleAcceleration": [
                 0.0,
