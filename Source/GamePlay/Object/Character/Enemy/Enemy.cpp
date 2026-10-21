@@ -40,7 +40,7 @@ void Enemy::Initialize()
 	weight = 0.5f;
 	radius = 0.8f;
 	height = 1.6f;
-	debugOffset = 0.8;
+	collisionOffset = 0.8;
 
 	position = { 0, 0, 10 };
 	angle = { 0, 3, 0 };
@@ -356,7 +356,7 @@ void Enemy::DrawGUI()
 			{
 				ImGui::DragFloat("Radius:", &radius, 0.1f);
 				ImGui::DragFloat("Height:", &height, 0.1f);
-				ImGui::DragFloat("Collision Transform Offset:", &debugOffset, 0.1f);
+				ImGui::DragFloat("Collision Transform Offset:", &collisionOffset, 0.1f);
 			}
 		}
 		ImGui::End();
@@ -452,7 +452,7 @@ void Enemy::RenderDebugPrimitive(ShapeRenderer* renderer)
 	{
 		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + collisionOffset, position.z);
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 1, 1, 0, 1 });

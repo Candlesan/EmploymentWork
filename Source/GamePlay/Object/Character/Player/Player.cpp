@@ -48,7 +48,7 @@ void Player::Initialize()
 	weight = 0.5f;
 	radius = 0.8f;
 	height = 1.0f;
-	debugOffset = 0.8;
+	CollisionOffset = 0.8;
 
 	// 杖の位置設定
 	weapon.position = { 0.07f, 0.0f, 0.03f };
@@ -584,7 +584,7 @@ void Player::DrawGUI()
 		{
 			ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
 			ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
-			ImGui::DragFloat(u8"デバッグ用描画オフセット", &debugOffset, 0.1f);
+			ImGui::DragFloat(u8"デバッグ用描画オフセット", &CollisionOffset, 0.1f);
 		}
 
 		// 武器のアタッチメント情報
@@ -700,7 +700,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	if (!status.isAvoid)
 	{
 		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + debugOffset, position.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y + CollisionOffset, position.z);
 		DirectX::XMStoreFloat4x4(&capsuleTransform, S * T);
 
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 0, 1, 0, 1 });

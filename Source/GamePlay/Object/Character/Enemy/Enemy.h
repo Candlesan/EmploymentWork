@@ -96,6 +96,8 @@ public:
 	MagicManager& GetMagicManager() { return magicManager; }
 	DefenseMagic& GetDefenseMagic() { return defenseMagic; }
 
+	float GetCollisionOffset() const { return collisionOffset; }
+
 protected:
 	// =========================================================================
 	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
@@ -141,7 +143,7 @@ private:
 	std::vector<Model::NodePose> oldNodePoses;
 
 	// ── 当たり判定・距離設定 ──
-	float debugOffset = 0.5;
+	float collisionOffset = 0.5;
 
 	// ── ダメージ・戦闘ステータス ──
 	float attackCoolTimer = 0.0f;

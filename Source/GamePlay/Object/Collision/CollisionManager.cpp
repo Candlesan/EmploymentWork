@@ -21,7 +21,6 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 	// aが魔法で、bがキャラクターの場合ダメージ
 	if (IsMagicTag(a.category) && IsCharacterTag(b.category))
 	{
-
 		MagicBase* magic = static_cast<MagicBase*>(a.owner); // void*やからキャストしてあげる必要がある
 		Character* target = static_cast<Character*>(b.owner);
 
@@ -70,15 +69,21 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		Character* targetA = static_cast<Character*>(a.owner);
 		Character* targetB = static_cast<Character*>(b.owner);
 
-		targetA->SetPosition(outPosA); // Collisionが計算してくれた座標をそのまま反映
-		targetB->SetPosition(outPosB);
+		// 判定の中心が動かされた量だけ足す（オフセット込みの座標をそのまま入れない）
+		DirectX::XMFLOAT3 posA = targetA->GetPosition();
+		DirectX::XMFLOAT3 posB = targetB->GetPosition();
+		targetA->SetPosition({ posA.x + (outPosA.x - a.pos.x), posA.y + (outPosA.y - a.pos.y), posA.z + (outPosA.z - a.pos.z) });
+		targetB->SetPosition({ posB.x + (outPosB.x - b.pos.x), posB.y + (outPosB.y - b.pos.y), posB.z + (outPosB.z - b.pos.z) });
 	}
 	// aがキャラクターでbがエリアの時の押し戻し処理
 	else if (IsCharacterTag(a.category) && IsArenaTag(b.category))
 	{
 		Character* targetA = static_cast<Character*>(a.owner);
 
-		targetA->SetPosition(outPosA); // Collistionが計算してくれた座標をそのまま反映
+		// 判定の中心がどれだけ動かされたか（オフセットに関係なく使える）
+		DirectX::XMFLOAT3 pushA = { outPosA.x - a.pos.x, outPosA.y - a.pos.y, outPosA.z - a.pos.z };
+		DirectX::XMFLOAT3 posA = targetA->GetPosition();
+		targetA->SetPosition({ posA.x + pushA.x, posA.y + pushA.y, posA.z + pushA.z });
 	}
 	// aが魔法系でbステージの処理
 	else if (IsMagicTag(a.category) && IsArenaTag(b.category))
@@ -130,6 +135,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 		static_cast<uint32_t>(CollisionTag::Arena);
 	playerBody.shape = HitBoxShape::Capsule;
 	playerBody.pos = player.GetPosition();
+	playerBody.pos.y += player.GetCollisonOffset();
 	playerBody.dir = player.GetCapsuleDirection();
 	playerBody.radius = player.GetRadius();
 	playerBody.height = player.GetHeight();
@@ -146,6 +152,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 		static_cast<uint32_t>(CollisionTag::Arena);
 	enemyBody.shape = HitBoxShape::Capsule;
 	enemyBody.pos = enemy.GetPosition();
+	enemyBody.pos.y += enemy.GetCollisionOffset();
 	enemyBody.dir = enemy.GetCapsuleDirection();
 	enemyBody.radius = enemy.GetRadius();
 	enemyBody.height = enemy.GetHeight();

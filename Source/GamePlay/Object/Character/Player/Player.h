@@ -90,6 +90,7 @@ public:
 	MagicManager& GetMagicManager() { return magicManager; }
 	DefenseMagic GetDefenseMagic() { return defenseMagic; }
 
+	float GetCollisonOffset() const { return CollisionOffset; }
 protected:
 	// =========================================================================
 	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
@@ -219,7 +220,7 @@ private:
 	float rtButtonHoldTime = 0.0f;
 	float debug_degree = 0.0f;
 	int debug_dirIndex = 0;
-	float debugOffset = 0.5f;
+	float CollisionOffset = 0.5f;
 
 	const float RB_THRESHOLD = 0.5f;
 	float debugAngle = 0.0f;
