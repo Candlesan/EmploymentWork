@@ -1,0 +1,290 @@
+{
+    "links": [
+        { "from": "Root", "to": "地上" },
+        { "from": "Root", "to": "空中" },
+        { "from": "地上", "to": "緊急回避_ヒート" },
+        { "from": "地上", "to": "緊急回避_魔力" },
+        { "from": "地上", "to": "飛行" },
+        { "from": "地上", "to": "前進" },
+        { "from": "地上", "to": "後退" },
+        { "from": "地上", "to": "横移動" },
+        { "from": "地上", "to": "待機" },
+        { "from": "横移動", "to": "右" },
+        { "from": "横移動", "to": "左" },
+        { "from": "空中", "to": "空中緊急回避" },
+        { "from": "空中", "to": "降下" },
+        { "from": "空中", "to": "空中前進" },
+        { "from": "空中", "to": "空中後退" },
+        { "from": "空中", "to": "空中横移動" },
+        { "from": "空中", "to": "空中待機" },
+        { "from": "空中横移動", "to": "空中右移動" },
+        { "from": "空中横移動", "to": "空中左移動" }
+    ],
+    "nodes": [
+        {
+            "StateName": "Root",
+            "actionType": "None",
+            "conditions": [],
+            "config": { "animationName": "", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "Root",
+            "parentName": "",
+            "position": [0.0, 0.0],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "地上",
+            "actionType": "None",
+            "conditions": [
+                { "compareType": 4, "conditionType": "IsFlying", "judgmentValue": 0.0 }
+            ],
+            "config": { "animationName": "", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "地上",
+            "parentName": "Root",
+            "position": [-400.0, 120.0],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "緊急回避_ヒート",
+            "actionType": "Avoid",
+            "conditions": [
+                { "compareType": 2, "conditionType": "IncomingMagicCount", "judgmentValue": 1.0 },
+                { "compareType": 2, "conditionType": "EnemyCurrentHeat", "judgmentValue": 85.0 }
+            ],
+            "config": { "animationName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": false,
+            "name": "緊急回避_ヒート",
+            "parentName": "地上",
+            "position": [-880.0, 260.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "緊急回避_魔力",
+            "actionType": "Avoid",
+            "conditions": [
+                { "compareType": 2, "conditionType": "IncomingMagicCount", "judgmentValue": 1.0 },
+                { "compareType": 3, "conditionType": "EnemyCurrentMagic", "judgmentValue": 12.0 }
+            ],
+            "config": { "animationName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": false,
+            "name": "緊急回避_魔力",
+            "parentName": "地上",
+            "position": [-760.0, 260.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "飛行",
+            "actionType": "Flight",
+            "conditions": [
+                { "compareType": 2, "conditionType": "EnemyCurrentMagic", "judgmentValue": 70.0 }
+            ],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "飛行",
+            "parentName": "地上",
+            "position": [-640.0, 260.0],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "前進",
+            "actionType": "MoveForward",
+            "conditions": [
+                { "compareType": 0, "conditionType": "Distance", "judgmentValue": 70.0 }
+            ],
+            "config": { "animationName": "AS_Run_Combat_Fast_Loop_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": true,
+            "name": "前進",
+            "parentName": "地上",
+            "position": [-520.0, 260.0],
+            "priority": 3,
+            "selectRule": 0
+        },
+        {
+            "StateName": "後退",
+            "actionType": "MoveBack",
+            "conditions": [
+                { "compareType": 1, "conditionType": "Distance", "judgmentValue": 35.0 }
+            ],
+            "config": { "animationName": "AS_Run_Combat_B_180_Loop_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": true,
+            "name": "後退",
+            "parentName": "地上",
+            "position": [-400.0, 260.0],
+            "priority": 3,
+            "selectRule": 0
+        },
+        {
+            "StateName": "横移動",
+            "actionType": "None",
+            "conditions": [],
+            "config": { "animationName": "", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "横移動",
+            "parentName": "地上",
+            "position": [-280.0, 260.0],
+            "priority": 4,
+            "selectRule": 4
+        },
+        {
+            "StateName": "右",
+            "actionType": "Right",
+            "conditions": [],
+            "config": { "animationName": "AS_Run_Combat_F_R_90_Loop_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": false,
+            "name": "右",
+            "parentName": "横移動",
+            "position": [-220.0, 400.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "左",
+            "actionType": "Left",
+            "conditions": [],
+            "config": { "animationName": "AS_Run_Combat_F_L_90_Loop_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": false,
+            "name": "左",
+            "parentName": "横移動",
+            "position": [-340.0, 400.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "待機",
+            "actionType": "Idle",
+            "conditions": [],
+            "config": { "animationName": "AS_Idle_Combat_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "待機",
+            "parentName": "地上",
+            "position": [-160.0, 260.0],
+            "priority": 5,
+            "selectRule": 0
+        },
+        {
+            "StateName": "空中",
+            "actionType": "None",
+            "conditions": [
+                { "compareType": 4, "conditionType": "IsFlying", "judgmentValue": 1.0 }
+            ],
+            "config": { "animationName": "", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "空中",
+            "parentName": "Root",
+            "position": [400.0, 120.0],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "空中緊急回避",
+            "actionType": "Avoid",
+            "conditions": [
+                { "compareType": 2, "conditionType": "IncomingMagicCount", "judgmentValue": 1.0 },
+                { "compareType": 2, "conditionType": "EnemyCurrentHeat", "judgmentValue": 85.0 }
+            ],
+            "config": { "animationName": "AS_Dodge_Combat_Air_F_0_Seq_0", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": true },
+            "interruptible": false,
+            "name": "空中緊急回避",
+            "parentName": "空中",
+            "position": [160.0, 260.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "降下",
+            "actionType": "Land",
+            "conditions": [
+                { "compareType": 3, "conditionType": "EnemyCurrentMagic", "judgmentValue": 40.0 }
+            ],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "降下",
+            "parentName": "空中",
+            "position": [280.0, 260.0],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "空中前進",
+            "actionType": "MoveForward",
+            "conditions": [
+                { "compareType": 0, "conditionType": "Distance", "judgmentValue": 70.0 }
+            ],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": true,
+            "name": "空中前進",
+            "parentName": "空中",
+            "position": [400.0, 260.0],
+            "priority": 3,
+            "selectRule": 0
+        },
+        {
+            "StateName": "空中後退",
+            "actionType": "MoveBack",
+            "conditions": [
+                { "compareType": 1, "conditionType": "Distance", "judgmentValue": 35.0 }
+            ],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": true,
+            "name": "空中後退",
+            "parentName": "空中",
+            "position": [520.0, 260.0],
+            "priority": 3,
+            "selectRule": 0
+        },
+        {
+            "StateName": "空中横移動",
+            "actionType": "None",
+            "conditions": [],
+            "config": { "animationName": "", "blendTime": 0.20000000298023224, "loop": false, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "空中横移動",
+            "parentName": "空中",
+            "position": [640.0, 260.0],
+            "priority": 4,
+            "selectRule": 4
+        },
+        {
+            "StateName": "空中右移動",
+            "actionType": "Right",
+            "conditions": [],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "空中右移動",
+            "parentName": "空中横移動",
+            "position": [700.0, 400.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "空中左移動",
+            "actionType": "Left",
+            "conditions": [],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "空中左移動",
+            "parentName": "空中横移動",
+            "position": [580.0, 400.0],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "空中待機",
+            "actionType": "Idle",
+            "conditions": [],
+            "config": { "animationName": "AS_Jump_Combat_Loop_0_Seq_0", "blendTime": 0.20000000298023224, "loop": true, "useRootMotion": false, "useRootMotionEx": false },
+            "interruptible": false,
+            "name": "空中待機",
+            "parentName": "空中",
+            "position": [760.0, 260.0],
+            "priority": 5,
+            "selectRule": 0
+        }
+    ]
+}

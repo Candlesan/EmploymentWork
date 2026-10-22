@@ -121,6 +121,8 @@ private:
 	void PlayActionGraph(const std::string& graphName);
 	void UpdateStateBehavior();
 	bool IsDownState();
+	bool IsReviveState();
+	bool CanControl();
 
 	// ── 物理・タイマー・その他 ──
 	void UpdateTimers(float elapsedTime);

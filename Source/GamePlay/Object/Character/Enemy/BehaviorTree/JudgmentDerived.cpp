@@ -26,7 +26,7 @@ bool FloatConditionJudgment::Judgment()
         currentValue = owner->GetDistanceToPlayer();
         break;
     case BTConditionType::BossHpRate:   // ボスのHPの割合
-        return (owner->GetHealth() / owner->GetMaxHealth() * 100.0f) <= Threshold;
+        currentValue = owner->GetHealth() / owner->GetMaxHealth() * 100.0f <= Threshold;
         break;
     case BTConditionType::timer:        // タイマー
         currentValue = owner->GetRunTimer();
@@ -101,6 +101,12 @@ bool FloatConditionJudgment::Judgment()
         break;
     case BTConditionType::PlayerIsFlying: // プレイヤーが飛行中か
         currentValue = player.GetFlightController().IsFlying() ? 1.0f : 0.0f;
+        break;
+    case BTConditionType::AvoidCoolDownTimer: // プレイヤーが飛行中か
+        currentValue = owner->GetAvoidCoolDownTimer();
+        break;
+    case BTConditionType::IsDead: // プレイヤーが飛行中か
+        currentValue = owner->IsDead() ? 1.0f : 0.0f;
         break;
     }
 

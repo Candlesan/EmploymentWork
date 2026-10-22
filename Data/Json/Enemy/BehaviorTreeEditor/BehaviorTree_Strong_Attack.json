@@ -1,0 +1,258 @@
+{
+    "links": [
+        {
+            "from": "Root",
+            "to": "迎撃"
+        },
+        {
+            "from": "Root",
+            "to": "魔力温存"
+        },
+        {
+            "from": "Root",
+            "to": "追撃連射"
+        },
+        {
+            "from": "Root",
+            "to": "ブレイク連射"
+        },
+        {
+            "from": "Root",
+            "to": "通常攻撃魔法"
+        },
+        {
+            "from": "Root",
+            "to": "牽制連射"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Root",
+            "actionType": "None",
+            "conditions": [],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "Root",
+            "parentName": "",
+            "position": [
+                0.0,
+                120.0
+            ],
+            "priority": 1,
+            "selectRule": 1
+        },
+        {
+            "StateName": "迎撃",
+            "actionType": "Intercept",
+            "conditions": [
+                {
+                    "compareType": 2,
+                    "conditionType": "IncomingMagicCount",
+                    "judgmentValue": 10.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 10.0
+                },
+                {
+                    "compareType": 1,
+                    "conditionType": "EnemyCurrentHeat",
+                    "judgmentValue": 85.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Combo_Attack_01_04_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": true,
+            "name": "迎撃",
+            "parentName": "Root",
+            "position": [
+                -400.0,
+                280.0
+            ],
+            "priority": 1,
+            "selectRule": 0
+        },
+        {
+            "StateName": "魔力温存",
+            "actionType": "None",
+            "conditions": [
+                {
+                    "compareType": 1,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 35.0
+                }
+            ],
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "魔力温存",
+            "parentName": "Root",
+            "position": [
+                -260.0,
+                280.0
+            ],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "追撃連射",
+            "actionType": "RapidFire",
+            "conditions": [
+                {
+                    "compareType": 3,
+                    "conditionType": "PlayerCurrentMagic",
+                    "judgmentValue": 5.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "EnemyCurrentHeat",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 40.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Skill_02_01_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "追撃連射",
+            "parentName": "Root",
+            "position": [
+                -120.0,
+                280.0
+            ],
+            "priority": 3,
+            "selectRule": 0
+        },
+        {
+            "StateName": "ブレイク連射",
+            "actionType": "RapidFire",
+            "conditions": [
+                {
+                    "compareType": 4,
+                    "conditionType": "IsPlayerDefending",
+                    "judgmentValue": 1.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "EnemyCurrentHeat",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 40.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Skill_02_01_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "ブレイク連射",
+            "parentName": "Root",
+            "position": [
+                20.0,
+                280.0
+            ],
+            "priority": 4,
+            "selectRule": 0
+        },
+        {
+            "StateName": "通常攻撃魔法",
+            "actionType": "NormalMagicAttack",
+            "conditions": [
+                {
+                    "compareType": 3,
+                    "conditionType": "AttackCoolDown",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 35.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": "IsPlayerDefending",
+                    "judgmentValue": 0.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Attack_01_01_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "通常攻撃魔法",
+            "parentName": "Root",
+            "position": [
+                160.0,
+                280.0
+            ],
+            "priority": 5,
+            "selectRule": 0
+        },
+        {
+            "StateName": "牽制連射",
+            "actionType": "RapidFire",
+            "conditions": [
+                {
+                    "compareType": 3,
+                    "conditionType": "EnemyCurrentHeat",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 0,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 70.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Skill_02_01_Loop_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "牽制連射",
+            "parentName": "Root",
+            "position": [
+                300.0,
+                280.0
+            ],
+            "priority": 6,
+            "selectRule": 0
+        }
+    ]
+}

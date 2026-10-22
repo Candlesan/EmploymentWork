@@ -137,7 +137,7 @@ ActionBase::State Avoid::Run(float elpasedTime)
     {
         owner->SetIsAvoid(false);
         isStarted = false;
-        owner->SetAvoidCoolDownTimer(1.0f);
+        owner->SetAvoidCoolDownTimer(Mathf::RandomRange(0.0f, 0.5f));
         return State::Complete;
     }
     return State::Run;

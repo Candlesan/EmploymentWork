@@ -15,6 +15,7 @@ void RapidMagic::Initialize()
 	// エフェクト作った時にロードする
 	CustomEffectManager::Instance().LoadEffectConfig(rapidMagic, "Data/Json/Effect/RapidFireMagic.json");
 	CustomEffectManager::Instance().LoadEffectConfig(magicCircle, "Data/Json/Effect/MagicCircle_Fast.json");
+	CustomEffectManager::Instance().LoadEffectConfig("RapidHit", "Data/Json/Effect/RapidHit.json");
 }
 
 // 魔法を生成
@@ -107,6 +108,7 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetLifeTimer(config.lifeTimer);		// 射程(生存時間)
 	magic->SetWaitTimer(0.0f);
 	magic->SetIsAlive(true);
+	magic->SetHitEffect("RapidHit", 1.0f);
 
 	// 発射
 	magic->Launch(dir, startPos, 0.0f);

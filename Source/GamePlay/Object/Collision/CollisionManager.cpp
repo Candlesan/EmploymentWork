@@ -62,6 +62,8 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 			guardOwner->OnGuardHit(200);
 		}
 
+		if (magic->GetMagicKind() == MagicKind::Rapid) magic->PlayHitEffect(a.pos);
+
 		magic->OnTerminate(); // 魔法は消える
 	}
 	// aもbもキャラクターの場合押し出し処理

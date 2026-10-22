@@ -4,8 +4,6 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Core/Input/Input.h"
 #include "System/Audio/Audio.h"
-#include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
-#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
@@ -744,6 +742,7 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 // 魔法射出
 void Player::MagicInput(float elapsedTime)
 {
+	if (!CanControl())return;
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// カメラの前方向を取得する
@@ -1149,7 +1148,8 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 // 入力処理
 void Player::InputMove(float elapsedTime)
 {
-	if (IsDownState() || status.isDead) return;
+	if (!CanControl()) return;
+
 
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -1844,7 +1844,7 @@ void Player::UpdateStateBehavior()
 // 今ダウン中かを判定する
 bool Player::IsDownState()
 {
-	// ダウン中じゃないならfalseを返す
+	// ダウン中ならtrueを返す
 	if (status.isDown) return true;
 
 	// サブグラフのDownの中にいる時は操作を出来ないようにする
@@ -1855,6 +1855,26 @@ bool Player::IsDownState()
 
 	// Exit 直後、親グラフで "Down" ノードに留まっているフレームも操作不可
 	return currentState == "Down";
+}
+
+bool Player::IsReviveState()
+{
+	// 死亡中ならtrueを返す
+	if (status.isDead) return true;
+
+	// サブグラフのReviveの中にいる時は操作を出来ないようにする
+	for (auto& idx : activeGraphStack)
+	{
+		if (transitionGraphs[idx].graphName == "Revive") return true;
+	}
+
+	// Exit 直後、親グラフで "Down" ノードに留まっているフレームも操作不可
+	return currentState == "Revive";
+}
+
+bool Player::CanControl()
+{
+	return !IsDownState() && !IsReviveState();
 }
 
 

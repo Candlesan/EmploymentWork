@@ -237,6 +237,11 @@ void Character::UpdateStatus(float elapsedTime)
 			status.currentDefenseDurability += status.defenseRecoverSpeed * elapsedTime;
 		}
 
+		if (status.isBreak)
+		{
+			status.currentDefenseDurability += status.defenseRecoverSpeed * elapsedTime * 3.0f;
+		}
+
 		// Œ»İ‚Ì’l‚ªÅ‘å’l‚ğ’´‚¦‚Ä‚¢‚½‚ç
 		if (status.currentDefenseDurability > status.maxDefenseDurability)
 		{
