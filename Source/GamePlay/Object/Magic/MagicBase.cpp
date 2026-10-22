@@ -1,5 +1,7 @@
 #include "GamePlay/Object/Magic/MagicBase.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
+#include <algorithm>
 
 // コンストラクタ
 MagicBase::MagicBase(MagicManager* manager)
@@ -14,6 +16,28 @@ void MagicBase::Destroy()
 {
 	// マネージャーから自分自身を削除する
 	manager->Remove(this);
+}
+
+// ヒットエフェクトを出す関数
+void MagicBase::PlayHitEffect(const DirectX::XMFLOAT3& pos)
+{
+	if (hitEffectName.empty()) return; // エフェクトが設定
+	if (hitEffectPlayed) return; 
+
+	// 進んでいた向きをエフェクトの角度にする
+	float yaw = atan2f(direction.x, direction.z);
+	float pitch = -asinf(std::clamp(direction.y, -1.0f, 1.0f));
+
+	DirectX::XMFLOAT3 angle = {
+		DirectX::XMConvertToDegrees(pitch),
+		DirectX::XMConvertToDegrees(yaw),
+		0.0f
+	};
+
+	DirectX::XMFLOAT3 scale = { hitEffectScale, hitEffectScale, hitEffectScale };
+	CustomEffectManager::Instance().PlayEffect(hitEffectName, pos, angle, scale);
+
+	hitEffectPlayed = true;
 }
 
 void MagicBase::UpdateTransform()

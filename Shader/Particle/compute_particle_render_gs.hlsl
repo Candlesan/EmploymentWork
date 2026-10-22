@@ -184,13 +184,25 @@ void main(point GS_IN gin[1], inout TriangleStream<PS_IN> output)
         0, 0, 1, 0,
         0, 0, 0, 1);
     }
+    
 
 	//  ワールド行列生成
     float3 position = particle_data_buffer[vertex_id].position.xyz;
     float4x4 scale_matrix = matrix_scaling(scale);
-    float4x4 rotation_matrix = mul(base_matrix, matrix_rotation_roll_pitch_yaw(particle_data_buffer[vertex_id].rotation.xyz));
     float4x4 translation_matrix = matrix_translation(particle_data_buffer[vertex_id].position.xyz);
     float4x4 world_matrix;
+    
+    float3 rot = particle_data_buffer[vertex_id].rotation.xyz;
+    float4x4 rotation_matrix;
+    if (billboardType > 0.5f)
+    {
+    // ビルボード：板の面の中で回すだけ（ロールのみ）→ そのあとカメラに向ける
+        rotation_matrix = mul(matrix_rotation_roll_pitch_yaw(float3(0, 0, rot.z)), base_matrix);
+    }
+    else
+    {
+        rotation_matrix = matrix_rotation_roll_pitch_yaw(rot);
+    }
     
     if (local_space != 0 && particle_data_buffer[vertex_id].rotation.w > 0.5f)
     {

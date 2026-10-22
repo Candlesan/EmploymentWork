@@ -55,6 +55,7 @@ private:
 	bool IsArenaTag(CollisionTag tag);
 	bool IsMagicTag(CollisionTag tag);
 	bool IsDefenseTag(CollisionTag tag);
+	DirectX::XMFLOAT3 ComputeHitPosition(const Collider& magic, const Collider& target);
 private:
 
 	// 1ƒtƒŒ[ƒ€•ª‚ÌCollider‚ğ‚©‚«W‚ß‚é

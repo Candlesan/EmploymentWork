@@ -5,6 +5,7 @@
 #include "GamePlay/Object/Collision/Collision.h"
 
 #include <memory>
+#include <string>
 
 // 前方宣言
 class MagicManager;
@@ -93,6 +94,16 @@ public:
 	// 防御魔法へのダメージ
 	float GetGuardDamage() const { return guardDamage; }
 	void SetGuardDamage(float d) { guardDamage = d; }
+
+
+	// ヒットエフェクトを出す関数
+	void PlayHitEffect(const DirectX::XMFLOAT3& pos);
+	void SetHitEffect(const std::string& name, float scale = 1.0f)
+	{
+		hitEffectName = name;
+		hitEffectScale = scale;
+	}
+	bool GetHitEffectPlayed() const { return hitEffectPlayed; }
 protected:
 	// 行列更新処理 
 	void UpdateTransform();
@@ -114,4 +125,8 @@ protected:
 	MagicKind magicKind = MagicKind::Normal;
 	InterceptProfile interceptProfile;
 	Character* owner = nullptr;
+
+	std::string hitEffectName = "";
+	float hitEffectScale = 1.0f;
+	bool hitEffectPlayed = false;
 };

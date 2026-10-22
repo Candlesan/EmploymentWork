@@ -37,6 +37,7 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 			target->ApplyDamage(magic->GetDamage() * 0.5f);
 		}
 
+		if (!target->GetIsGaurd())magic->PlayHitEffect(ComputeHitPosition(a, b));
 		magic->OnTerminate(); // 当たったら魔法を消す
 
 	}
@@ -118,6 +119,31 @@ bool CollisionManager::IsMagicTag(CollisionTag tag)
 bool CollisionManager::IsDefenseTag(CollisionTag tag)
 {
 	return tag == CollisionTag::PlayerDefenseMagic || tag == CollisionTag::EnemyDefenseMagic;
+}
+
+// 通常魔法系の線分上の近い点を返す関数
+DirectX::XMFLOAT3 CollisionManager::ComputeHitPosition(const Collider& magic, const Collider& target)
+{
+	using namespace DirectX;
+
+	// 球の魔法（連射魔法）は、今の位置がそのまま当たった位置になる
+	if (magic.shape != HitBoxShape::Capsule) return magic.pos;
+
+	// レーザーの始点と向き（posは真ん中なので半分戻したところが始点になる）
+	XMVECTOR dir = XMVector3Normalize(XMLoadFloat3(&magic.dir));
+	XMVECTOR start = XMVectorSubtract(XMLoadFloat3(&magic.pos), XMVectorScale(dir, magic.height * 0.5));
+
+	// 相手の中心をレーザーの線上に落とす（始点から何メートル先か）
+	XMVECTOR toTarget = XMVectorSubtract(XMLoadFloat3(&target.pos), start);
+	float t = XMVectorGetX(XMVector3Dot(toTarget, dir));
+	t = std::clamp(t, 0.0f, magic.height);
+
+	// 相手の半径分手前に戻す（身体の表面で爆発させるため）
+	t = (std::max)(0.0f, t - target.radius);
+
+	XMFLOAT3 hit;
+	XMStoreFloat3(&hit, XMVectorAdd(start, XMVectorScale(dir, t)));
+	return hit;
 }
 
 // 1フレーム分のColliderをかき集める

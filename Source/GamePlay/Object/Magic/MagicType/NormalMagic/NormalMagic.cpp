@@ -16,6 +16,7 @@ void NormalMagic::Initialize()
 	CustomEffectManager::Instance().LoadEffectConfig(chargeMagic, "Data/Json/Effect/" + chargeMagic + ".json");
 	CustomEffectManager::Instance().LoadEffectConfig(magicCircleFast, "Data/Json/Effect/MagicCircle_Fast.json");
 	CustomEffectManager::Instance().LoadEffectConfig(magicCircleLong, "Data/Json/Effect/MagicCircle_Long.json");
+	CustomEffectManager::Instance().LoadEffectConfig("NormalMagicHit", "Data/Json/Effect/NormalMagicHit.json");
 }
 
 // 更新処理
@@ -166,6 +167,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	magic->SetHeight(range);
 	magic->SetDamage(damage); // 生身へのダメージ
 	magic->SetGuardDamage(config.guardDamage); // 防御魔法へのダメージ
+	magic->SetHitEffect("NormalMagicHit");
 
 	// 魔力消費
 	if (info.owner != nullptr)
