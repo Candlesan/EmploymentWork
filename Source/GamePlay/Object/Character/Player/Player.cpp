@@ -742,7 +742,6 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 // 魔法射出
 void Player::MagicInput(float elapsedTime)
 {
-	if (!CanControl())return;
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
 	// カメラの前方向を取得する
@@ -797,7 +796,7 @@ void Player::MagicInput(float elapsedTime)
 	};
 
 	// チャージ魔法
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && !status.isDown)
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
 	{
 		if (normalMagic.IsFullCharged())
 		{
@@ -818,7 +817,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 通常攻撃魔法
-	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER && !status.isDown)
+	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
 	{
 		if (!normalMagic.IsFullCharged() && magicCoolDownTimer <= 0.0f) // フルチャージ済みなら上のifで既に処理済みなので除外
 		{
@@ -838,7 +837,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 連射魔法
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && !status.isDown && !status.isBuring)
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && !status.isBuring && CanControl())
 	{
 		status.isRapidFire = true;
 
@@ -876,7 +875,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 防御魔法
-	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER) && !status.isDown && !status.isBuring && !status.isBreak) // ダウン状態でもバースト状態でもないとき
+	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER) && !status.isBuring && !status.isBreak && CanControl()) // ダウン状態でもバースト状態でもないとき
 	{
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
@@ -954,6 +953,14 @@ void Player::UpdateFly(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
+	// ダウン状態になると落下するようにする
+	if (!CanControl())
+	{
+		flightController.SetFlightMode(FlightMode::OFF);
+		flightController.Update(this, elapsedTime);
+		return;
+	}
+
 	// 入力をまとめる
 	FlightInput input;
 	input.isAButtonDown = (gamePad.GetButton() & GamePad::BTN_A) != 0;
@@ -964,13 +971,6 @@ void Player::UpdateFly(float elapsedTime)
 
 	// 状態を更新する
 	flightController.Update(this, elapsedTime);
-
-	// ダウン状態になると落下するようにする
-	if (status.isDown || status.isDead)
-	{
-		flightController.SetFlightMode(FlightMode::OFF);
-		return;
-	}
 }
 
 void Player::InputLockOn()
@@ -1865,11 +1865,12 @@ bool Player::IsReviveState()
 	// サブグラフのReviveの中にいる時は操作を出来ないようにする
 	for (auto& idx : activeGraphStack)
 	{
-		if (transitionGraphs[idx].graphName == "Revive") return true;
+		const std::string& name = transitionGraphs[idx].graphName;
+		if (name == "Revive" || name == "Revive_Air") return true;
 	}
 
-	// Exit 直後、親グラフで "Down" ノードに留まっているフレームも操作不可
-	return currentState == "Revive";
+	// Exit 直後、親グラフで "Revive系" ノードに留まっているフレームも操作不可
+	return currentState == "Revive" || currentState == "Revive_Air";
 }
 
 bool Player::CanControl()

@@ -22,7 +22,6 @@
 // デストラクタ
 Enemy::~Enemy()
 {
-	CustomEffectManager::Instance().Stop(starEffect);
 }
 
 // 初期化
@@ -112,7 +111,6 @@ void Enemy::Initialize()
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
 	lockOn.Initialize(this, &Player::Instance());
-	CustomEffectManager::Instance().LoadEffectConfig("testStar", "Data/Json/Effect/testStar.json");
 }
 
 
@@ -214,26 +212,6 @@ void Enemy::Update(float elapsedTime)
 	magicManager.Update(elapsedTime);
 	defenseMagic.Update(this, elapsedTime);
 	debugShot(elapsedTime);
-
-	// 流れ星のエフェクトを背中に付ける
-	auto& effectManager = CustomEffectManager::Instance();
-
-	// まだ出ていない、またはシーン切り替えなどで消えていたら出し直す
-	if (!effectManager.Exists(starEffect))
-	{
-		starEffect = effectManager.PlayEffect("testStar", position, { 0, 0, 0 }, { 1, 1, 1 });
-	}
-
-	// 敵の向き（angle.y はラジアン）から前方向を作って、その逆に下げる
-	float yaw = angle.y;
-	DirectX::XMFLOAT3 backPos = {
-		position.x - sinf(yaw) * starBackOffset,
-		position.y + starHeightOffset,
-		position.z - cosf(yaw) * starBackOffset
-	};
-
-	effectManager.SetPosition(starEffect, backPos);
-	effectManager.SetAngle(starEffect, { 0.0f, DirectX::XMConvertToDegrees(yaw), 0.0f });
 
 	// モデル更新処理
 	UpdateTransform();

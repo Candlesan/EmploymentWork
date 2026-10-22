@@ -54,7 +54,7 @@
                 {
                     "compareType": 2,
                     "conditionType": "IncomingMagicCount",
-                    "judgmentValue": 10.0
+                    "judgmentValue": 7.0
                 },
                 {
                     "compareType": 0,
