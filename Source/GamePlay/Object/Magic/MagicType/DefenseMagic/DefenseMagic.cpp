@@ -90,5 +90,8 @@ void DefenseMagic::DrawGUI()
 
 		ImGui::DragFloat3(u8"防御魔法のオフセット位置", &defensePositionOffset.x, 0.1f);
 		ImGui::DragFloat(u8"防御魔法の半径", &defenseRadius, 0.1f);
+
+		//ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding);
+		ImGui::Separator();
 	}
 }

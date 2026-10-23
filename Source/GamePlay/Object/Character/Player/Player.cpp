@@ -514,28 +514,6 @@ void Player::DrawGUI()
 
 		if (ImGui::CollapsingHeader(u8"連射魔法", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			if (ImGui::Button(u8"保存##Rapid"))
-			{
-				rapidMagicConfig.Save();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button(u8"読み込み##Rapid"))
-			{
-				rapidMagicConfig.Load(); // JSONから読み込み
-			}
-			ImGui::Separator();
-
-			ImGui::DragFloat(u8"発射間隔", &rapidMagicConfig.rapidInterval, 0.01f);
-			ImGui::DragFloat(u8"拡散", &rapidMagicConfig.diffusion, 0.1f);
-			ImGui::DragFloat(u8"生身へのダメージ", &rapidMagicConfig.damage, 0.1f);
-			ImGui::DragFloat(u8"防御魔法へのダメージ", &rapidMagicConfig.gaurdDamage, 0.1f);
-			ImGui::DragFloat(u8"魔法の速度", &rapidMagicConfig.speed, 0.1f);
-			ImGui::DragFloat(u8"魔力消費量", &status.rapidFireMagicCost, 0.1f);
-
-
-			ImGui::DragFloat3(u8"手元オフセット##rapid", &rapidMagicConfig.spawnOffset.x, 0.1f);
-			ImGui::Separator();
-
 			rapidMagic.DrawGUI(rapidMagicConfig);
 		}
 

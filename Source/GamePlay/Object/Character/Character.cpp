@@ -156,11 +156,12 @@ void Character::UpdateStatus(float elapsedTime)
 				if (status.currentMagic > status.maxMagic)
 				{
 					status.currentMagic = status.maxMagic; // 最大値を超えないようにする
-
-					status.isDown = false; // 最大値まで回復させたらフラグを折る
 				}
-
 			}
+
+			// 最大値まで回復させたらフラグを折る
+			if (status.currentMagic >= status.maxMagic)
+				status.isDown = false;
 		}
 		else // ディレイタイマーがなくなったら魔力を回復する
 		{

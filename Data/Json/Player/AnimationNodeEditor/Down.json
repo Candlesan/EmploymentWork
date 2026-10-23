@@ -32,7 +32,7 @@
                     "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 19
+                    "type": 18
                 }
             ],
             "fromState": "AS_Knock_Down_Combat_Loop_Seq_0",

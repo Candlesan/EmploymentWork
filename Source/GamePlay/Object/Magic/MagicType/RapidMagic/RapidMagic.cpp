@@ -14,7 +14,6 @@ void RapidMagic::Initialize()
 {
 	// エフェクト作った時にロードする
 	CustomEffectManager::Instance().LoadEffectConfig(rapidMagic, "Data/Json/Effect/RapidFireMagic.json");
-	CustomEffectManager::Instance().LoadEffectConfig(magicCircle, "Data/Json/Effect/MagicCircle_Fast.json");
 	CustomEffectManager::Instance().LoadEffectConfig("RapidHit", "Data/Json/Effect/RapidHit.json");
 }
 
@@ -94,15 +93,15 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetDamage(0.01f);					// 生身へのダメージ
 	magic->SetGuardDamage(config.gaurdDamage);	// 防御魔法へのダメージ
 
-	if (info.owner != nullptr)
-	{
-		const float magicCost =
-			info.owner->GetStatus().rapidFireMagicCost;
+	//if (info.owner != nullptr)
+	//{
+	//	const float magicCost =
+	//		info.owner->GetStatus().rapidFireMagicCost;
 
-		const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
+	//	const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
 
-		magic->SetMagicmagicRefund(magicCost + interceptBonus);
-	}
+	//	magic->SetMagicmagicRefund(magicCost + interceptBonus);
+	//}
 
 	magic->SetSpeed(config.speed);				// 弾速
 	magic->SetLifeTimer(config.lifeTimer);		// 射程(生存時間)
@@ -112,6 +111,7 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 
 	// 発射
 	magic->Launch(dir, startPos, 0.0f);
+	info.owner->ConsumMagic(config.magicCost);
 
 	// 次に発射のためにインデックスを１つ進める
 	currentSpawnIndex = (currentSpawnIndex + 1) % 6;
@@ -135,6 +135,28 @@ void  RapidMagic::Update(float elapsedTime, MagicManager* manager, const MagicSp
 // GUI描画
 void RapidMagic::DrawGUI(RapidMagicConfig& config)
 {
+	if (ImGui::Button(u8"保存##Rapid"))
+	{
+		config.Save();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button(u8"読み込み##Rapid"))
+	{
+		config.Load(); // JSONから読み込み
+	}
+	ImGui::Separator();
+
+	ImGui::DragFloat(u8"発射間隔", &config.rapidInterval, 0.01f);
+	ImGui::DragFloat(u8"拡散", &config.diffusion, 0.1f);
+	ImGui::DragFloat(u8"生身へのダメージ", &config.damage, 0.1f);
+	ImGui::DragFloat(u8"防御魔法へのダメージ", &config.gaurdDamage, 0.1f);
+	ImGui::DragFloat(u8"魔法の速度", &config.speed, 0.1f);
+	ImGui::DragFloat(u8"魔力消費量", &config.magicCost, 0.1f);
+
+
+	ImGui::DragFloat3(u8"手元オフセット##rapid", &config.spawnOffset.x, 0.1f);
+	ImGui::Separator();
+
 	if (ImGui::TreeNode(u8"スポーン位置調整 (6箇所)"))
 	{
 		for (int i = 0; i < 6; ++i)

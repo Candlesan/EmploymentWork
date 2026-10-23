@@ -13,6 +13,7 @@ public:
         float rapidInterval = 0.1; // ”­ËŠÔŠu
         float gaurdDamage = 2; // –hŒä–‚–@‚Ö‚Ìƒ_ƒ[ƒW
         float diffusion = 0.0f; // ŠgU
+        float magicCost = 6.0f; // –‚—ÍÁ”ï—Ê
         
        DirectX::XMFLOAT3 spawnOffsets[6] = {
             { -1.0f,  1.0f,   0.0f }, // ¶ã
@@ -33,6 +34,7 @@ public:
             SaveBase(j); // e(‹¤’Ê•”•ª)‚ğ•Û‘¶
 
             j["rapidInterval"] = rapidInterval;
+            j["magicCost"] = magicCost;
             j["diffusion"] = diffusion;
             j["gaurdDamage"] = gaurdDamage;
             j["offsetPosition"] = { offsetPosition.x, offsetPosition.y, offsetPosition.z };
@@ -63,6 +65,7 @@ public:
 
                 LoadBase(j); // e‚ğ“Ç‚İ‚Ş
                 if (j.find("rapidInterval") != j.end()) rapidInterval = j["rapidInterval"];
+                if (j.find("magicCost") != j.end()) magicCost = j["magicCost"];
                 if (j.find("diffusion") != j.end()) diffusion = j["diffusion"];
                 if (j.find("gaurdDamage") != j.end()) gaurdDamage = j["gaurdDamage"];
                 if (j.find("offsetPosition") != j.end()) offsetPosition = { j["offsetPosition"][0], j["offsetPosition"][1], j["offsetPosition"][2] };
@@ -96,7 +99,6 @@ public:
 
 private:
     std::string rapidMagic = "RapidFireMagic"; 
-    std::string magicCircle = "MagicCircleFast";
     int currentSpawnIndex = 0;
     float rapidTimer = 0.0f;
     std::mt19937 rng{ std::random_device{}() };

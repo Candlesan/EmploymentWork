@@ -29,7 +29,6 @@ struct CharacterStatus
 	float currentMagicRecoverSpeed = 5.0f; // 自然回復速度
 	float magicRecoverDelayTimer = 0.0f;   // 魔力が回復し始めるまでの遅延
 
-	float rapidFireMagicCost = 6.0f;	// 連射魔法の魔力消費量
 	float interceptMagicCost = 10.0f;	// 迎撃中の魔力消費量
 
 	// --- 防御系 ---
@@ -37,9 +36,6 @@ struct CharacterStatus
 	float currentDefenseDurability = 100.0f;	// 現在の防御魔法の耐久値
 	float defenseRecoverSpeed = 5.0f;			// 防御魔法の耐久値の回復速度
 	float defenseMagicCost = 3.0f;				// 防御魔法の魔力消費量
-
-	// --- ダウン系 ---
-	float downTimer = 0.0f; // 魔力切れをしたときに使うタイマー
 
 	// --- 状態フラグ ---
 	bool isDown = false;			// 魔力切れダウン中か

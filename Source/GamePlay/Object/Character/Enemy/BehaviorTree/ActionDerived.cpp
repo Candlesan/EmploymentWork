@@ -304,7 +304,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         fireTimer -= elapsedTime;
 
         // 射撃時間が終わったまたは魔力が足りなくなったら終了
-        if (fireTimer <= 0.0f || owner->GetCurrentMagic() <= owner->GetStatus().rapidFireMagicCost)
+        if (fireTimer <= 0.0f || owner->GetCurrentMagic() <= magicConfig.magicCost)
         {
             //owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
             owner->SetIsRapidFire(false);
