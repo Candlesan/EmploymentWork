@@ -21,7 +21,9 @@ struct RenderContext
 	const RenderState*		renderState;
 	const Camera*			camera;
 	const LightManager*		lightManager = nullptr;
+
 	const ShadowMapData* shadowMapData = nullptr;
+	bool isShadowPass = false;
 
 	// PBR—p
 	float pbrMetalness = 0.0f;

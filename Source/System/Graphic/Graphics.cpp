@@ -32,6 +32,20 @@ void Graphics::Initialize(HWND hWnd)
 			D3D_FEATURE_LEVEL_9_1,
 		};
 
+		// ティアリングに対応しているか確認する
+		{
+			Microsoft::WRL::ComPtr<IDXGIFactory5> factory5;
+			if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(factory5.GetAddressOf()))))
+			{
+				BOOL allowTearing = FALSE;
+				if (SUCCEEDED(factory5->CheckFeatureSupport(
+					DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing))))
+				{
+					tearingSupported = (allowTearing == TRUE);
+				}
+			}
+		}
+
 		// スワップチェーンを作成するための設定オプション
 		DXGI_SWAP_CHAIN_DESC swapchainDesc;
 		{
@@ -49,7 +63,7 @@ void Graphics::Initialize(HWND hWnd)
 			swapchainDesc.OutputWindow = hWnd;
 			swapchainDesc.Windowed = TRUE;
 			swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-			swapchainDesc.Flags = 0;
+			swapchainDesc.Flags = tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 		}
 
 		D3D_FEATURE_LEVEL featureLevel;
@@ -151,7 +165,8 @@ void Graphics::SetRenderTargets()
 // 画面表示
 void Graphics::Present(UINT syncInterval)
 {
-	swapchain->Present(syncInterval, 0);
+	UINT presentFlags = (tearingSupported && syncInterval == 0) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+	swapchain->Present(syncInterval, presentFlags);
 }
 
 // 画面のサイズ変更
@@ -164,7 +179,9 @@ void Graphics::OnResize()
 	renderTargetView.Reset();
 	depthStencilView.Reset();
 
-	swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	//swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	swapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN,
+		tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0);
 
 	// RTV再生成
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;

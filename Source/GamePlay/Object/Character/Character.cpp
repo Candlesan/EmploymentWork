@@ -476,7 +476,7 @@ bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
 			//キャスト量を算出
 			//GetXだけのスカラー値(大きさ)だけでは実際にどれだけ移動するか分からないからLength関数で長さを計算し実際の移動距離とする
 			float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Move));
-			if (distance < 0.0001f) break;
+			if (!vertical && distance < 0.0001f) break;
 
 			//壁より少し手前で止まって欲しいので少しだけキャスト量を増やす
 			distance += 0.01;
@@ -488,7 +488,12 @@ bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
 			}
 
 			DirectX::XMVECTOR Origin = DirectX::XMVectorAdd(Position, CenterOffset); //開始位置
-			DirectX::XMVECTOR Direction = DirectX::XMVector3Normalize(Move); //方向
+
+			// 縦方向は常に真下にキャストする（移動量がほぼ0だと Normalize が不安定になるため）
+			DirectX::XMVECTOR Direction = vertical
+				? DirectX::XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f)
+				: DirectX::XMVector3Normalize(Move);		
+
 			DirectX::XMFLOAT3 origin, direction;
 			DirectX::XMStoreFloat3(&origin, Origin);
 			DirectX::XMStoreFloat3(&direction, Direction);

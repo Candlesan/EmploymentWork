@@ -1,9 +1,4 @@
 #pragma once
-
-#include <mutex>
-#include <d3d11.h>
-#include <wrl.h>
-#include <memory>
 #include "RenderState.h"
 #include "System/Renderer/PrimitiveRenderer/PrimitiveRenderer.h"
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
@@ -11,6 +6,12 @@
 
 // シェーダー
 #include "System/Shader/ShadowMap/ShadowMap.h"
+
+#include <mutex>
+#include <d3d11.h>
+#include <wrl.h>
+#include <memory>
+#include <dxgi1_5.h>
 
 // グラフィックス
 class Graphics
@@ -98,4 +99,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device>            device; // 一番最後
 
 	std::mutex mutex;
+
+	bool tearingSupported = false; // ティアリング（同期無し表示）に対応しているか
 };

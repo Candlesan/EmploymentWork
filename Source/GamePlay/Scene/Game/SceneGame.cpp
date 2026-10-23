@@ -221,7 +221,7 @@ void SceneGame::Render()
 	// レンダーステート設定
 	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
 	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullBack));
 
 	// カメラ取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
@@ -242,12 +242,12 @@ void SceneGame::Render()
 	rc.pbrRoughness = pbrRoughness;
 	rc.lightManager = &lightManager;
 	rc.ambientIntensity = ambientIntensity;
+	rc.isShadowPass = false;
 
 	// シャドウマップ描画
 	RenderShadowMap();
 
 	// シャドウマップ準備
-	//RenderContextに対してシャドウマップの情報を格納する
 	ShadowMapData shadowData;
 	shadowData.shadowMap = shadowMap->GetShaderResourceView();
 	shadowData.shadowSampler = shadowMap->GetSamplerState();
@@ -375,7 +375,7 @@ void SceneGame::RenderShadowMap()
 	// レンダーステート設定
 	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
 	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
-	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullBack));
 
 	// 描画コンテキスト設定
 	RenderContext rc;
@@ -383,6 +383,7 @@ void SceneGame::RenderShadowMap()
 	rc.renderState = renderState;
 	rc.camera = &camera;
 	rc.lightManager = &lightManager;
+	rc.isShadowPass = true;
 
 	//１カメラをライトから見た情報に変更
 	{

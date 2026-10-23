@@ -49,7 +49,15 @@ void PBRShader::Begin(const RenderContext& rc)
     // シェーダー・入力レイアウト設定
     dc->IASetInputLayout(inputLayout.Get());
     dc->VSSetShader(vertexShader.Get(), nullptr, 0);
-    dc->PSSetShader(pixelShader.Get(), nullptr, 0);
+
+    if (rc.isShadowPass)
+    {
+        dc->PSSetShader(nullptr, nullptr, 0);
+    }
+    else
+    {
+        dc->PSSetShader(pixelShader.Get(), nullptr, 0);
+    }
 
     // メッシュ用定数バッファをb13にセット
     ID3D11Buffer* cbs[] = { meshConstantBuffer.Get() };
@@ -109,7 +117,7 @@ void PBRShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
     // -------------------------------------------------------
     // シャドウマップ用定数バッファ更新
     // -------------------------------------------------------
-    if (rc.shadowMapData != nullptr)
+    if (rc.shadowMapData != nullptr && !rc.isShadowPass)
     {
         shadowmap_constants cbShadow{};
         cbShadow.light_view_projection = rc.shadowMapData->lightViewProjection;

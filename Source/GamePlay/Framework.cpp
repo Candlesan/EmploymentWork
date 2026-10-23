@@ -15,7 +15,7 @@
 #include "System/Audio/Audio.h"
 
 // 垂直同期間隔設定
-static const int syncInterval = 1;
+static const int syncInterval = 0;
 
 // コンストラクタ
 Framework::Framework(HWND hWnd)
@@ -119,6 +119,14 @@ void Framework::Render(float elapsedTime)
 	// シーンGUI描画処理
 	if(GUIDrawSwitch)
 	SceneManager::Instance().DrawGUI();
+
+
+	// GUIでFPS表示
+	ImGui::Begin("FPS");
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::Text("FPS : %.1f", io.Framerate);
+	ImGui::Text("Frame : %.3f ms", 1000.0f / io.Framerate);
+	ImGui::End();
 
 	// IMGUI描画
 	ImGuiRenderer::Render(dc);

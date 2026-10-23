@@ -174,7 +174,8 @@ void ModelRenderer::Render(const RenderContext& rc)
 			else
 			{
 				// ’Êí‚Ìƒp[ƒc‚Í”w–Ê‚ðƒJƒbƒgi•`‰æ•‰‰×ŒyŒ¸j
-				dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+				dc->RSSetState(rc.renderState->GetRasterizerState(
+					rc.isShadowPass ? RasterizerState::SolidCullBack : RasterizerState::SolidCullNone));
 			}
 
 			// •`‰æ
