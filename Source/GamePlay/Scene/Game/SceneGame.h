@@ -42,7 +42,8 @@ public:
 	void Render() override;
 
 	// シャドウマップ描画
-	void RenderShadowMap();
+	void RenderStageShadowMap();
+	void RenderCharacterShadowMap();
 
 	// GUI描画
 	void DrawGUI() override;
@@ -92,9 +93,14 @@ private:
 	float ambientIntensity = 0.5;
 
 	// シャドウマップ調整用
-	float shadowAttenuation = 0;
-	float shadowBias = 0.006f;
-	DirectX::XMFLOAT4X4 lightViewProjection;
+	float stageShadowAttenuation = 0;
+	float stageShadowBias = 0.006f;
+	float characterShadowAttenuation = 0;
+	float characterShadowBias = 0.006f;
+	DirectX::XMFLOAT4X4 stageLightViewProjection;
+	DirectX::XMFLOAT4X4 characterLightViewProjection;
+	float stageRadius = 0.0f;
+	bool stageShadowRendered = false;
 
 	// ブルーム調整用
 	std::unique_ptr<bloom> bloomer;

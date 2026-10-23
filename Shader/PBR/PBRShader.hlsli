@@ -8,7 +8,8 @@ struct VS_OUT
     float3 w_normal : NORMAL;
     float4 w_tangent : TANGENT;
     float2 texcoord : TEXCOORD;
-    float3 shadow_texcoord : TEXCOORD1;
+    float3 stage_shadow_texcoord : TEXCOORD1;
+    float3 character_shadow_texcoord : TEXCOORD2;
 };
 
 cbuffer MATERIAL_CONSTANT_BUFFER : register(b13)
@@ -38,11 +39,13 @@ cbuffer MATERIAL_CONSTANT_BUFFER : register(b13)
 
 cbuffer SHADOWMAP_CONSTANT_BUFFER : register(b5)
 {
-    row_major float4x4 light_view_projection;
+    row_major float4x4 stage_light_view_projection;
+    row_major float4x4 character_light_view_projection;
     float4 shadow_color;
-    float shadow_attenuation;
-    float shadow_bias;
-    float2 shadow_dummy;
+    float stage_shadow_attenuation;
+    float stage_shadow_bias;
+    float character_shadow_attenuation;
+    float character_shadow_bias;
 };
 
 #include "../Common/shading_functions.hlsli"

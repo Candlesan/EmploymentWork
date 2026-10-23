@@ -1,6 +1,15 @@
 #include "PBRShader.hlsli"
 #include "../Common/Skinning.hlsli"
 
+float3 ToShadowTexcoord(float4 pos, float4x4 lvp)
+{
+    float4 p = mul(pos, lvp);
+    p.xyz /= p.w;
+    p.y = -p.y;
+    p.xy = 0.5f * p.xy + 0.5f;
+    return p.xyz;
+}
+
 VS_OUT main(
     float4 position : POSITION,
     float3 normal : NORMAL,
@@ -32,11 +41,8 @@ VS_OUT main(
     
     //シャドウマップ用のパラメーター計算
     {
-        float4 wvpPos = mul(skinnedPosition, light_view_projection);
-        wvpPos.xyz /= wvpPos.w;
-        wvpPos.y = -wvpPos.y; // Y軸を反転
-        wvpPos.xy = 0.5f * wvpPos.xy + 0.5f;
-        vout.shadow_texcoord = wvpPos.xyz;
+        vout.stage_shadow_texcoord = ToShadowTexcoord(skinnedPosition, stage_light_view_projection);
+        vout.character_shadow_texcoord = ToShadowTexcoord(skinnedPosition, character_light_view_projection);
     }
     
     return vout;

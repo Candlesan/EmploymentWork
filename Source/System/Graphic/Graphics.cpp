@@ -144,7 +144,8 @@ void Graphics::Initialize(HWND hWnd)
 	shapeRenderer = std::make_unique<ShapeRenderer>(device.Get());
 	modelRenderer = std::make_unique<ModelRenderer>(device.Get());
 
-	shadowMap = std::make_unique<ShadowMap>(device.Get(), 4096, 4096);
+	stageShadowMap = std::make_unique<ShadowMap>(device.Get(), 4096, 4096);
+	characterShadowMap = std::make_unique<ShadowMap>(device.Get(), 2048, 2048);
 }
 
 // ÉNÉäÉA

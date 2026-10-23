@@ -74,7 +74,8 @@ public:
 	ModelRenderer* GetModelRenderer() const { return modelRenderer.get(); }
 
 	// シャドウマップ取得
-	ShadowMap* GetShadowMap() const { return shadowMap.get(); }
+	ShadowMap* GetStageShadowMap() const { return stageShadowMap.get(); }
+	ShadowMap* GetCharacterShadowMap() const { return characterShadowMap.get(); }
 
 	// ミューテックス取得 
 	std::mutex& GetMutex() { return mutex; }
@@ -85,7 +86,8 @@ private:
 	D3D11_VIEWPORT viewport;
 
 	// ↓ Renderer系を先に宣言（先に解放される）
-	std::unique_ptr<ShadowMap>          shadowMap;
+	std::unique_ptr<ShadowMap>          stageShadowMap;
+	std::unique_ptr<ShadowMap>          characterShadowMap;
 	std::unique_ptr<ModelRenderer>      modelRenderer;
 	std::unique_ptr<ShapeRenderer>      shapeRenderer;
 	std::unique_ptr<PrimitiveRenderer>  primitiveRenderer;

@@ -22,7 +22,8 @@ struct RenderContext
 	const Camera*			camera;
 	const LightManager*		lightManager = nullptr;
 
-	const ShadowMapData* shadowMapData = nullptr;
+	const ShadowMapData* stageShadowMapData = nullptr;
+	const ShadowMapData* characterShadowMapData = nullptr;
 	bool isShadowPass = false;
 
 	// PBR—p

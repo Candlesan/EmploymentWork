@@ -73,15 +73,20 @@ void PBRShader::Begin(const RenderContext& rc)
         dc->PSSetConstantBuffers(5, 1, &shadowCB);
 
         // シャドウマップ用サンプラーをslot 5にセット
-        ID3D11SamplerState* sampler = Graphics::Instance().GetShadowMap()->GetSamplerState();
+        ID3D11SamplerState* sampler = Graphics::Instance().GetStageShadowMap()->GetSamplerState();
         dc->PSSetSamplers(5, 1, &sampler);
 
         // shadowMapDataがある時だけSRVをslot 5にセット
         // （シャドウマップ描画中はnullのままにしてDSVとの競合を防ぐ）
-        if (rc.shadowMapData != nullptr)
+        if (rc.stageShadowMapData != nullptr)
         {
-            ID3D11ShaderResourceView* srv = rc.shadowMapData->shadowMap;
+            ID3D11ShaderResourceView* srv = rc.stageShadowMapData->shadowMap;
             dc->PSSetShaderResources(5, 1, &srv);
+        }
+        if (rc.characterShadowMapData != nullptr)
+        {
+            ID3D11ShaderResourceView* srv = rc.characterShadowMapData->shadowMap;
+            dc->PSSetShaderResources(6, 1, &srv);
         }
     }
 }
@@ -117,14 +122,22 @@ void PBRShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
     // -------------------------------------------------------
     // シャドウマップ用定数バッファ更新
     // -------------------------------------------------------
-    if (rc.shadowMapData != nullptr && !rc.isShadowPass)
+    if (!rc.isShadowPass && (rc.stageShadowMapData || rc.characterShadowMapData))
     {
         shadowmap_constants cbShadow{};
-        cbShadow.light_view_projection = rc.shadowMapData->lightViewProjection;
-        cbShadow.shadow_bias = rc.shadowMapData->shadowBias;
-        cbShadow.shadow_attenuation = rc.shadowMapData->shadowAttenuation;
-        cbShadow.shadow_color = rc.shadowMapData->shadowColor;
-
+        if (rc.stageShadowMapData)
+        {
+            cbShadow.stage_light_view_projection = rc.stageShadowMapData->lightViewProjection;
+            cbShadow.stage_shadow_bias = rc.stageShadowMapData->shadowBias;
+            cbShadow.stage_shadow_attenuation = rc.stageShadowMapData->shadowAttenuation;
+            cbShadow.shadow_color = rc.stageShadowMapData->shadowColor;
+        }
+        if (rc.characterShadowMapData)
+        {
+            cbShadow.character_light_view_projection = rc.characterShadowMapData->lightViewProjection;
+            cbShadow.character_shadow_bias = rc.characterShadowMapData->shadowBias;
+            cbShadow.character_shadow_attenuation = rc.characterShadowMapData->shadowAttenuation;
+        }
         dc->UpdateSubresource(shadowmap_constant_buffer.Get(), 0, 0, &cbShadow, 0, 0);
     }
 
@@ -167,9 +180,9 @@ void PBRShader::End(const RenderContext& rc)
     ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
     dc->PSSetShaderResources(0, _countof(nullSRVs), nullSRVs);
 
-    // シャドウマップSRV解除（slot 5）
-    ID3D11ShaderResourceView* srvs_null[] = { nullptr };
-    dc->PSSetShaderResources(5, 1, srvs_null);
+    // シャドウマップSRV解除（slot 5, 6）
+    ID3D11ShaderResourceView* srvs_null[] = { nullptr, nullptr };
+    dc->PSSetShaderResources(5, 2, srvs_null);
 
     // IBL SRV解除（slot 33〜35）
     ID3D11ShaderResourceView* nullIBLSRVs[3] = { nullptr, nullptr, nullptr };

@@ -84,8 +84,11 @@ void SceneGame::Initialize()
 	bloomer->bloom_extraction_threshold = bloom_extraction;
 
 	// シャドウマップのパラメータ設定
-	shadowAttenuation = 0;
-	shadowBias = 0.001f;
+	stageShadowAttenuation = 0;
+	stageShadowBias = 0.001f;
+
+	characterShadowAttenuation = 0;
+	characterShadowBias = 0.001f;
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());
@@ -231,7 +234,8 @@ void SceneGame::Render()
 
 	// シャドウマップ取得
 	Graphics& graphics = Graphics::Instance();
-	ShadowMap* shadowMap = graphics.GetShadowMap();
+	ShadowMap* shadowMap = graphics.GetStageShadowMap();
+	ShadowMap* characterShadowMap = graphics.GetCharacterShadowMap();
 
 	// 描画コンテキスト設定
 	RenderContext rc;
@@ -245,17 +249,31 @@ void SceneGame::Render()
 	rc.isShadowPass = false;
 
 	// シャドウマップ描画
-	RenderShadowMap();
+	if (!stageShadowRendered)
+	{
+		RenderStageShadowMap();
+		stageShadowRendered = true;
+	}
 
-	// シャドウマップ準備
-	ShadowMapData shadowData;
-	shadowData.shadowMap = shadowMap->GetShaderResourceView();
-	shadowData.shadowSampler = shadowMap->GetSamplerState();
-	shadowData.lightViewProjection = lightViewProjection;
-	shadowData.shadowColor = DirectX::XMFLOAT4(0, 0, 0, 0.1);
-	shadowData.shadowBias = shadowBias;
-	shadowData.shadowAttenuation = shadowAttenuation;
-	rc.shadowMapData = &shadowData;
+	// stage用のャドウマップ準備
+	ShadowMapData stageShadowData;
+	stageShadowData.shadowMap = shadowMap->GetShaderResourceView();
+	stageShadowData.shadowSampler = shadowMap->GetSamplerState();
+	stageShadowData.lightViewProjection = stageLightViewProjection;
+	stageShadowData.shadowColor = DirectX::XMFLOAT4(0, 0, 0, 0.1);
+	stageShadowData.shadowBias = stageShadowBias;
+	stageShadowData.shadowAttenuation = stageShadowAttenuation;
+	rc.stageShadowMapData = &stageShadowData;
+
+	RenderCharacterShadowMap();
+	ShadowMapData characterShadowData;
+	characterShadowData.shadowMap = characterShadowMap->GetShaderResourceView();
+	characterShadowData.shadowSampler = characterShadowMap->GetSamplerState();
+	characterShadowData.lightViewProjection = characterLightViewProjection;
+	characterShadowData.shadowColor = DirectX::XMFLOAT4(0, 0, 0, 0.1);
+	characterShadowData.shadowBias = characterShadowBias;
+	characterShadowData.shadowAttenuation = characterShadowAttenuation;
+	rc.characterShadowMapData = &characterShadowData;
 
 
 	// デバック描画
@@ -360,17 +378,14 @@ void SceneGame::Render()
 }
 
 // シャドウマップ描画
-void SceneGame::RenderShadowMap()
+void SceneGame::RenderStageShadowMap()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 	RenderState* renderState = Graphics::Instance().GetRenderState();
 	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	Graphics& graphics = Graphics::Instance();
-	ShadowMap* shadowMap = graphics.GetShadowMap();
-
-	// プレイヤーを取得
-	Player& player = Player::Instance();
+	ShadowMap* shadowMap = graphics.GetStageShadowMap();
 
 	// レンダーステート設定
 	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
@@ -402,11 +417,11 @@ void SceneGame::RenderShadowMap()
 		DirectX::XMVECTOR Min = DirectX::XMLoadFloat3(&vmin);
 		DirectX::XMVECTOR Max = DirectX::XMLoadFloat3(&vmax);
 		DirectX::XMVECTOR Center = DirectX::XMVectorScale(DirectX::XMVectorAdd(Min, Max), 0.5f);
-		float radius = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(Max, Center)));
+		stageRadius = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(Max, Center)));
 
 		DirectX::XMVECTOR L = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&lightDir));
 		DirectX::XMFLOAT3 lightPos, lightTarget;
-		DirectX::XMStoreFloat3(&lightPos, DirectX::XMVectorSubtract(Center, DirectX::XMVectorScale(L, radius)));
+		DirectX::XMStoreFloat3(&lightPos, DirectX::XMVectorSubtract(Center, DirectX::XMVectorScale(L, stageRadius)));
 		DirectX::XMStoreFloat3(&lightTarget, Center);
 
 		DirectX::XMFLOAT3 lightEyeUp = { 0, 1, 0 }; // 上方向を向く
@@ -414,10 +429,10 @@ void SceneGame::RenderShadowMap()
 		// 計算した内容をセットする
 		camera.SetLookAt(lightPos, lightTarget, lightEyeUp);
 		camera.SetOrthographic(
-			radius * 1.2f,   // 横幅：アリーナの直径
-			radius * 1.2f,   // 高さ
+			stageRadius * 1.8f,   // 横幅：アリーナの直径
+			stageRadius * 1.8f,   // 高さ
 			0.0f,            // 近平面：ライト位置から
-			radius * 1.2f    // 遠平面：アリーナの反対側まで
+			stageRadius * 1.8f    // 遠平面：アリーナの反対側まで
 		);
 
 		DirectX::XMFLOAT4X4 view = camera.GetView();
@@ -428,7 +443,7 @@ void SceneGame::RenderShadowMap()
 		// ライトビュープロジェクション行列を計算して保存
 		// シャドウマップ用の情報に入れる
 		DirectX::XMMATRIX lightViewProjection_M = DirectX::XMMatrixMultiply(V, P);
-		DirectX::XMStoreFloat4x4(&lightViewProjection, lightViewProjection_M);
+		DirectX::XMStoreFloat4x4(&stageLightViewProjection, lightViewProjection_M);
 	}
 
 	shadowMap->Active(dc);
@@ -436,6 +451,94 @@ void SceneGame::RenderShadowMap()
 		// ステージ描画
 		stage->Render(rc, modelRenderer);
 
+		// 全モデル描画
+		modelRenderer->Render(rc);
+	}
+	shadowMap->Deactive(dc);
+
+	//２変更したカメラの情報を元に戻すこと
+	camera.ResetCamera();
+}
+
+void SceneGame::RenderCharacterShadowMap()
+{
+	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+	RenderState* renderState = Graphics::Instance().GetRenderState();
+	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	Graphics& graphics = Graphics::Instance();
+	ShadowMap* shadowMap = graphics.GetCharacterShadowMap();
+
+	// プレイヤーを取得
+	Player& player = Player::Instance();
+
+	// レンダーステート設定
+	dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
+	dc->RSSetState(renderState->GetRasterizerState(RasterizerState::SolidCullBack));
+
+	// 描画コンテキスト設定
+	RenderContext rc;
+	rc.deviceContext = dc;
+	rc.renderState = renderState;
+	rc.camera = &camera;
+	rc.lightManager = &lightManager;
+	rc.isShadowPass = true;
+
+	//１カメラをライトから見た情報に変更
+	{
+		// 最初のカメラの情報を保存する
+		camera.SaveCamera();
+
+		// キャラ2体を囲む球を出す
+		DirectX::XMFLOAT3 pPos = player.GetPosition();
+		DirectX::XMFLOAT3 ePos = enemy->GetPosition();
+
+		DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&pPos);
+		DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&ePos);
+
+		// 2点の中間点を足元から身体の半分の高さまで上げる
+		const float characterHeight = 2.0f; // おそらくキャラの全長
+		const float margin = 1.5f; // 武器や手がはみ出すぶん
+		DirectX::XMVECTOR Center = DirectX::XMVectorScale(DirectX::XMVectorAdd(Ppos, Epos), 0.5f);
+		Center = DirectX::XMVectorAdd(Center, DirectX::XMVectorSet(0, characterHeight * 0.5f, 0, 0));
+
+		float halfDist = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(Ppos, Epos))) * 0.5f;
+		float charaRadius = halfDist + characterHeight + margin;
+
+		// ライト方向を取得
+		DirectX::XMFLOAT3 lightDir = lightManager.GetDirectionalLight().direction;
+
+		// 奥行きはステージの半径を使う（理由は下に書きます）
+		float depth = stageRadius;   // ステージ用パスで出している radius
+
+		DirectX::XMVECTOR L = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&lightDir));
+		DirectX::XMFLOAT3 lightPos, lightTarget;
+		DirectX::XMStoreFloat3(&lightPos, DirectX::XMVectorSubtract(Center, DirectX::XMVectorScale(L, depth)));
+		DirectX::XMStoreFloat3(&lightTarget, Center);
+
+		camera.SetLookAt(lightPos, lightTarget, { 0, 1, 0 });
+		camera.SetOrthographic(
+			charaRadius * 2.0f,   // 横幅：キャラだけ
+			charaRadius * 2.0f,   // 高さ：キャラだけ
+			0.0f,
+			depth * 2.0f          // 奥行き：ステージの反対側まで
+		);
+		DirectX::XMFLOAT3 lightEyeUp = { 0, 1, 0 }; // 上方向を向く
+
+		DirectX::XMFLOAT4X4 view = camera.GetView();
+		DirectX::XMFLOAT4X4 projaection = camera.GetProjection();
+		DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
+		DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projaection);
+
+		// ライトビュープロジェクション行列を計算して保存
+		// シャドウマップ用の情報に入れる
+		DirectX::XMMATRIX lightViewProjection_M = DirectX::XMMatrixMultiply(V, P);
+		DirectX::XMStoreFloat4x4(&characterLightViewProjection, lightViewProjection_M);
+	}
+
+	shadowMap->Active(dc);
+	{
 		// プレイヤー描画
 		player.Render(rc, modelRenderer);
 
@@ -455,7 +558,8 @@ void SceneGame::RenderShadowMap()
 void SceneGame::DrawGUI()
 {
 	Graphics& graphics = Graphics::Instance();
-	ShadowMap* shadowMap = graphics.GetShadowMap();
+	ShadowMap* stageShadowMap = graphics.GetStageShadowMap();
+	ShadowMap* characterShadowMap = graphics.GetCharacterShadowMap();
 	RenderContext rc;
 
 	Player& player = Player::Instance();
@@ -562,12 +666,23 @@ void SceneGame::DrawGUI()
 
 			if (ImGui::CollapsingHeader(u8"シャドウマップ", ImGuiTreeNodeFlags_DefaultOpen))
 			{
+				if (ImGui::CollapsingHeader(u8"ステージ用", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::DragFloat(u8"影の減衰##stage", &stageShadowAttenuation, 0.001f, 0.0f, 1.0f);
+					ImGui::DragFloat(u8"シャドウバイアス##stage", &stageShadowBias, 0.001f, 0.0f, 1.0f);
 
-				ImGui::DragFloat(u8"影の減衰", &shadowAttenuation, 0.001f, 0.0f, 1.0f);
-				ImGui::DragFloat(u8"シャドウバイアス", &shadowBias, 0.001f, 0.0f, 1.0f);
+					ImGui::Text(u8"テクスチャ##stage");
+					ImGui::Image(stageShadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+				}
 
-				ImGui::Text(u8"テクスチャ");
-				ImGui::Image(shadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+				if (ImGui::CollapsingHeader(u8"キャラクター用", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::DragFloat(u8"影の減衰##character", &characterShadowAttenuation, 0.001f, 0.0f, 1.0f);
+					ImGui::DragFloat(u8"シャドウバイアス##character", &characterShadowBias, 0.001f, 0.0f, 1.0f);
+
+					ImGui::Text(u8"テクスチャ##character");
+					ImGui::Image(characterShadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+				}
 			}
 
 			if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))

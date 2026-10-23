@@ -17,8 +17,25 @@ TextureCube specular_pmrem : register(t34);
 Texture2D lut_ggx : register(t35);
 
 // シャドウマップ
-Texture2D shadow_map : register(t5);
+Texture2D stage_shadow_map : register(t5);
+Texture2D character_shadow_map : register(t6);
 SamplerComparisonState shadow_sampler_state : register(s5);
+
+
+float SampleShadowPCF(Texture2D map, float3 tc, float bias)
+{
+    float2 size;
+    map.GetDimensions(size.x, size.y);
+    float2 texel = 1.0f / size;
+    float depth = tc.z - bias;
+    
+    float lit = 0.0f;
+    [unroll]for (int y = -1; y <= 1; ++y)
+    [unroll]for (int x = -1; x <= 1; ++x)
+            lit += map.SampleCmpLevelZero(shadow_sampler_state, tc.xy + float2(x, y) * texel, depth);
+    
+    return lit / 9.0f;
+}
 
 
 float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
@@ -111,29 +128,12 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
             float3 LC = lightColor.rgb;
             DirectBRDF(diffuse_reflectance, F0, N, V, L, LC, final_roughness, diffuse, specular);
 
-            float shadow = 0.0f;
-            float compareDepth = pin.shadow_texcoord.z - shadow_bias;
-
-            // 平行光源用シャドウマップのサイズ取得
-            float2 shadow_size;
-            shadow_map.GetDimensions(shadow_size.x, shadow_size.y);
-            float2 texel = 1.0f / shadow_size;
-
-            // 3x3 Hardware PCF サンプリング
-            [unroll]
-            for (int y = -1; y <= 1; ++y)
-            {
-                [unroll]
-                for (int x = -1; x <= 1; ++x)
-                {
-                    float2 uvOffset = pin.shadow_texcoord.xy + float2(x, y) * texel;
-                    shadow += shadow_map.SampleCmpLevelZero(shadow_sampler_state, uvOffset, compareDepth);
-                }
-            }
-            shadow /= 9.0f; // SampleCmp は日なたで 1.0、影で 0.0 を返す
+            float stage_lit = SampleShadowPCF(stage_shadow_map, pin.stage_shadow_texcoord, stage_shadow_bias);
+            float chara_lit = SampleShadowPCF(character_shadow_map, pin.character_shadow_texcoord, character_shadow_bias);
             
-            float shadow_factor = 1.0f - shadow; // 影の強さ (1.0 = 完全な影)
-            float atten = lerp(1.0f, shadow_attenuation, shadow_factor);
+            float stage_atten = lerp(1.0f, stage_shadow_attenuation, 1.0f - stage_lit);
+            float chara_atten = lerp(1.0f, character_shadow_attenuation, 1.0f - chara_lit);
+            float atten = min(stage_atten, chara_atten); // 暗いほうを使う
             
             diffuse *= atten;
             specular *= atten;
