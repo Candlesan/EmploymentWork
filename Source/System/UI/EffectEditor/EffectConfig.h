@@ -68,6 +68,7 @@ struct NodeConfig
 
 	// --- 共通パラメータ（時間・生成・移動計算）---
 	int emitCount = 1;													// パーティクルの生成数
+	int maxParticle = 128;												// 同時生成数
 	float lifeTime = 1.0f;												// 消滅までの寿命
 	float delayTime = 0.0f;												// パーティクルを生成するまでの時間
 	float duration = 1.0f;												// エフェクト全体の生存時間

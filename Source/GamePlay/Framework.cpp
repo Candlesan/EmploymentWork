@@ -117,16 +117,18 @@ void Framework::Render(float elapsedTime)
 
 #if _DEBUG
 	// シーンGUI描画処理
-	if(GUIDrawSwitch)
-	SceneManager::Instance().DrawGUI();
+	if (GUIDrawSwitch)
+	{
+		SceneManager::Instance().DrawGUI();
 
 
-	// GUIでFPS表示
-	ImGui::Begin("FPS");
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Text("FPS : %.1f", io.Framerate);
-	ImGui::Text("Frame : %.3f ms", 1000.0f / io.Framerate);
-	ImGui::End();
+		// GUIでFPS表示
+		ImGui::Begin("FPS");
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::Text("FPS : %.1f", io.Framerate);
+		ImGui::Text("Frame : %.3f ms", 1000.0f / io.Framerate);
+		ImGui::End();
+	}
 
 	// IMGUI描画
 	ImGuiRenderer::Render(dc);

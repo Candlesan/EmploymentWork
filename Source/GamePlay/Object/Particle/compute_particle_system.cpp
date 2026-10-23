@@ -1,5 +1,17 @@
 #include "compute_particle_system.h"
 
+// 全インスタンスで共有するシェーダー
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::init_shader;
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::emit_shader;
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::update_shader;
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::begin_frame_shader;
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::end_frame_shader;
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::sort_b2_shader;
+Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::sort_c2_shader;
+Microsoft::WRL::ComPtr<ID3D11VertexShader>   compute_particle_system::vertex_shader;
+Microsoft::WRL::ComPtr<ID3D11GeometryShader> compute_particle_system::geometry_shader;
+Microsoft::WRL::ComPtr<ID3D11PixelShader>    compute_particle_system::pixel_shader;
+
 compute_particle_system::compute_particle_system(ID3D11Device* device, UINT particles_count,
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view, DirectX::XMUINT2 split_count)
 {
@@ -145,32 +157,30 @@ compute_particle_system::compute_particle_system(ID3D11Device* device, UINT part
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	//	コンピュートシェーダー読み込み
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_init_cs.cso", init_shader.GetAddressOf());
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_emit_cs.cso", emit_shader.GetAddressOf());
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_update_cs.cso", update_shader.GetAddressOf());
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_begin_frame_cs.cso", begin_frame_shader.GetAddressOf());
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_end_frame_cs.cso", end_frame_shader.GetAddressOf());
-	//create_cs_from_cso(device, "compute_particle_sort_cs.cso", sort_shader.GetAddressOf());
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_bitonic_sort_b2_cs.cso", sort_b2_shader.GetAddressOf());
-	GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_bitonic_sort_c2_cs.cso", sort_c2_shader.GetAddressOf());
+	if (!init_shader)
+	{
+		//	コンピュートシェーダー読み込み
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_init_cs.cso", init_shader.GetAddressOf());
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_emit_cs.cso", emit_shader.GetAddressOf());
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_update_cs.cso", update_shader.GetAddressOf());
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_begin_frame_cs.cso", begin_frame_shader.GetAddressOf());
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_end_frame_cs.cso", end_frame_shader.GetAddressOf());
 
-	//	描画用情報生成
+		//create_cs_from_cso(device, "compute_particle_sort_cs.cso", sort_shader.GetAddressOf());
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_bitonic_sort_b2_cs.cso", sort_b2_shader.GetAddressOf());
+		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_bitonic_sort_c2_cs.cso", sort_c2_shader.GetAddressOf());
+
+		//	描画用情報生成
+		GpuResourceUtils::LoadVertexShader(device, "Data/Shader/compute_particle_render_vs.cso", nullptr, 0, 0, vertex_shader.GetAddressOf());
+		GpuResourceUtils::LoadGeometryShader(device, "Data/Shader/compute_particle_render_gs.cso", geometry_shader.GetAddressOf());
+		GpuResourceUtils::LoadPixelShader(device, "Data/Shader/compute_particle_render_ps.cso", pixel_shader.GetAddressOf());
+	}
+
 	this->shader_resource_view = shader_resource_view;
-	GpuResourceUtils::LoadVertexShader(device, "Data/Shader/compute_particle_render_vs.cso", nullptr, 0, 0, vertex_shader.GetAddressOf());
-	GpuResourceUtils::LoadGeometryShader(device, "Data/Shader/compute_particle_render_gs.cso", geometry_shader.GetAddressOf());
-	GpuResourceUtils::LoadPixelShader(device, "Data/Shader/compute_particle_render_ps.cso", pixel_shader.GetAddressOf());
 }
 
 compute_particle_system::~compute_particle_system()
 {
-	init_shader.Reset();
-	update_shader.Reset();
-	emit_shader.Reset();
-	vertex_shader.Reset();
-	geometry_shader.Reset();
-	pixel_shader.Reset();
-	shader_resource_view.Reset();
 }
 
 void compute_particle_system::emit(const emit_particle_data& data)
@@ -273,12 +283,8 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		immediate_context->DispatchIndirect(indirect_data_buffer.Get(), UpdateDispatchIndirectOffset);
 	}
 
+	//	バイトニックソート
 	{
-		//	ソート処理
-		//immediate_context->CSSetShader(sort_shader.Get(), nullptr, 0);
-		//immediate_context->Dispatch(1, 1, 1);
-
-		//	バイトニックソート
 		//	https://www.bealto.com/gpu-sorting_parallel-bitonic-1.html
 		float	f_exponent = log2f(static_cast<float>(num_particles));
 		UINT	exponent = static_cast<UINT>(ceilf(f_exponent) + 0.5f);

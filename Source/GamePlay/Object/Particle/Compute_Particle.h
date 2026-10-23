@@ -8,7 +8,7 @@
 class Compute_Particle
 {
 public:
-	Compute_Particle(ID3D11Device* device);
+	Compute_Particle(ID3D11Device* device, int maxParticle = 128);
 	~Compute_Particle() {};
 
 	void Initialize(ID3D11Device* device);

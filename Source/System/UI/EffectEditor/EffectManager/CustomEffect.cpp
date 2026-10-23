@@ -28,7 +28,11 @@ void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
 
         if (nodeConfig.type == RenderType::Particle)
         {
-            rNode.particleManager = std::make_unique<Compute_Particle>(device);
+            rNode.particleManager = std::make_unique<Compute_Particle>(device, nodeConfig.maxParticle);
+            if (!nodeConfig.texturePath.empty())
+            {
+                rNode.particleManager->SetTexture(nodeConfig.texturePath, { (UINT)nodeConfig.splitCount[0], (UINT)nodeConfig.splitCount[1] });
+            }
         }
         // メッシュノードなら、そのノードのパスでモデルを生成
         else if (nodeConfig.type == RenderType::Mesh && !nodeConfig.meshPath.empty())
@@ -319,6 +323,7 @@ void CustomEffect::Update(float elapsedTime)
     for (auto& node : runTimeNodes)
     {
         if (!node.particleManager) continue;
+        if (node.finished) continue;
 
         bool local = (node.config.particleFollowMode == 1);
         node.particleManager->SetParent(node.worldTransform, local);
@@ -460,12 +465,6 @@ void CustomEffect::EmitParticles(float elapsedTime)
         if (node.spawnTimer >=pConfig.spawnInterval)
         {
             node.spawnTimer -=pConfig.spawnInterval;
-
-            // そのノードのテクスチャをGPUにセット（マルチテクスチャ対応！）
-            if (node.particleManager && !pConfig.texturePath.empty())
-            {
-                node.particleManager->SetTexture(pConfig.texturePath, { (UINT)pConfig.splitCount[0], (UINT)pConfig.splitCount[1] });
-            }
 
             // 生成数分 for 文で回す
             for (int i = 0; i <pConfig.emitCount; i++)

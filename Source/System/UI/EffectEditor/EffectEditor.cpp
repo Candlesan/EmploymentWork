@@ -258,6 +258,8 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
         {
             ImGui::DragInt(u8"¶¬”##Particle", &node.emitCount, 1);
             ImGui::Separator();
+            ImGui::DragInt(u8"“¯¶‘¶”##Particle", &node.maxParticle, 1);
+            ImGui::Separator();
 
             ImGui::Separator();
 

@@ -59,6 +59,7 @@ void EffectConfig::Save(const std::string& filePath)
 
         // éûä‘ÅEÉãÅ[Év
         n["emitCount"] = node.emitCount;
+        n["maxParticle"] = node.maxParticle;
         n["lifeTime"] = node.lifeTime;
         n["delayTime"] = node.delayTime;
         n["duration"] = node.duration;
@@ -220,6 +221,7 @@ void EffectConfig::Load(const std::string& filePath)
                 }
 
                 node.emitCount = nodeJson.value("emitCount", 1);
+                node.maxParticle = nodeJson.value("maxParticle", 128);
                 node.lifeTime  = nodeJson.value("lifeTime", 1.0f);
                 node.isLoop    = nodeJson.value("isLoop", true);
                 node.spawnInterval = nodeJson.value("spawnInterval", 0.1f);

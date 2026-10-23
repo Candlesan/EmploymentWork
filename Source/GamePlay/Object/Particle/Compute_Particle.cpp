@@ -2,10 +2,9 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Resource/TextureResourceManager/TextureResourceManager.h"
 
-Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
+Compute_Particle::Compute_Particle(ID3D11Device* device, int maxParticle) : device(device)
 {
     //	総パーティクル数
-    int num_particle = 5000;
 
     D3D11_TEXTURE2D_DESC texture2d_desc;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view;
@@ -15,7 +14,7 @@ Compute_Particle::Compute_Particle(ID3D11Device* device) : device(device)
 
     //	コンピュートパーティクルシステム生成
     system = std::make_unique<compute_particle_system>(device,
-        num_particle,
+        maxParticle,
         shader_resource_view,
         DirectX::XMUINT2(4, 4));
 
@@ -102,8 +101,8 @@ bool Compute_Particle::SetTexture(const std::string& texturePath, DirectX::XMUIN
     try
     {
         // 画像を読み込む
-        HRESULT hr = GpuResourceUtils::LoadTexture(device, texturePath.c_str(), srv.GetAddressOf(), &texture2d_desc);
-        if (FAILED(hr)) return false;
+        srv = TextureResourceManager::Instance().GetOrLoad(device, texturePath);
+        if (!srv) return false;
     }
     catch (...)
     {

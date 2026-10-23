@@ -168,15 +168,15 @@ public:
     Microsoft::WRL::ComPtr<ID3D11Buffer> bitonic_sort_constant_buffer;
 
     //Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_shader;
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_b2_shader;
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_c2_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_b2_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_c2_shader;
 
     //	DrawIndirectを用いるため、RWStrcturedBufferを用いる物に変更
     Microsoft::WRL::ComPtr<ID3D11Buffer> indirect_data_buffer;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> indirect_data_unordered_access_view;
 
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> begin_frame_shader;
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> end_frame_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> begin_frame_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> end_frame_shader;
 
 public:
     compute_particle_system(ID3D11Device* device, UINT particle_count,
@@ -208,6 +208,7 @@ public:
         dissolve_mode = mode;
         dissolve_softness = value;
     }
+
 private:
     UINT num_particles;
     UINT num_emit_particles;
@@ -232,13 +233,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particle_emit_shader_resource_view;
 
     // 各種シェーダー
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> init_shader;
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> emit_shader;
-    Microsoft::WRL::ComPtr<ID3D11ComputeShader> update_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> init_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> emit_shader;
+    static Microsoft::WRL::ComPtr<ID3D11ComputeShader> update_shader;
 
-    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader;
-    Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometry_shader;
-    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader;
+    static Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader;
+    static Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometry_shader;
+    static Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader;
 
     DirectX::XMFLOAT4X4 parent_world = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
     bool local_space = false;
