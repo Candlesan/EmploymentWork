@@ -32,13 +32,6 @@ struct CharacterStatus
 	float rapidFireMagicCost = 6.0f;	// 連射魔法の魔力消費量
 	float interceptMagicCost = 10.0f;	// 迎撃中の魔力消費量
 
-	// --- ヒート値 ---
-	float maxHeat = 100.0f;				// 最大ヒート値
-	float currentHeat = 0.0f;			// 現在のヒート値
-	float heatIncreaseSpeed = 20.0f;	// ヒート値の増加スピード
-	float heatRecoverSpeed = 5.0f;		// ヒート値の回復速度
-	float heatRecoverOnBreak = 50.0f;	// 防御魔法を割った時の回復量
-
 	// --- 防御系 ---
 	float maxDefenseDurability = 100.0f;		// 防御魔法の最大耐久値
 	float currentDefenseDurability = 100.0f;	// 現在の防御魔法の耐久値
@@ -50,8 +43,6 @@ struct CharacterStatus
 
 	// --- 状態フラグ ---
 	bool isDown = false;			// 魔力切れダウン中か
-	bool isBurstTrigger = false;	// オーバーヒートしたか
-	bool isBuring = false;			// オーバーヒート中か
 	bool isBreak = false;			// 防御魔法が割れたか
 	bool isRapidFire = false;		// 連射攻撃か
 	bool isIntercept = false;		// 迎撃中か
@@ -121,9 +112,6 @@ public:
 
 	// 魔力回復
 	void RecoverMagic(float amount);
-
-	// ヒート値回復
-	void RecoverHeat(float amount);
 
 	// ガード耐久値減少
 	void OnGuardHit(float amount);
@@ -248,5 +236,5 @@ protected:
 	float stepOffset = 0.3f; // 足元からの補正
 	float slopeLimit = DirectX::XMConvertToRadians(45.0f); // 角度で滑らせるか
 	float collisionRadius = 0.8f;
-	float BurstCoolDownScale = 1.0f; // バースト時のヒート値の回復倍率
+	float BurstCoolDownScale = 3.0f; // バースト時のヒート値の回復倍率
 };

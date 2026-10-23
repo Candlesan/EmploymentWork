@@ -312,14 +312,6 @@ void Enemy::DrawGUI()
 				ConsumMagic(10.0f, magicRecoverDelay);
 			}
 
-			// ヒート値
-			ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
-			ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
-			ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
-			ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
-			ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
-			ImGui::Separator();
-
 			// 防御魔法
 			ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
 			ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
@@ -630,10 +622,7 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 	{
 	case Enemy::ForcedState::None:
 	{
-		// 立ち上がりの瞬間だけ拾う
-		bool burstStarted = status.isBurstTrigger && !wasBurstTrigger;
 		bool breakStarted = status.isBreak && !wasBreak;
-		wasBurstTrigger = status.isBurstTrigger;
 		wasBreak = status.isBreak;
 
 		if (status.isDown)
@@ -647,13 +636,13 @@ bool Enemy::UpdateForcedState(float elapsedTime)
 			return true;
 		}
 
-		if (burstStarted || breakStarted)
+		if (breakStarted)
 		{
 			moveBT.Abort();
 			attackBT.Abort();
 			defenseBT.Abort();
-			ChangeAnimationState(burstStarted ? "Burst" : "Break");
-			forcedState = burstStarted ? ForcedState::Burst : ForcedState::Break;
+			ChangeAnimationState("Break");
+			forcedState = ForcedState::Break;
 			return true;
 		}
 		return false;

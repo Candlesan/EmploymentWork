@@ -33,7 +33,6 @@ void PlayerUI::Update(const CharacterStatus& status)
 	setFill(hpBar, status.currentHp, status.maxHp);
 	setFill(mpBar, status.currentMagic, status.maxMagic);
 	setFill(guardBar, status.currentDefenseDurability, status.maxDefenseDurability);
-	setFill(heatBar, status.currentHeat, status.maxHeat);
 }
 
 // GUI•`‰æ

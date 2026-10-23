@@ -184,50 +184,6 @@ void Character::UpdateStatus(float elapsedTime)
 		}
 	}
 
-	// ヒート値回復
-	if (status.isRapidFire)
-	{
-		// 迎撃しながらの連射は消費が大きい
-		float cost = status.isIntercept ? status.interceptMagicCost : status.rapidFireMagicCost;
-		ConsumMagic(cost * elapsedTime);
-
-		// ヒート値を回復させる
-		status.currentHeat += status.heatIncreaseSpeed * elapsedTime;
-
-		// 最大値を超えないようにする
-		if (status.currentHeat >= status.maxHeat)
-		{
-			status.currentHeat = status.maxHeat;
-			status.isBurstTrigger = true;
-			status.isBuring = true;
-		}
-	}
-	else
-	{
-		if (status.currentHeat > 0.0f)
-		{
-			status.isBurstTrigger = false;
-
-			// ヒート値があったら下げていく
-			if (status.isBuring)
-			{
-				status.currentHeat -= (status.heatRecoverSpeed * elapsedTime) * BurstCoolDownScale;
-			}
-			else
-			{
-				status.currentHeat -= status.heatRecoverSpeed * elapsedTime;
-
-			}
-
-			// ヒート値が0よりも低かったら
-			if (status.currentHeat <= 0.0f)
-			{
-				status.currentHeat = 0.0f;
-				status.isBuring = false;
-			}
-		}
-	}
-
 	// ガード値回復
 	if (!status.isGuarding) // ガードしてないとき
 	{
@@ -292,20 +248,6 @@ void Character::RecoverMagic(float amount)
 	// 最大値を超えないようにする
 	if (status.currentMagic >= status.maxMagic)
 		status.currentMagic = status.maxMagic;
-}
-
-// ヒート値を回復する
-void Character::RecoverHeat(float amount)
-{
-	status.currentHeat -= amount;
-
-	// 0を下回らないようにする
-	if (status.currentHeat <= 0.0f)
-	{
-		status.currentHeat = 0.0f;
-		status.isBurstTrigger = false;
-		status.isBuring = false;
-	}
 }
 
 // ガード耐久値減少

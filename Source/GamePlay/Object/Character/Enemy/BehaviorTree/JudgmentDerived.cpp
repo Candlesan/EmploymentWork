@@ -37,17 +37,11 @@ bool FloatConditionJudgment::Judgment()
     case BTConditionType::EnemyCurrentMagic: // 敵の魔力残量
         currentValue = owner->GetCurrentMagic();
         break;
-    case BTConditionType::EnemyCurrentHeat: // 敵の現在のヒート値の上昇量
-        currentValue = owner->GetCurrentHeat();
-        break;
     case BTConditionType::EnemyCurrentDefense: // 敵の現在の防御魔法の耐久値
         currentValue = owner->GetCurrentDefense();
         break;
     case BTConditionType::PlayerCurrentMagic: // プレイヤーの現在の魔力残量
         currentValue = player.GetCurrentMagic();
-        break;
-    case BTConditionType::PlayerCurrentHeat: // プレイヤーの現在のヒート値
-        currentValue = player.GetCurrentHeat();
         break;
     case BTConditionType::PlayerCurrentDefense: // プレイヤーの魔力残量
         currentValue = player.GetCurrentDefense();
@@ -85,10 +79,6 @@ bool FloatConditionJudgment::Judgment()
         currentValue = static_cast<float>(count);
         break;
     }
-    case BTConditionType::IsBurst: // バースト中か
-        currentValue = owner->GetStatus().isBuring ? 1.0f : 0.0f;
-        break;
-
     case BTConditionType::IsBreak: // バリアブレイク中か
         currentValue = owner->GetStatus().isBreak ? 1.0f : 0.0f;
         break;

@@ -71,7 +71,6 @@ public:
 	// =========================================================================
 	// ── プレイヤーの状態 ──
 	float GetCurrentMagic() const { return status.currentMagic; } // 現在の魔力量を返す
-	float GetCurrentHeat() const { return status.currentHeat; } // 現在のヒート値を返す
 	float GetCurrentDefense() const { return status.currentDefenseDurability; } // 現在の防御魔法の耐久値を返す
 
 	LockOnSystem& GetLockOnSystem() { return lockOn; }

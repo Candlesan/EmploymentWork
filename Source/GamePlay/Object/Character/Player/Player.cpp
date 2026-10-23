@@ -425,15 +425,6 @@ void Player::DrawGUI()
 					ConsumMagic(10.0f, magicRecoverDelay);
 				}
 
-				ImGui::Text(u8"ヒート値 : %f.0", status.currentHeat);
-				ImGui::DragFloat(u8"ヒート値", &status.currentHeat, 0.1f);
-				ImGui::DragFloat(u8"ヒート値増加量", &status.heatIncreaseSpeed, 0.1f);
-				ImGui::DragFloat(u8"ヒート値減少量", &status.heatRecoverSpeed, 0.1f);
-				ImGui::DragFloat(u8"シールドブレイク時の回復量", &status.heatRecoverOnBreak, 0.1f);
-				ImGui::DragFloat(u8"バースト時の回復倍率", &BurstCoolDownScale, 0.1f);
-				ImGui::Checkbox(u8"連射魔法テスト", &status.isRapidFire);
-				ImGui::Separator();
-
 				ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
 				ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
 				if (ImGui::Button(u8"耐久値減少"))
@@ -837,7 +828,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 連射魔法
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && !status.isBuring && CanControl())
+	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && CanControl())
 	{
 		status.isRapidFire = true;
 
@@ -875,7 +866,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 防御魔法
-	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER) && !status.isBuring && !status.isBreak && CanControl()) // ダウン状態でもバースト状態でもないとき
+	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)  && !status.isBreak && CanControl()) // ダウン状態でもバースト状態でもないとき
 	{
 		status.isGuarding = true;
 		defenseMagic.SetIsActive(status.isGuarding);
@@ -1715,7 +1706,6 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsFalling = falling;
 	ctx.IsDown = status.isDown;
-	ctx.IsBurst = status.isBurstTrigger;
 	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.IsDead = IsDead();
 	ctx.currentHP = status.currentHp;
@@ -2018,12 +2008,6 @@ void Player::CalculateStatusParameters()
 	// Y軸の加速度が-0.1以下なら落ちている判定
 	falling = (velocity.y < -0.1f);
 
-	// バーストの瞬間にアニメーションを呼ぶ
-	if (status.isBurstTrigger && flightController.IsFlying())
-	{
-		PlayActionGraph("Burst");
-	}
-
 	if (status.isBreak && !wasBreak)
 	{
 		PlayActionGraph("Break");
@@ -2036,28 +2020,6 @@ void Player::CalculateStatusParameters()
 	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Epos, Ppos);
 	enemyFromDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
 }
-
-// 剣先と根本を求める関数
-//void Player::CalculationRootAndTip()
-//{
-//	for (int i = 0; i < 2; ++i)
-//	{
-//		// 剣の根本・先端の座標を計算
-//		DirectX::XMVECTOR RootOffset = DirectX::XMLoadFloat3(&rootOffset);
-//		DirectX::XMVECTOR TipOffset = DirectX::XMLoadFloat3(&tipOffset);
-//
-//		DirectX::XMMATRIX W = DirectX::XMLoadFloat4x4(&weapon.transform);
-//
-//		DirectX::XMVECTOR Root = DirectX::XMVector3TransformCoord(RootOffset, W);
-//		DirectX::XMVECTOR Tip = DirectX::XMVector3TransformCoord(TipOffset, W);
-//
-//		DirectX::XMFLOAT3 rootF3, tipF3;
-//		DirectX::XMStoreFloat3(&rootF3, Root);
-//		DirectX::XMStoreFloat3(&tipF3, Tip);
-//
-//		trail.Update(rootF3, tipF3);
-//	}
-//}
 
 // 移動時の背骨の回転角度を求める関数
 void Player::CalculateSpineRotation(float elapsedTime)

@@ -50,13 +50,6 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		bool wasBroken = guardOwner->GetStatus().isBreak;
 		guardOwner->OnGuardHit(magic->GetGuardDamage());  // ガード耐久値を削る
 
-		// このヒットで割れた瞬間だけ、連射魔法を撃った人のヒート値を回復
-		if (!wasBroken && guardOwner->GetStatus().isBreak
-			&& magic->GetMagicKind() == MagicKind::Rapid && magic->GetOwner())
-		{
-			magic->GetOwner()->RecoverHeat(magic->GetOwner()->GetStatus().heatRecoverOnBreak);
-		}
-
 		if (magic->GetMagicKind() == MagicKind::Normal && magic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
 		{
 			guardOwner->OnGuardHit(200);

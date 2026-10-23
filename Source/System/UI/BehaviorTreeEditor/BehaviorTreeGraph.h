@@ -19,14 +19,11 @@ enum class BTConditionType
 	timer,					// タイマー
 	AttackCoolDown,			// 攻撃のクールダウン
 	EnemyCurrentMagic,		// 敵の現在の魔力残量
-	EnemyCurrentHeat,		// 敵の現在のヒート値
 	EnemyCurrentDefense,	// 敵の現在の防御魔法の耐久値
 	PlayerCurrentMagic,		// プレイヤーの現在の魔力残量
-	PlayerCurrentHeat,		// プレイヤーの現在のヒート値
 	PlayerCurrentDefense,	// プレイヤーの現在の防御魔法の耐久値
 	IsPlayerDefending,		// プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)
 	IncomingMagicCount,		// 自身に向かって飛んできている魔法の数 (迎撃判断用)
-	IsBurst,				// バースト状態か
 	IsBreak,				// バリアが壊れたか
 	AvoidCoolDownTimer,		// 回避用のクールダウン
 	Random,					// 確率
@@ -88,14 +85,11 @@ inline const BTConditionInfo kConditionInfos[] = {
 	{BTConditionType::timer,                  "timer",                  u8"タイマー(秒)"},
 	{BTConditionType::AttackCoolDown,         "AttackCoolDown",         u8"攻撃のクールダウン"},
 	{BTConditionType::EnemyCurrentMagic,      "EnemyCurrentMagic",      u8"敵の現在の魔力残量"},
-	{BTConditionType::EnemyCurrentHeat,       "EnemyCurrentHeat",       u8"敵の現在のヒート値"},
 	{BTConditionType::EnemyCurrentDefense,    "EnemyCurrentDefense",    u8"敵の現在の防御魔法の耐久値"},
 	{BTConditionType::PlayerCurrentMagic,     "PlayerCurrentMagic",     u8"プレイヤーの現在の魔力残量"},
-	{BTConditionType::PlayerCurrentHeat,      "PlayerCurrentHeat",      u8"プレイヤーの現在のヒート値"},
 	{BTConditionType::PlayerCurrentDefense,   "PlayerCurrentDefense",   u8"プレイヤーの現在の防御魔法の耐久値"},
 	{BTConditionType::IsPlayerDefending,      "IsPlayerDefending",      u8"プレイヤーが防御魔法を展開中か (1.0=Yes, 0.0=No)"},
 	{BTConditionType::IncomingMagicCount,     "IncomingMagicCount",     u8"自身に向かって飛んできている魔法の数"},
-	{BTConditionType::IsBurst,                "IsBurst",                u8"バースト状態か"},
 	{BTConditionType::IsBreak,                "IsBreak",                u8"バリアブレイクをしたか"},
 	{BTConditionType::AvoidCoolDownTimer,     "AvoidCoolDownTimer",     u8"回避用のクールダウンがあるか"},
 	{BTConditionType::Random,                 "Random",                 u8"確率"},
