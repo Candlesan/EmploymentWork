@@ -287,10 +287,6 @@ void Enemy::DrawGUI()
 			ImGui::SameLine();
 			ImGui::Checkbox(u8"連射魔法", &onRapidMagic);
 			ImGui::Separator();
-			if (ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding))
-			{
-				defenseMagic.SetIsActive(status.isGuarding);
-			}
 			ImGui::Separator();
 
 
@@ -307,19 +303,13 @@ void Enemy::DrawGUI()
 			ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
 			ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
 			ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
-			if (ImGui::Button(u8"魔力消費"))
-			{
-				ConsumMagic(10.0f, magicRecoverDelay);
-			}
 
 			// 防御魔法
 			ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
 			ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
-			if (ImGui::Button(u8"耐久値減少"))
-			{
-				OnGuardHit(10.0f);
-			}
 			ImGui::Separator();
+
+			defenseMagic.DrawGUI();
 
 			// クールダウン・ステート情報
 			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);

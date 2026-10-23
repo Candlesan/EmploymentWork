@@ -17,7 +17,6 @@
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
-#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
 
 #include <memory>
 #include <unordered_map>
@@ -45,7 +44,6 @@ public:
 	//  外部アクション・AI制御
 	// =========================================================================
 	float GetCurrentMagic() const { return status.currentMagic; } // 現在の魔力量を返す
-	float GetCurrentDefense() const { return status.currentDefenseDurability; } // 現在の防御魔法の耐久値を返す
 
 	// プレイヤーとの距離を取得
 	float GetDistanceToPlayer() const;
@@ -184,7 +182,6 @@ private:
 	NormalMagic normalMagic;
 	RapidMagic::RapidMagicConfig rapidMagicConfig;
 	RapidMagic rapidMagic;
-	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
 	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン

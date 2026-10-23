@@ -16,7 +16,6 @@
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
-#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
 
 #include <memory>
 
@@ -68,7 +67,6 @@ public:
 	// =========================================================================
 	// ── プレイヤーの状態 ──
 	float GetCurrentMagic() const { return status.currentMagic; } // 現在の魔力量を返す
-	float GetCurrentDefense() const { return status.currentDefenseDurability; } // 現在の防御魔法の耐久値を返す
 
 	LockOnSystem& GetLockOnSystem() { return lockOn; }
 	const LockOnSystem& GetLockOnSystem() const { return lockOn; }
@@ -84,7 +82,7 @@ public:
 	const std::shared_ptr<Model> GetModel() const override { return player; }
 	AnimationSequencer& GetAnimSequence() { return animSequence; }
 	MagicManager& GetMagicManager() { return magicManager; }
-	DefenseMagic GetDefenseMagic() { return defenseMagic; }
+	DefenseMagic& GetDefenseMagic() { return defenseMagic; }
 
 	float GetCollisonOffset() const { return CollisionOffset; }
 protected:
@@ -163,7 +161,6 @@ private:
 	NormalMagic normalMagic;
 	RapidMagic::RapidMagicConfig rapidMagicConfig;
 	RapidMagic rapidMagic;
-	DefenseMagic defenseMagic;
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
 	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン

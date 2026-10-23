@@ -115,7 +115,7 @@ void Character::UpdateStatus(float elapsedTime)
 {
 	// 魔力回復
 	// 攻撃していないまたはガードしながら攻撃していないとき
-	if (status.isGuarding)
+	if (defenseMagic.GetIsActive())
 	{
 		status.guardMagicRecoverTimer += elapsedTime;
 
@@ -144,7 +144,7 @@ void Character::UpdateStatus(float elapsedTime)
 			}
 
 		}
-		else if (status.isDown || isGround) // ダウン中は急速に回復させる
+		else if (status.isDown) // ダウン中は急速に回復させる
 		{
 			if (status.currentMagic < status.maxMagic)
 			{
@@ -186,7 +186,7 @@ void Character::UpdateStatus(float elapsedTime)
 	}
 
 	// ガード値回復
-	if (!status.isGuarding) // ガードしてないとき
+	if (!defenseMagic.GetIsActive()) // ガードしてないとき
 	{
 		// 現在の数値が最大値よりも少なかったら
 		if (status.currentDefenseDurability < status.maxDefenseDurability)

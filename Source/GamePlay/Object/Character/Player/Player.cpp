@@ -402,27 +402,22 @@ void Player::DrawGUI()
 				ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
 				ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
 				ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
+				ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 				ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
 				ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
 				ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
-				if (ImGui::Button(u8"魔力消費"))
-				{
-					ConsumMagic(10.0f, magicRecoverDelay);
-				}
+				ImGui::Separator();
 
 				ImGui::Text(u8"防御魔法の耐久値 : %f.0", status.currentDefenseDurability);
 				ImGui::DragFloat(u8"防御魔法の魔力消費量", &status.defenseMagicCost, 0.1f);
-				if (ImGui::Button(u8"耐久値減少"))
-				{
-					OnGuardHit(10.0f);
+				if (GetIsGaurd()) {
+					ImGui::Text(u8"防衛状態: ガード中");
+				}
+				else {
+					ImGui::Text(u8"防衛状態: ガードなし");
 				}
 				ImGui::Separator();
-				ImGui::Checkbox(u8"防御魔法展開", &status.isGuarding);
-				ImGui::Separator();
 
-
-				ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
-				ImGui::Separator();
 				ImGui::Text(u8"首の回転: %f.0", debugAngle);
 				ImGui::Separator();
 
@@ -451,13 +446,6 @@ void Player::DrawGUI()
 
 				ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
 				ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
-
-				if (status.isGuarding) {
-					ImGui::Text(u8"防衛状態: ガード中");
-				}
-				else {
-					ImGui::Text(u8"防衛状態: ガードなし");
-				}
 
 				if (status.isAvoid) {
 					ImGui::Text(u8"アクション状態: 回避中");
@@ -824,8 +812,7 @@ void Player::MagicInput(float elapsedTime)
 	// 防御魔法
 	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)  && !status.isBreak && CanControl()) // ダウン状態でもバースト状態でもないとき
 	{
-		status.isGuarding = true;
-		defenseMagic.SetIsActive(status.isGuarding);
+		SetIsGaurd(true);
 
 		// まだ生きているかを確認する
 		if (!effectManager.Exists(barrierEffect))
@@ -845,8 +832,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 	else
 	{
-		status.isGuarding = false;
-		defenseMagic.SetIsActive(status.isGuarding);
+		SetIsGaurd(false);
 
 		// ボタンを離したら止めて、ポインタも空に戻す
 		if (barrierEffect)
@@ -1375,32 +1361,6 @@ void Player::UpdateUpperBodyTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentOverlayState)
 	{
-		//// ジャンプ処理
-		//if (nextState == "State_Jump" || nextState == "State_LockOn_Jump")
-		//{
-		//	Jump(jumpSpeed);
-
-		//	// 空中に飛び出すときに勢いを載せる
-		//	if (moveLength > 0.1f)
-		//	{
-		//		float mvX = moveVec.x / moveLength;
-		//		float mvZ = moveVec.z / moveLength;
-
-		//		// 走ってるときの速度を掛けてVelocityに送る
-		//		float jumpForwardSpeed = maxMoveSpeed;
-		//		velocity.x = mvX * jumpForwardSpeed;
-		//		velocity.z = mvZ * jumpForwardSpeed;
-		//	}
-		//	else
-		//	{
-		//		velocity.x = 0.0f;
-		//		velocity.z = 0.0f;
-		//	}
-
-		//	jumpCount++;
-		//	bufferedButton &= ~GamePad::BTN_A; // 先行入力の記憶をリセット
-		//}
-
 		// アクションを実行する
 		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
 		if (trans)
@@ -1582,8 +1542,6 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 		bufferedButton |= gamePad.GetButtonDown();
 	}
 
-	status.isGuarding = (gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER);
-
 	// RBボタンの長押し判定
 	if (gamePad.GetButton() & GamePad::BTN_RIGHT_SHOULDER)
 	{
@@ -1618,7 +1576,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.buttonUp = gamePad.GetButtonUp();
 	ctx.IsGround = IsGround();
 	ctx.isLockOn = lockOn.IsHardLock();
-	ctx.isGuarding = status.isGuarding;
+	ctx.isGuarding = GetIsGaurd();
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
 	ctx.IsDown = status.isDown;
 	ctx.inputDir = CalculateRelativeInputDir();

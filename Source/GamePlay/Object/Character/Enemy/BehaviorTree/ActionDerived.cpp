@@ -324,7 +324,6 @@ ActionBase::State GuardMagic::Run(float elapsedTime)
 {
     // 防御魔法を起動する
     owner->SetIsGaurd(true);
-    owner->GetDefenseMagic().SetIsActive(true);
 
     if (owner->GetIsGaurd())
     {
@@ -363,7 +362,6 @@ ActionBase::State DropGuardMagic::Run(float elapsedTime)
 {
     // 防御魔法を解除する
     owner->SetIsGaurd(false);
-    owner->GetDefenseMagic().SetIsActive(false);
 
     // 十分に回復したら終わる
     const auto& s = owner->GetStatus();

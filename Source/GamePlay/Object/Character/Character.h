@@ -6,6 +6,7 @@
 // ゲーム
 #include "GamePlay/Object/Flight/FlightController.h"
 #include "GamePlay/Object/LockOnSystem/LockOnSystem.h"
+#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseMagic.h"
 
 #include <DirectXMath.h>
 #include <vector>
@@ -42,7 +43,6 @@ struct CharacterStatus
 	bool isBreak = false;			// 防御魔法が割れたか
 	bool isRapidFire = false;		// 連射攻撃か
 	bool isIntercept = false;		// 迎撃中か
-	bool isGuarding = false;		// ガード中か
 	bool isFlying = false;			// 飛行中か
 	bool isHovering = false;		// 滞空中か
 	bool isAvoid = false;			// 回避したか
@@ -116,8 +116,10 @@ public:
 	void SetIsIntercept(bool flag) { status.isIntercept = flag; }
 
 	// 防御魔法を展開しているか
-	bool GetIsGaurd() const { return status.isGuarding; }
-	void SetIsGaurd(bool flag) { status.isGuarding = flag; }
+	bool GetIsGaurd() const { return defenseMagic.GetIsActive(); }
+	void SetIsGaurd(bool flag) { defenseMagic.SetIsActive(flag); }
+	float GetCurrentDefense() const { return status.currentDefenseDurability; } // 現在の防御魔法の耐久値
+
 	// ----- 移動 / 回転 -----
 
 	// 移動処理（入力 vx, vz, speed を受け取る）
@@ -134,7 +136,6 @@ public:
 
 	// ステータスを取得する
 	const CharacterStatus& GetStatus() const { return status; }
-	void SetStatus(CharacterStatus& s) { status = s; }
 
 	// 自動照準システムを取得
 	LockOnSystem&  GetLockOnSystem() { return lockOn; }
@@ -191,10 +192,10 @@ protected:
 	virtual void OnDown() {}
 
 protected:
-	CharacterStatus status;		  // 現在のステータス
-	CharacterStatus defaltStatus; // 初期データ
-	FlightController flightController; // 飛行情報
-	LockOnSystem lockOn;
+	CharacterStatus status;				// 現在のステータス
+	FlightController flightController;	// 飛行情報
+	LockOnSystem lockOn;				// エイムアシスト
+	DefenseMagic defenseMagic;			// 防御魔法
 
 	// 位置・回転・スケール・行列
 	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
