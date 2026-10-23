@@ -748,7 +748,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "IsLockOn",			TransitionConditionType::IsLockOn },
 				{ "IsGuarding",			TransitionConditionType::IsGuarding },
 				{ "IsCancelable",		TransitionConditionType::IsCancelable },
-				{ "IsFalling",			TransitionConditionType::IsFalling },
 
 				{ "InputDir",			TransitionConditionType::InputDir },          
 				{ "PositionX",			TransitionConditionType::PositionX },    
@@ -756,7 +755,6 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "PositionZ",			TransitionConditionType::PositionZ },
 
 				{ "IsDown",			TransitionConditionType::IsDown },
-				{ "IsBurst",			TransitionConditionType::IsBurst },
 				{ "IsDead",			TransitionConditionType::IsDead },
 				{ "currentHP",			TransitionConditionType::currentHP },
 

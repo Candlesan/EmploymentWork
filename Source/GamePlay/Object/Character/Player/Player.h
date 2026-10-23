@@ -45,7 +45,6 @@ public:
 	void Finalize();
 	void Update(float elapsedTime);
 	void Render(RenderContext& rc, ModelRenderer* renderer);
-	void RenderTrail(const RenderContext& rc) { trail.Render(rc); }
 	void DrawGUI();
 	void RenderDebugPrimitive(ShapeRenderer* renderer);
 
@@ -55,7 +54,6 @@ public:
 	void MagicInput(float elapsedTime);
 	void AddGraph(std::string name);
 	void UpdateSounds(const std::string& state);
-	void UpdateFly(float elapsedTime);
 	void InputLockOn();
 
 	// =========================================================================
@@ -64,7 +62,6 @@ public:
 	void SetEnemy(Enemy* e) { enemy = e; }
 	void SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos);
 	void ClearLockOnTarget();
-	void SetIsHit(bool hit) { isHit = hit; }
 
 	// =========================================================================
 	//  ゲッター
@@ -94,7 +91,6 @@ protected:
 	// =========================================================================
 	//  親子関係のオーバーライド（AnimationCharacterからの継承関数）
 	// =========================================================================
-	void OnStateChanged(const std::string& oldState, const std::string& newState);
 
 	// 死んだときに呼ばれる奴
 	void OnDead() override;
@@ -151,26 +147,9 @@ private:
 
 	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;
-	float flightSpeed = 20.0f;
 	float fullChargeSpeed = 15.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 	float moveLength = 0.0f;
-
-	// ── 戦闘・ステータス（HP・スタミナ・無敵） ──
-	float runDisableTimer = 0.0f;
-	float staminaCooldownTimer = 0.0f;
-	bool haveStamina = false;
-	bool isStaminaEmpty = false;
-
-	// ── アクション状態のフラグ ──
-	bool isHit = false;
-
-	// ── ジャンプ関係 ──
-	bool jumpPressed = false;
-	float jumpSpeed = 7.0f;
-	bool falling = false;
-	int jumpCount = 0;
-	int jumpLimit = 1;
 
 	// ── ロックオン・敵との距離 ──
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;
@@ -199,7 +178,6 @@ private:
 	float currentBankAngle = 0.0f;
 	float targetSpineAngle = -10.0f;
 	float spineAngleSpeed = 10.0f;
-	Trail trail;
 	DirectX::XMFLOAT3 rootOffset = { 0.42f, -5.93f, -0.37f };
 	DirectX::XMFLOAT3 tipOffset = { 0.770f, 6.22f, -0.5f };
 	DirectX::XMFLOAT3 swingAngle = { 0.0f, 0.0f, 1.6f };
@@ -208,7 +186,6 @@ private:
 	DirectX::XMFLOAT3 headLocalForward = { 0.0f, 0.0f, 1.0f };
 	float rotationSpeed = 25.0f;
 	float rotation = 0.0f;
-	float dropSpeed = 5.0f;
 	float dropStartT = 0.0f;
 	float dropEndT = 0.0f;
 	float lookAtWeight = 0.0f;

@@ -29,12 +29,10 @@ enum class TransitionConditionType
 	PositionZ,			// 位置:Z座標
 
 	IsCancelable,		// モーションキャンセル
-	IsFalling,			// 落下中か
 
 	Always,				// 無条件
 
 	IsDown,				// ダウン状態
-	IsBurst,			// バースト状態
 	MoveSpeed,			// 移動速度
 	IsDead,				// 今死んだか
 	currentHP,			// 現在の体力
@@ -104,9 +102,7 @@ struct TransitionContext
 	bool  isLockOn;
 	bool  isGuarding;
 	bool IsCancelable;
-	bool IsFalling;
 	bool IsDown;
-	bool IsBurst;
 	bool IsDead;
 	RelativeInputDir inputDir;
 };

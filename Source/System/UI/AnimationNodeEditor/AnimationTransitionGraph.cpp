@@ -190,16 +190,8 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.IsCancelable;
 			break;
 
-		case TransitionConditionType::IsFalling:
-			result = ctx.IsFalling;
-			break;
-
 		case TransitionConditionType::IsDown:
 			result = ctx.IsDown;
-			break;
-
-		case TransitionConditionType::IsBurst:
-			result = ctx.IsBurst;
 			break;
 
 		case TransitionConditionType::MoveSpeed:

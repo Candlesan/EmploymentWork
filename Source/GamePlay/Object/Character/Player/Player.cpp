@@ -60,8 +60,6 @@ void Player::Initialize()
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
 
-	trail.Initialize(); // トレイルの初期化
-
 	normalMagic.Initialize();
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
 	rapidMagic.Initialize();
@@ -225,14 +223,6 @@ void Player::Update(float elapsedTime)
 	// 今、文字入力中かどうかを取得
 	bool isTyping = ImGui::GetIO().WantCaptureKeyboard;
 
-	// ジャンプ入力を確定させる（文字入力中・プレビュー中は無効化）
-	if (!isTyping && !isPreviewMode) {
-		jumpPressed = (gamePad.GetButtonDown() & GamePad::BTN_A);
-	}
-	else {
-		jumpPressed = false;
-	}
-
 	// GUIの表示/非表示
 	ShowDebugSwitch();
 
@@ -257,9 +247,6 @@ void Player::Update(float elapsedTime)
 	{
 		// 移動処理
 		InputMove(elapsedTime);
-
-		// 飛行状態を更新
-		UpdateFly(elapsedTime);
 
 		// アニメーション遷移
 		UpdateStateTransitions(elapsedTime);
@@ -302,9 +289,6 @@ void Player::Update(float elapsedTime)
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
-	// 根本と剣先を求める関数
-	//CalculationRootAndTip();
-
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
 	defenseMagic.Update(this, elapsedTime);
@@ -316,6 +300,7 @@ void Player::Update(float elapsedTime)
 
 	// アニメーション更新
 	UpdateAnimation(elapsedTime);
+
 	UpdateTransform();
 	player->UpdateTransform(transform);
 
@@ -485,12 +470,6 @@ void Player::DrawGUI()
 			lockOn.DrawGUI();
 		}
 
-		if (ImGui::CollapsingHeader(u8"飛行", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::Text(u8"飛行中か: %s", flightController.IsFlying() ? "true" : "false");
-			ImGui::DragFloat(u8"飛行中の移動速度", &flightSpeed, 0.1f);
-		}
-
 		// 魔法関係
 		if (ImGui::CollapsingHeader(u8"通常魔法", ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -589,7 +568,6 @@ void Player::DrawGUI()
 			ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
 
 			ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
-			ImGui::DragFloat(u8"剣の落下速度", &dropSpeed, 0.1, 0.0f, 100.0f);
 			ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
 			ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
 			ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
@@ -939,31 +917,6 @@ void Player::UpdateSounds(const std::string& state)
 	}
 }
 
-// 飛行の更新処理
-void Player::UpdateFly(float elapsedTime)
-{
-	GamePad& gamePad = Input::Instance().GetGamePad();
-
-	// ダウン状態になると落下するようにする
-	if (!CanControl())
-	{
-		flightController.SetFlightMode(FlightMode::OFF);
-		flightController.Update(this, elapsedTime);
-		return;
-	}
-
-	// 入力をまとめる
-	FlightInput input;
-	input.isAButtonDown = (gamePad.GetButton() & GamePad::BTN_A) != 0;
-	input.isAButtonUp = (gamePad.GetButtonUp() & GamePad::BTN_A) != 0;
-
-	// 入力状態を渡す
-	flightController.ProcessInput(input, elapsedTime);
-
-	// 状態を更新する
-	flightController.Update(this, elapsedTime);
-}
-
 void Player::InputLockOn()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
@@ -1071,11 +1024,6 @@ DirectX::XMFLOAT3 Player::GetWeaponDirection() const
 //  親子関係のオーバーライド
 // =========================================================================
 
-// アニメーションのコールバック関数
-void Player::OnStateChanged(const std::string& oldState, const std::string& newState)
-{
-}
-
 // 死んだときに呼ばれる奴
 void Player::OnDead()
 {
@@ -1145,17 +1093,7 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (flightController.IsFlying() && !normalMagic.IsFullCharged())
-	{
-		// 飛行中の移動速度
-		Move(moveVec.x, moveVec.z, flightSpeed);
-	}
-	else if (normalMagic.IsFullCharged() && flightController.IsFlying())
-	{
-		// 飛行中かつチャージ済み移動速度
-		Move(moveVec.x, moveVec.z, fullChargeSpeed);
-	}
-	else if (useRootMotion || useRootMotionEx)
+	if (useRootMotion || useRootMotionEx)
 	{
 		// ルートモーションを使ってる時の移動速度
 		Move(moveVec.x, moveVec.z, 0.0f);
@@ -1704,7 +1642,6 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.isLockOn = lockOn.IsHardLock();
 	ctx.isGuarding = status.isGuarding;
 	ctx.IsCancelable = animSequence.GetRange("Cancelable");
-	ctx.IsFalling = falling;
 	ctx.IsDown = status.isDown;
 	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.IsDead = IsDead();
@@ -2005,9 +1942,6 @@ void Player::UpdateLockAt(float elapsedTime)
 // プレイヤーの状態を計算する関数
 void Player::CalculateStatusParameters()
 {
-	// Y軸の加速度が-0.1以下なら落ちている判定
-	falling = (velocity.y < -0.1f);
-
 	if (status.isBreak && !wasBreak)
 	{
 		PlayActionGraph("Break");
