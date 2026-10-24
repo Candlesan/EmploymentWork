@@ -417,7 +417,9 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
     info.position = EPos;
     DirectX::XMStoreFloat3(&info.direction, Dir);
     info.angleY = owner->GetAngle().y;
+    info.owner = owner;
     info.target = &Player::Instance();
+    info.targetPos = targetMagic->GetPosition();
     info.holdTime = 0.0f;
 
     fireTimer -= elapsedTime;

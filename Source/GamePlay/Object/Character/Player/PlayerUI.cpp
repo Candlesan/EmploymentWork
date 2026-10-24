@@ -14,6 +14,9 @@
 void PlayerUI::Initialize(UICanvas& uiCanvas)
 {
 	crosshair = uiCanvas.Find("Crosshair");
+	hp = uiCanvas.Find("HP");
+	mp = uiCanvas.Find("MP");
+	guard = uiCanvas.Find("Guard");
 }
 
 // XVˆ—
@@ -26,6 +29,9 @@ void PlayerUI::Update(const CharacterStatus& status)
 		e->fillAmount = std::clamp(current / max, 0.0f, 1.0f); // 0`1‚É’¼‚·
 	};
 
+	setFill(hp, status.currentHp, status.maxHp);
+	setFill(mp, status.currentMagic, status.maxMagic);
+	setFill(guard, status.currentDefenseDurability, status.maxDefenseDurability);
 }
 
 // GUI•`‰æ

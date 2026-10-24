@@ -26,6 +26,9 @@ private:
 	bool WorldToUI(const DirectX::XMFLOAT3& worldPos, const Camera& camera, DirectX::XMFLOAT2& uiPos);
 private:
 	UIElement* crosshair = nullptr;
+	UIElement* hp = nullptr;
+	UIElement* mp = nullptr;
+	UIElement* guard = nullptr;
 
 	float crosshairSpeed = 15.0f; // クロスヘアの移動速度
 };
