@@ -54,6 +54,7 @@ public:
 	void AddGraph(std::string name);
 	void UpdateSounds(const std::string& state);
 	void InputLockOn();
+	void UpdateFly(float elapsedTime);
 
 	// =========================================================================
 	//  セッター
@@ -145,9 +146,11 @@ private:
 
 	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;
+	float flightSpeed = 20.0f;
 	float fullChargeSpeed = 15.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 	float moveLength = 0.0f;
+	bool falling = false;
 
 	// ── ロックオン・敵との距離 ──
 	const DirectX::XMFLOAT3* lockOnTargetPos = nullptr;

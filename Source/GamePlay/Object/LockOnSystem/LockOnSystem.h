@@ -28,7 +28,7 @@ public:
 	// 予測位置を返す
 	DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const;
 
-	// 偏差込みの発射方向（ロックしていなければaimDirectionをそのまま返す）
+	// 偏差込みの発射方向(主に敵用)
 	DirectX::XMFLOAT3 GetAimDirection(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const;
 
 	bool IsLocked() const { return state == State::Locked; } // ロックオン中か

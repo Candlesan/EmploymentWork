@@ -137,7 +137,7 @@ DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& mu
 	return result;
 }
 
-// •Î·‚İ‚ÌƒGƒCƒ€
+// •Î·‚İ‚Ì”­Ë•ûŒü(å‚É“G—p)
 DirectX::XMFLOAT3 LockOnSystem::GetAimDirection(const DirectX::XMFLOAT3& muzzlePos, float projectileSpeed) const
 {
 	if (!IsLocked()) return aimDirection;

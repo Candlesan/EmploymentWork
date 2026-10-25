@@ -29,7 +29,7 @@ enum class TransitionConditionType
 	PositionZ,			// 位置:Z座標
 
 	IsCancelable,		// モーションキャンセル
-
+	IsFalling,			// 落下中か
 	Always,				// 無条件
 
 	IsDown,				// ダウン状態
@@ -102,6 +102,7 @@ struct TransitionContext
 	bool  isLockOn;
 	bool  isGuarding;
 	bool IsCancelable;
+	bool IsFalling;
 	bool IsDown;
 	bool IsDead;
 	RelativeInputDir inputDir;
