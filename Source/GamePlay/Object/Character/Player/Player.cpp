@@ -265,9 +265,6 @@ void Player::Update(float elapsedTime)
 	// 移動処理
 	InputMove(elapsedTime);
 
-	// 飛行状態を更新
-	UpdateFly(elapsedTime);
-
 	// アニメーション遷移
 	UpdateStateTransitions(elapsedTime);
 
@@ -664,9 +661,6 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 		DirectX::XMFLOAT3 predicted = lockOn.GetPredictedPosition(position, rapidMagicConfig.speed);
 		renderer->DrawSphere(predicted, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
 	}
-
-	// スフィアキャストデバック表示
-	//renderer->DrawCapsule(capsuleTransform, radius, stepOffset, {1.0f, 0.0f, 0.0f, 1.0f});
 }
 
 

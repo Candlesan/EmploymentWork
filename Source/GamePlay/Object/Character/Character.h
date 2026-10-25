@@ -170,6 +170,8 @@ private:
 
 	bool MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical);
 
+	// 壁にめり込んでいたら押し出す
+	void PushOutFromWalls();
 protected:
 	// ジャンプ処理（派生で呼ぶ）
 	void Jump(float speed);

@@ -1,6 +1,8 @@
 #include "Gameplay/Object/Character/Character.h"
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Stage/Stage.h"
+#include <SphereCast.h>
+
 
 // 行列更新
 void Character::UpdateTransform()
@@ -335,6 +337,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 {
 	if (stage)
 	{
+		PushOutFromWalls();
 		MoveAndSlide({ velocity.x * elapsedTime, 0.0f, velocity.z * elapsedTime }, false);
 	}
 	else
@@ -523,4 +526,69 @@ bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
 
 	DirectX::XMStoreFloat3(&position, Position);
 	return false;
+}
+
+// 壁にめり込んでいたら押し出す
+void Character::PushOutFromWalls()
+{
+	const auto& triangles = stage->GetTriangles();
+	const auto& areas = stage->GetAreas();
+
+	// 球の中心（MoveAndSlideと同じ高さ）
+	DirectX::XMVECTOR Center = DirectX::XMVectorAdd(
+		DirectX::XMLoadFloat3(&position),
+		DirectX::XMVectorSet(0, collisionRadius + stepOffset, 0, 0));
+
+	// 球を囲む箱（調べるエリアを絞るため）
+	DirectX::BoundingBox sphereAABB;
+	DirectX::XMStoreFloat3(&sphereAABB.Center, Center);
+	sphereAABB.Extents = { collisionRadius, collisionRadius, collisionRadius };
+
+	for (const Collision::Area& area : areas)
+	{
+		if (!area.boundingBox.Intersects(sphereAABB)) continue;
+
+		for (int triIndex : area.triangleIndices)
+		{
+			const Collision::Triangle& tri = triangles[triIndex];
+			DirectX::XMVECTOR Positions[3] =
+			{
+				DirectX::XMLoadFloat3(&tri.positions[0]),
+				DirectX::XMLoadFloat3(&tri.positions[1]),
+				DirectX::XMLoadFloat3(&tri.positions[2])
+			};
+
+			// 球と三角形が重なっているか
+			SphereCastResult result;
+			if (!IntersectSphereVsTriangle(Center, collisionRadius, Positions, &result)) continue;
+
+			// めり込んだ深さ（ほんの少しなら無視する）
+			float depth = collisionRadius - result.distance;
+			if (depth < 0.001f) continue;
+
+			// 押し出す方向（三角形の一番近い点 → 球の中心）
+			DirectX::XMVECTOR PushDir = result.normal;
+
+			// 中心が壁の裏まで入っていたら、面の向きで押し出す
+			DirectX::XMVECTOR FaceNormal = DirectX::XMLoadFloat3(&tri.normal);
+			if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(PushDir, FaceNormal)) < 0.0f)
+			{
+				//PushDir = FaceNormal;
+				//depth = collisionRadius + result.distance;
+				continue;
+			}
+
+			// 横方向だけ押し出す（床で浮かないように）
+			DirectX::XMVECTOR Push = DirectX::XMVectorScale(PushDir, depth);
+			Push = DirectX::XMVectorSetY(Push, 0.0f);
+
+			// その場で押し出して、次の三角形は押し出した後の位置で調べる
+			Center = DirectX::XMVectorAdd(Center, Push);
+		}
+	}
+
+	// 中心から足元の位置に戻して保存
+	DirectX::XMVECTOR Position = DirectX::XMVectorSubtract(
+		Center, DirectX::XMVectorSet(0, collisionRadius + stepOffset, 0, 0));
+	DirectX::XMStoreFloat3(&position, Position);
 }
