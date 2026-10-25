@@ -634,8 +634,10 @@ void SceneGame::DrawGUI()
 			}
 			ImGui::Separator();
 
-			ImGui::DragFloat(u8"距離", &cameraRange, 0.1f);
-			gameCamera->SetRange(cameraRange);
+			if (cameraMode == CameraMode::Game)
+			{
+				gameCamera->DrawGUI();
+			}
 		}
 		ImGui::End();
 

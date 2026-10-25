@@ -1,10 +1,15 @@
-#include "GameCamera.h"
+Ôªø#include "GameCamera.h"
 #include "System/Core/Input/Input.h"
+#include "System/Core/Mathf.h"
+
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
 #include "GamePlay/Object/Character/Player/Player.h"
 
-// çXêVèàóù
+#include <imgui.h>
+#include <algorithm>
+
+// Êõ¥Êñ∞Âá¶ÁêÜ
 void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle>& stageTriangles, const std::vector<Collision::Area>& stageAreas)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
@@ -12,33 +17,52 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	float ax = gamePad.GetAxisRX();
 	float ay = -gamePad.GetAxisRY();
 
-	// Yé≤îΩì]Ç™OnÇÃéûÇÕÉäÉoÅ[ÉXÇ≥ÇπÇÈ
+	// YËª∏ÂèçËª¢„ÅåOn„ÅÆÊôÇ„ÅØ„É™„Éê„Éº„Çπ„Åï„Åõ„Çã
 	if (isInvertY)
 	{
 		ay = -ay;
 	}
 
-	// ÉJÉÅÉâÇÃâÒì]ë¨ìx
-	float speed = rollSpeed * elapsedTime;
+	// „Ç´„É°„É©„ÅÆÂõûËª¢ÈÄüÂ∫¶
+	float targetVelX = ay * rollSpeed;
+	float targetVelY = ax * rollSpeed;
+	
+	// expf(-ÈÄü„Åï * elapsedTime)ÂøÖ„Åö 0„Äú1 „ÅÆÁØÑÂõ≤„Å´Âèé„Åæ„Çã
+	float rotT = 1.0f - expf(-rotSpeed * elapsedTime);
+	currentRotVel.x = Mathf::Lerp(currentRotVel.x, targetVelX, rotT);
+	currentRotVel.y = Mathf::Lerp(currentRotVel.y, targetVelY, rotT);
 
 	if (player.GetLockOnSystem().IsHardLock()
 		&& player.GetLockOnSystem().GetTarget() != nullptr)
 	{
-		// ÉXÉeÉBÉbÉNì¸óÕÇñ≥éãÇµÇƒìGÇÃï˚å¸Ç…äpìxÇçáÇÌÇπÇÈ
+		// „Çπ„ÉÜ„Ç£„ÉÉ„ÇØÂÖ•Âäõ„ÇíÁÑ°Ë¶ñ„Åó„Å¶Êïµ„ÅÆÊñπÂêë„Å´ËßíÂ∫¶„ÇíÂêà„Çè„Åõ„Çã
 		DirectX::XMFLOAT3 enemyPos = player.GetLockOnSystem().GetTarget()->GetPosition();
 		float dx = enemyPos.x - currentTarget.x;
 		float dy = enemyPos.y - currentTarget.y;
 		float dz = enemyPos.z - currentTarget.z;
-		angle.y = std::atan2f(dx, dz);
-		angle.x = -atan2f(dy, sqrtf(dx * dx + dz * dz));
+
+		// ÁõÆÊ®ô„ÅÆËßíÂ∫¶
+		float targetYaw = std::atan2f(dx, dz);
+		float targetPitch = -atan2f(dy, sqrtf(dx * dx + dz * dz));
+
+		float lockOnT = 1.0f - expf(-lockOnLerpSpeed * elapsedTime);
+
+		// Á∏¶„ÅØ„Åù„ÅÆ„Åæ„ÅæË£úÈñì
+		angle.x = Mathf::Lerp(angle.x, targetPitch, lockOnT);
+
+		// Ê®™„ÅØ -œÄ„ÄúœÄ „ÅÆÂ¢ÉÁõÆ„ÅßÈÄÜÂõû„Çä„Åó„Å™„ÅÑ„Çà„ÅÜ„Å´Â∑ÆÂàÜ„Çí‰∏∏„ÇÅ„Å¶„Åã„ÇâË£úÈñì
+		float diff = targetYaw - angle.y;
+		while (diff > DirectX::XM_PI) diff -= DirectX::XM_2PI;
+		while (diff < -DirectX::XM_PI) diff += DirectX::XM_2PI;
+		angle.y = Mathf::Lerp(angle.y, angle.y + diff, lockOnT);
 	}
 	else
 	{
-		// ÉXÉeÉBÉbÉNÇÃì¸óÕílÇ…çáÇÌÇπÇƒXé≤Ç∆Yé≤ÇâÒì]
-		angle.x += ay * speed;
-		angle.y += ax * speed;
+		// „Çπ„ÉÜ„Ç£„ÉÉ„ÇØ„ÅÆÂÖ•ÂäõÂÄ§„Å´Âêà„Çè„Åõ„Å¶XËª∏„Å®YËª∏„ÇíÂõûËª¢
+		angle.x += currentRotVel.x * elapsedTime;
+		angle.y += currentRotVel.y * elapsedTime;
 
-		// ÉJÉÅÉâÇÃè„â∫ÇÃêßå¿ÇÇ©ÇØÇÈ
+		// „Ç´„É°„É©„ÅÆ‰∏ä‰∏ã„ÅÆÂà∂Èôê„Çí„Åã„Åë„Çã
 		const float MAX_ANGLE = DirectX::XMConvertToRadians(80.0f);
 
 		if (angle.x > MAX_ANGLE)
@@ -51,66 +75,62 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 		}
 	}
 
-	// ê¸å`ï‚ä‘Ç≈É^Å[ÉQÉbÉgÇÉWÉèÉWÉèí«ê’Ç≥ÇπÇÈ
-	// 10.0f ÇÃílÇè¨Ç≥Ç≠Ç∑ÇÈÇŸÇ«ÅAóhÇÍÇ…ëŒÇµÇƒì›ä¥ÅiääÇÁÇ©ÅjÇ…Ç»ÇËÇ‹Ç∑
-	float lerpSpeed = 5.0f;
+	// Á∑öÂΩ¢Ë£úÈñì„Åß„Çø„Éº„Ç≤„ÉÉ„Éà„Çí„Ç∏„ÉØ„Ç∏„ÉØËøΩË∑°„Åï„Åõ„Çã
+	// 10.0f „ÅÆÂÄ§„ÇíÂ∞è„Åï„Åè„Åô„Çã„Åª„Å©„ÄÅÊè∫„Çå„Å´ÂØæ„Åó„Å¶ÈàçÊÑüÔºàÊªë„Çâ„ÅãÔºâ„Å´„Å™„Çä„Åæ„Åô
 	currentTarget.x += (target.x - currentTarget.x) * lerpSpeed * elapsedTime;
 	currentTarget.y += (target.y - currentTarget.y) * lerpSpeed * elapsedTime;
 	currentTarget.z += (target.z - currentTarget.z) * lerpSpeed * elapsedTime;
 
-	// ÉJÉÅÉââÒì]ílÇâÒì]çsóÒÇ…ïœä∑
+	// „Ç´„É°„É©ÂõûËª¢ÂÄ§„ÇíÂõûËª¢Ë°åÂàó„Å´Â§âÊèõ
 	DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
 
-	// âÒì]çsóÒÇ©ÇÁëOï˚å¸ÉxÉNÉgÉãÇéÊÇËèoÇ∑
+	// ÂõûËª¢Ë°åÂàó„Åã„ÇâÂâçÊñπÂêë„Éô„ÇØ„Éà„É´„ÇíÂèñ„ÇäÂá∫„Åô
 	DirectX::XMVECTOR Front = Transform.r[2];
 	DirectX::XMFLOAT3 front;
 	DirectX::XMStoreFloat3(&front, Front);
 
 	DirectX::XMFLOAT3 eye;
 
-	// ÉXÉ^Å[Égínì_Çê›íË
+	// „Çπ„Çø„Éº„ÉàÂú∞ÁÇπ„ÇíË®≠ÂÆö
 	DirectX::XMFLOAT3 origin = currentTarget;
 
-	// îÚÇŒÇ∑ï˚å¸Çê›íË(ÉJÉÅÉâÇ∆îΩëŒå¸Ç´)
+	// È£õ„Å∞„ÅôÊñπÂêë„ÇíË®≠ÂÆö(„Ç´„É°„É©„Å®ÂèçÂØæÂêë„Åç)
 	DirectX::XMFLOAT3 direction = { -front.x, -front.y, -front.z };
 
-	// îÚÇŒÇ∑ãóó£
+	// È£õ„Å∞„ÅôË∑ùÈõ¢
 	float distance = range;
-
-	// ÉJÉÅÉâÇÃìñÇΩÇËîªíËÇÃëÂÇ´Ç≥
-	float radius = 0.2f;
 
 	DirectX::XMFLOAT3 hitPosition, hitNormal;
 
-	// ÉXÉeÅ[ÉWÇ∆ÇÃìñÇΩÇËîªíË
+	// „Çπ„ÉÜ„Éº„Ç∏„Å®„ÅÆÂΩì„Åü„ÇäÂà§ÂÆö
+	float desiredDistance = range; // ‰ªä„Éï„É¨„Éº„É†„ÅÆÁõÆÊ®ôË∑ùÈõ¢„ÇíÊ±∫„ÇÅ„Çã
 	if (Collision::SphereCast(origin, direction, radius, distance, stageTriangles, stageAreas, hitPosition, hitNormal, true)) 
 	{
-		// ÉJÉÅÉâÇ∆É^Å[ÉQÉbÉgÇÃãóó£Çë™ÇÈ
+		// „Ç´„É°„É©„Å®„Çø„Éº„Ç≤„ÉÉ„Éà„ÅÆË∑ùÈõ¢„ÇíÊ∏¨„Çã
 		float dx = hitPosition.x - currentTarget.x;
 		float dy = hitPosition.y - currentTarget.y;
 		float dz = hitPosition.z - currentTarget.z;
 
-		float distSq = sqrtf(dx * dx + dy * dy + dz * dz);
+		// Ë∑ùÈõ¢„Åå0‰ª•‰∏ã„Å´„Å™„Å£„Åü„Çâ0.1„Å´„Åô„Çã
+		 desiredDistance = (std::max)(sqrtf(dx * dx + dy * dy + dz * dz), 0.1f);
+	}
 
-		// ãóó£Ç™ãﬂÇ∑Ç¨ÇÈèÍçá
-		if (distSq < 0.01f)
-		{
-			eye.x = currentTarget.x + direction.x * 0.1f;
-			eye.y = currentTarget.y + direction.y * 0.1f;
-			eye.z = currentTarget.z + direction.z * 0.1f;
-		}
-		else
-		{
-			eye = hitPosition;
-		}
+	if (desiredDistance < currentDistance)
+	{
+		// Â£Å„Å´Ëøë„Å•„Åè„Å®„Åç„ÅØÂç≥Â∫ß„Å´Âêà„Çè„Åõ„ÇãÔºà„ÇÅ„ÇäËæº„ÅøÈò≤Ê≠¢Ôºâ
+		currentDistance = desiredDistance;
 	}
 	else
 	{
-		// íçéãì_Ç©ÇÁå„ÇÎÉxÉNÉgÉãï˚å¸Ç…àÍíËãóó£ó£ÇÍÇΩÉJÉÅÉâéãì_ÇãÅÇﬂÇÈ
-		eye.x = currentTarget.x - front.x * range;
-		eye.y = currentTarget.y - front.y * range;
-		eye.z = currentTarget.z - front.z * range;
+		// Èõ¢„Çå„ÇãÊôÇ„ÅØ„ÇÜ„Å£„Åè„ÇäÊàª„Åô
+		float returnSpeed = 3.0f;
+		currentDistance += (desiredDistance - currentDistance) * (1.0f - expf(-returnSpeed * elapsedTime));
 	}
+
+	// Ê≥®Ë¶ñÁÇπ„Åã„ÇâÂæå„Çç„Éô„ÇØ„Éà„É´ÊñπÂêë„Å´‰∏ÄÂÆöË∑ùÈõ¢Èõ¢„Çå„Åü„Ç´„É°„É©Ë¶ñÁÇπ„ÇíÊ±Ç„ÇÅ„Çã
+	eye.x = currentTarget.x - front.x * currentDistance;
+	eye.y = currentTarget.y - front.y * currentDistance;
+	eye.z = currentTarget.z - front.z * currentDistance;
 
 	targetFov = defaultFov;
 
@@ -118,10 +138,10 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	bool isAvoiding = (playerState.find("Avoid") != std::string::npos ||
 		playerState.find("Dodge") != std::string::npos);
 
-	// âÒîíÜÇ»ÇÁÅAñ⁄ïWFOVÇçLÇ≠Ç∑ÇÈ
+	// ÂõûÈÅø‰∏≠„Å™„Çâ„ÄÅÁõÆÊ®ôFOV„ÇíÂ∫É„Åè„Åô„Çã
 	if (isAvoiding)
 	{
-		targetFov = 65.0f;
+		targetFov = maxFov;
 	}
 
 	float fovLerpSpeed = 5.0f;
@@ -139,7 +159,7 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 
 	currentFov += (targetFov - currentFov) * lerpFactor;
 
-	// ÉJÉÅÉâÇÃéãì_Ç∆íçéãì_Çê›íË
+	// „Ç´„É°„É©„ÅÆË¶ñÁÇπ„Å®Ê≥®Ë¶ñÁÇπ„ÇíË®≠ÂÆö
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	camera.SetPerspectiveFov(
 		DirectX::XMConvertToRadians(currentFov),
@@ -148,4 +168,27 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 		camera.GetFar()
 	);
 	camera.SetLookAt(eye, currentTarget, DirectX::XMFLOAT3(0, 1, 0));
+}
+
+void GameCamera::DrawGUI()
+{
+	if (ImGui::CollapsingHeader(u8"Ë™øÊï¥", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::SliderAngle(u8"ÂõûËª¢ÈÄüÂ∫¶", &rollSpeed, 0.0f, 360.0f);
+		ImGui::DragFloat(u8"ÂõûËª¢„ÅÆËøΩÂæì", &rotSpeed, 0.1f, 0.0f, 50.0f);
+		ImGui::DragFloat(u8"Ë∑ùÈõ¢", &range, 0.1f, 0.0f, 50.0f);
+		ImGui::DragFloat(u8"„É≠„ÉÉ„ÇØ„Ç™„É≥ËøΩÂæì", &lockOnLerpSpeed, 0.1f, 0.0f, 50.0f);
+		ImGui::DragFloat(u8"Ê≥®Ë¶ñÁÇπËøΩÂæì", &lerpSpeed, 0.1f, 0.0f, 50.0f);
+		ImGui::DragFloat(u8"ÂΩì„Åü„ÇäÂà§ÂÆöÂçäÂæÑ", &radius, 0.01f, 0.0f, 2.0f);
+		ImGui::DragFloat(u8"ÈÄöÂ∏∏FOV", &defaultFov, 0.1f, 10.0f, 120.0f);
+		ImGui::DragFloat(u8"ÂõûÈÅøFOV", &maxFov, 0.1f, 10.0f, 120.0f);
+	}
+
+	if (ImGui::CollapsingHeader(u8"Áä∂ÊÖã"))
+	{
+		ImGui::Text(u8"ËßíÂ∫¶  : %.1f, %.1f",
+			DirectX::XMConvertToDegrees(angle.x), DirectX::XMConvertToDegrees(angle.y));
+		ImGui::Text(u8"ÂõûËª¢ÈÄüÂ∫¶: %.2f, %.2f", currentRotVel.x, currentRotVel.y);
+		ImGui::Text(u8"FOV   : %.1f -> %.1f", currentFov, targetFov);
+	}
 }
