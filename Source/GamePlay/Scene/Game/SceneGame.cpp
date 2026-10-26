@@ -88,7 +88,7 @@ void SceneGame::Initialize()
 	stageShadowBias = 0.001f;
 
 	characterShadowAttenuation = 0;
-	characterShadowBias = 0.001f;
+	characterShadowBias = 0.000f;
 
 	// スカイマップ初期化
 	skyMap = std::make_unique<SkyMap>(Graphics::Instance().GetDevice());

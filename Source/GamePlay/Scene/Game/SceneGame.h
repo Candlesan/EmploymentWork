@@ -93,10 +93,10 @@ private:
 	float ambientIntensity = 0.5;
 
 	// シャドウマップ調整用
-	float stageShadowAttenuation = 0;
+	float stageShadowAttenuation = 0.0f;
 	float stageShadowBias = 0.006f;
-	float characterShadowAttenuation = 0;
-	float characterShadowBias = 0.006f;
+	float characterShadowAttenuation = 0.0f;
+	float characterShadowBias = 0.000f;
 	DirectX::XMFLOAT4X4 stageLightViewProjection;
 	DirectX::XMFLOAT4X4 characterLightViewProjection;
 	float stageRadius = 0.0f;

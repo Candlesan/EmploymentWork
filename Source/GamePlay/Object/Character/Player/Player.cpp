@@ -1077,20 +1077,20 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (flightController.IsFlying() && !normalMagic.IsFullCharged())
-	{
-		// 飛行中の移動速度
-		Move(moveVec.x, moveVec.z, flightSpeed);
-	}
-	else if (normalMagic.IsFullCharged() && flightController.IsFlying())
-	{
-		// 飛行中かつチャージ済み移動速度
-		Move(moveVec.x, moveVec.z, fullChargeSpeed);
-	}
 	if (useRootMotion || useRootMotionEx)
 	{
 		// ルートモーションを使ってる時の移動速度
 		Move(moveVec.x, moveVec.z, 0.0f);
+	}
+	else if (flightController.IsFlying() && normalMagic.IsFullCharged())
+	{
+		// 飛行中かつチャージ済み移動速度
+		Move(moveVec.x, moveVec.z, fullChargeSpeed);
+	}
+	else if (flightController.IsFlying())
+	{
+		// 飛行中の移動速度
+		Move(moveVec.x, moveVec.z, flightSpeed);
 	}
 	else
 	{
@@ -1598,7 +1598,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.position = GetPosition();
 	ctx.animSeconds = GetCurrentAnimationSeconds();
 	ctx.animLength = GetCurrentAnimationLength();
-	ctx.moveLength = smoothMoveLength;
+	ctx.moveLength = moveLength;
 	ctx.enemyFromdistance = enemyFromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
 	ctx.buttonHeld = gamePad.GetButton();

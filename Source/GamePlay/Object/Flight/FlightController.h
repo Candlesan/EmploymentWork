@@ -41,7 +41,7 @@ public:
 private:
 	FlightMode currentMode = FlightMode::OFF; // ‰Šúó‘Ô‚ÍOFF
 	float aButtonHoldTime = 0.0f; // Aƒ{ƒ^ƒ“‚ğ‚Ç‚ê‚­‚ç‚¢’·‰Ÿ‚µ‚µ‚½‚©
-	const float LONG_PRESS_TIME = 0.25f; // ’·‰Ÿ‚µ‚Æ‚·‚éŠÔ
+	const float LONG_PRESS_TIME = 0.15f; // ’·‰Ÿ‚µ‚Æ‚·‚éŠÔ
 
 	float upSpeed = 5.0f; // ã¸‘¬“x
 };
