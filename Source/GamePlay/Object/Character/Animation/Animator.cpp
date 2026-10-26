@@ -30,6 +30,7 @@ void Animator::PlayUpper(int animIndex, bool loop, const std::string& boneName, 
 	{
 		upperLayer.oldPoses = finalPoses;
 		upperLayer.isBlending = true;
+		upperLayer.isFadeingOut = false;
 		upperLayer.blendSeconds = 0.0f;
 	}
 
@@ -53,6 +54,7 @@ void Animator::PlayBaseMix(
 	{
 		baseLayer.oldPoses = finalPoses;
 		baseLayer.isBlending = true;
+		upperLayer.isFadeingOut = false;
 		baseLayer.blendSeconds = 0.0f;
 	}
 

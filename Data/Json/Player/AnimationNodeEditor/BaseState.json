@@ -922,6 +922,25 @@
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Revive_Air.json",
             "type": 1
+        },
+        {
+            "StateName": "Fly_Idle",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -268.0,
+                -183.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Fly_Idle.json",
+            "type": 1
         }
     ]
 }

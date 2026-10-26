@@ -907,6 +907,11 @@ void Player::UpdateFly(float elapsedTime)
 		return;
 	}
 
+	if (flightController.IsFlying())
+	{
+		PlayActionGraph("Fly_Idle");
+	}
+
 	// 入力をまとめる
 	FlightInput input;
 	input.isAButtonDown = (gamePad.GetButton() & GamePad::BTN_A) != 0;

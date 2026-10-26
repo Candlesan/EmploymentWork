@@ -56,7 +56,6 @@ void AnimationCharacter::ChangeAnimationState(const std::string& newState, bool 
 // 上半身のアニメーション
 void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 {
-	if (currentOverlayState == newState) return;
 
 	auto it = stateConfigs.find(newState);
 	if (it == stateConfigs.end()) return;
@@ -70,6 +69,8 @@ void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 
 	int newAnimationIndex = model->GetAnimationIndex(config.animationName.c_str());
 	if (newAnimationIndex < 0) return;
+
+	if (currentOverlayState == newState) return;
 
 	if (animator)
 	{

@@ -31,7 +31,7 @@ public:
 
 	void Update(Character* character, float elapsedTime);
 
-	// 現在の飛行モードを取得（AIの行動遷移に使うやつ）
+	// 現在の飛行モードを取得
 	FlightMode GetFlightMode() const { return currentMode; }
 	void SetFlightMode(FlightMode mode) { currentMode = mode; }
 

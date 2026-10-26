@@ -10,12 +10,14 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 24
+                    "type": 18
                 }
             ],
             "fromState": "Entry",
             "priority": 0,
+            "toSlot": 0,
             "toState": "AS_Idle_Combat_Seq_0"
         },
         {
@@ -28,25 +30,30 @@
                 {
                     "buttonMask": 0,
                     "negate": false,
+                    "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 0
+                    "type": 18
                 }
             ],
             "fromState": "AS_Idle_Combat_Seq_0",
             "priority": 0,
+            "toSlot": 0,
             "toState": "Exit"
         }
     ],
     "nodes": [
         {
             "StateName": "Entry",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 -220.0,
                 -7.0
@@ -56,13 +63,16 @@
         },
         {
             "StateName": "Exit",
+            "assetName": "",
             "config": {
                 "animationName": "",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 323.0,
                 -7.0
@@ -72,13 +82,16 @@
         },
         {
             "StateName": "AS_Idle_Combat_Seq_0",
+            "assetName": "",
             "config": {
                 "animationName": "AS_Idle_Combat_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": true,
+                "targetBoneName": "",
                 "useRootMotion": false,
                 "useRootMotionEx": false
             },
+            "mixRate": 0.0,
             "position": [
                 -12.0,
                 -7.0
