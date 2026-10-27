@@ -268,64 +268,31 @@ void Character::OnGuardHit(float amount)
 //水平速力更新処理
 void Character::UpdateHorizontalVelocity(float elapsedTime)
 {
-	//XZ平面の速力を減速
-	float length = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
-	if (length > 0.0f)
+	// 目標速度を計算する
+	float moveLen = sqrtf(moveVecX * moveVecX + moveVecZ * moveVecZ);
+	float targetX = moveVecX * maxMoveSpeed;
+	float targetZ = moveVecZ * maxMoveSpeed;
+
+	float rate;
+	if (moveLen > 0.0f)
 	{
-		// 空中にいる時は摩擦をほぼ0にする
-		float currentFriction = isGround ? (this->friction * elapsedTime) : (this->friction * 0.5f * elapsedTime);
-
-		//摩擦力
-		//float friction = this->friction * elapsedTime;
-
-		//摩擦による横方向の減速処理
-		if (length > currentFriction)
-		{
-			//単位ベクトル化
-			float vx = velocity.x / length;
-			float vz = velocity.z / length;
-			//速力を減らす
-			velocity.x -= vx * currentFriction;
-			velocity.z -= vz * currentFriction;
-		}
-		//横方向の速力が摩擦力以下になってたので速力を無効化
-		else
-		{
-			velocity.x = 0.0f;
-			velocity.z = 0.0f;
-		}
+		// 入力と今の速度が逆向きなら強めにブレーキを掛ける
+		float dot = velocity.x * moveVecX + velocity.z * moveVecZ; // 今スティックを倒した方向が同じ向きか逆向きかを判定する
+		rate = (isGround && dot < 0.0f) ? acceleration * 1.5f : acceleration * 4.0f; // 地上にいて内積が0より小さかったら倍の加速度を掛ける
+	}
+	else
+	{
+		rate = isGround ? friction : friction * 0.5f; // 地上：通常の摩擦力 空中: 通常の半分の摩擦力
 	}
 
-	//XZ平面の速力を加速する
-	if (length <= maxMoveSpeed)
-	{
-		//移動ベクトルがゼロベクトルでないなら加速する
-		float moveVeclength = sqrtf(moveVecX * moveVecX + moveVecZ * moveVecZ);
-		if (moveVeclength > 0.0f)
-		{
-			// 空中でスティックを倒したときの空中制御力を下げる。自由にターンできるのを防ぐため
-			float currentAcceleration = isGround ? (this->acceleration * elapsedTime) : (this->acceleration * 1.0f * elapsedTime);
+	// 今のフレームの速度を目標速度に近づけていく
+	float dx = targetX - velocity.x;
+	float dz = targetZ - velocity.z;
+	float dist = sqrtf(dx * dx + dz * dz); // 目標速度 - 現在の速度
+	float step = rate * elapsedTime; // 差がどれだけあるか
+	if (dist <= step) { velocity.x = targetX; velocity.z = targetZ; } // 差が上限以下ならそのまま目標速度に合わせる
+	else { velocity.x += dx / dist * step; velocity.z += dz / dist * step;} // 今フレームで速度を変えていい上限
 
-			//加速力
-			//float acceleration = this->acceleration * elapsedTime;
-
-			//移動ベクトルによる加速処理
-			velocity.x += currentAcceleration * moveVecX;
-			velocity.z += currentAcceleration * moveVecZ;
-
-			//最大速度制限
-			float length = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
-			if (length > maxMoveSpeed)
-			{
-				//速度を単位ベクトル化
-				float vx = velocity.x / length;
-				float vz = velocity.z / length;
-				//速度設定
-				velocity.x = vx * maxMoveSpeed;
-				velocity.z = vz * maxMoveSpeed;
-			}
-		}
-	}
 
 	//移動ベクトルをリセット
 	moveVecX = 0.0f;
