@@ -848,22 +848,281 @@
             "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_R_90_Seq_0",
-            "ranges": [],
-            "speedKeys": []
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
         },
         {
             "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_B_180_Seq_0",
-            "ranges": [],
-            "speedKeys": []
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
         },
         {
             "assetName": "",
             "events": [],
             "name": "AS_Dodge_Combat_to_Run_B_R_45_Seq_0",
-            "ranges": [],
-            "speedKeys": []
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_B_L_45_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_L_90_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_F_R_45_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Dodge_Combat_to_Run_F_L_45_Seq_0",
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.30000001192092896,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "JastAvoidFream",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
+            "speedKeys": [
+                {
+                    "speed": 3.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.34166666865348816
+                }
+            ]
         },
         {
             "assetName": "",
@@ -1113,6 +1372,90 @@
                 {
                     "speed": 1.2000000476837158,
                     "time": 0.9166666865348816
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_R_90_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_B_180_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_L_90_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
+                }
+            ]
+        },
+        {
+            "assetName": "",
+            "events": [],
+            "name": "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.2000000476837158,
+                    "time": 0.0
                 }
             ]
         },

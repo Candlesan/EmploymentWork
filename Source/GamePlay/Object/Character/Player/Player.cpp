@@ -940,19 +940,6 @@ void Player::UpdateFly(float elapsedTime)
 //  セッター（インライン以外）
 // =========================================================================
 
-// ロックオン対象の位置を取得
-void Player::SetLockOnTargetPosition(const DirectX::XMFLOAT3* pos)
-{
-	lockOnTargetPos = pos;
-	hasLockOnTarget = true;
-}
-
-void Player::ClearLockOnTarget()
-{
-	hasLockOnTarget = false;
-}
-
-
 // =========================================================================
 //  ゲッター（インライン以外）
 // =========================================================================
@@ -1098,10 +1085,16 @@ void Player::InputMove(float elapsedTime)
 		// 魔法中は移動速度を0にする
 		velocity = { 0, 0, 0 };
 	}
-	else if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0")
+	else if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0" ||
+		(lockOn.IsHardLock() && currentState.rfind("AS_Dodge_Combat_to_Run_", 0) == 0))
 	{
 		// 回避中は
-		Move(moveVec.x, moveVec.z, moveSpeed * 1.3f);
+		Move(moveVec.x, moveVec.z, moveSpeed * 1.0f);
+	}
+	else if (useRootMotion || useRootMotionEx && lockOn.IsHardLock())
+	{
+		// ルートモーションを使ってる時の移動速度
+		Move(moveVec.x, moveVec.z, moveSpeed * 0.7f);
 	}
 	else if (useRootMotion || useRootMotionEx)
 	{
@@ -1134,9 +1127,9 @@ void Player::InputMove(float elapsedTime)
 		// 魔法中は敵の方を向く
 		TurnToPosition(elapsedTime, aimPos, turnSpeed);
 	}
-	else if (hasLockOnTarget)
+	else if (lockOn.IsHardLock())
 	{
-		TurnToPosition(elapsedTime, *lockOnTargetPos, turnSpeed);
+		TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
 	}
 	else
 	{
@@ -1956,6 +1949,13 @@ void Player::CalculateStatusParameters()
 		PlayActionGraph("Break");
 	}
 	wasBreak = status.isBreak;
+
+	GamePad& gamePad = Input::Instance().GetGamePad();
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
+	{
+		hardLock = !hardLock;
+		lockOn.SetHardLock(hardLock);
+	}
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
