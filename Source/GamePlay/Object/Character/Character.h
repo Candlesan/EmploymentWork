@@ -221,6 +221,10 @@ protected:
 
 	float friction = 15.0f;  // –€C—Í
 	float acceleration = 50.0f;  // ‰Á‘¬“x
+	float turnaroundRate = 2.0f; // Ø‚è‘Ö‚¦‚µŒW”
+	float airTurnaroundRate = 4.0f; // Ø‚è‘Ö‚¦‚µŒW”
+	float airFrictionRate = 0.5f; // ‹ó’†‚Ì–€CŒW”
+	float overSpeedDecel = 20.0f; // ŠŠ‚é’·‚³
 	float gravity = -9.8f;  // d—Í
 
 	// “–‚½‚è”»’è

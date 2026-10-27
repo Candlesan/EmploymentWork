@@ -456,6 +456,11 @@ void Player::DrawGUI()
 				else {
 					ImGui::Text(u8"アクション状態: 通常時");
 				}
+
+				ImGui::DragFloat(u8"地上切り替えし速度", &turnaroundRate, 0.1f);
+				ImGui::DragFloat(u8"空中切り替えし速度", &airTurnaroundRate, 0.1f);
+				ImGui::DragFloat(u8"滑り度合い", &overSpeedDecel, 0.1f);
+				ImGui::DragFloat(u8"空中の摩擦係数", &airFrictionRate, 0.1f);
 			}
 
 			lockOn.DrawGUI();
@@ -1092,6 +1097,11 @@ void Player::InputMove(float elapsedTime)
 	{
 		// 魔法中は移動速度を0にする
 		velocity = { 0, 0, 0 };
+	}
+	else if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0")
+	{
+		// 回避中は
+		Move(moveVec.x, moveVec.z, moveSpeed * 1.3f);
 	}
 	else if (useRootMotion || useRootMotionEx)
 	{

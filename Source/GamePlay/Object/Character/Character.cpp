@@ -2,6 +2,7 @@
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Stage/Stage.h"
 #include <SphereCast.h>
+#include <algorithm>
 
 
 // 行列更新
@@ -269,20 +270,33 @@ void Character::OnGuardHit(float amount)
 void Character::UpdateHorizontalVelocity(float elapsedTime)
 {
 	// 目標速度を計算する
-	float moveLen = sqrtf(moveVecX * moveVecX + moveVecZ * moveVecZ);
-	float targetX = moveVecX * maxMoveSpeed;
-	float targetZ = moveVecZ * maxMoveSpeed;
+	float moveLen = sqrtf(moveVecX * moveVecX + moveVecZ * moveVecZ); // パッドは最大に倒しても1にならないことがあるから正規化して１にする
+	float targetX = 0.0f;
+	float targetZ = 0.0f;
+	if (moveLen > 0.0f)
+	{
+		// 8割以上倒していれば最大速度にする
+		float power = (std::min)(moveLen / 0.8f, 1.0f);
+		targetX = moveVecX / moveLen * maxMoveSpeed * power;
+		targetZ = moveVecZ / moveLen * maxMoveSpeed * power;
+	}
 
 	float rate;
+	float speed = sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
 	if (moveLen > 0.0f)
 	{
 		// 入力と今の速度が逆向きなら強めにブレーキを掛ける
 		float dot = velocity.x * moveVecX + velocity.z * moveVecZ; // 今スティックを倒した方向が同じ向きか逆向きかを判定する
-		rate = (isGround && dot < 0.0f) ? acceleration * 1.5f : acceleration * 4.0f; // 地上にいて内積が0より小さかったら倍の加速度を掛ける
+		if (dot < 0.0f)
+			rate = acceleration * (isGround ? turnaroundRate : airTurnaroundRate);
+		else if (speed > maxMoveSpeed)
+			rate = overSpeedDecel;
+		else
+			rate = acceleration;
 	}
 	else
 	{
-		rate = isGround ? friction : friction * 0.5f; // 地上：通常の摩擦力 空中: 通常の半分の摩擦力
+		rate = isGround ? friction : friction * airFrictionRate; // 地上：通常の摩擦力 空中: 通常の半分の摩擦力
 	}
 
 	// 今のフレームの速度を目標速度に近づけていく

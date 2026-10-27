@@ -317,19 +317,19 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 7.0,
-                    "type": 20
+                    "threshold": 0.0,
+                    "type": 10
                 },
                 {
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 0.0,
-                    "type": 10
+                    "threshold": 7.0,
+                    "type": 20
                 }
             ],
             "fromState": "Fly",
-            "priority": 0,
+            "priority": 1,
             "toSlot": 0,
             "toState": "Land"
         },
@@ -976,7 +976,7 @@
             "mixRate": 0.0,
             "position": [
                 -412.0,
-                57.0
+                -7.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Land.json",
             "type": 1
