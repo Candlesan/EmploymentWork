@@ -1514,7 +1514,31 @@
                 }
             ],
             "name": "AS_Combo_Attack_03_04_Seq_0",
-            "ranges": [],
+            "ranges": [
+                {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "boneName": "",
+                    "damageRate": 1.0,
+                    "end": 0.8600000143051147,
+                    "height": 1.0,
+                    "invincible": 0.30000001192092896,
+                    "isHitBox": false,
+                    "name": "shot",
+                    "offset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "poiseRate": 1.0,
+                    "radius": 0.5,
+                    "shapeType": 0,
+                    "start": 0.0
+                }
+            ],
             "speedKeys": [
                 {
                     "speed": 1.0,

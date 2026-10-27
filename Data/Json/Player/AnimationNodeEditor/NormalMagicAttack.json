@@ -71,7 +71,7 @@
                     "buttonMask": 0,
                     "negate": false,
                     "targetDir": 0,
-                    "threshold": 1.3700000047683716,
+                    "threshold": 0.8600000143051147,
                     "type": 1
                 }
             ],
@@ -87,6 +87,7 @@
             "assetName": "",
             "config": {
                 "animationName": "",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -106,6 +107,7 @@
             "assetName": "",
             "config": {
                 "animationName": "",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -125,6 +127,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Combo_Attack_04_02_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -144,6 +147,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Combo_Attack_03_04_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",

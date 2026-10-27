@@ -49,7 +49,7 @@ void AnimationCharacter::ChangeAnimationState(const std::string& newState, bool 
 
 	if (animator)
 	{
-		animator->PlayBase(newAnimationIndex, config.loop, animationBlendSecondsLength, useRootMotion, useRootMotionEx);
+		animator->PlayBase(newAnimationIndex, config.loop, animationBlendSecondsLength, useRootMotion, useRootMotionEx, bakeTranslationY);
 	}
 }
 
@@ -95,7 +95,9 @@ void AnimationCharacter::UpdateAnimation(float elapsedTime)
 		DirectX::XMFLOAT3 delta = animator->Update(elapsedTime * baseSpeed, GetTransform());
 
 		this->position.x += delta.x;
+		if(!bakeTranslationY)
 		this->position.y += delta.y;
+
 		this->position.z += delta.z;
 
 		this->animationSeconds = animator->GetBaseCurrentSeconds();

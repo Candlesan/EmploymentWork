@@ -120,7 +120,6 @@ private:
 	void UpdateTimers(float elapsedTime);
 	void UpdateLockAt(float elapsedTime);
 	void CalculateStatusParameters();
-	//void CalculationRootAndTip();
 	void CalculateSpineRotation(float elapsedTime);
 
 	// 音を取得（無ければ自動ロード）する関数
@@ -136,9 +135,12 @@ private:
 	void ShowDebugSwitch();
 
 	void TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& target, float speed);
+
+	// 飛行中に身体を傾ける処理
+	void bank(float elapsedTime);
 private:
 	// =========================================================================
-	//  メンバ変数（大量にあるので、ジャンルごとに綺麗にグループ化！）
+	//  メンバ変数
 	// =========================================================================
 	// ── 3Dモデルと装備 ──
 	std::shared_ptr<Model> player;
@@ -164,34 +166,28 @@ private:
 	NormalMagic normalMagic;
 	RapidMagic::RapidMagicConfig rapidMagicConfig;
 	RapidMagic rapidMagic;
+
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
 	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン
-	bool rapidInterval = 0.1f;				// 連射魔法の発射感覚
 	float magicRecoverDelay = 0.0f;			// 魔力を回復するまでの遅延
 	float interceptRadius = 50.0f;			// 迎撃用の半径
+	DirectX::XMFLOAT3 muzzlePos = { 0, 0, 0 }; // 発射方向
+	DirectX::XMFLOAT3 defultTarget = { 0, 0, 0 }; // 初期の狙ってる位置
 	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
-	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f }; // 迎撃する方向
 	bool isShot = false;
 
-	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
-	float previousAngleY = 0.0f;
-	float currentBankAngle = 0.0f;
-	float targetSpineAngle = -10.0f;
-	float spineAngleSpeed = 10.0f;
-	DirectX::XMFLOAT3 rootOffset = { 0.42f, -5.93f, -0.37f };
-	DirectX::XMFLOAT3 tipOffset = { 0.770f, 6.22f, -0.5f };
-	DirectX::XMFLOAT3 swingAngle = { 0.0f, 0.0f, 1.6f };
-	DirectX::XMFLOAT3 swingPosition = { 0.0f, 2.0f, 0.0f };
-	DirectX::XMFLOAT3 swingOriginOffset = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 headLocalForward = { 0.0f, 0.0f, 1.0f };
-	DirectX::XMFLOAT3 muzzlePos = { 0, 0, 0 };
-	DirectX::XMFLOAT3 defultTarget = { 0, 0, 0 };
-	float rotationSpeed = 25.0f;
-	float rotation = 0.0f;
-	float dropStartT = 0.0f;
-	float dropEndT = 0.0f;
-	float lookAtWeight = 0.0f;
+	// ── IK関係 ──
+	DirectX::XMFLOAT3 headLocalForward = { 0.0f, 0.0f, 1.0f }; // 頭の向きを保存
+	float previousAngleY = 0.0f; // 前フレームの背骨の傾きを保存
+	float currentBankAngle = 0.0f; // 現在の背骨の傾き
+	float targetSpineAngle = -10.0f; // 目標の腰骨の角度
+	float spineAngleSpeed = 10.0f; // 腰骨の回転速度
+	float lookAtWeight = 0.0f; // ルックアットの重み
+	float flightBankX = 0.0f; // 飛行中のX軸の傾き
+	float flightBankZ = 0.0f; // 飛行中のZ軸の傾き
+	float bankSpeed = 5.0f; // 傾く速度
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;

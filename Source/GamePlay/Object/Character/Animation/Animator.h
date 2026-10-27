@@ -43,8 +43,7 @@ public:
 	void Initialize(std::shared_ptr<Model> model) { targetModel = model; }
 
 	// レイヤー各種設定
-	void PlayBase(int animIndex, bool loop, float blendTime, bool rootMotion, bool rootMotionEx);
-	void PlayUpper(int animIndex, bool loop, const std::string& boneName, float blendTime);
+	void PlayBase(int animIndex, bool loop, float blendTime, bool rootMotion, bool rootMotionEx, bool bakeY);	void PlayUpper(int animIndex, bool loop, const std::string& boneName, float blendTime);
 	
 	// 加算ブレンド各レイヤー設定
 	void PlayBaseMix(int animIndexA, int animIndexB, float mixRate,

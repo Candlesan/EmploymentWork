@@ -292,6 +292,8 @@ void Player::Update(float elapsedTime)
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
 
+	bank(elapsedTime);
+
 	// 魔法更新処理
 	magicManager.Update(elapsedTime);
 	defenseMagic.Update(this, elapsedTime);
@@ -467,7 +469,7 @@ void Player::DrawGUI()
 		}
 
 		// 魔法関係
-		if (ImGui::CollapsingHeader(u8"通常魔法", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"通常魔法"))
 		{
 			if (ImGui::Button(u8"保存##Normal"))
 			{
@@ -508,7 +510,7 @@ void Player::DrawGUI()
 			normalMagic.DrawGUI(normalMagicConfig);
 		}
 
-		if (ImGui::CollapsingHeader(u8"連射魔法", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"連射魔法"))
 		{
 			rapidMagic.DrawGUI(rapidMagicConfig);
 		}
@@ -516,13 +518,13 @@ void Player::DrawGUI()
 		//　防御魔法
 		defenseMagic.DrawGUI();
 
-		if (ImGui::CollapsingHeader(u8"迎撃", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"迎撃"))
 		{
 			ImGui::DragFloat(u8"迎撃をする距離", &interceptRadius, 0.1f);
 		}
 
 		// 当たり判定情報
-		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)"))
 		{
 			ImGui::DragFloat(u8"判定の半径", &radius, 0.1f);
 			ImGui::DragFloat(u8"判定の高さ", &height, 0.1f);
@@ -530,28 +532,26 @@ void Player::DrawGUI()
 		}
 
 		// 武器のアタッチメント情報
-		if (ImGui::CollapsingHeader(u8"武器アタッチメント (手元・位置調整)", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"杖アタッチメント"))
 		{
-			ImGui::DragFloat3(u8"武器のローカル位置##1", &weapon.position.x, 0.01f);
-			ImGui::DragFloat3(u8"武器のローカル角度##1", &weapon.angle.x, 0.01f);
-			ImGui::DragFloat3(u8"武器のローカルスケール##1", &weapon.scale.x, 0.01f);
-
-			ImGui::DragFloat3(u8"攻撃判定の位置ズレ##1", &weapon.weaponHitOffset.x, 0.1f);
-			ImGui::DragFloat3(u8"攻撃判定の角度ズレ##1", &weapon.weaponAngleOffset.x, 0.1f);
-			ImGui::DragFloat(u8"攻撃判定の半径##1", &weapon.weaponRadius, 0.1f);
-			ImGui::DragFloat(u8"攻撃判定の長さ##1", &weapon.weaponHeight, 0.1f);
-
-			ImGui::DragFloat(u8"武器の回転速度", &rotationSpeed, 0.1, 0.0f, 100.0f);
-			ImGui::DragFloat3(u8"回転中の杖の位置", &swingPosition.x, 0.1f);
-			ImGui::DragFloat3(u8"回転中の杖の向き", &swingAngle.x, 0.1f, -360.0f, 360.0f);
-			ImGui::DragFloat3(u8"回転軸のオフセット", &swingOriginOffset.x, 0.1f);
+			ImGui::DragFloat3(u8"位置##wand", &weapon.position.x, 0.01f);
+			ImGui::DragFloat3(u8"角度##wand", &weapon.angle.x, 0.01f);
+			ImGui::DragFloat3(u8"スケール##wand", &weapon.scale.x, 0.01f);
 		}
 
 		// 移動時の背骨の傾き
-		if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(u8"背骨のしなり (バンキング設定)"))
 		{
 			ImGui::DragFloat(u8"しなりの強さ", &targetSpineAngle, 0.1f);
 			ImGui::DragFloat(u8"しなりの戻り速度", &spineAngleSpeed, 0.1f);
+		}
+
+		// 移動時の背骨の傾き
+		if (ImGui::CollapsingHeader(u8"飛行中の傾き"))
+		{
+			ImGui::Text(u8"X軸 : %f.0", flightBankX);
+			ImGui::Text(u8"Z軸 : %f.0", flightBankZ);
+			ImGui::DragFloat(u8"傾き速度", &bankSpeed, 0.1f);
 		}
 		ImGui::End();
 	}
@@ -735,7 +735,7 @@ void Player::MagicInput(float elapsedTime)
 	};
 
 	// ボタンを離したら予約をする
-	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
 	{
 		isShot = true;
 	}
@@ -777,6 +777,7 @@ void Player::MagicInput(float elapsedTime)
 		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
 		magicCoolDownTimer = coolDownValue;
 		normalMagic.ResetCharge();
+		isShot = false;
 	}
 
 	// 連射魔法
@@ -1770,42 +1771,22 @@ void Player::UpdateStateBehavior()
 {
 }
 
-// 今ダウン中かを判定する
-bool Player::IsDownState()
+// ノードの設定を最新にする関数
+void Player::RefreshStateConfigs()
 {
-	// ダウン中ならtrueを返す
-	if (status.isDown) return true;
-
-	// サブグラフのDownの中にいる時は操作を出来ないようにする
-	for (auto& idx : activeGraphStack)
+	// メモリ上の transitionGraphs から最新の config データを stateConfigs に反映する
+	for (const auto& graph : transitionGraphs)
 	{
-		if (transitionGraphs[idx].graphName == "Down") return true;
+		for (const auto& node : graph.nodes)
+		{
+			if (node.type == NodeType::Animation)
+			{
+				stateConfigs[node.StateName] = node.config;
+			}
+		}
 	}
-
-	// Exit 直後、親グラフで "Down" ノードに留まっているフレームも操作不可
-	return currentState == "Down";
 }
 
-bool Player::IsReviveState()
-{
-	// 死亡中ならtrueを返す
-	if (status.isDead) return true;
-
-	// サブグラフのReviveの中にいる時は操作を出来ないようにする
-	for (auto& idx : activeGraphStack)
-	{
-		const std::string& name = transitionGraphs[idx].graphName;
-		if (name == "Revive" || name == "Revive_Air") return true;
-	}
-
-	// Exit 直後、親グラフで "Revive系" ノードに留まっているフレームも操作不可
-	return currentState == "Revive" || currentState == "Revive_Air";
-}
-
-bool Player::CanControl()
-{
-	return !IsDownState() && !IsReviveState();
-}
 
 
 // =========================================================================
@@ -1820,6 +1801,29 @@ void Player::UpdateTimers(float elapsedTime)
 	{
 		magicCoolDownTimer -= elapsedTime;
 	}
+}
+
+// プレイヤーの状態を計算する関数
+void Player::CalculateStatusParameters()
+{
+	if (status.isBreak && !wasBreak)
+	{
+		PlayActionGraph("Break");
+	}
+	wasBreak = status.isBreak;
+
+	GamePad& gamePad = Input::Instance().GetGamePad();
+	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
+	{
+		hardLock = !hardLock;
+		lockOn.SetHardLock(hardLock);
+	}
+
+	// 敵との距離の計算
+	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());
+	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Epos, Ppos);
+	enemyFromDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
 }
 
 // ルックアット処理更新
@@ -1941,29 +1945,6 @@ void Player::UpdateLockAt(float elapsedTime)
 	DirectX::XMStoreFloat4(&headNode.rotation, FinalHeadRot);
 }
 
-// プレイヤーの状態を計算する関数
-void Player::CalculateStatusParameters()
-{
-	if (status.isBreak && !wasBreak)
-	{
-		PlayActionGraph("Break");
-	}
-	wasBreak = status.isBreak;
-
-	GamePad& gamePad = Input::Instance().GetGamePad();
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
-	{
-		hardLock = !hardLock;
-		lockOn.SetHardLock(hardLock);
-	}
-
-	// 敵との距離の計算
-	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
-	DirectX::XMVECTOR Epos = DirectX::XMLoadFloat3(&enemy->GetPosition());
-	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(Epos, Ppos);
-	enemyFromDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
-}
-
 // 移動時の背骨の回転角度を求める関数
 void Player::CalculateSpineRotation(float elapsedTime)
 {
@@ -1994,6 +1975,118 @@ void Player::CalculateSpineRotation(float elapsedTime)
 	{
 		animator->SetBankAngle(currentBankAngle);
 	}
+}
+
+//　ノードの名前を探す関数
+AnimNode* Player::FindNodeByName(const std::string& stateName)
+{
+	// Playerが持っているすべての遷移グラフ（transitionGraphs）から探す
+	for (auto& graph : transitionGraphs)
+	{
+		for (auto& node : graph.nodes)
+		{
+			// 名前（StateName）が一致するノードが見つかったらそのポインタを返す
+			if (node.StateName == stateName)
+			{
+				return &node;
+			}
+		}
+	}
+	return nullptr; // 見つからなかったら nullptr
+}
+
+// 指定の方向へ補間しながら向く
+void Player::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& target, float speed)
+{
+	float dx = target.x - position.x;
+	float dz = target.z - position.z;
+	if (dx * dx + dz * dz < 0.0001f) return; // 真上・真下にいる時は向きを変えない
+
+	float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
+	float diff = targetAngleY - angle.y;
+	diff = DirectX::XMScalarModAngle(diff);
+	float t = (std::min)(speed * elapsedTime, 1.0f); // 行き過ぎ防止
+	angle.y += diff * t;
+}
+
+// 飛行中に身体を傾ける処理
+void Player::bank(float elapsedTime)
+{
+	if (!flightController.IsFlying() || animSequence.GetRange("shot"))
+	{
+		// 跳んでいないときはもとに戻す
+		flightBankX = 0.0f;
+		flightBankZ = 0.0f;
+		angle.x = 0.0f;
+		angle.z = 0.0f;
+		return;
+	}
+
+	// 移動ベクトルを取得
+	DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
+	// プレイヤーの前方向・右方向を計算する
+	float forwardX = sinf(angle.y);
+	float forwardZ = cosf(angle.y);
+
+	float rightX = cosf(angle.y);
+	float rightZ = -sinf(angle.y);
+
+	// プレイヤーから見た前後・左右の入力量
+	float inputForward = moveVec.x * forwardX + moveVec.z * forwardZ;
+	float inputRight = moveVec.x * rightX + moveVec.z * rightZ;
+
+	// 目標の傾き
+	const float maxBank = DirectX::XMConvertToRadians(20.0f);
+	float targetX = inputForward * maxBank; // 前に倒す
+	float targetZ = -inputRight * maxBank; // 右に倒す
+
+	// いきなり傾かないようにLerpする
+	float t = (std::min)(bankSpeed * elapsedTime, 1.0f);
+	flightBankX += (targetX - flightBankX) * t;
+	flightBankZ += (targetZ - flightBankZ) * t;
+
+	angle.x = flightBankX;
+	angle.z = flightBankZ;
+}
+
+// 今ダウン中かを判定する
+bool Player::IsDownState()
+{
+	// ダウン中ならtrueを返す
+	if (status.isDown) return true;
+
+	// サブグラフのDownの中にいる時は操作を出来ないようにする
+	for (auto& idx : activeGraphStack)
+	{
+		if (transitionGraphs[idx].graphName == "Down") return true;
+	}
+
+	// Exit 直後、親グラフで "Down" ノードに留まっているフレームも操作不可
+	return currentState == "Down";
+}
+
+// 蘇生したか判定する
+bool Player::IsReviveState()
+{
+	// 死亡中ならtrueを返す
+	if (status.isDead) return true;
+
+	// サブグラフのReviveの中にいる時は操作を出来ないようにする
+	for (auto& idx : activeGraphStack)
+	{
+		const std::string& name = transitionGraphs[idx].graphName;
+		if (name == "Revive" || name == "Revive_Air") return true;
+	}
+
+	// Exit 直後、親グラフで "Revive系" ノードに留まっているフレームも操作不可
+	return currentState == "Revive" || currentState == "Revive_Air";
+}
+
+// 操作できるか判定する
+bool Player::CanControl()
+{
+	return !IsDownState() && !IsReviveState();
 }
 
 // 音を取得（無ければ自動ロード）する関数
@@ -2029,40 +2122,6 @@ AudioSource* Player::GetOrLoadSound(const std::string& soundName)
 	}
 }
 
-//　ノードの名前を探す関数
-AnimNode* Player::FindNodeByName(const std::string& stateName)
-{
-	// Playerが持っているすべての遷移グラフ（transitionGraphs）から探す
-	for (auto& graph : transitionGraphs)
-	{
-		for (auto& node : graph.nodes)
-		{
-			// 名前（StateName）が一致するノードが見つかったらそのポインタを返す
-			if (node.StateName == stateName)
-			{
-				return &node;
-			}
-		}
-	}
-	return nullptr; // 見つからなかったら nullptr
-}
-
-// ノードの設定を最新にする関数
-void Player::RefreshStateConfigs()
-{
-	// メモリ上の transitionGraphs から最新の config データを stateConfigs に反映する
-	for (const auto& graph : transitionGraphs)
-	{
-		for (const auto& node : graph.nodes)
-		{
-			if (node.type == NodeType::Animation)
-			{
-				stateConfigs[node.StateName] = node.config;
-			}
-		}
-	}
-}
-
 // GUIの表示/非表示
 void Player::ShowDebugSwitch()
 {
@@ -2081,18 +2140,4 @@ void Player::ShowDebugSwitch()
 		showPlayerParameter = !showPlayerParameter;
 	}
 	wasF8DownLastFrame = f8Down;
-}
-
-// 指定の方向へ補間しながら向く
-void Player::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& target, float speed)
-{
-	float dx = target.x - position.x;
-	float dz = target.z - position.z;
-	if (dx * dx + dz * dz < 0.0001f) return; // 真上・真下にいる時は向きを変えない
-
-	float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
-	float diff = targetAngleY - angle.y;
-	diff = DirectX::XMScalarModAngle(diff);
-	float t = (std::min)(speed * elapsedTime, 1.0f); // 行き過ぎ防止
-	angle.y += diff * t;
 }

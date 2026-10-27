@@ -1034,6 +1034,7 @@ void AnimationTransitionEditor::DrawSelectedNodeEditor(AnimationTransitionGraph&
 			// ルートモーション設定
 			ImGui::Checkbox(u8"ルートモーションを使用", &selectedNode->config.useRootMotion);
 			ImGui::Checkbox(u8"ルートモーション(拡張)", &selectedNode->config.useRootMotionEx);
+			ImGui::Checkbox(u8"Y移動を無視", &selectedNode->config.bakeTranslationY);
 
 			// ブレンド時間
 			ImGui::DragFloat(u8"ブレンド時間(秒)", &selectedNode->config.blendTime, 0.01f, 0.0f, 2.0f);

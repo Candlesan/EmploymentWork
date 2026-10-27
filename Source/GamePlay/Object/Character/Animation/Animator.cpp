@@ -2,7 +2,7 @@
 
 
 // ベースレイヤー
-void Animator::PlayBase(int animIndex, bool loop, float blendTime, bool rootMotion, bool rootMotionEx)
+void Animator::PlayBase(int animIndex, bool loop, float blendTime, bool rootMotion, bool rootMotionEx, bool bakeY)
 {
 	// アニメが違うものに切り替わる瞬間なら、今の全身ポーズを退避してブレンド開始
 	if (baseLayer.animationIndex != animIndex && !finalPoses.empty())
@@ -17,6 +17,7 @@ void Animator::PlayBase(int animIndex, bool loop, float blendTime, bool rootMoti
 	baseLayer.blendSecondsLength = blendTime; // ブレンド時間を受け取る
 	baseLayer.useRootMotion = rootMotion;
 	baseLayer.useRootMotionEx = rootMotionEx;
+	baseLayer.bakeTranslationY = bakeY;
 	baseLayer.currentSeconds = 0.0f;
 	baseLayer.oldSeconds = 0.0f;
 
