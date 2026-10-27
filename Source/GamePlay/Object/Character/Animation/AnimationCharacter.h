@@ -29,7 +29,7 @@ public:
 	void UpdateWeaponAttachment(const std::string& attachBoneName);
 
 	// 現在のアニメーションが終了したかどうか
-	bool IsAnimationFinished() const;
+	bool IsAnimationFinished();
 
 	// 再生時間が指定範囲内かを判定する（遷移条件に使う）
 	bool IsAnimationInTimeRange(float startSeconds, float endSeconds) const;
@@ -38,7 +38,7 @@ public:
 	bool IsAnimationOutTimeRange(float startSeconds, float endSeconds) const;
 
 	// 再生時間が指定位置より後かを判定する（遷移条件に使う）
-	bool IsAnimationOutTimeRange(float StartTransition) const;
+	bool IsAnimationOutTimeRange(float StartTransition);
 
 	// 徐々にアニメーション速度を落とす補助関数
 	void AnimationLerp(float StartSlow, float endSlow, float SlowSpeed);
@@ -105,6 +105,7 @@ protected:
 	bool isBlending = true;
 	bool justChangedAnimation = true;
 	bool animationLoop = false;
+	bool isFinished = false;
 
 	// ルートモーション関連
 	bool useRootMotion = false;
@@ -162,5 +163,4 @@ protected:
 		bool isVisible = false;
 	};
 	Weapon weapon;
-
 };

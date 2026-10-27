@@ -37,7 +37,7 @@ void AnimationSequencer::Update(const std::string& animName, float animTime)
     // アニメーションが切り替わったらリセット
     if (animName != currentAnimName)
     {
-        currentAnimName = realAnimName;
+        currentAnimName = animName;
         prevAnimTime = 0.0f;
         firedEvents.clear();
         activeFlags.clear();

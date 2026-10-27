@@ -139,7 +139,7 @@ void AnimationCharacter::UpdateWeaponAttachment(const std::string& attachBoneNam
 }
 
 // アニメーション終了判定
-bool AnimationCharacter::IsAnimationFinished() const
+bool AnimationCharacter::IsAnimationFinished()
 {
 	if (animationIndex < 0) return false;
 
@@ -147,7 +147,15 @@ bool AnimationCharacter::IsAnimationFinished() const
 	if (!model) return false;
 
 	const Model::Animation& animation = model->GetAnimations().at(animationIndex);
-	return animationSeconds >= animation.secondsLength;
+	if (animationSeconds >= animation.secondsLength)
+	{
+		isFinished = true;
+	}
+	else
+	{
+		isFinished = false;
+	}
+	return isFinished;
 }
 
 // 再生時間で判定する関数（特定の範囲内なら遷移OK）
@@ -168,11 +176,20 @@ bool AnimationCharacter::IsAnimationOutTimeRange(float startSeconds, float endSe
 }
 
 // 再生時間で判定する関数（特定の場所以降なら遷移OK）
-bool AnimationCharacter::IsAnimationOutTimeRange(float StartTransition) const
+bool AnimationCharacter::IsAnimationOutTimeRange(float StartTransition)
 {
 	if (animationIndex < 0) return false;
 	// 現在の再生時間がStartTransition以上かををチェック
-	return (animationSeconds >= StartTransition);
+
+	if (animationSeconds >= StartTransition)
+	{
+		isFinished = true;
+	}
+	else
+	{
+		isFinished = false;
+	}
+	return isFinished;
 }
 
 // だんだんアニメーション遅くする関数

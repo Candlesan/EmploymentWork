@@ -1115,6 +1115,85 @@
                     "time": 0.9166666865348816
                 }
             ]
+        },
+        {
+            "assetName": "State_Idle",
+            "events": [],
+            "name": "State_Idle",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "AS_Combo_Attack_04_02_Seq_0",
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "shot",
+                    "soundName": "",
+                    "time": 0.4785808324813843,
+                    "type": 0
+                }
+            ],
+            "name": "AS_Combo_Attack_04_02_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.3624997138977051,
+                    "time": 0.26790153980255127
+                },
+                {
+                    "speed": 2.0250024795532227,
+                    "time": 0.6225031614303589
+                },
+                {
+                    "speed": 1.0,
+                    "time": 0.8048375248908997
+                },
+                {
+                    "speed": 1.0,
+                    "time": 2.066666603088379
+                }
+            ]
+        },
+        {
+            "assetName": "AS_Combo_Attack_03_04_Seq_0",
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "shot",
+                    "soundName": "",
+                    "time": 0.38177934288978577,
+                    "type": 0
+                }
+            ],
+            "name": "AS_Combo_Attack_03_04_Seq_0",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.3624997138977051,
+                    "time": 0.15046274662017822
+                },
+                {
+                    "speed": 1.562500238418579,
+                    "time": 0.4370361566543579
+                },
+                {
+                    "speed": 0.587499737739563,
+                    "time": 0.9936156272888184
+                },
+                {
+                    "speed": 1.0,
+                    "time": 2.5999999046325684
+                }
+            ]
         }
     ]
 }

@@ -136,6 +136,8 @@ private:
 
 	// GUIの表示/非表示
 	void ShowDebugSwitch();
+
+	void TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& target, float speed);
 private:
 	// =========================================================================
 	//  メンバ変数（大量にあるので、ジャンルごとに綺麗にグループ化！）
@@ -172,6 +174,7 @@ private:
 	float interceptRadius = 50.0f;			// 迎撃用の半径
 	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
 	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f };
+	bool isShot = false;
 
 	// ── 特殊演出（背骨の傾き・武器の見た目・トレイル） ──
 	float previousAngleY = 0.0f;
@@ -184,6 +187,8 @@ private:
 	DirectX::XMFLOAT3 swingPosition = { 0.0f, 2.0f, 0.0f };
 	DirectX::XMFLOAT3 swingOriginOffset = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 headLocalForward = { 0.0f, 0.0f, 1.0f };
+	DirectX::XMFLOAT3 muzzlePos = { 0, 0, 0 };
+	DirectX::XMFLOAT3 defultTarget = { 0, 0, 0 };
 	float rotationSpeed = 25.0f;
 	float rotation = 0.0f;
 	float dropStartT = 0.0f;
@@ -192,6 +197,7 @@ private:
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;
+	bool isSubGraphExited = false; // 子グラフからExitした直後か（親ではアニメ終了扱いにする）
 	float lerpSpeed = 3.0f;
 	float bButtonHoldTime = 0.0f;
 	float rbButtonHoldTime = 0.0f;

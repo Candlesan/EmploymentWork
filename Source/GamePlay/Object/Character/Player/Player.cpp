@@ -248,6 +248,7 @@ void Player::Update(float elapsedTime)
 		// 移動処理
 		InputMove(elapsedTime);
 
+		// 飛行更新
 		UpdateFly(elapsedTime);
 
 		// アニメーション遷移
@@ -266,6 +267,9 @@ void Player::Update(float elapsedTime)
 #ifdef NDEBUG
 	// 移動処理
 	InputMove(elapsedTime);
+
+	// 飛行更新
+	UpdateFly(elapsedTime);
 
 	// アニメーション遷移
 	UpdateStateTransitions(elapsedTime);
@@ -675,14 +679,13 @@ void Player::MagicInput(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	// カメラの前方向を取得する
+	// 連射魔法用にカメラの前方向を取得する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	DirectX::XMFLOAT3 defultDir = camera.GetFront();
 	DirectX::XMFLOAT3 defultPos = camera.GetEye();
 	DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&defultPos);
 	DirectX::XMVECTOR cameraFront = DirectX::XMLoadFloat3(&defultDir);
 	DirectX::XMVECTOR Target = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, rapidMagicConfig.speed * rapidMagicConfig.lifeTimer));
-	DirectX::XMFLOAT3 defultTarget;
 	DirectX::XMStoreFloat3(&defultTarget, Target);
 
 	MagicBase* targetMagic = nullptr;
@@ -720,11 +723,17 @@ void Player::MagicInput(float elapsedTime)
 	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
 	// 通常魔法の発射位置を計算する
-	DirectX::XMFLOAT3 muzzlePos = {
+	muzzlePos = {
 		position.x + normalMagicConfig.spawnOffset.x,
 		position.y + normalMagicConfig.spawnOffset.y,
 		position.z + normalMagicConfig.spawnOffset.z,
 	};
+
+	// ボタンを離したら予約をする
+	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
+	{
+		isShot = true;
+	}
 
 	// チャージ魔法
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
@@ -748,23 +757,21 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 通常攻撃魔法
-	if (gamePad.GetButtonUp() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
+	if (animSequence.GetEvent("shot") && isShot && magicCoolDownTimer <= 0.0f)
 	{
-		if (!normalMagic.IsFullCharged() && magicCoolDownTimer <= 0.0f) // フルチャージ済みなら上のifで既に処理済みなので除外
-		{
-			MagicSpawnInfo spawnInfo;
-			spawnInfo.position = position;
-			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(muzzlePos, 100000.0f);
-			spawnInfo.owner = this;
-			spawnInfo.target = enemy;
-			spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
-			spawnInfo.holdTime = rbButtonHoldTime;
-			spawnInfo.angleY = angle.y;
 
-			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
-			magicCoolDownTimer = coolDownValue;
-			normalMagic.ResetCharge();
-		}
+		MagicSpawnInfo spawnInfo;
+		spawnInfo.position = position;
+		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(muzzlePos, 100000.0f);
+		spawnInfo.owner = this;
+		spawnInfo.target = enemy;
+		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
+		spawnInfo.holdTime = rbButtonHoldTime;
+		spawnInfo.angleY = angle.y;
+
+		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
+		magicCoolDownTimer = coolDownValue;
+		normalMagic.ResetCharge();
 	}
 
 	// 連射魔法
@@ -1078,11 +1085,15 @@ void Player::InputMove(float elapsedTime)
 {
 	if (!CanControl()) return;
 
-
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (useRootMotion || useRootMotionEx)
+	if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
+	{
+		// 魔法中は移動速度を0にする
+		velocity = { 0, 0, 0 };
+	}
+	else if (useRootMotion || useRootMotionEx)
 	{
 		// ルートモーションを使ってる時の移動速度
 		Move(moveVec.x, moveVec.z, 0.0f);
@@ -1103,16 +1114,19 @@ void Player::InputMove(float elapsedTime)
 		Move(moveVec.x, moveVec.z, moveSpeed);
 	}
 
-	// 回転処理
-	if (hasLockOnTarget)
-	{
-		float dx = lockOnTargetPos->x - position.x;
-		float dz = lockOnTargetPos->z - position.z;
-		float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
+	DirectX::XMFLOAT3 aimPos = lockOn.IsLocked()
+		? lockOn.GetPredictedPosition(muzzlePos, 100000.0f)
+		: defultTarget;
 
-		float diff = targetAngleY - angle.y;
-		diff = DirectX::XMScalarModAngle(diff);
-		angle.y += diff * turnSpeed * elapsedTime;
+	// 回転処理
+	if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
+	{
+		// 魔法中は敵の方を向く
+		TurnToPosition(elapsedTime, aimPos, turnSpeed);
+	}
+	else if (hasLockOnTarget)
+	{
+		TurnToPosition(elapsedTime, *lockOnTargetPos, turnSpeed);
 	}
 	else
 	{
@@ -1247,6 +1261,9 @@ void Player::UpdateStateTransitions(float elapsedTime)
 	// 今のステートから変化があった場合のみ処理
 	if (nextState != currentState)
 	{
+		// 遷移したらExit直後のフラグを戻す
+		isSubGraphExited = false;
+
 		// アクションを実行する
 		const AnimationTransition* trans = currentGraph->GetTransition(evalStateForTrans, nextState);
 		if (trans)
@@ -1275,6 +1292,9 @@ void Player::UpdateStateTransitions(float elapsedTime)
 			activeGraphStack.pop_back();
 
 			bufferedButton = 0;
+
+			// 親グラフではアニメーション終了扱いにして、すぐ次へ遷移できるようにする
+			isSubGraphExited = true;
 
 			return;
 		}
@@ -1603,6 +1623,13 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.position = GetPosition();
 	ctx.animSeconds = GetCurrentAnimationSeconds();
 	ctx.animLength = GetCurrentAnimationLength();
+
+	// 子グラフからExitした直後はアニメーション終了とみなす
+	if (isSubGraphExited)
+	{
+		ctx.animSeconds = ctx.animLength;
+	}
+
 	ctx.moveLength = moveLength;
 	ctx.enemyFromdistance = enemyFromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
@@ -2044,4 +2071,18 @@ void Player::ShowDebugSwitch()
 		showPlayerParameter = !showPlayerParameter;
 	}
 	wasF8DownLastFrame = f8Down;
+}
+
+// 指定の方向へ補間しながら向く
+void Player::TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& target, float speed)
+{
+	float dx = target.x - position.x;
+	float dz = target.z - position.z;
+	if (dx * dx + dz * dz < 0.0001f) return; // 真上・真下にいる時は向きを変えない
+
+	float targetAngleY = atan2f(dx, dz); // 敵の方向に即座に向く
+	float diff = targetAngleY - angle.y;
+	diff = DirectX::XMScalarModAngle(diff);
+	float t = (std::min)(speed * elapsedTime, 1.0f); // 行き過ぎ防止
+	angle.y += diff * t;
 }
