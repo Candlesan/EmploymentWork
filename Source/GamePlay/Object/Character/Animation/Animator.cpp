@@ -263,7 +263,7 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		}
 
 		// Mix用のアニメーションがあったら
-		if (baseLayer.mixAnimationIndex >= 0)
+		if (upperLayer.mixAnimationIndex >= 0)
 		{
 			std::vector<Model::NodePose> poseA;
 			std::vector<Model::NodePose> poseB;
@@ -293,13 +293,26 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 			finalUpperPoses = upperPoses;
 		}
 
-		// 上半身のノードだけ finalPoses を上書き
+		// 重みをつけてブレンドしていく
+		float weight = 1.0f;
+		if (upperLayer.isFadeingOut)
+		{
+			upperLayer.fadeOutSeconds += elapsedTime;
+			weight = 1.0f - (std::min)(upperLayer.fadeOutSeconds / upperLayer.fadeOutLength, 1.0f);
+		}
+
+		std::vector<Model::NodePose> weighted;
+		targetModel->BlendAnimations(finalPoses, finalUpperPoses, weight, weighted);
 		for (int i = 0; i < (int)nodes.size(); i++)
 		{
 			if (IsUpperBodyNode(nodes[i], upperLayer.rootBoneName))
-			{
-				finalPoses[i] = finalUpperPoses[i]; // ここで初めて全身ポーズの骨を上書き
-			}
+				finalPoses[i] = weighted[i];
+		}
+
+		if (upperLayer.isFadeingOut && weight <= 0.0f)
+		{
+			upperLayer.isFadeingOut = false;
+			upperLayer.animationIndex = -1;
 		}
 
 		upperLayer.oldSeconds = upperLayer.currentSeconds;
@@ -314,31 +327,17 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 			}
 			else
 			{
-				upperLayer.animationIndex = -1;
-				upperLayer.currentSeconds = 0.0f;
+				upperLayer.currentSeconds = upperAnim.secondsLength;
+				if (!upperLayer.isFadeingOut)
+				{
+					upperLayer.isFadeingOut = true;
+					upperLayer.fadeOutSeconds = 0.0f;
+				}
 			}
 		}
 	}
 
 	float totalBankAngle = this->bankAngle;
-
-	// もしフェイドアウトがオンになってたら
-	if (upperLayer.isFadeingOut)
-	{
-		// タイマーを進める
-		upperLayer.fadeOutSeconds += elapsedTime;
-		float rate = upperLayer.fadeOutSeconds / upperLayer.fadeOutLength;
-
-		if (rate >= 1.0f)
-		{
-			upperLayer.isFadeingOut = false;
-			upperLayer.animationIndex = -1;
-		}
-		else
-		{
-			targetModel->BlendAnimations(upperLayer.fadeOutOldPose, finalPoses, rate, finalPoses);
-		}
-	}
 
 	// 姿勢更新
 	if (!finalPoses.empty())
@@ -401,9 +400,8 @@ float Animator::GetUpperAnimationLength() const
 
 void Animator::StopUpper()
 {
+	if (upperLayer.animationIndex < 0 || upperLayer.isFadeingOut) return;
 	upperLayer.isFadeingOut = true;
 	upperLayer.fadeOutSeconds = 0.0f;
-	upperLayer.fadeOutOldPose = finalPoses;
-	upperLayer.currentSeconds = 0.0f;
 	upperLayer.mixAnimationIndex = -1;
 }

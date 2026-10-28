@@ -63,7 +63,7 @@
                 },
                 {
                     "compareType": 1,
-                    "conditionType": "EnemyCurrentHeat",
+                    "conditionType": "None",
                     "judgmentValue": 85.0
                 }
             ],
@@ -122,7 +122,7 @@
                 },
                 {
                     "compareType": 3,
-                    "conditionType": "EnemyCurrentHeat",
+                    "conditionType": "None",
                     "judgmentValue": 0.0
                 },
                 {
@@ -159,7 +159,7 @@
                 },
                 {
                     "compareType": 3,
-                    "conditionType": "EnemyCurrentHeat",
+                    "conditionType": "None",
                     "judgmentValue": 0.0
                 },
                 {
@@ -206,11 +206,11 @@
                 }
             ],
             "config": {
-                "animationName": "AS_Attack_01_01_Seq_0",
+                "animationName": "AS_Combo_Attack_04_01_Seq_0",
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "useRootMotion": false,
-                "useRootMotionEx": false
+                "useRootMotionEx": true
             },
             "interruptible": false,
             "name": "通常攻撃魔法",
@@ -228,7 +228,7 @@
             "conditions": [
                 {
                     "compareType": 3,
-                    "conditionType": "EnemyCurrentHeat",
+                    "conditionType": "None",
                     "judgmentValue": 0.0
                 },
                 {

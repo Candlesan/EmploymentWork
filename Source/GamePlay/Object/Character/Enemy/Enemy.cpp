@@ -202,7 +202,10 @@ void Enemy::Update(float elapsedTime)
 	UpdateAnimation(elapsedTime);
 
 	// シーケンサーの更新
-	animSequence.Update(currentState, GetCurrentAnimationSeconds());
+	if (!currentOverlayState.empty())
+		animSequence.Update(currentOverlayState, GetOverlayAnimationSeconds());
+	else
+		animSequence.Update(currentState, GetCurrentAnimationSeconds());
 	SetBaseSpeed(animSequence.GetSpeed());
 
 	// サウンド再生

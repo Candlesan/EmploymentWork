@@ -214,7 +214,7 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
     case Phase::Attacking:
         normalMagic.Update(elapsedTime, owner, magicConfig, false);
 
-        if(!hasFired)
+        if(!hasFired && owner->GetAnimSequence().GetEvent("Eshot"))
         {
             // 魔法を設定する
             MagicSpawnInfo info;

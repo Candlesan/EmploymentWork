@@ -45,6 +45,7 @@ void AnimationCharacter::ChangeAnimationState(const std::string& newState, bool 
 	animationLoop = config.loop;
 	useRootMotion = config.useRootMotion;
 	useRootMotionEx = config.useRootMotionEx;
+	bakeTranslationY = config.bakeTranslationY;
 	animationBlendSecondsLength = config.blendTime;
 
 	if (animator)
@@ -60,8 +61,6 @@ void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 	auto it = stateConfigs.find(newState);
 	if (it == stateConfigs.end()) return;
 
-	currentOverlayState = newState;
-
 	const AnimationConfig& config = it->second;
 
 	std::shared_ptr<Model> model = GetModel();
@@ -71,11 +70,14 @@ void AnimationCharacter::StartOverlayAnimation(const std::string& newState)
 	if (newAnimationIndex < 0) return;
 
 	if (currentOverlayState == newState) return;
+	currentOverlayState = newState;
 
 	if (animator)
 	{
+		const std::string& bone = config.targetBoneName.empty() ? upperBodyNodeName : config.targetBoneName;
+
 		// AnimatorHê‚Ìã”¼gƒ‰ƒCƒ“‚É”­’‚·‚é‚¾‚¯I
-		animator->PlayUpper(newAnimationIndex, config.loop, config.targetBoneName, config.blendTime);
+		animator->PlayUpper(newAnimationIndex, config.loop, bone, config.blendTime);
 	}
 }
 

@@ -1,16 +1,23 @@
 {
     "animations": [
         {
+            "assetName": "",
             "events": [],
             "name": "Pursuit",
             "ranges": [],
             "speedKeys": []
         },
         {
+            "assetName": "",
             "events": [],
             "name": "Attack",
             "ranges": [
                 {
+                    "angleOffset": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
                     "boneName": "ik_hand_r",
                     "damageRate": 0.10000000149011612,
                     "end": 0.2940506041049957,
@@ -45,8 +52,59 @@
             ]
         },
         {
+            "assetName": "",
             "events": [],
             "name": "Idle",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "待機",
+            "events": [],
+            "name": "待機",
+            "ranges": [],
+            "speedKeys": []
+        },
+        {
+            "assetName": "通常攻撃魔法",
+            "events": [
+                {
+                    "effectName": "",
+                    "name": "Eshot",
+                    "soundName": "",
+                    "time": 0.4000000059604645,
+                    "type": 0
+                }
+            ],
+            "name": "通常攻撃魔法",
+            "ranges": [],
+            "speedKeys": [
+                {
+                    "speed": 1.0,
+                    "time": 0.0
+                },
+                {
+                    "speed": 0.36000001430511475,
+                    "time": 0.15000000596046448
+                },
+                {
+                    "speed": 1.559999942779541,
+                    "time": 0.43700000643730164
+                },
+                {
+                    "speed": 0.5899999737739563,
+                    "time": 0.9940000176429749
+                },
+                {
+                    "speed": 1.0,
+                    "time": 2.5999999046325684
+                }
+            ]
+        },
+        {
+            "assetName": "ブレイク連射",
+            "events": [],
+            "name": "ブレイク連射",
             "ranges": [],
             "speedKeys": []
         }

@@ -951,6 +951,7 @@
             "assetName": "",
             "config": {
                 "animationName": "",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -970,6 +971,7 @@
             "assetName": "",
             "config": {
                 "animationName": "",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -989,6 +991,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_F_0_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1008,6 +1011,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1027,6 +1031,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_Air_F_0_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1046,6 +1051,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_F_R_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1065,6 +1071,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_R_90_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1084,6 +1091,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_B_R_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1103,6 +1111,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_B_180_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1122,6 +1131,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_B_L_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1141,6 +1151,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_L_90_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1160,6 +1171,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_to_Run_F_L_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1168,7 +1180,7 @@
             },
             "mixRate": 0.0,
             "position": [
-                -284.0,
+                -271.0,
                 -503.0
             ],
             "subGraphPath": "",
@@ -1179,6 +1191,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_Air_F_R_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1198,6 +1211,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Air_Combat_R_90_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1217,6 +1231,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Air_Combat_B_R_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1236,6 +1251,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Air_Combat_B_180_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1255,6 +1271,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Air_Combat_B_L_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1274,6 +1291,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Air_Combat_L_90_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -1283,7 +1301,7 @@
             "mixRate": 0.0,
             "position": [
                 -316.0,
-                329.0
+                345.0
             ],
             "subGraphPath": "",
             "type": 0
@@ -1293,6 +1311,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Dodge_Combat_Air_F_L_45_Seq_0",
+                "bakeTranslationY": true,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
