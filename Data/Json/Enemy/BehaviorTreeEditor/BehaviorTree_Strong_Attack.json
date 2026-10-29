@@ -62,9 +62,9 @@
                     "judgmentValue": 10.0
                 },
                 {
-                    "compareType": 1,
-                    "conditionType": "None",
-                    "judgmentValue": 85.0
+                    "compareType": 3,
+                    "conditionType": "Random",
+                    "judgmentValue": 40.0
                 }
             ],
             "config": {
@@ -91,7 +91,7 @@
                 {
                     "compareType": 1,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 35.0
+                    "judgmentValue": 45.0
                 }
             ],
             "config": {
@@ -122,8 +122,8 @@
                 },
                 {
                     "compareType": 3,
-                    "conditionType": "None",
-                    "judgmentValue": 0.0
+                    "conditionType": "Random",
+                    "judgmentValue": 40.0
                 },
                 {
                     "compareType": 0,
@@ -159,8 +159,8 @@
                 },
                 {
                     "compareType": 3,
-                    "conditionType": "None",
-                    "judgmentValue": 0.0
+                    "conditionType": "Random",
+                    "judgmentValue": 60.0
                 },
                 {
                     "compareType": 0,
@@ -228,8 +228,8 @@
             "conditions": [
                 {
                     "compareType": 3,
-                    "conditionType": "None",
-                    "judgmentValue": 0.0
+                    "conditionType": "Random",
+                    "judgmentValue": 25.0
                 },
                 {
                     "compareType": 0,

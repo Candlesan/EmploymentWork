@@ -22,6 +22,10 @@
         },
         {
             "from": "地上",
+            "to": "飛行_追従"
+        },
+        {
+            "from": "地上",
             "to": "前進"
         },
         {
@@ -136,9 +140,14 @@
                     "judgmentValue": 1.0
                 },
                 {
-                    "compareType": 2,
-                    "conditionType": "None",
-                    "judgmentValue": 85.0
+                    "compareType": 3,
+                    "conditionType": "AvoidCoolDownTimer",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "Random",
+                    "judgmentValue": 35.0
                 }
             ],
             "config": {
@@ -171,6 +180,16 @@
                     "compareType": 3,
                     "conditionType": "EnemyCurrentMagic",
                     "judgmentValue": 12.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "AvoidCoolDownTimer",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "Random",
+                    "judgmentValue": 50.0
                 }
             ],
             "config": {
@@ -197,7 +216,7 @@
                 {
                     "compareType": 2,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 70.0
+                    "judgmentValue": 40.0
                 }
             ],
             "config": {
@@ -213,6 +232,38 @@
             "position": [
                 -640.0,
                 260.0
+            ],
+            "priority": 2,
+            "selectRule": 0
+        },
+        {
+            "StateName": "飛行_追従",
+            "actionType": "Flight",
+            "conditions": [
+                {
+                    "compareType": 4,
+                    "conditionType": "PlayerIsFlying",
+                    "judgmentValue": 1.0
+                },
+                {
+                    "compareType": 2,
+                    "conditionType": "EnemyCurrentMagic",
+                    "judgmentValue": 25.0
+                }
+            ],
+            "config": {
+                "animationName": "AS_Jump_Combat_Loop_0_Seq_0",
+                "blendTime": 0.20000000298023224,
+                "loop": true,
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "interruptible": false,
+            "name": "飛行_追従",
+            "parentName": "地上",
+            "position": [
+                -640.0,
+                400.0
             ],
             "priority": 2,
             "selectRule": 0
@@ -392,9 +443,14 @@
                     "judgmentValue": 1.0
                 },
                 {
-                    "compareType": 2,
-                    "conditionType": "None",
-                    "judgmentValue": 85.0
+                    "compareType": 3,
+                    "conditionType": "AvoidCoolDownTimer",
+                    "judgmentValue": 0.0
+                },
+                {
+                    "compareType": 3,
+                    "conditionType": "Random",
+                    "judgmentValue": 35.0
                 }
             ],
             "config": {
@@ -421,7 +477,12 @@
                 {
                     "compareType": 3,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 40.0
+                    "judgmentValue": 20.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": "PlayerIsFlying",
+                    "judgmentValue": 0.0
                 }
             ],
             "config": {

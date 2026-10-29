@@ -93,15 +93,15 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetDamage(0.01f);					// 生身へのダメージ
 	magic->SetGuardDamage(config.gaurdDamage);	// 防御魔法へのダメージ
 
-	//if (info.owner != nullptr)
-	//{
-	//	const float magicCost =
-	//		info.owner->GetStatus().rapidFireMagicCost;
+	if (info.owner != nullptr)
+	{
+		const float magicCost =
+			info.owner->GetStatus().rapidFireMagicCost;
 
-	//	const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
+		const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
 
-	//	magic->SetMagicmagicRefund(magicCost + interceptBonus);
-	//}
+		magic->SetMagicmagicRefund(magicCost + interceptBonus);
+	}
 
 	magic->SetSpeed(config.speed);				// 弾速
 	magic->SetLifeTimer(config.lifeTimer);		// 射程(生存時間)

@@ -365,8 +365,8 @@ ActionBase::State DropGuardMagic::Run(float elapsedTime)
 
     // 十分に回復したら終わる
     const auto& s = owner->GetStatus();
-    if (s.currentMagic >= s.maxMagic * 0.6f &&
-        s.currentDefenseDurability >= s.maxDefenseDurability * 0.8f)
+    if (s.currentMagic >= s.maxMagic * 0.45f &&
+        s.currentDefenseDurability >= s.maxDefenseDurability * 0.6f)
     {
         return State::Complete;
     }

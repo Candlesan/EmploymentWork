@@ -1081,11 +1081,11 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	//if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
-	//{
-	//	// 魔法中は移動速度を0にする
-	//	velocity = { 0, 0, 0 };
-	//}
+	if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
+	{
+		// 魔法中は移動速度を0にする
+		velocity = { 0, 0, 0 };
+	}
 	if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0" ||
 		(lockOn.IsHardLock() && currentState.rfind("AS_Dodge_Combat_to_Run_", 0) == 0))
 	{
