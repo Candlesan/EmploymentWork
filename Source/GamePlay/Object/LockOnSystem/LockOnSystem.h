@@ -2,6 +2,7 @@
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
 
 #include "GamePlay/Object/Character/Player/PlayerUI.h"
+#include "GamePlay/Object/Camera/GameCamera/GameCamera.h"
 
 #include <DirectXMath.h>
 
@@ -39,6 +40,11 @@ public:
 	// ハードロック
 	void SetHardLock(bool flag) { hardLock = flag; }
 	bool IsHardLock() const { return hardLock; }
+
+	float AimAssistScale();
+	
+	bool GetAuotAim() const { return autoAim; }
+	void SetAuotAim(bool flag) { autoAim = flag; }
 private:
 	// ロックオンが出来るか
 	bool IsTargetable(const DirectX::XMFLOAT3& aimDirection) const;
@@ -54,6 +60,7 @@ private:
 	State state = State::None;
 	DirectX::XMFLOAT3 aimDirection = { 0, 0, 1 }; // 初期値は正面
 	float lockTimer = 0.0f; // ロックオン判定になるまでの時間
+	float assistAngle = 10.0f; // アシスト判定になる角度
 	bool hardLock = false; // 敵が画面中央に固定されるフラグ
 
 	// GUI用
@@ -61,4 +68,5 @@ private:
 	float lockAngle = 45.0f; // ロックオン判定の角度
 	float lockTime = 0.3; // ロックオン判定になるまでの時間(秒)
 	float leadError = 0.0f; // 偏差の誤差
+	bool autoAim = true;
 };

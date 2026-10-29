@@ -162,8 +162,8 @@ void Character::UpdateStatus(float elapsedTime)
 				}
 			}
 
-			// 最大値まで回復させたらフラグを折る
-			if (status.currentMagic >= status.maxMagic)
+			// 最大値の30%まで回復させたらフラグを折る
+			if (status.currentMagic >= status.maxMagic * 0.3)
 				status.isDown = false;
 		}
 		else // ディレイタイマーがなくなったら魔力を回復する
@@ -390,6 +390,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
 	}
 }
 
+// スフィアキャストを使用した壁ずり処理
 bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
 {
 	DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&position);

@@ -23,9 +23,11 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 		ay = -ay;
 	}
 
-	// カメラの回転速度
-	float targetVelX = ay * rollSpeed;
-	float targetVelY = ax * rollSpeed;
+	// カメラの回転速度(エイムアシスト補正を入れる)
+	float assist = player.GetLockOnSystem().AimAssistScale();
+	float slow = 1.0f - assistStrength * assist;
+	float targetVelX = ay * rollSpeed * slow;
+	float targetVelY = ax * rollSpeed * slow;
 	
 	// expf(-速さ * elapsedTime)必ず 0〜1 の範囲に収まる
 	float rotT = 1.0f - expf(-rotSpeed * elapsedTime);
@@ -172,7 +174,7 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 
 void GameCamera::DrawGUI()
 {
-	if (ImGui::CollapsingHeader(u8"調整", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(u8"調整"))
 	{
 		ImGui::SliderAngle(u8"回転速度", &rollSpeed, 0.0f, 360.0f);
 		ImGui::DragFloat(u8"回転の追従", &rotSpeed, 0.1f, 0.0f, 50.0f);
@@ -182,6 +184,12 @@ void GameCamera::DrawGUI()
 		ImGui::DragFloat(u8"当たり判定半径", &radius, 0.01f, 0.0f, 2.0f);
 		ImGui::DragFloat(u8"通常FOV", &defaultFov, 0.1f, 10.0f, 120.0f);
 		ImGui::DragFloat(u8"回避FOV", &maxFov, 0.1f, 10.0f, 120.0f);
+	}
+
+	if (ImGui::CollapsingHeader(u8"エイムアシスト"))
+	{
+		ImGui::Text(u8"アシスト: %.2f", Player::Instance().GetLockOnSystem().AimAssistScale());
+		ImGui::DragFloat(u8"エイムアシストの強さ", &assistStrength, 0.1f, 0.0f, 1.0f);
 	}
 
 	if (ImGui::CollapsingHeader(u8"状態"))

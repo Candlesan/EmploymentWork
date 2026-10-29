@@ -72,7 +72,7 @@ void DefenseMagic::Load()
 // GUI•`‰æ
 void DefenseMagic::DrawGUI()
 {
-	if (ImGui::CollapsingHeader(u8"–hŒä–‚–@", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(u8"–hŒä–‚–@"))
 	{
 		// •Û‘¶
 		if (ImGui::Button(u8"•Û‘¶##Defense"))

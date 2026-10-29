@@ -202,6 +202,13 @@
                     "targetDir": 0,
                     "threshold": 0.10000000149011612,
                     "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
                 }
             ],
             "fromState": "Down",
@@ -274,6 +281,13 @@
                     "targetDir": 0,
                     "threshold": 0.10000000149011612,
                     "type": 7
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
                 }
             ],
             "fromState": "Down",
@@ -294,6 +308,13 @@
                     "targetDir": 0,
                     "threshold": 0.10000000149011612,
                     "type": 14
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
                 }
             ],
             "fromState": "Down",

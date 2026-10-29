@@ -203,11 +203,23 @@ void SceneGame::Update(float elapsedTime)
 		// 自作エフェクトマネージャ更新
 		CustomEffectManager::Instance().Update(delta);
 
+		// プレイヤーのUI更新
 		playerUI.Update(Player::Instance().GetStatus());
+
+		// Rスティック押し込みでオートエイム/エイムアシスト切り替え
+		if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
+		{
+			LockOnSystem& lockOn = player.GetLockOnSystem();
+			lockOn.SetAuotAim(!lockOn.GetAuotAim());
+		}
+
+		// クロスヘア更新
 		playerUI.UpdateCrosshair(elapsedTime, player.GetLockOnSystem(), camera);
 
+		// 敵のUI更新
 		enemyUI.Update(enemy.get()->GetStatus());
 
+		// UIエディターの更新
 		uiEditor.Update(delta);
 		uiCanvas.Update(delta);
 	}

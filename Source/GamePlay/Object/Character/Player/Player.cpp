@@ -697,7 +697,6 @@ void Player::MagicInput(float elapsedTime)
 	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
 
 	auto& effectManager = CustomEffectManager::Instance();
-
 	// 迎撃
 	if (status.isIntercept && !status.isDown)
 	{
@@ -734,6 +733,12 @@ void Player::MagicInput(float elapsedTime)
 		position.z + normalMagicConfig.spawnOffset.z,
 	};
 
+	// 発射位置 → 照準の先 の向きを作る
+	DirectX::XMVECTOR Muzzle = DirectX::XMLoadFloat3(&muzzlePos);
+	DirectX::XMVECTOR Aim = DirectX::XMLoadFloat3(&defultTarget);
+	DirectX::XMFLOAT3 crosshairDir;
+	DirectX::XMStoreFloat3(&crosshairDir, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Aim, Muzzle)));
+
 	// ボタンを離したら予約をする
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
 	{
@@ -764,10 +769,10 @@ void Player::MagicInput(float elapsedTime)
 	// 通常攻撃魔法
 	if (animSequence.GetEvent("shot") && isShot && magicCoolDownTimer <= 0.0f)
 	{
-
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
-		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(muzzlePos, 100000.0f);
+		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir
+			: lockOn.GetAuotAim() ? lockOn.GetAimDirection(muzzlePos, 100000.0f) : crosshairDir; 
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
 		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
@@ -919,11 +924,6 @@ void Player::UpdateFly(float elapsedTime)
 		flightController.Update(this, elapsedTime);
 		return;
 	}
-
-	//if (flightController.IsFlying())
-	//{
-	//	PlayActionGraph("Fly_Idle");
-	//}
 
 	// 入力をまとめる
 	FlightInput input;
@@ -1081,12 +1081,12 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
-	{
-		// 魔法中は移動速度を0にする
-		velocity = { 0, 0, 0 };
-	}
-	else if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0" ||
+	//if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
+	//{
+	//	// 魔法中は移動速度を0にする
+	//	velocity = { 0, 0, 0 };
+	//}
+	if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0" ||
 		(lockOn.IsHardLock() && currentState.rfind("AS_Dodge_Combat_to_Run_", 0) == 0))
 	{
 		// 回避中は
@@ -1128,10 +1128,10 @@ void Player::InputMove(float elapsedTime)
 		// 魔法中は敵の方を向く
 		TurnToPosition(elapsedTime, aimPos, turnSpeed);
 	}
-	else if (lockOn.IsHardLock())
-	{
-		TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
-	}
+	//else if (lockOn.IsHardLock())
+	//{
+	//	TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
+	//}
 	else
 	{
 		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
@@ -1812,12 +1812,12 @@ void Player::CalculateStatusParameters()
 	}
 	wasBreak = status.isBreak;
 
-	GamePad& gamePad = Input::Instance().GetGamePad();
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
-	{
-		hardLock = !hardLock;
-		lockOn.SetHardLock(hardLock);
-	}
+	//GamePad& gamePad = Input::Instance().GetGamePad();
+	//if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
+	//{
+	//	hardLock = !hardLock;
+	//	lockOn.SetHardLock(hardLock);
+	//}
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
@@ -1829,9 +1829,6 @@ void Player::CalculateStatusParameters()
 // ルックアット処理更新
 void Player::UpdateLockAt(float elapsedTime)
 {
-
-	if (enemyFromDistance > 10.0f && currentOverlayState != "State_Magic") return;
-
 	// ターゲット位置を計算する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	DirectX::XMVECTOR camFront = DirectX::XMLoadFloat3(&camera.GetFront());

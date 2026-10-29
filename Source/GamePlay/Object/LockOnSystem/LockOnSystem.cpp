@@ -17,7 +17,10 @@ void LockOnSystem::Initialize(Character* owner, Character* target)
 void LockOnSystem::Update(float elapsedTime, const DirectX::XMFLOAT3& direction)
 {
 	if (owner == nullptr || target == nullptr) return;
+
 	aimDirection = direction;
+	if (!autoAim) { state = State::None; return; }
+
 
 	// ロックが可能ならタイマーを増やす
 	if (IsTargetable(aimDirection))
@@ -62,8 +65,10 @@ void LockOnSystem::DrawGUI()
 			break;
 		}
 
+		ImGui::Checkbox(u8"オートエイム", &autoAim);
 		ImGui::DragFloat(u8"ロックオンの感知距離", &range, 0.1f);
 		ImGui::DragFloat(u8"ロックオンの感知角度", &lockAngle, 0.1f);
+		ImGui::DragFloat(u8"エイムアシストの感知角度", &assistAngle, 0.1f);
 		ImGui::DragFloat(u8"ターゲット補足時間", &lockTime, 0.1f);
 		ImGui::Separator();
 		ui.DrawGUI();
@@ -163,6 +168,35 @@ float LockOnSystem::GetLockProgress() const
 {
 	if (lockTime <= 0.0f) return 1.0f; // 0以下なら1を返す
 	return lockTimer / lockTime;
+}
+
+// エイムアシストをどのくらい効かせるか
+float LockOnSystem::AimAssistScale()
+{
+	if (!target || assistAngle <= 0.0f) return 0.0f;
+
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+
+	// カメラの正面とカメラ->敵からアシスト判定の角度を計算する
+	DirectX::XMFLOAT3 aimPos = target->GetPosition();
+	aimPos.y += 0.8f;
+
+	// 画面外ならアシストしない
+	if (!IsEnemyInScreen(aimPos, camera)) return 0.0f;
+
+	DirectX::XMVECTOR targetPos = DirectX::XMLoadFloat3(&aimPos);
+	DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&camera.GetEye());
+	DirectX::XMVECTOR Vec = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(targetPos, cameraPos));
+	DirectX::XMVECTOR Front = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&camera.GetFront()));
+
+	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Vec, Front)); // 内積を取る
+	float angle = acosf(std::clamp(dot, -1.0f, 1.0f)); // Nanを防ぐ
+
+	float rate = 1.0f - angle / DirectX::XMConvertToRadians(assistAngle);
+	rate = std::clamp(rate, 0.0f, 1.0f);
+	if (rate <= 0.0f) return 0.0f;
+
+	return rate;
 }
 
 // ロックオンできるか
