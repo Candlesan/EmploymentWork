@@ -82,6 +82,15 @@ public:
 		DirectX::XMFLOAT3& hitPosition,
 		DirectX::XMFLOAT3& hitNormal,
 		bool spaceDivisionFlag = false);
+	
+	static bool RayCastVsCapsule(
+		const DirectX::XMFLOAT3& start,
+		const DirectX::XMFLOAT3& end,
+		const DirectX::XMFLOAT3& capsulePos,
+		const DirectX::XMFLOAT3& capsuleDir,
+		float height, float radius,
+		DirectX::XMFLOAT3& hitPosition,
+		float& distance);
 
 private:
 	// ヘルパー関数：線分と線分の最短距離を求める計算

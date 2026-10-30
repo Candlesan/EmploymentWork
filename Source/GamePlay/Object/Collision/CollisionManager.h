@@ -41,11 +41,6 @@ struct Collider
 	void* owner; // この判定を持っているオブジェクト
 };
 
-struct RayCast
-{
-
-};
-
 class CollisionManager {
 public:
 	// 更新処理

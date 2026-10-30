@@ -8,6 +8,7 @@
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
+#include "GamePlay/Object/Stage/Stage.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -672,6 +673,8 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 		DirectX::XMFLOAT3 predicted = lockOn.GetPredictedPosition(position, rapidMagicConfig.speed);
 		renderer->DrawSphere(predicted, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
 	}
+
+	renderer->DrawSphere(GetAimPoint(100.0f), 0.5f, {1, 0, 0, 1});
 }
 
 
@@ -733,11 +736,6 @@ void Player::MagicInput(float elapsedTime)
 		position.z + normalMagicConfig.spawnOffset.z,
 	};
 
-	// 発射位置 → 照準の先 の向きを作る
-	DirectX::XMVECTOR Muzzle = DirectX::XMLoadFloat3(&muzzlePos);
-	DirectX::XMVECTOR Aim = DirectX::XMLoadFloat3(&defultTarget);
-	DirectX::XMFLOAT3 crosshairDir;
-	DirectX::XMStoreFloat3(&crosshairDir, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Aim, Muzzle)));
 
 	// ボタンを離したら予約をする
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
@@ -769,13 +767,20 @@ void Player::MagicInput(float elapsedTime)
 	// 通常攻撃魔法
 	if (animSequence.GetEvent("shot") && isShot && magicCoolDownTimer <= 0.0f)
 	{
+		DirectX::XMFLOAT3 aimPos = GetAimPoint(normalMagicConfig.range + 10.0f);
+
+		DirectX::XMVECTOR Muzzle = DirectX::XMLoadFloat3(&muzzlePos);
+		DirectX::XMVECTOR Aim = DirectX::XMLoadFloat3(&aimPos);
+		DirectX::XMFLOAT3 aimDir;
+		DirectX::XMStoreFloat3(&aimDir, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Aim, Muzzle)));
+
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
 		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir
-			: lockOn.GetAuotAim() ? lockOn.GetAimDirection(muzzlePos, 100000.0f) : crosshairDir; 
+			: lockOn.GetAuotAim() ? lockOn.GetAimDirection(muzzlePos, 100000.0f) : aimDir;
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
-		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
+		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : aimPos;
 		spawnInfo.holdTime = rbButtonHoldTime;
 		spawnInfo.angleY = angle.y;
 
@@ -2045,6 +2050,49 @@ void Player::bank(float elapsedTime)
 
 	angle.x = flightBankX;
 	angle.z = flightBankZ;
+}
+
+// 狙う点を返す
+DirectX::XMFLOAT3 Player::GetAimPoint(float range)
+{
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+
+	// 始点と終点を求める
+	DirectX::XMVECTOR Start = DirectX::XMLoadFloat3(&camera.GetEye());
+	DirectX::XMVECTOR Front = DirectX::XMLoadFloat3(&camera.GetFront());
+	DirectX::XMVECTOR End = DirectX::XMVectorAdd(Start, DirectX::XMVectorScale(Front, range));
+
+	DirectX::XMFLOAT3 start, end, front;
+	DirectX::XMStoreFloat3(&start, Start);
+	DirectX::XMStoreFloat3(&end, End);
+	DirectX::XMStoreFloat3(&front, Front);
+
+	DirectX::XMFLOAT3 EPos = enemy->GetPosition();
+	EPos.y += enemy->GetCollisionOffset();
+
+	// 敵に当たったか調べる
+	float enemyDist = range;
+	DirectX::XMFLOAT3 enemyHitPos;
+	bool hitEnemy = Collision::RayCastVsCapsule(start, end, EPos, enemy->GetCapsuleDirection(), enemy->GetHeight(), enemy->GetRadius(), enemyHitPos, enemyDist);
+
+	// ステージに当たったか調べる
+	const auto& traiangles = stage->GetTriangles();
+	const auto& areas = stage->GetAreas();
+	float stageDist = range;
+	DirectX::XMFLOAT3 stageHitPos, stageHitNormal;
+	bool hitStage = Collision::SphereCast(start, front, 0.01f, stageDist, traiangles, areas, stageHitPos, stageHitNormal, true);
+
+	// 近い方の値を返す
+	if (hitEnemy && hitStage)
+	{
+		return (enemyDist < stageDist) ? enemyHitPos : stageHitPos;
+	}
+
+	if (hitEnemy) return enemyHitPos;
+	if (hitStage) return stageHitPos;
+
+	// どちらでもなければ「end」を返す
+	return end;
 }
 
 // 今ダウン中かを判定する

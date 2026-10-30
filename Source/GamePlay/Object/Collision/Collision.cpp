@@ -417,3 +417,45 @@ void Collision::ClosetPointSegmentSegment(
     XMStoreFloat3(&c1, C1);
     XMStoreFloat3(&c2, C2);
 }
+
+// カプセルとレイキャストの当たり判定
+bool Collision::RayCastVsCapsule(
+    const DirectX::XMFLOAT3& start,
+    const DirectX::XMFLOAT3& end,
+    const DirectX::XMFLOAT3& capsulePos,
+    const DirectX::XMFLOAT3& capsuleDir,
+    float height, float radius,
+    DirectX::XMFLOAT3& hitPosition,
+    float& distance)
+{
+    using namespace DirectX;
+
+    // カプセルの軸を作る
+    XMVECTOR CapsulePos = XMLoadFloat3(&capsulePos);
+    XMVECTOR CapsuleDir = XMLoadFloat3(&capsuleDir);
+
+    XMVECTOR HalfHeight = XMVectorScale(CapsuleDir, height * 0.5f);
+
+    XMFLOAT3 p, q;
+    XMStoreFloat3(&p, XMVectorSubtract(CapsulePos, HalfHeight));
+    XMStoreFloat3(&q, XMVectorAdd(CapsulePos, HalfHeight));
+
+    XMFLOAT3 c1, c2;
+    ClosetPointSegmentSegment(start, end, p, q, c1, c2);
+
+    XMVECTOR C1 = XMLoadFloat3(&c1);
+    XMVECTOR C2 = XMLoadFloat3(&c2);
+    XMVECTOR Vec = XMVectorSubtract(C2, C1);
+    float Distance = XMVectorGetX(XMVector3LengthSq(Vec));
+
+    if (Distance > radius * radius) return false;
+
+    XMVECTOR Start = XMLoadFloat3(&start);
+    XMVECTOR Vec2 = XMVectorSubtract(C1, Start);
+    float dist = XMVectorGetX(XMVector3Length(Vec2));
+
+    hitPosition = c1;
+    distance = dist;
+
+    return true;
+}

@@ -138,6 +138,10 @@ private:
 
 	// 飛行中に身体を傾ける処理
 	void bank(float elapsedTime);
+
+	// カメラの照準の先で、最初に当たる点を返す
+	DirectX::XMFLOAT3 GetAimPoint(float range); 
+
 private:
 	// =========================================================================
 	//  メンバ変数
