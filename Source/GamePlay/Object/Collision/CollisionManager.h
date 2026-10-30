@@ -9,6 +9,7 @@ class NormalMagic;
 class RapidMagic;
 class DefenseMagic;
 class Stage;
+class MagicManager;
 
 // 当たり判定の属性
 enum class CollisionTag : uint32_t
@@ -53,6 +54,7 @@ private:
 	// ヘルパー関数
 	bool IsCharacterTag(CollisionTag tag);
 	bool IsArenaTag(CollisionTag tag);
+	bool IsStageTag(CollisionTag tag);
 	bool IsMagicTag(CollisionTag tag);
 	bool IsDefenseTag(CollisionTag tag);
 	DirectX::XMFLOAT3 ComputeHitPosition(const Collider& magic, const Collider& target);
@@ -63,4 +65,7 @@ private:
 
 	// 集めたColliderを総当たりでチェックする
 	void CheckCollisions(std::vector<Collider>& colliders);
+
+	// 通常魔法（レーザー）をステージにレイキャストして判定する
+	void CheckMagicVsStage(MagicManager& magicMgr, Stage& stage);
 };

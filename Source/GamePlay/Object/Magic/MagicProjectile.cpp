@@ -51,6 +51,8 @@ void MagicProjectile::Update(float elapsedTime)
 
 		break;
 	case ProjectileState::Fire:
+		prevPosition = position;
+
 		if (moveComponent)
 		{
 			moveComponent->UpdateMove(position, direction, speed, elapsedTime);
@@ -165,6 +167,7 @@ void MagicProjectile::Launch(const DirectX::XMFLOAT3& dir, const DirectX::XMFLOA
 {
 	this->direction = dir;
 	this->position = pos;
+	this->prevPosition = pos;
 	this->waitTimer = waitTime;
 	this->state = ProjectileState::Wait;
 }

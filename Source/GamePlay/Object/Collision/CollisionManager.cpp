@@ -12,6 +12,10 @@ void CollisionManager::Update(Player& player, Enemy& enemy, Stage& stage)
 {
 	std::vector<Collider> colliders = GatherColliders(player, enemy, stage);
 	CheckCollisions(colliders);
+
+	// 魔法とステージはレイで判定する
+	CheckMagicVsStage(player.GetMagicManager(), stage);
+	CheckMagicVsStage(enemy.GetMagicManager(), stage);
 }
 
 // 当たった時の処理
@@ -81,12 +85,37 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		DirectX::XMFLOAT3 posA = targetA->GetPosition();
 		targetA->SetPosition({ posA.x + pushA.x, posA.y + pushA.y, posA.z + pushA.z });
 	}
-	// aが魔法系でbステージの処理
+	// aが魔法系でbがエリアの処理
 	else if (IsMagicTag(a.category) && IsArenaTag(b.category))
 	{
 		MagicBase* magic = static_cast<MagicBase*>(a.owner);
+		if (magic->GetMagicKind() == MagicKind::Rapid) magic->PlayHitEffect(a.pos);
 
 		// メモ：通常魔法はステージとヒットしたときに今いる位置からヒットした位置までの長さにする方法が無いから今は連射魔法だけ
+		magic->OnTerminate(); // 魔法は消える
+	}
+	// aが連射魔法でbがステージの処理（通常魔法はCheckLaserVsStageでレイ判定する）
+	else if (IsMagicTag(a.category) && IsStageTag(b.category))
+	{
+		MagicBase* magic = static_cast<MagicBase*>(a.owner);
+		Stage* stage = static_cast<Stage*>(b.owner);
+
+		// 少し手前から進行方向にレイを飛ばして、ステージの表面に当たった位置を探す
+		DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&a.dir));
+		float back = a.radius * 2.0f; // どれだけ手前から飛ばすか
+		DirectX::XMFLOAT3 start, dirF, hitPos, hitNormal;
+		DirectX::XMStoreFloat3(&start, DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&a.pos), DirectX::XMVectorScale(dir, back)));
+		DirectX::XMStoreFloat3(&dirF, dir);
+		float distance = back * 2.0f;
+
+		// 見つからなかったら今の位置で出す
+		if (!Collision::SphereCast(start, dirF, 0.1f, distance,
+			stage->GetTriangles(), stage->GetAreas(), hitPos, hitNormal, true))
+		{
+			hitPos = a.pos;
+		}
+
+		magic->PlayHitEffect(hitPos);
 		magic->OnTerminate(); // 魔法は消える
 	}
 }
@@ -97,10 +126,16 @@ bool CollisionManager::IsCharacterTag(CollisionTag tag)
 	return tag == CollisionTag::PlayerBody || tag == CollisionTag::EnemyBody;
 }
 
-// このタグはステージか？
+// このタグはエリアか？
 bool CollisionManager::IsArenaTag(CollisionTag tag)
 {
 	return tag == CollisionTag::Arena;
+}
+
+// このタグはステージか？
+bool CollisionManager::IsStageTag(CollisionTag tag)
+{
+	return tag == CollisionTag::Stage;
 }
 
 // このタグは魔法系か？
@@ -180,7 +215,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 	enemyBody.owner = &enemy;
 	colliders.push_back(enemyBody);
 
-	// ステージ
+	// 移動範囲
 	Collider areaCollition;
 	areaCollition.category = CollisionTag::Arena;
 	areaCollition.targetMask = static_cast<uint32_t>(CollisionTag::None);
@@ -209,7 +244,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 			playerMagic.targetMask =
 				static_cast<uint32_t>(CollisionTag::EnemyBody) |
 				static_cast<uint32_t>(CollisionTag::EnemyDefenseMagic) |
-				static_cast<uint32_t>(CollisionTag::EnemyNormalMagic);
+				static_cast<uint32_t>(CollisionTag::EnemyNormalMagic); // ステージはCheckLaserVsStageで判定
 		}
 		else// MagicKind::Rapid
 		{
@@ -217,7 +252,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 			playerMagic.targetMask = static_cast<uint32_t>(CollisionTag::EnemyBody)
 				| static_cast<uint32_t>(CollisionTag::EnemyDefenseMagic) |
 				static_cast<uint32_t>(CollisionTag::EnemyRapidMagic) |
-				static_cast<uint32_t>(CollisionTag::Stage);
+				static_cast<uint32_t>(CollisionTag::Arena);
 		}
 		playerMagic.shape = pMagic->GetShape();
 		playerMagic.pos = pMagic->GetPosition();
@@ -245,8 +280,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 			enemyMagic.targetMask = 
 				static_cast<uint32_t>(CollisionTag::PlayerBody)|
 				static_cast<uint32_t>(CollisionTag::PlayerDefenseMagic) |
-				static_cast<uint32_t>(CollisionTag::PlayerNomalMagic) |
-				static_cast<uint32_t>(CollisionTag::Arena);
+				static_cast<uint32_t>(CollisionTag::PlayerNomalMagic); // ステージはCheckLaserVsStageで判定
 
 		}
 		else// MagicKind::Rapid
@@ -256,7 +290,7 @@ std::vector<Collider> CollisionManager::GatherColliders(Player& player, Enemy& e
 				static_cast<uint32_t>(CollisionTag::PlayerBody)|
 				static_cast<uint32_t>(CollisionTag::PlayerDefenseMagic) |
 				static_cast<uint32_t>(CollisionTag::PlayerRapidMagic)|
-				static_cast<uint32_t>(CollisionTag::Stage);
+				static_cast<uint32_t>(CollisionTag::Arena);
 		}
 		enemyMagic.shape = eMagic->GetShape();
 		enemyMagic.pos = eMagic->GetPosition();
@@ -375,6 +409,52 @@ void CollisionManager::CheckCollisions(std::vector<Collider>& colliders)
 			{
 				ResolveCollision(a, b, outPosA, outPosB);
 			}
+		}
+	}
+}
+
+// 通常魔法（レーザー）をステージにレイキャストして、当たった所にエフェクトを出す
+void CollisionManager::CheckMagicVsStage(MagicManager& magicMgr, Stage& stage)
+{
+	using namespace DirectX;
+
+	for (int i = 0; i < magicMgr.GetMagicCount(); ++i)
+	{
+		MagicBase* magic = magicMgr.getMagic(i);
+		if (!magic->GetIsAlive()) continue;
+
+		XMFLOAT3 startF, dirF, hitPos, hitNormal;
+		float distance = magic->GetHeight(); // レーザーの長さ分だけ飛ばす
+		float castRadius = 0.1f;
+
+		if (magic->GetMagicKind() == MagicKind::Normal)
+		{
+			// レーザーの始点（posは真ん中なので半分戻す）
+			XMVECTOR dir = XMVector3Normalize(XMLoadFloat3(&magic->GetDirection()));
+			XMVECTOR start = XMVectorSubtract(XMLoadFloat3(&magic->GetPosition()),
+				XMVectorScale(dir, magic->GetHeight() * 0.5f));
+
+			XMStoreFloat3(&startF, start);
+			XMStoreFloat3(&dirF, dir);
+		}
+		else
+		{
+			// 前のフレームの位置から今の位置まで
+			XMVECTOR prev = XMLoadFloat3(&magic->GetPrevPosition());
+			XMVECTOR move = XMVectorSubtract(XMLoadFloat3(&magic->GetPosition()), prev);
+			distance = XMVectorGetX(XMVector3Length(move));
+			if (distance < 0.0001f) continue; // まだ動いてない
+
+			XMStoreFloat3(&startF, prev);
+			XMStoreFloat3(&dirF, XMVectorScale(move, 1.0f / distance));
+			castRadius = magic->GetRadius(); // 弾の大きさで当てる
+		}
+
+		if (Collision::SphereCast(startF, dirF, castRadius, distance,
+			stage.GetTriangles(), stage.GetAreas(), hitPos, hitNormal, true))
+		{
+			magic->PlayHitEffect(hitPos);
+			magic->OnTerminate(); // 魔法は消える
 		}
 	}
 }

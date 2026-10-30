@@ -104,6 +104,7 @@ public:
 		hitEffectScale = scale;
 	}
 	bool GetHitEffectPlayed() const { return hitEffectPlayed; }
+	const DirectX::XMFLOAT3& GetPrevPosition() const { return prevPosition; }
 protected:
 	// çsóÒçXêVèàóù 
 	void UpdateTransform();
@@ -129,4 +130,6 @@ protected:
 	std::string hitEffectName = "";
 	float hitEffectScale = 1.0f;
 	bool hitEffectPlayed = false;
+
+	DirectX::XMFLOAT3 prevPosition = {};
 };
