@@ -32,7 +32,7 @@
                     "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 18
+                    "type": 19
                 }
             ],
             "fromState": "AS_Knock_Down_Combat_Loop_Seq_0",
@@ -152,6 +152,7 @@
             "assetName": "",
             "config": {
                 "animationName": "",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -171,6 +172,7 @@
             "assetName": "",
             "config": {
                 "animationName": "",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -190,6 +192,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Hit_Combat_Air_Large_To_Floor_Loop_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "targetBoneName": "",
@@ -209,6 +212,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Knock_Down_Combat_Loop_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": true,
                 "targetBoneName": "",
@@ -228,6 +232,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Knock_Down_Combat_End_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -247,6 +252,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Get_Up_Combat_B_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",
@@ -266,6 +272,7 @@
             "assetName": "",
             "config": {
                 "animationName": "AS_Hit_Combat_Air_Large_To_Floor_End_Seq_0",
+                "bakeTranslationY": false,
                 "blendTime": 0.20000000298023224,
                 "loop": false,
                 "targetBoneName": "",

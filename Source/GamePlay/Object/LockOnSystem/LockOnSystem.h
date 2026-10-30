@@ -41,7 +41,12 @@ public:
 	void SetHardLock(bool flag) { hardLock = flag; }
 	bool IsHardLock() const { return hardLock; }
 
+	// 減速型エイムアシスト
 	float AimAssistScale();
+
+	// 追尾型エイムアシスト
+	DirectX::XMFLOAT2 GetTarckingAssist(const DirectX::XMFLOAT3& origin, bool hasInput);
+
 	
 	bool GetAuotAim() const { return autoAim; }
 	void SetAuotAim(bool flag) { autoAim = flag; }
@@ -68,5 +73,9 @@ private:
 	float lockAngle = 45.0f; // ロックオン判定の角度
 	float lockTime = 0.3; // ロックオン判定になるまでの時間(秒)
 	float leadError = 0.0f; // 偏差の誤差
-	bool autoAim = true;
+	bool autoAim = true; // オートエイムを使うか
+
+	DirectX::XMFLOAT2 prevTargetAngle = { 0, 0 }; // 前のフレームの角度
+	bool hasPrevAngle = false; // 前フレームの角度があるか
+	float trackingStrength = 1.0f; // 追従の強さ
 };

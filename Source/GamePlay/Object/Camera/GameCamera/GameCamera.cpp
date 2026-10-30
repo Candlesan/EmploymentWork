@@ -28,6 +28,14 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	float slow = 1.0f - assistStrength * assist;
 	float targetVelX = ay * rollSpeed * slow;
 	float targetVelY = ax * rollSpeed * slow;
+
+	bool hasInput = fabsf(ax) > 0.1f || fabsf(ay) > 0.1f; // 少しでも動かしていたらtrue
+	DirectX::XMFLOAT3 v = player.GetVelocity();
+	bool isMoving = (v.x * v.x + v.y * v.y + v.z * v.z) > 1.0f; // 秒速1m以上で移動中
+	float inputRate = hasInput ? 1.0f : (isMoving ? 0.5f : 0.0f);
+	DirectX::XMFLOAT2 track = player.GetLockOnSystem().GetTarckingAssist(player.GetPosition(), inputRate);
+	angle.x += track.x;
+	angle.y += track.y;
 	
 	// expf(-速さ * elapsedTime)必ず 0〜1 の範囲に収まる
 	float rotT = 1.0f - expf(-rotSpeed * elapsedTime);

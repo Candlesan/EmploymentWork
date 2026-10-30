@@ -68,8 +68,12 @@ void LockOnSystem::DrawGUI()
 		ImGui::Checkbox(u8"オートエイム", &autoAim);
 		ImGui::DragFloat(u8"ロックオンの感知距離", &range, 0.1f);
 		ImGui::DragFloat(u8"ロックオンの感知角度", &lockAngle, 0.1f);
-		ImGui::DragFloat(u8"エイムアシストの感知角度", &assistAngle, 0.1f);
 		ImGui::DragFloat(u8"ターゲット補足時間", &lockTime, 0.1f);
+		ImGui::Separator();
+
+		ImGui::DragFloat(u8"エイムアシストの感知角度", &assistAngle, 0.1f);
+		ImGui::DragFloat(u8"追尾の強さ", &trackingStrength, 0.1f);
+
 		ImGui::Separator();
 		ui.DrawGUI();
 	}
@@ -197,6 +201,49 @@ float LockOnSystem::AimAssistScale()
 	if (rate <= 0.0f) return 0.0f;
 
 	return rate;
+}
+
+// 追尾型エイムアシスト
+DirectX::XMFLOAT2 LockOnSystem::GetTarckingAssist(const DirectX::XMFLOAT3& origin, bool hasInput)
+{
+	float scale = AimAssistScale();
+	// アシスト範囲外ならリセット
+	if (scale <= 0.0f)
+	{
+		hasPrevAngle = false;
+		return { 0, 0 };
+	}
+
+	DirectX::XMFLOAT3 aimPos = target->GetPosition();
+	aimPos.y += 0.8f; // 敵の高さ
+
+	float dx = aimPos.x - origin.x;
+	float dy = aimPos.y - origin.y;
+	float dz = aimPos.z - origin.z;
+	float yaw = atan2f(dx, dz);
+	float pitch = -atan2f(dy, sqrtf(dx * dx + dz * dz));
+
+	// 初回だけ記録
+	if (!hasPrevAngle)
+	{
+		prevTargetAngle = { pitch, yaw };
+		hasPrevAngle = true;
+		return { 0, 0 }; // 記録だけやから0を返す
+	}
+
+	float dPitch = pitch - prevTargetAngle.x;
+	float dYaw = yaw - prevTargetAngle.y;
+
+	// ヨーが±πを超えた時
+	if (dYaw > DirectX::XM_PI) dYaw -= DirectX::XM_2PI;
+	if (dYaw < -DirectX::XM_PI) dYaw += DirectX::XM_2PI;
+
+	prevTargetAngle = { pitch, yaw };
+
+	if (!hasInput) return { 0, 0 };
+	float s = trackingStrength * scale;
+
+	return { dPitch * s, dYaw * s };
 }
 
 // ロックオンできるか

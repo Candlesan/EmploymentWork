@@ -32,7 +32,7 @@ private:
 	DirectX::XMFLOAT3 currentTarget = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 }; // 回転角度
 	DirectX::XMFLOAT2 currentRotVel = { 0.0f, 0.0f }; // x:縦回転, y:横回転
-	float rollSpeed = DirectX::XMConvertToRadians(120); // 回転速度
+	float rollSpeed = DirectX::XMConvertToRadians(80); // 回転速度
 	float rotSpeed = 15.0f;
 	float lockOnLerpSpeed = 10.0f;
 	float lerpSpeed = 5.0f;
@@ -45,7 +45,7 @@ private:
 	float targetFov = 0.0f;
 	
 	float radius = 0.2f; // カメラの当たり判定
-	float assistStrength = 0.7; // アシストの強さ(0～1)
+	float assistStrength = 0.4f; // アシストの強さ(0～1)
 
 	bool isInvertY = false; // true：リバース / false：ノーマル
 };
