@@ -31,11 +31,16 @@ private:
 	DirectX::XMFLOAT3 target = { 0, 0, 0 }; // ’‹“_
 	DirectX::XMFLOAT3 currentTarget = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 }; // ‰ñ“]Šp“x
+	DirectX::XMFLOAT3 offset = { 0.6f, 0.3f, 0.0f }; // ƒIƒtƒZƒbƒg
 	DirectX::XMFLOAT2 currentRotVel = { 0.0f, 0.0f }; // x:c‰ñ“], y:‰¡‰ñ“]
 	float rollSpeed = DirectX::XMConvertToRadians(80); // ‰ñ“]‘¬“x
 	float rotSpeed = 15.0f;
+
 	float lockOnLerpSpeed = 10.0f;
-	float lerpSpeed = 5.0f;
+	float lerpSpeed = 8.0f;
+	float maxLag = 10.0f;
+
+
 	float range = 10.0f; // ‹——£
 	float currentDistance = range;
 

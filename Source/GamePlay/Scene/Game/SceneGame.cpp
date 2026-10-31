@@ -165,7 +165,7 @@ void SceneGame::Update(float elapsedTime)
 	{
 		// ゲーム用のカメラ更新
 		DirectX::XMFLOAT3 target = player.GetPosition();
-		target.y += 2.0f; // 注視点を少し上にあげる
+		target.y += 1.2f; // 注視点を少し上にあげる
 		gameCamera->SetTarget(target);
 
 		gameCamera->Update(elapsedTime, stage->GetTriangles(), stage->GetAreas());

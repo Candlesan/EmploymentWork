@@ -43,6 +43,14 @@ DirectX::XMFLOAT2 Mathf::Lerp(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT
 	return { a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t };
 }
 
+float Mathf::Length(const DirectX::XMFLOAT3& vel)
+{
+	DirectX::XMVECTOR Length = DirectX::XMLoadFloat3(&vel);
+
+
+	return DirectX::XMVectorGetX(DirectX::XMVector3Length(Length));
+}
+
 // 3次エルミート補間によるイージング
 float Mathf::EaseCurve(float t, int startSpeed, int endSpeed)
 {

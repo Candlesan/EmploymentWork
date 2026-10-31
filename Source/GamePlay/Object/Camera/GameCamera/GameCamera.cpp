@@ -85,11 +85,14 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 		}
 	}
 
+	float speed = Mathf::Length(player.GetVelocity());
+	float followSpeed = (std::max)(lerpSpeed, speed / maxLag);
+
 	// 線形補間でターゲットをジワジワ追跡させる
 	// 10.0f の値を小さくするほど、揺れに対して鈍感（滑らか）になります
-	currentTarget.x += (target.x - currentTarget.x) * lerpSpeed * elapsedTime;
-	currentTarget.y += (target.y - currentTarget.y) * lerpSpeed * elapsedTime;
-	currentTarget.z += (target.z - currentTarget.z) * lerpSpeed * elapsedTime;
+	currentTarget.x += (target.x - currentTarget.x) * followSpeed * elapsedTime;
+	currentTarget.y += (target.y - currentTarget.y) * followSpeed * elapsedTime;
+	currentTarget.z += (target.z - currentTarget.z) * followSpeed * elapsedTime;
 
 	// カメラ回転値を回転行列に変換
 	DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
@@ -99,10 +102,20 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	DirectX::XMFLOAT3 front;
 	DirectX::XMStoreFloat3(&front, Front);
 
+	// カメラの右方向
+	DirectX::XMFLOAT3 right;
+	DirectX::XMStoreFloat3(&right, Transform.r[0]);
+
+	// カメラ基準でずらした注視点(出発点＋方向×動かす量)
+	DirectX::XMFLOAT3 pivot;
+	pivot.x = currentTarget.x + right.x * offset.x + front.x * offset.z;
+	pivot.y = currentTarget.y + offset.y + front.y * offset.z;
+	pivot.z = currentTarget.z + right.z * offset.x + front.z * offset.z;
+
 	DirectX::XMFLOAT3 eye;
 
 	// スタート地点を設定
-	DirectX::XMFLOAT3 origin = currentTarget;
+	DirectX::XMFLOAT3 origin = pivot;
 
 	// 飛ばす方向を設定(カメラと反対向き)
 	DirectX::XMFLOAT3 direction = { -front.x, -front.y, -front.z };
@@ -117,9 +130,9 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	if (Collision::SphereCast(origin, direction, radius, distance, stageTriangles, stageAreas, hitPosition, hitNormal, true)) 
 	{
 		// カメラとターゲットの距離を測る
-		float dx = hitPosition.x - currentTarget.x;
-		float dy = hitPosition.y - currentTarget.y;
-		float dz = hitPosition.z - currentTarget.z;
+		float dx = hitPosition.x - pivot.x;
+		float dy = hitPosition.y - pivot.y;
+		float dz = hitPosition.z - pivot.z;
 
 		// 距離が0以下になったら0.1にする
 		 desiredDistance = (std::max)(sqrtf(dx * dx + dy * dy + dz * dz), 0.1f);
@@ -138,9 +151,9 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	}
 
 	// 注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
-	eye.x = currentTarget.x - front.x * currentDistance;
-	eye.y = currentTarget.y - front.y * currentDistance;
-	eye.z = currentTarget.z - front.z * currentDistance;
+	eye.x = pivot.x - front.x * currentDistance;
+	eye.y = pivot.y - front.y * currentDistance;
+	eye.z = pivot.z - front.z * currentDistance;
 
 	targetFov = defaultFov;
 
@@ -177,18 +190,20 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 		camera.GetNear(),
 		camera.GetFar()
 	);
-	camera.SetLookAt(eye, currentTarget, DirectX::XMFLOAT3(0, 1, 0));
+	camera.SetLookAt(eye, pivot, DirectX::XMFLOAT3(0, 1, 0));
 }
 
 void GameCamera::DrawGUI()
 {
 	if (ImGui::CollapsingHeader(u8"調整"))
 	{
+		ImGui::DragFloat3(u8"オフセット", &offset.x, 0.01f, -3.0f, 3.0f);
 		ImGui::SliderAngle(u8"回転速度", &rollSpeed, 0.0f, 360.0f);
 		ImGui::DragFloat(u8"回転の追従", &rotSpeed, 0.1f, 0.0f, 50.0f);
 		ImGui::DragFloat(u8"距離", &range, 0.1f, 0.0f, 50.0f);
 		ImGui::DragFloat(u8"ロックオン追従", &lockOnLerpSpeed, 0.1f, 0.0f, 50.0f);
 		ImGui::DragFloat(u8"注視点追従", &lerpSpeed, 0.1f, 0.0f, 50.0f);
+		ImGui::DragFloat(u8"注視点追従補正", &maxLag, 0.1f, 0.0f, 50.0f);
 		ImGui::DragFloat(u8"当たり判定半径", &radius, 0.01f, 0.0f, 2.0f);
 		ImGui::DragFloat(u8"通常FOV", &defaultFov, 0.1f, 10.0f, 120.0f);
 		ImGui::DragFloat(u8"回避FOV", &maxFov, 0.1f, 10.0f, 120.0f);

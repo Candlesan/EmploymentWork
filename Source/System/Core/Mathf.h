@@ -18,6 +18,9 @@ public:
 
 	static DirectX::XMFLOAT2 Lerp(const DirectX::XMFLOAT2& a, const DirectX::XMFLOAT2& b, float t);
 
+	// 長さを返す関数
+	static float Length(const DirectX::XMFLOAT3& vel);
+
 	// 自作エフェクト用イージング関数 (t: 0.0~1.0, startSpeed: 0~6, endSpeed: 0~6)
 	static float EaseCurve(float t, int startSpeed, int endSpeed);
 };
