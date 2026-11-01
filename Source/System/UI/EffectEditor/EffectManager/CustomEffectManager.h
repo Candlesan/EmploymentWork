@@ -31,6 +31,13 @@ public:
 	EffectHandle PlayEffect(const std::string& effectName,
 		DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale);
 
+	// 常駐エフェクトを取得する
+	CustomEffect* GetOrCreateResident(const std::string& effectName);
+
+	// 常駐エフェクトを使って指定位置に1回だけ発生させる
+	void PlayBurst(const std::string& effectName,
+		DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale);
+
 	// 更新処理
 	void Update(float elapsedTime);
 
@@ -58,6 +65,7 @@ private:
 	ID3D11Device* device;
 
 	std::unordered_map<std::string, EffectConfig> effectConfigs; // キャッシュ用の箱
+	std::unordered_map<std::string, std::unique_ptr<CustomEffect>> residentEffects; // 常駐エフェクト
 
 	// Effekseerみたいにハンドルに変更
 	std::map<EffectHandle, std::unique_ptr<CustomEffect>> activeEffects;

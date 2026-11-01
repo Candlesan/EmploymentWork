@@ -77,6 +77,7 @@ void Player::Initialize()
 	InitializeHeadDirection(); // 頭の向きを初期化
 	CustomEffectManager::Instance().LoadEffectConfig("Barrier", "Data/Json/Effect/Barrier.json");
 	CustomEffectManager::Instance().LoadEffectConfig("Intercept", "Data/Json/Effect/Intercept.json");
+	CustomEffectManager::Instance().GetOrCreateResident("Intercept");
 }
 
 // シーケンサーの初期化
@@ -821,7 +822,7 @@ void Player::MagicInput(float elapsedTime)
 			RecoverMagic(targetMagic->GetMagicmagicRefund());
 			if (targetMagic->GetIsAlive())
 			{
-				CustomEffectManager::Instance().PlayEffect("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1,1 });
+				CustomEffectManager::Instance().PlayBurst("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1,1 });
 				targetMagic->OnTerminate();
 			}
 		}

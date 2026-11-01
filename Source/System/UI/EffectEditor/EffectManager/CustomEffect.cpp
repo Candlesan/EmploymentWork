@@ -185,10 +185,55 @@ void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, Dir
     }
 }
 
+// 常駐モード
+void CustomEffect::PlayResident()
+{
+    Play({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+    isResident = true;
+}
+
+// 指定位置で一回だけパーティクルを発生させる
+void CustomEffect::Burst(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& scale)
+{
+    this->position = position;
+    this->angle = angle;
+    this->scale = scale;
+    prevPosition = position;
+
+    // 新しい位置で行列を作り直してから出す
+    UpdateNodeTransforms();
+
+    for (auto& node : runTimeNodes)
+    {
+        if (node.config.type != RenderType::Particle) continue;
+        if (!node.config.visible) continue;
+
+        EmitNode(node);
+    }
+}
+
 // エフェクト更新
 void CustomEffect::Update(float elapsedTime)
 {
     if (!isPlaying) return;
+
+    // 常駐モードはタイムラインを進めずに粒の計算だけ進める
+    if (isResident)
+    {
+        ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+        for (auto& node : runTimeNodes)
+        {
+            if (!node.particleManager) continue;
+
+            node.particleManager->SetParent(node.worldTransform, false);
+            node.particleManager->SetBlendMode(node.config.blendMode);
+            node.particleManager->SetDissolve(node.config.dissolveMode,
+                node.config.dissolveSoftness);
+            node.particleManager->Update(dc, { 0.0f, 0.0f, 0.0f }, elapsedTime); // 移動差分は0
+        }
+
+        return;
+    }
 
     // タイマー更新
     effectTimer += elapsedTime;
@@ -267,23 +312,13 @@ void CustomEffect::Update(float elapsedTime)
         }
     } 
 
-    DirectX::XMMATRIX effectMatrix = ComputeEffectMatrix();
+    // ノードのワールド行列を計算する
+    UpdateNodeTransforms();
 
     // ２回目のループ（行列を作る）
     for (int i : updateOrder)
     {
         auto& node = runTimeNodes[i];
-
-        // 親のワールド行列(親なしならエフェクト全体の行列)
-        DirectX::XMMATRIX parentWorld = effectMatrix;
-        if (node.parentIndex != -1)
-        {
-            parentWorld = DirectX::XMLoadFloat4x4(&runTimeNodes[node.parentIndex].worldTransform);
-        }
-
-        // 非表示・まだ始まっていない・終わったノードも子のために行列は計算しておく
-        DirectX::XMMATRIX world = ComputeLocalMatrix(node) * parentWorld;
-        DirectX::XMStoreFloat4x4(&node.worldTransform, world);
 
         // トレイル
         if (node.config.type == RenderType::Trail && node.trail &&
@@ -464,197 +499,8 @@ void CustomEffect::EmitParticles(float elapsedTime)
 
         if (node.spawnTimer >=pConfig.spawnInterval)
         {
-            node.spawnTimer -=pConfig.spawnInterval;
-
-            // 生成数分 for 文で回す
-            for (int i = 0; i <pConfig.emitCount; i++)
-            {
-                compute_particle_system::emit_particle_data data;
-                data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-                data.parameter.x = static_cast<float>(pConfig.spriteType);
-                data.parameter.y =pConfig.lifeTime;
-                data.parameter.z =pConfig.uvScrollSpeed.x;
-                data.parameter.w =pConfig.uvScrollSpeed.y;
-
-                // フェードのスピードを設定する
-                int packedSpeed =
-                    (pConfig.fadeInStartSpeed)
-                    | (pConfig.fadeInEndSpeed << 4)
-                    | (pConfig.fadeOutStartSpeed << 8)
-                    | (pConfig.fadeOutEndSpeed << 12);
-
-                data.fade_param.x = pConfig.IsFadeIn  ? pConfig.fadeInTime : 0.0f;
-                data.fade_param.y = pConfig.IsFadeOut ? pConfig.fadeOutTime : 0.0f;
-                data.fade_param.z = pConfig.lifeTime;
-                data.fade_param.w = static_cast<float>(packedSpeed);
-
-                // 発生位置をワールド行列からとる
-                // 発生位置：相対位置モードならノードの原点から、そうでなければワールド座標で
-                DirectX::XMFLOAT3 origin = local ? DirectX::XMFLOAT3{ 0, 0, 0 }
-                : DirectX::XMFLOAT3{ node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
-
-                // 位置
-                data.position = {
-                 origin.x + (pConfig.positionRange.x * Mathf::RandFloat()),
-                 origin.y + (pConfig.positionRange.y * Mathf::RandFloat()),
-                 origin.z + (pConfig.positionRange.z * Mathf::RandFloat()),
-                   1.0f
-                };
-                // 初速度
-                if (pConfig.emitShape == 1)
-                {
-                    // ランダムな向き　×　ランダムな速さ（全方向に飛ばす）
-                    float z = Mathf::RandFloat(); // -1～1
-                    float theta = Mathf::RandomRange(0.0f, DirectX::XM_2PI);
-                    float r = sqrtf((std::max)(0.0f, 1.0f - z * z));
-                    float speed = Mathf::RandomRange(pConfig.burstSpeedMin, pConfig.burstSpeedMax);
-                    data.posVelocity = {
-                        pConfig.positionVelocity.x + r * cosf(theta) * speed,
-                        pConfig.positionVelocity.y + r * sinf(theta) * speed,
-                        pConfig.positionVelocity.z + z * speed,
-                        0.0f
-                    };
-                }
-                else
-                {
-                    data.posVelocity = {
-                        pConfig.positionVelocity.x + (pConfig.positionVelocityRange.x * Mathf::RandFloat()),
-                        pConfig.positionVelocity.y + (pConfig.positionVelocityRange.y * Mathf::RandFloat()),
-                        pConfig.positionVelocity.z + (pConfig.positionVelocityRange.z * Mathf::RandFloat()),
-                         0.0f
-                    };
-                }
-                // 加速度
-                data.posAcceleration = {
-                   pConfig.positionAcceleration.x + (pConfig.positionAccelerationRange.x * Mathf::RandFloat()),
-                   pConfig.positionAcceleration.y + (pConfig.positionAccelerationRange.y * Mathf::RandFloat()),
-                   pConfig.positionAcceleration.z + (pConfig.positionAccelerationRange.z * Mathf::RandFloat()),
-                   pConfig.drag
-                };
-
-                DirectX::XMFLOAT3 baseAngle = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : this->angle;
-
-                // 回転
-                data.rotation = {
-                    DirectX::XMConvertToRadians(baseAngle.x + (pConfig.rotation.x + (pConfig.rotationRange.x * Mathf::RandFloat()))),
-                    DirectX::XMConvertToRadians(baseAngle.y + (pConfig.rotation.y + (pConfig.rotationRange.y * Mathf::RandFloat()))),
-                    DirectX::XMConvertToRadians(baseAngle.z + (pConfig.rotation.z + (pConfig.rotationRange.z * Mathf::RandFloat()))),
-                    static_cast<float>(pConfig.billboardType)
-                };
-                data.rotVelocity = {
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.x + (pConfig.rotationVelocityRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.y + (pConfig.rotationVelocityRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationVelocity.z + (pConfig.rotationVelocityRange.z * Mathf::RandFloat())),
-                    0.0f
-                };
-                data.rotAcceleration = {
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.x + (pConfig.rotationAccelerationRange.x * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.y + (pConfig.rotationAccelerationRange.y * Mathf::RandFloat())),
-                    DirectX::XMConvertToRadians(pConfig.rotationAcceleration.z + (pConfig.rotationAccelerationRange.z * Mathf::RandFloat())),
-                    0.0f
-                };
-
-                int scaleEasingSpeed =
-                    (pConfig.scaleUniformStartSpeed)
-                    | (pConfig.scaleUniformEndSpeed << 4);
-
-                // 拡大
-                switch (pConfig.scaleMode)
-                {
-                case ScaleMode::Fixed: // 固定
-                    data.scale = {
-                        std::max(0.0f, this->scale.x * (pConfig.scale.x + (pConfig.scaleRange.x * Mathf::RandFloat()))),
-                        std::max(0.0f, this->scale.y * (pConfig.scale.y + (pConfig.scaleRange.y * Mathf::RandFloat()))),
-                        1.0f, 0.0f
-                    };
-                    data.scaleVelocity = {
-                        pConfig.scaleVelocity.x + (pConfig.scaleVelocityRange.x * Mathf::RandFloat()),
-                        pConfig.scaleVelocity.y + (pConfig.scaleVelocityRange.y * Mathf::RandFloat()),
-                        pConfig.scaleVelocity.z + (pConfig.scaleVelocityRange.z * Mathf::RandFloat()),
-                        0.0f
-                    };
-                    data.scaleAcceleration = {
-                        pConfig.scaleAcceleration.x + (pConfig.scaleAccelerationRange.x * Mathf::RandFloat()),
-                        pConfig.scaleAcceleration.y + (pConfig.scaleAccelerationRange.y * Mathf::RandFloat()),
-                        pConfig.scaleAcceleration.z + (pConfig.scaleAccelerationRange.z * Mathf::RandFloat()),
-                        0.0f
-                    };
-
-                    data.scale_param.x = -1.0f; // イージング無しのフラグ
-
-                    break;
-                case ScaleMode::UniformEasing: // 単一イージング
-
-                    // 中心 ± 振れ幅の範囲でランダムに実際の値を決める
-                    float actualStart = pConfig.scaleUniformStart
-                        + Mathf::RandomRange(-pConfig.scaleUniformStartRandom, pConfig.scaleUniformStartRandom);
-                    float actualEnd = pConfig.scaleUniformEnd
-                        + Mathf::RandomRange(-pConfig.scaleUniformEndRandom, pConfig.scaleUniformEndRandom);
-
-                    data.scaleUniformStart = this->scale.x * actualStart;
-                    data.scaleUniformEnd = this->scale.x * actualEnd;
-                    data.scale_param.x = scaleEasingSpeed;
-                    data.scale_param.y = pConfig.lifeTime;
-                    break;
-                }
-                data.scale_param.z = pConfig.stretchScale; // 速度方向に伸ばす量
-
-
-                int colorEasingSpeed =
-                    (pConfig.colorStartSpeed)
-                    | (pConfig.colorEndSpeed << 4);
-
-                // 色
-                switch (pConfig.colorMode)
-                {
-                case ColorMode::Fixed: // 固定
-                    data.color = pConfig.color;
-                    data.start_color = pConfig.color;
-                    data.end_color = pConfig.color;
-                    data.color_param.x = -1.0f; // イージング無しのフラグ
-                    data.color_param.y = pConfig.lifeTime;
-
-                    break;
-
-                case ColorMode::Random: // ランダム
-                    // 色をランダムで取得してcolorに入れる
-                    data.color.x = Mathf::RandomRange(pConfig.colorMin.x, pConfig.colorMax.x);
-                    data.color.y = Mathf::RandomRange(pConfig.colorMin.y, pConfig.colorMax.y);
-                    data.color.z = Mathf::RandomRange(pConfig.colorMin.z, pConfig.colorMax.z);
-                    data.color.w = Mathf::RandomRange(pConfig.colorMin.w, pConfig.colorMax.w);
-
-                    data.start_color = data.color;
-                    data.end_color = data.color;
-                    data.color_param.x = -1.0f;
-                    data.color_param.y = pConfig.lifeTime;
-
-
-                    break;
-
-                case ColorMode::Easing: // イージング
-                {
-                    // 始点の色を指定した範囲でランダムに取得
-                    data.start_color.x = Mathf::RandomRange(pConfig.colorStartMin.x, pConfig.colorStartMax.x);
-                    data.start_color.y = Mathf::RandomRange(pConfig.colorStartMin.y, pConfig.colorStartMax.y);
-                    data.start_color.z = Mathf::RandomRange(pConfig.colorStartMin.z, pConfig.colorStartMax.z);
-                    data.start_color.w = Mathf::RandomRange(pConfig.colorStartMin.w, pConfig.colorStartMax.w);
-
-                    // 終点の色を指定した範囲でランダムに取得
-                    data.end_color.x = Mathf::RandomRange(pConfig.colorEndMin.x, pConfig.colorEndMax.x);
-                    data.end_color.y = Mathf::RandomRange(pConfig.colorEndMin.y, pConfig.colorEndMax.y);
-                    data.end_color.z = Mathf::RandomRange(pConfig.colorEndMin.z, pConfig.colorEndMax.z);
-                    data.end_color.w = Mathf::RandomRange(pConfig.colorEndMin.w, pConfig.colorEndMax.w);
-
-                    data.color_param.x = colorEasingSpeed;
-                    data.color_param.y = pConfig.lifeTime;
-
-                    break;
-                }
-                }
-
-                node.particleManager->Emit(data);
-            }
+            node.spawnTimer -= pConfig.spawnInterval;
+            EmitNode(node);
         }
     }
 }
@@ -944,4 +790,223 @@ DirectX::XMFLOAT4 CustomEffect::ComputeNodeColor(const RuntimeNode& node) const
 
     finalColor.w *= alpha; // ← フェードを透明度に掛ける
     return finalColor;
+}
+
+// ノードのワールド行列を計算
+void CustomEffect::UpdateNodeTransforms()
+{
+    DirectX::XMMATRIX effectMatrix = ComputeEffectMatrix();
+
+    for (int i : updateOrder)
+    {
+        auto& node = runTimeNodes[i];
+
+        DirectX::XMMATRIX parentWorld = effectMatrix;
+
+        if (node.parentIndex != -1)
+        {
+            parentWorld = DirectX::XMLoadFloat4x4(&runTimeNodes[node.parentIndex].worldTransform);
+        }
+
+        DirectX::XMMATRIX world = ComputeLocalMatrix(node) * parentWorld;
+        DirectX::XMStoreFloat4x4(&node.worldTransform, world);
+    }
+}
+
+// 1ノード分のパーティクルを発生させる
+void CustomEffect::EmitNode(RuntimeNode& node)
+{
+
+    // 生成数分 for 文で回す
+    for (int i = 0; i < node.config.emitCount; i++)
+    {
+        // 常駐モードは位置が Burst のたびに変わるので、相対位置モードでもワールド座標で出す
+        const bool local = !isResident && (node.config.particleFollowMode == 1);
+
+        compute_particle_system::emit_particle_data data;
+        data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+        data.parameter.x = static_cast<float>(node.config.spriteType);
+        data.parameter.y = node.config.lifeTime;
+        data.parameter.z = node.config.uvScrollSpeed.x;
+        data.parameter.w = node.config.uvScrollSpeed.y;
+
+        // フェードのスピードを設定する
+        int packedSpeed =
+            (node.config.fadeInStartSpeed)
+            | (node.config.fadeInEndSpeed << 4)
+            | (node.config.fadeOutStartSpeed << 8)
+            | (node.config.fadeOutEndSpeed << 12);
+
+        data.fade_param.x = node.config.IsFadeIn ? node.config.fadeInTime : 0.0f;
+        data.fade_param.y = node.config.IsFadeOut ? node.config.fadeOutTime : 0.0f;
+        data.fade_param.z = node.config.lifeTime;
+        data.fade_param.w = static_cast<float>(packedSpeed);
+
+        // 発生位置をワールド行列からとる
+        // 発生位置：相対位置モードならノードの原点から、そうでなければワールド座標で
+        DirectX::XMFLOAT3 origin = local ? DirectX::XMFLOAT3{ 0, 0, 0 }
+        : DirectX::XMFLOAT3{ node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
+
+        // 位置
+        data.position = {
+         origin.x + (node.config.positionRange.x * Mathf::RandFloat()),
+         origin.y + (node.config.positionRange.y * Mathf::RandFloat()),
+         origin.z + (node.config.positionRange.z * Mathf::RandFloat()),
+           1.0f
+        };
+        // 初速度
+        if (node.config.emitShape == 1)
+        {
+            // ランダムな向き　×　ランダムな速さ（全方向に飛ばす）
+            float z = Mathf::RandFloat(); // -1～1
+            float theta = Mathf::RandomRange(0.0f, DirectX::XM_2PI);
+            float r = sqrtf((std::max)(0.0f, 1.0f - z * z));
+            float speed = Mathf::RandomRange(node.config.burstSpeedMin, node.config.burstSpeedMax);
+            data.posVelocity = {
+                node.config.positionVelocity.x + r * cosf(theta) * speed,
+                node.config.positionVelocity.y + r * sinf(theta) * speed,
+                node.config.positionVelocity.z + z * speed,
+                0.0f
+            };
+        }
+        else
+        {
+            data.posVelocity = {
+                node.config.positionVelocity.x + (node.config.positionVelocityRange.x * Mathf::RandFloat()),
+                node.config.positionVelocity.y + (node.config.positionVelocityRange.y * Mathf::RandFloat()),
+                node.config.positionVelocity.z + (node.config.positionVelocityRange.z * Mathf::RandFloat()),
+                 0.0f
+            };
+        }
+        // 加速度
+        data.posAcceleration = {
+           node.config.positionAcceleration.x + (node.config.positionAccelerationRange.x * Mathf::RandFloat()),
+           node.config.positionAcceleration.y + (node.config.positionAccelerationRange.y * Mathf::RandFloat()),
+           node.config.positionAcceleration.z + (node.config.positionAccelerationRange.z * Mathf::RandFloat()),
+           node.config.drag
+        };
+
+        DirectX::XMFLOAT3 baseAngle = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : this->angle;
+
+        // 回転
+        data.rotation = {
+            DirectX::XMConvertToRadians(baseAngle.x + (node.config.rotation.x + (node.config.rotationRange.x * Mathf::RandFloat()))),
+            DirectX::XMConvertToRadians(baseAngle.y + (node.config.rotation.y + (node.config.rotationRange.y * Mathf::RandFloat()))),
+            DirectX::XMConvertToRadians(baseAngle.z + (node.config.rotation.z + (node.config.rotationRange.z * Mathf::RandFloat()))),
+            static_cast<float>(node.config.billboardType)
+        };
+        data.rotVelocity = {
+            DirectX::XMConvertToRadians(node.config.rotationVelocity.x + (node.config.rotationVelocityRange.x * Mathf::RandFloat())),
+            DirectX::XMConvertToRadians(node.config.rotationVelocity.y + (node.config.rotationVelocityRange.y * Mathf::RandFloat())),
+            DirectX::XMConvertToRadians(node.config.rotationVelocity.z + (node.config.rotationVelocityRange.z * Mathf::RandFloat())),
+            0.0f
+        };
+        data.rotAcceleration = {
+            DirectX::XMConvertToRadians(node.config.rotationAcceleration.x + (node.config.rotationAccelerationRange.x * Mathf::RandFloat())),
+            DirectX::XMConvertToRadians(node.config.rotationAcceleration.y + (node.config.rotationAccelerationRange.y * Mathf::RandFloat())),
+            DirectX::XMConvertToRadians(node.config.rotationAcceleration.z + (node.config.rotationAccelerationRange.z * Mathf::RandFloat())),
+            0.0f
+        };
+
+        int scaleEasingSpeed =
+            (node.config.scaleUniformStartSpeed)
+            | (node.config.scaleUniformEndSpeed << 4);
+
+        // 拡大
+        switch (node.config.scaleMode)
+        {
+        case ScaleMode::Fixed: // 固定
+            data.scale = {
+                std::max(0.0f, this->scale.x * (node.config.scale.x + (node.config.scaleRange.x * Mathf::RandFloat()))),
+                std::max(0.0f, this->scale.y * (node.config.scale.y + (node.config.scaleRange.y * Mathf::RandFloat()))),
+                1.0f, 0.0f
+            };
+            data.scaleVelocity = {
+                node.config.scaleVelocity.x + (node.config.scaleVelocityRange.x * Mathf::RandFloat()),
+                node.config.scaleVelocity.y + (node.config.scaleVelocityRange.y * Mathf::RandFloat()),
+                node.config.scaleVelocity.z + (node.config.scaleVelocityRange.z * Mathf::RandFloat()),
+                0.0f
+            };
+            data.scaleAcceleration = {
+                node.config.scaleAcceleration.x + (node.config.scaleAccelerationRange.x * Mathf::RandFloat()),
+                node.config.scaleAcceleration.y + (node.config.scaleAccelerationRange.y * Mathf::RandFloat()),
+                node.config.scaleAcceleration.z + (node.config.scaleAccelerationRange.z * Mathf::RandFloat()),
+                0.0f
+            };
+
+            data.scale_param.x = -1.0f; // イージング無しのフラグ
+
+            break;
+        case ScaleMode::UniformEasing: // 単一イージング
+
+            // 中心 ± 振れ幅の範囲でランダムに実際の値を決める
+            float actualStart = node.config.scaleUniformStart
+                + Mathf::RandomRange(-node.config.scaleUniformStartRandom, node.config.scaleUniformStartRandom);
+            float actualEnd = node.config.scaleUniformEnd
+                + Mathf::RandomRange(-node.config.scaleUniformEndRandom, node.config.scaleUniformEndRandom);
+
+            data.scaleUniformStart = this->scale.x * actualStart;
+            data.scaleUniformEnd = this->scale.x * actualEnd;
+            data.scale_param.x = scaleEasingSpeed;
+            data.scale_param.y = node.config.lifeTime;
+            break;
+        }
+        data.scale_param.z = node.config.stretchScale; // 速度方向に伸ばす量
+
+
+        int colorEasingSpeed =
+            (node.config.colorStartSpeed)
+            | (node.config.colorEndSpeed << 4);
+
+        // 色
+        switch (node.config.colorMode)
+        {
+        case ColorMode::Fixed: // 固定
+            data.color = node.config.color;
+            data.start_color = node.config.color;
+            data.end_color = node.config.color;
+            data.color_param.x = -1.0f; // イージング無しのフラグ
+            data.color_param.y = node.config.lifeTime;
+
+            break;
+
+        case ColorMode::Random: // ランダム
+            // 色をランダムで取得してcolorに入れる
+            data.color.x = Mathf::RandomRange(node.config.colorMin.x, node.config.colorMax.x);
+            data.color.y = Mathf::RandomRange(node.config.colorMin.y, node.config.colorMax.y);
+            data.color.z = Mathf::RandomRange(node.config.colorMin.z, node.config.colorMax.z);
+            data.color.w = Mathf::RandomRange(node.config.colorMin.w, node.config.colorMax.w);
+
+            data.start_color = data.color;
+            data.end_color = data.color;
+            data.color_param.x = -1.0f;
+            data.color_param.y = node.config.lifeTime;
+
+
+            break;
+
+        case ColorMode::Easing: // イージング
+        {
+            // 始点の色を指定した範囲でランダムに取得
+            data.start_color.x = Mathf::RandomRange(node.config.colorStartMin.x, node.config.colorStartMax.x);
+            data.start_color.y = Mathf::RandomRange(node.config.colorStartMin.y, node.config.colorStartMax.y);
+            data.start_color.z = Mathf::RandomRange(node.config.colorStartMin.z, node.config.colorStartMax.z);
+            data.start_color.w = Mathf::RandomRange(node.config.colorStartMin.w, node.config.colorStartMax.w);
+
+            // 終点の色を指定した範囲でランダムに取得
+            data.end_color.x = Mathf::RandomRange(node.config.colorEndMin.x, node.config.colorEndMax.x);
+            data.end_color.y = Mathf::RandomRange(node.config.colorEndMin.y, node.config.colorEndMax.y);
+            data.end_color.z = Mathf::RandomRange(node.config.colorEndMin.z, node.config.colorEndMax.z);
+            data.end_color.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
+
+            data.color_param.x = colorEasingSpeed;
+            data.color_param.y = node.config.lifeTime;
+
+            break;
+        }
+        }
+
+        node.particleManager->Emit(data);
+    }
 }

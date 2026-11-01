@@ -51,6 +51,9 @@ void SceneGame::Initialize()
 	// ステージ初期化
 	stage = std::make_unique<Stage>();
 
+	// 自作エフェクトマネージャー初期化
+	CustomEffectManager::Instance().Initialize(device);
+
 	// プレイヤー初期化
 	Player& player = Player::Instance();
 	player.Initialize();
@@ -99,9 +102,6 @@ void SceneGame::Initialize()
 	// エフェクトエディター初期化
 	effectEditor = std::make_unique<EffectEditor>();
 	effectEditor->Initialize(device);
-
-	// 自作エフェクトマネージャー初期化
-	CustomEffectManager::Instance().Initialize(device);
 
 	// UIエディター初期化
 	uiEditor.Initialize(device);

@@ -15,6 +15,7 @@ void RapidMagic::Initialize()
 	// エフェクト作った時にロードする
 	CustomEffectManager::Instance().LoadEffectConfig(rapidMagic, "Data/Json/Effect/RapidFireMagic.json");
 	CustomEffectManager::Instance().LoadEffectConfig("RapidHit", "Data/Json/Effect/RapidHit.json");
+	CustomEffectManager::Instance().GetOrCreateResident("RapidHit");
 }
 
 // 魔法を生成

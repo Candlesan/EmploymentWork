@@ -41,6 +41,31 @@ EffectHandle CustomEffectManager::PlayEffect(const std::string& effectName, Dire
 	return handle;
 }
 
+// 常駐エフェクトを取得する(無ければつくる)
+CustomEffect* CustomEffectManager::GetOrCreateResident(const std::string& effectName)
+{
+	// こののエフェクトがあるか探す
+	auto it = residentEffects.find(effectName);
+	if (it != residentEffects.end()) return it->second.get(); // 既にあったら見つけたのを返す
+
+	// エフェクトを生成する
+	auto effect = CreateEffect(effectName);
+	if (!effect) return nullptr;
+
+	effect->PlayResident();
+	CustomEffect* ptr = effect.get();
+	residentEffects[effectName] = std::move(effect); // 所有権を渡してそれを返す
+
+	return ptr;
+}
+
+// 常駐エフェクトを使って指定位置に1回だけ発生させる
+void CustomEffectManager::PlayBurst(const std::string& effectName, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, DirectX::XMFLOAT3 scale)
+{
+	CustomEffect* effect = GetOrCreateResident(effectName);
+	if (effect) effect->Burst(position, angle, scale);
+}
+
 // 更新処理
 void CustomEffectManager::Update(float elapsedTime)
 {
@@ -58,6 +83,12 @@ void CustomEffectManager::Update(float elapsedTime)
 			++it;
 		}
 	}
+
+	// 常駐エフェクトの更新
+	for (auto& [name, effect] : residentEffects)
+	{
+		effect->Update(elapsedTime);
+	}
 }
 
 // 描画処理
@@ -68,6 +99,12 @@ void CustomEffectManager::Render(RenderContext& rc)
 	{
 		effect->Render(rc);
 	}
+
+	for (auto& [name, effect] : residentEffects)
+	{
+		effect->Render(rc);
+	}
+
 }
 
 // メッシュVFXの描画
@@ -93,6 +130,11 @@ void CustomEffectManager::RenderMeshVFX(ModelRenderer* modelRenderer)
 		effect->RenderMeshVFX(shader, rc);
 	}
 
+	for (auto& [name, effect] : residentEffects)
+	{
+		effect->RenderMeshVFX(shader, rc);
+	}
+
 	shader->End(rc);
 }
 
@@ -101,6 +143,7 @@ void CustomEffectManager::Clear()
 {
 	activeEffects.clear();
 	effectConfigs.clear();
+	residentEffects.clear();
 }
 
 std::unique_ptr<CustomEffect> CustomEffectManager::CreateEffect(const std::string& effectName)

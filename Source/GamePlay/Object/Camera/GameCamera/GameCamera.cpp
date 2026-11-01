@@ -232,8 +232,8 @@ void GameCamera::DrawGUI()
 
 		ImGui::DragFloat(u8"強さ", &testStrength, 0.01f, 0.0f, 2.0f);
 		ImGui::DragFloat(u8"時間", &testDuration, 0.01f, 0.0f, 3.0f);
-		ImGui::DragFloat3(u8"位置", &testPosition.x, 0.01f);
 		ImGui::DragFloat(u8"半径", &testRadius, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat3(u8"位置", &testPosition.x, 0.01f);
 		if (ImGui::Button(u8"揺らす"))
 		{
 			CameraShakeManager::Instance().Add(testPosition, testRadius, testStrength, testDuration);

@@ -45,7 +45,15 @@ void MagicBase::PlayHitEffect(const DirectX::XMFLOAT3& pos)
 	};
 
 	DirectX::XMFLOAT3 scale = { hitEffectScale, hitEffectScale, hitEffectScale };
-	CustomEffectManager::Instance().PlayEffect(hitEffectName, pos, angle, scale);
+
+	if (GetMagicKind() == MagicKind::Rapid)
+	{
+		CustomEffectManager::Instance().PlayBurst(hitEffectName, pos, angle, scale);
+	}
+	else
+	{
+		CustomEffectManager::Instance().PlayEffect(hitEffectName, pos, angle, scale);
+	}
 }
 
 // カメラシェイクを渡す関数

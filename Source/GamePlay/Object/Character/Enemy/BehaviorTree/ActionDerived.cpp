@@ -437,7 +437,7 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
 
         // 撃ち落とす
         owner->RecoverMagic(targetMagic->GetMagicmagicRefund());
-        CustomEffectManager::Instance().PlayEffect("Intercept", targetMagic->GetPosition(), {0, 0, 0}, {1.0f, 1.0f, 1.0f});
+        CustomEffectManager::Instance().PlayBurst("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1.0f, 1.0f, 1.0f });
         targetMagic->OnTerminate();
     }
 
