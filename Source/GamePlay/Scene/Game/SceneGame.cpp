@@ -8,6 +8,7 @@
 #include "System/UI/Dialog/Dialog.h"
 
 #include "Gameplay/Object/Camera/Camera.h"
+#include "GamePlay/Object/CameraShake/CameraShake.h"
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "Gameplay/Scene/Manager/SceneManager.h"
@@ -116,6 +117,7 @@ void SceneGame::Finalize()
 	Player& player = Player::Instance();
 	player.SetStage(stage.get());
 	enemy->SetStage(stage.get());
+	CameraShakeManager::Instance().Clear();
 	player.Finalize();
 }
 
@@ -168,6 +170,7 @@ void SceneGame::Update(float elapsedTime)
 		target.y += 1.2f; // 注視点を少し上にあげる
 		gameCamera->SetTarget(target);
 
+		CameraShakeManager::Instance().Update(elapsedTime);
 		gameCamera->Update(elapsedTime, stage->GetTriangles(), stage->GetAreas());
 	}
 	else
@@ -315,6 +318,7 @@ void SceneGame::Render()
 			player.RenderDebugPrimitive(shapeRenderer);
 			enemy->RenderDebugPrimitive(shapeRenderer);
 			stage->RenderDebugPrimitive(shapeRenderer);
+			CameraShakeManager::Instance().RenderDebugPrimitive(shapeRenderer);
 		}
 #endif // DEBUG
 

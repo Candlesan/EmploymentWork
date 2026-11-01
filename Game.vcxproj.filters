@@ -265,6 +265,9 @@
     <Filter Include="Source\GamepPlay\Object\LockOnSystem">
       <UniqueIdentifier>{9ab603c7-870d-4506-8557-60a6f7a7fbfa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\CameraShake">
+      <UniqueIdentifier>{8e44ed97-7217-477c-b89a-8f05f5df1fb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -618,6 +621,9 @@
     <ClInclude Include="Source\GamePlay\Object\Character\Enemy\EnemyUI.h">
       <Filter>Source\GamepPlay\Object\Character\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\CameraShake\CameraShake.h">
+      <Filter>Source\GamepPlay\Object\CameraShake</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -925,6 +931,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Character\Enemy\EnemyUI.cpp">
       <Filter>Source\GamepPlay\Object\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\CameraShake\CameraShake.cpp">
+      <Filter>Source\GamepPlay\Object\CameraShake</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

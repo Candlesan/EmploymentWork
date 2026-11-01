@@ -105,6 +105,9 @@ public:
 	}
 	bool GetHitEffectPlayed() const { return hitEffectPlayed; }
 	const DirectX::XMFLOAT3& GetPrevPosition() const { return prevPosition; }
+
+	// カメラシェイクを渡す関数
+	void SetHitShake(float strength, float duration, float radius);
 protected:
 	// 行列更新処理 
 	void UpdateTransform();
@@ -132,4 +135,8 @@ protected:
 	bool hitEffectPlayed = false;
 
 	DirectX::XMFLOAT3 prevPosition = {};
+
+	float hitShakeStrength = 0.0f; // 0なら揺らさない
+	float hitShakeDuration = 0.0f;
+	float hitShakeRadius = 0.0f;   // 0以下なら位置なしの揺れ
 };

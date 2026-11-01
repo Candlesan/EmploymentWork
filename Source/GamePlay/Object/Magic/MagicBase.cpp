@@ -1,6 +1,11 @@
-#include "GamePlay/Object/Magic/MagicBase.h"
-#include "GamePlay/Object/Magic/MagicManager.h"
+#include "MagicBase.h"
+
 #include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
+
+#include "GamePlay/Object/Magic/MagicManager.h"
+#include "GamePlay/Object/CameraShake/CameraShake.h"
+
+
 #include <algorithm>
 
 // コンストラクタ
@@ -21,8 +26,13 @@ void MagicBase::Destroy()
 // ヒットエフェクトを出す関数
 void MagicBase::PlayHitEffect(const DirectX::XMFLOAT3& pos)
 {
-	if (hitEffectName.empty()) return; // エフェクトが設定
 	if (hitEffectPlayed) return; 
+	hitEffectPlayed = true;
+
+	// カメラシェイク
+	CameraShakeManager::Instance().Add(pos, hitShakeRadius, hitShakeStrength, hitShakeDuration);
+
+	if (hitEffectName.empty()) return; // エフェクトが設定
 
 	// 進んでいた向きをエフェクトの角度にする
 	float yaw = atan2f(direction.x, direction.z);
@@ -36,8 +46,14 @@ void MagicBase::PlayHitEffect(const DirectX::XMFLOAT3& pos)
 
 	DirectX::XMFLOAT3 scale = { hitEffectScale, hitEffectScale, hitEffectScale };
 	CustomEffectManager::Instance().PlayEffect(hitEffectName, pos, angle, scale);
+}
 
-	hitEffectPlayed = true;
+// カメラシェイクを渡す関数
+void MagicBase::SetHitShake(float strength, float duration, float radius)
+{
+	hitShakeStrength = strength;
+	hitShakeDuration = duration;
+	hitShakeRadius = radius;
 }
 
 void MagicBase::UpdateTransform()

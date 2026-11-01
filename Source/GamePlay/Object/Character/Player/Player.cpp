@@ -7,6 +7,7 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
+#include "GamePlay/Object/CameraShake/CameraShake.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
 #include "GamePlay/Object/Stage/Stage.h"
 
@@ -785,6 +786,8 @@ void Player::MagicInput(float elapsedTime)
 		spawnInfo.angleY = angle.y;
 
 		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
+		CameraShakeManager::Instance().Add(0.05f, 0.15f); // 位置なし
+
 		magicCoolDownTimer = coolDownValue;
 		normalMagic.ResetCharge();
 		isShot = false;

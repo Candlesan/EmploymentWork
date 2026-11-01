@@ -53,4 +53,6 @@ private:
 	float assistStrength = 0.4f; // アシストの強さ(0～1)
 
 	bool isInvertY = false; // true：リバース / false：ノーマル
+
+	DirectX::XMFLOAT3 testPosition = { 0.0f, 0.0f, 0.0f };
 };

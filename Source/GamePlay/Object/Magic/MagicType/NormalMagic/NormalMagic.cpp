@@ -168,6 +168,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	magic->SetDamage(damage); // 生身へのダメージ
 	magic->SetGuardDamage(config.guardDamage); // 防御魔法へのダメージ
 	magic->SetHitEffect("NormalMagicHit");
+	magic->SetHitShake(0.15f, 0.4f, 15.0f);
 
 	// 魔力消費
 	if (info.owner != nullptr)

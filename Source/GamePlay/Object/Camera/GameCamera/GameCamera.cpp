@@ -5,6 +5,7 @@
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
 #include "GamePlay/Object/Character/Player/Player.h"
+#include "GamePlay/Object/CameraShake/CameraShake.h"
 
 #include <imgui.h>
 #include <algorithm>
@@ -182,6 +183,12 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 
 	currentFov += (targetFov - currentFov) * lerpFactor;
 
+	// カメラシェイク
+	DirectX::XMFLOAT3 shake = CameraShakeManager::Instance().GetOffset(player.GetPosition());
+	pivot.x += shake.x;
+	pivot.y += shake.y;
+	pivot.z += shake.z;
+
 	// カメラの視点と注視点を設定
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	camera.SetPerspectiveFov(
@@ -213,6 +220,24 @@ void GameCamera::DrawGUI()
 	{
 		ImGui::Text(u8"アシスト: %.2f", Player::Instance().GetLockOnSystem().AimAssistScale());
 		ImGui::DragFloat(u8"エイムアシストの強さ", &assistStrength, 0.1f, 0.0f, 1.0f);
+	}
+
+	if (ImGui::CollapsingHeader(u8"カメラシェイク"))
+	{
+		CameraShakeManager::Instance().DrawGUI();
+
+		static float testStrength = 0.1f;
+		static float testDuration = 0.3f;
+		static float testRadius = 1.0f;
+
+		ImGui::DragFloat(u8"強さ", &testStrength, 0.01f, 0.0f, 2.0f);
+		ImGui::DragFloat(u8"時間", &testDuration, 0.01f, 0.0f, 3.0f);
+		ImGui::DragFloat3(u8"位置", &testPosition.x, 0.01f);
+		ImGui::DragFloat(u8"半径", &testRadius, 0.01f, 0.0f, 10.0f);
+		if (ImGui::Button(u8"揺らす"))
+		{
+			CameraShakeManager::Instance().Add(testPosition, testRadius, testStrength, testDuration);
+		}
 	}
 
 	if (ImGui::CollapsingHeader(u8"状態"))

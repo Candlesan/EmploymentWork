@@ -133,6 +133,7 @@
     <ClInclude Include="External\ImGuizmo\ImSequencer.h" />
     <ClInclude Include="External\SphereCast\Include\SphereCast.h" />
     <ClInclude Include="Source\GamePlay\Framework.h" />
+    <ClInclude Include="Source\GamePlay\Object\CameraShake\CameraShake.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\Camera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
     <ClCompile Include="External\SphereCast\Include\SphereCast.cpp" />
     <ClCompile Include="Source\GamePlay\Framework.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\CameraShake\CameraShake.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\Camera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\DebugCamera\DebugCamera.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Camera\GameCamera\GameCamera.cpp" />

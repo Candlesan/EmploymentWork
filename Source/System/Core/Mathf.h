@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include <cstdlib>
 
 // 浮動小数算術
 class Mathf
@@ -23,4 +24,7 @@ public:
 
 	// 自作エフェクト用イージング関数 (t: 0.0~1.0, startSpeed: 0~6, endSpeed: 0~6)
 	static float EaseCurve(float t, int startSpeed, int endSpeed);
+
+	// 範囲：-1～1
+	static float GetRandRange() { return static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f; }
 };
