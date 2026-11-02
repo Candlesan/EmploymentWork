@@ -624,6 +624,9 @@
     <ClInclude Include="Source\GamePlay\Object\CameraShake\CameraShake.h">
       <Filter>Source\GamepPlay\Object\CameraShake</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Core\DebugConfig.h">
+      <Filter>Source\System\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">

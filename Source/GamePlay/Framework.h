@@ -1,7 +1,10 @@
 #pragma once
 #include "System/Core/HighResolutionTimer.h"
+
 #include "Gameplay/Scene/Manager/Scene.h"
+
 #include <windows.h>
+#include <memory>
 
 class Framework
 {
@@ -24,8 +27,15 @@ private:
 	const HWND				hWnd;
 	HighResolutionTimer		timer;
 	std::unique_ptr<Scene>	scene;
-	bool isFullscreen = false;
 	RECT windowedRect = {};
-	bool GUIDrawSwitch = true;
+
+	bool isFullscreen = false;
+
+#ifdef _DEBUG
+	bool GUIDrawSwitch = true; // デバックは起動時にGUIを表示する
+#else
+	bool GUIDrawSwitch = false; // リリースは起動時にGUIを非表示にする
+#endif // DEBUG
+
 	bool isF1PressedLastFrame = false;
 };

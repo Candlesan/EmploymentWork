@@ -181,6 +181,7 @@
     <ClInclude Include="Source\System\Audio\Audio.h" />
     <ClInclude Include="Source\System\Audio\AudioResource.h" />
     <ClInclude Include="Source\System\Audio\AudioSource.h" />
+    <ClInclude Include="Source\System\Core\DebugConfig.h" />
     <ClInclude Include="Source\System\Core\Easing.h" />
     <ClInclude Include="Source\System\Core\HighResolutionTimer.h" />
     <ClInclude Include="Source\System\Core\Input\GamePad.h" />

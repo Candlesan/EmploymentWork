@@ -1,10 +1,8 @@
-#include <memory>
-#include <sstream>
-#include <imgui.h>
-
 #include "Framework.h"
+
 #include "System/Graphic/Graphics.h"
 #include "System/Renderer/ImGuiRenderer/ImGuiRenderer.h"
+#include "System/Core/DebugConfig.h"
 #include "System/Core/Input/Input.h"
 #include "System/Effect/EffectManager.h"
 
@@ -13,6 +11,9 @@
 #include "GamePlay/Scene/Title/SceneTitle.h"
 #include "GamePlay/Scene/Game/SceneGame.h"
 #include "System/Audio/Audio.h"
+
+#include <sstream>
+#include <imgui.h>
 
 // 垂直同期間隔設定
 static const int syncInterval = 0;
@@ -77,7 +78,7 @@ Framework::~Framework()
 // 更新処理
 void Framework::Update(float elapsedTime)
 {
-#ifdef _DEBUG
+#if ENABLE_DEBUG_GUI
 	bool isF1DownNow = (GetAsyncKeyState(VK_F1) & 0x8000);
 	// GUIの表示/非表示切り替え
 	if (isF1DownNow && !isF1PressedLastFrame)
@@ -115,13 +116,11 @@ void Framework::Render(float elapsedTime)
 	// シーン描画処理
 	SceneManager::Instance().Render();
 
-#if _DEBUG
+#if ENABLE_DEBUG_GUI
 	// シーンGUI描画処理
 	if (GUIDrawSwitch)
 	{
 		SceneManager::Instance().DrawGUI();
-
-
 		// GUIでFPS表示
 		ImGui::Begin("FPS");
 		ImGuiIO& io = ImGui::GetIO();
