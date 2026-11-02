@@ -1192,7 +1192,7 @@ void Player::InputMove(float elapsedTime)
 		// 魔法中は敵の方を向く
 		TurnToPosition(elapsedTime, aimPos, turnSpeed);
 	}
-	else if ((status.isIntercept || status.isRapidFire) && flightController.IsFlying())
+	else if ((status.isIntercept || status.isRapidFire) && flightController.IsFlying() && lockOn.IsLocked())
 	{
 		// 空中で迎撃・連射している時だけ敵の方を向く
 		TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
