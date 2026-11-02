@@ -238,7 +238,7 @@ protected:
 	// 接地関係
 	const Stage* stage = nullptr;
 	float stepOffset = 0.3f; // 足元からの補正
-	float slopeLimit = DirectX::XMConvertToRadians(45.0f); // 角度で滑らせるか
+	float slopeLimit = DirectX::XMConvertToRadians(30.0f); // 角度で滑らせるか
 	float collisionRadius = 0.8f;
 	float BurstCoolDownScale = 3.0f; // バースト時のヒート値の回復倍率
 };

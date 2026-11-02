@@ -1,0 +1,106 @@
+{
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 16384,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 5
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Combo_Attack_04_01_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 16384,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 5
+                }
+            ],
+            "fromState": "AS_Combo_Attack_04_01_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": true,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -175.0,
+                -39.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": true,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                257.0,
+                -39.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Combo_Attack_04_01_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Combo_Attack_04_01_Seq_0",
+                "bakeTranslationY": true,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "spine_01",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -44.0,
+                -39.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
+}

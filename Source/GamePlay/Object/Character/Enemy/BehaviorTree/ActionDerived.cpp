@@ -299,6 +299,9 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         info.target = &Player::Instance();
         owner->SetIsRapidFire(true);
 
+        rapidMagic.SetEffect("RapidMagic");
+        rapidMagic.SetHitEffect("RapidHit");
+
         rapidMagic.Update(elapsedTime, &owner->GetMagicManager(), info, magicConfig, true);
 
         fireTimer -= elapsedTime;
@@ -400,6 +403,11 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
         phase = Phase::Start;
         owner->SetIsIntercept(false);
         owner->SetIsRapidFire(false);
+
+        // 撃つ前に見た目を迎撃用にする
+        rapidMagic.SetEffect("InterceptShot");
+        rapidMagic.SetHitEffect("Intercept");
+
         owner->StopOverlayAnimation();
         return State::Complete;
     }
@@ -430,6 +438,8 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
             // 連射で迎撃している間
             owner->SetIsIntercept(true);
             owner->SetIsRapidFire(true);
+
+            rapidFireConfig.speed = 80.0f;
 
             rapidMagic.Emit(&owner->GetMagicManager(), info, rapidFireConfig);
             fireTimer = rapidFireConfig.rapidInterval;

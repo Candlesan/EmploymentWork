@@ -257,6 +257,17 @@ void Player::Update(float elapsedTime)
 		// アニメーション遷移
 		UpdateStateTransitions(elapsedTime);
 
+		// 迎撃の構え：0.348秒で止める
+		if (currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
+			&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds && !status.isAvoid)
+		{
+			animator->SetUpperSpeed(0.0f);
+		}
+		else
+		{
+			animator->SetUpperSpeed(1.0f);
+		}
+
 		// 上半身のアニメーション遷移
 		UpdateUpperBodyTransitions(elapsedTime);
 	}
@@ -276,6 +287,13 @@ void Player::Update(float elapsedTime)
 
 	// アニメーション遷移
 	UpdateStateTransitions(elapsedTime);
+
+	// 迎撃の構え：0.348秒で止める
+	if (currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
+		&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds && !status.isAvoid)
+	{
+		animator->SetUpperSpeed(0.0f);
+	}
 
 	// 上半身のアニメーション遷移
 	UpdateUpperBodyTransitions(elapsedTime);
@@ -320,6 +338,9 @@ void Player::Update(float elapsedTime)
 
 	// ルックアット処理更新
 	UpdateLockAt(elapsedTime);
+
+	// 腕のIK
+	ArmIK(elapsedTime);
 
 	// モデル更新処理
 	UpdateTransform();
@@ -688,6 +709,8 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 void Player::MagicInput(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
+	MagicBase* targetMagic = nullptr;
+	auto& effectManager = CustomEffectManager::Instance();
 
 	// 連射魔法用にカメラの前方向を取得する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
@@ -698,37 +721,12 @@ void Player::MagicInput(float elapsedTime)
 	DirectX::XMVECTOR Target = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, rapidMagicConfig.speed * rapidMagicConfig.lifeTimer));
 	DirectX::XMStoreFloat3(&defultTarget, Target);
 
-	MagicBase* targetMagic = nullptr;
+	// LTを押したら
 	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
-
-	auto& effectManager = CustomEffectManager::Instance();
-	// 迎撃
-	if (status.isIntercept && !status.isDown)
-	{
-		// 迎撃の中心位置
-		DirectX::XMFLOAT3 centerPos = {
-			position.x + interceptCenterOffset.x,
-			position.y + interceptCenterOffset.y,
-			position.z + interceptCenterOffset.z
-		};
-
-		// 一番近い魔法を取得する
-		MagicManager& manager = enemy->GetMagicManager();
-		auto targets = manager.FindNearProjectiles(this, centerPos, interceptRadius);
-
-		if (!targets.empty())
-		{
-			targetMagic = targets[0]; // 一番近い敵の魔法
-
-			// 迎撃する方向を計算する
-			DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&targetMagic->GetPosition());
-			DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
-			DirectX::XMVECTOR dir = DirectX::XMVectorSubtract(magicPos, playerPos);
-			DirectX::XMStoreFloat3(&interceptDir, DirectX::XMVector3Normalize(dir));
-		}
-	}
+	status.isRapidFire = (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) != 0;
+	bool isHold = (rbButtonHoldTime > RB_THRESHOLD); // RB長押しでチャージ（消える可能性あり）
 	
-	bool isHold = (rbButtonHoldTime > RB_THRESHOLD);
+	// 通常魔法系更新
 	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
 	// 通常魔法の発射位置を計算する
@@ -738,14 +736,13 @@ void Player::MagicInput(float elapsedTime)
 		position.z + normalMagicConfig.spawnOffset.z,
 	};
 
-
 	// ボタンを離したら予約をする
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
 	{
 		isShot = true;
 	}
 
-	// チャージ魔法
+	// チャージ魔法 (今後通所魔法と置き換えになるか消えるかもしれやん)
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
 	{
 		if (normalMagic.IsFullCharged())
@@ -794,11 +791,68 @@ void Player::MagicInput(float elapsedTime)
 		isShot = false;
 	}
 
-	// 連射魔法
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER && CanControl())
+	// 迎撃
+	if (status.isIntercept && CanControl())
 	{
-		status.isRapidFire = true;
+		if(flightController.IsFlying())
+		PlayActionGraph("Intercept");
 
+		// 迎撃の中心位置
+		DirectX::XMFLOAT3 centerPos = {
+			position.x + interceptCenterOffset.x,
+			position.y + interceptCenterOffset.y,
+			position.z + interceptCenterOffset.z
+		};
+
+		// 一番近い魔法を取得する
+		MagicManager& manager = enemy->GetMagicManager();
+		auto targets = manager.FindNearProjectiles(this, centerPos, interceptRadius);
+		if (!targets.empty())
+		{
+			targetMagic = targets[0];
+		}
+
+		if (targetMagic)
+		{
+			// 迎撃する方向を計算する
+			DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&targetMagic->GetPosition());
+			DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
+			DirectX::XMStoreFloat3(&interceptDir, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(magicPos, playerPos)));
+
+			// 撃つ前に見た目を迎撃用にする
+			rapidMagic.SetEffect("InterceptShot");
+			rapidMagic.SetHitEffect("Intercept");
+
+			// 魔法の設定
+			MagicSpawnInfo spawnInfo;
+			spawnInfo.position = position;
+			spawnInfo.direction = interceptDir;
+			spawnInfo.owner = this;
+			spawnInfo.target = enemy;
+			spawnInfo.targetPos = targetMagic->GetPosition();
+
+			rapidMagicConfig.damage = 0.0f;
+			rapidMagicConfig.gaurdDamage = 0.0f;
+			rapidMagicConfig.hitRadius = 0.25f;
+			rapidMagicConfig.speed = 80.0f;
+
+			rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, true);
+
+			// 敵が連射魔法なら撃ち落とす
+			if (targetMagic->GetMagicKind() == MagicKind::Rapid && targetMagic->GetIsAlive())
+			{
+				RecoverMagic(targetMagic->GetMagicmagicRefund());
+				CustomEffectManager::Instance().PlayBurst("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1, 1 });
+				CameraShakeManager::Instance().Add(targetMagic->GetPosition(), 10.0f, 0.5f, 0.1f);
+				targetMagic->OnTerminate();
+			}
+		}
+	}
+	// 連射魔法
+	else if (status.isRapidFire && CanControl())
+	{
+		rapidMagic.SetEffect("RapidMagic");
+		rapidMagic.SetHitEffect("RapidHit");
 		// 魔法の設定
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
@@ -815,21 +869,6 @@ void Player::MagicInput(float elapsedTime)
 
 		// 連射魔法を呼び出す
 		rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, status.isRapidFire);
-
-		// 敵が連射魔法なら撃ち落とす
-		if (targetMagic && targetMagic->GetMagicKind() == MagicKind::Rapid)
-		{
-			RecoverMagic(targetMagic->GetMagicmagicRefund());
-			if (targetMagic->GetIsAlive())
-			{
-				CustomEffectManager::Instance().PlayBurst("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1,1 });
-				targetMagic->OnTerminate();
-			}
-		}
-	}
-	else
-	{
-		status.isRapidFire = false;
 	}
 
 	// 防御魔法
@@ -1090,13 +1129,15 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
+	bool isAimDodge = lockOn.IsHardLock() || status.isIntercept;
+
+	if ((currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0"))
 	{
 		// 魔法中は移動速度を0にする
 		velocity = { 0, 0, 0 };
 	}
 	if (currentState == "AS_Dodge_Combat_to_Run_Fast_F_0_Seq_0" ||
-		(lockOn.IsHardLock() && currentState.rfind("AS_Dodge_Combat_to_Run_", 0) == 0))
+		(isAimDodge && currentState.rfind("AS_Dodge_Combat_to_Run_", 0) == 0))
 	{
 		// 回避中は
 		Move(moveVec.x, moveVec.z, moveSpeed * 1.0f);
@@ -1137,10 +1178,11 @@ void Player::InputMove(float elapsedTime)
 		// 魔法中は敵の方を向く
 		TurnToPosition(elapsedTime, aimPos, turnSpeed);
 	}
-	//else if (lockOn.IsHardLock())
-	//{
-	//	TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
-	//}
+	else if ((status.isIntercept || status.isRapidFire) && flightController.IsFlying())
+	{
+		// 空中で迎撃・連射している時だけ敵の方を向く
+		TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
+	}
 	else
 	{
 		Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
@@ -1658,6 +1700,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.IsDead = IsDead();
 	ctx.currentHP = status.currentHp;
+	ctx.IsAiming = status.isIntercept;
 
 	// 移動速度を計算する
 	const DirectX::XMFLOAT3 v = GetVelocity();
@@ -1857,7 +1900,7 @@ void Player::UpdateLockAt(float elapsedTime)
 	float targetWeight = 0.0f;
 	bool isMagicEndingSoon = false;
 
-	if (currentOverlayState == "State_Magic")
+	if (currentOverlayState == "Intercept")
 	{
 		float currentSec = animator->GetUpperCurrentSeconds();
 		float lengthSec = animator->GetUpperAnimationLength();
@@ -1869,7 +1912,7 @@ void Player::UpdateLockAt(float elapsedTime)
 	}
 
 	// 範囲内かつ、内積が前方を向いているとき
-	if (((enemyFromDistance <= 10.0f && dot >= 0.0f) || currentOverlayState == "State_Magic") && !isMagicEndingSoon)
+	if (((enemyFromDistance <= 10.0f && dot >= 0.0f) || currentOverlayState == "Intercept") && !isMagicEndingSoon)
 	{
 		targetWeight = 1.0f;
 	}
@@ -2054,6 +2097,63 @@ void Player::bank(float elapsedTime)
 
 	angle.x = flightBankX;
 	angle.z = flightBankZ;
+}
+
+// 腕のIK
+void Player::ArmIK(float elapsedTime)
+{
+	if (status.isAvoid) return;
+	// ＝＝＝＝＝＝ 今は迎撃の時だけ ＝＝＝＝＝＝
+	
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	// 構えで止まっている間だけ腕を向ける
+	bool isStance = !isGround
+		&& currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
+		&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds
+		&& !(gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER);
+
+	// 腕を敵に向ける時に補完する
+	float targetWeight = isStance ? 1.0f : 0.0f;
+	armAimWeight += (targetWeight - armAimWeight) * 10.0f * elapsedTime;
+	if (armAimWeight <= 0.001f) { armAimWeight = 0.0f; return; }
+
+	// 左肩と左手のボーンを取得する
+	int armIndex = player->GetNodeIndex("upperarm_l");
+	int handIndex = player->GetNodeIndex("hand_l");
+	if (armIndex < 0 || handIndex < 0 || !enemy) return; // 無かったらreturn
+
+	Model::Node& armNode = player->GetNodes().at(armIndex);
+	Model::Node& handNode = player->GetNodes().at(handIndex);
+
+	// 肩のローカル空間に変換する行列
+	DirectX::XMMATRIX ArmWorld = DirectX::XMLoadFloat4x4(&armNode.worldTransform);
+	DirectX::XMMATRIX InvArmWorld = DirectX::XMMatrixInverse(nullptr, ArmWorld);
+
+	// 今の肩から手首への向き（ローカル）
+	DirectX::XMVECTOR HandWorld = DirectX::XMVectorSet(
+		handNode.worldTransform._41, handNode.worldTransform._42, handNode.worldTransform._43, 1.0f);
+	DirectX::XMVECTOR LocalForward = DirectX::XMVector3Normalize(DirectX::XMVector3Transform(HandWorld, InvArmWorld));
+
+	// 肩から敵への向き（ローカル）
+	DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
+	enemyPos.y += interceptAimHeight; // 敵の胸のあたりを狙う
+	DirectX::XMVECTOR TargetLocal = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&enemyPos), InvArmWorld);
+	DirectX::XMVECTOR LocalDirection = DirectX::XMVector3Normalize(TargetLocal);
+
+	// 回転軸と角度
+	DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(LocalForward, LocalDirection);
+	if (DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(Axis)) < 1e-6f) return; // すでに向いている
+	Axis = DirectX::XMVector3Normalize(Axis);
+
+	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(LocalForward, LocalDirection));
+	float rotAngle = acosf(std::clamp(dot, -1.0f, 1.0f));
+	rotAngle = (std::min)(rotAngle, DirectX::XMConvertToRadians(interceptArmMaxAngle)); // 肩が壊れないように制限
+
+	// 今の回転に足す
+	DirectX::XMVECTOR CurrentRot = DirectX::XMLoadFloat4(&armNode.rotation);
+	DirectX::XMVECTOR AddRot = DirectX::XMQuaternionRotationAxis(Axis, rotAngle * armAimWeight);
+	DirectX::XMStoreFloat4(&armNode.rotation, DirectX::XMQuaternionMultiply(AddRot, CurrentRot));
 }
 
 // 狙う点を返す

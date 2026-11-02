@@ -12,10 +12,17 @@
 // 初期化
 void RapidMagic::Initialize()
 {
-	// エフェクト作った時にロードする
-	CustomEffectManager::Instance().LoadEffectConfig(rapidMagic, "Data/Json/Effect/RapidFireMagic.json");
-	CustomEffectManager::Instance().LoadEffectConfig("RapidHit", "Data/Json/Effect/RapidHit.json");
-	CustomEffectManager::Instance().GetOrCreateResident("RapidHit");
+	auto& effectManager = CustomEffectManager::Instance();
+
+	// 連射魔法
+	effectManager.LoadEffectConfig("RapidMagic", "Data/Json/Effect/RapidFireMagic.json");
+	effectManager.LoadEffectConfig("RapidHit", "Data/Json/Effect/RapidHit.json");
+	effectManager.GetOrCreateResident("RapidHit");
+
+	// 迎撃
+	effectManager.LoadEffectConfig("InterceptShot", "Data/Json/Effect/InterceptShot.json");
+	effectManager.LoadEffectConfig("Intercept", "Data/Json/Effect/Intercept.json");
+	effectManager.GetOrCreateResident("Intercept");
 }
 
 // 魔法を生成
@@ -108,7 +115,7 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetLifeTimer(config.lifeTimer);		// 射程(生存時間)
 	magic->SetWaitTimer(0.0f);
 	magic->SetIsAlive(true);
-	magic->SetHitEffect("RapidHit", 1.0f);
+	magic->SetHitEffect(rapidHitEfc, 1.0f);
 
 	// 発射
 	magic->Launch(dir, startPos, 0.0f);

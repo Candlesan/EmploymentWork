@@ -36,6 +36,7 @@ enum class TransitionConditionType
 	MoveSpeed,			// 移動速度
 	IsDead,				// 今死んだか
 	currentHP,			// 現在の体力
+	IsAiming,
 };
 
 enum class TransitionActionType
@@ -105,5 +106,6 @@ struct TransitionContext
 	bool IsFalling;
 	bool IsDown;
 	bool IsDead;
+	bool IsAiming;
 	RelativeInputDir inputDir;
 };

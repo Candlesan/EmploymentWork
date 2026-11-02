@@ -34,6 +34,8 @@ struct AnimLayer {
 	float fadeOutSeconds = 0.0f;
 	float fadeOutLength = 0.2;
 	std::vector<Model::NodePose> fadeOutOldPose;
+
+	float speed = 1.0f; // 再生速度
 };
 
 // アニメーション専門のクラス
@@ -61,6 +63,8 @@ public:
 	void StopUpper();
 
 	void SetBankAngle(float angle) { bankAngle = angle; }
+
+	void SetUpperSpeed(float s) { upperLayer.speed = s; }
 private:
 	std::shared_ptr<Model> targetModel; // 動かす対象のモデル
 

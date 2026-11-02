@@ -156,7 +156,8 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			break;
 
 		case TransitionConditionType::ButtonHeld:
-			result = (ctx.HoldTime >= cond.threshold);
+			result = (ctx.buttonHeld & cond.buttonMask) != 0
+				&& ctx.HoldTime >= cond.threshold;
 			break;
 
 		case TransitionConditionType::IsGround:
@@ -208,6 +209,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 
 		case TransitionConditionType::currentHP:
 			result = (ctx.currentHP >= cond.threshold);
+			break;
+
+		case TransitionConditionType::IsAiming:
+			result = ctx.IsAiming;
 			break;
 
 		case TransitionConditionType::Always:

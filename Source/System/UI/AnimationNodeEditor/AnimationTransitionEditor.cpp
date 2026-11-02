@@ -758,6 +758,7 @@ void AnimationTransitionEditor::DrawSelectedLinkEditor(AnimationTransitionGraph&
 				{ "IsDown",			TransitionConditionType::IsDown },
 				{ "IsDead",			TransitionConditionType::IsDead },
 				{ "currentHP",			TransitionConditionType::currentHP },
+				{ "IsAiming", TransitionConditionType::IsAiming },
 
 				{ "Always",				TransitionConditionType::Always },
 			};

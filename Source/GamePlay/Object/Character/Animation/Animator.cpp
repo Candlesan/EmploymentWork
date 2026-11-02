@@ -40,6 +40,7 @@ void Animator::PlayUpper(int animIndex, bool loop, const std::string& boneName, 
 	upperLayer.blendSecondsLength = blendTime;
 	upperLayer.currentSeconds = 0.0f;
 	upperLayer.rootBoneName = boneName;
+	upperLayer.speed = 1.0f;
 
 	upperLayer.mixAnimationIndex = -1;
 }
@@ -86,6 +87,7 @@ void Animator::PlayUpperMix(int animIndexA, int animIndexB, float mixRate, bool 
 	upperLayer.blendSecondsLength = blendTime;
 	upperLayer.currentSeconds = 0.0f;
 	upperLayer.rootBoneName = boneName;
+	upperLayer.speed = 1.0f;
 }
 
 // 更新処理
@@ -316,8 +318,8 @@ DirectX::XMFLOAT3 Animator::Update(float elapsedTime, const DirectX::XMFLOAT4X4&
 		}
 
 		upperLayer.oldSeconds = upperLayer.currentSeconds;
-		upperLayer.currentSeconds += elapsedTime;
-		upperLayer.mixcurrentSeconds += elapsedTime;
+		upperLayer.currentSeconds += elapsedTime * upperLayer.speed;
+		upperLayer.mixcurrentSeconds += elapsedTime * upperLayer.speed;
 
 		if (upperLayer.currentSeconds >= upperAnim.secondsLength)
 		{
@@ -404,4 +406,5 @@ void Animator::StopUpper()
 	upperLayer.isFadeingOut = true;
 	upperLayer.fadeOutSeconds = 0.0f;
 	upperLayer.mixAnimationIndex = -1;
+	upperLayer.speed = 1.0f;
 }

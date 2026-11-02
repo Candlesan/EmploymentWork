@@ -85,6 +85,7 @@ public:
         }
     };
 
+public:
     // 初期化
     void Initialize();
 
@@ -97,8 +98,13 @@ public:
     // GUI描画 (config を参照で受け取る！)
     void DrawGUI(RapidMagicConfig& config);
 
+   // エフェクト用のセッター
+    void SetEffect(const std::string& effectName) { rapidMagic = effectName; }
+    void SetHitEffect(const std::string& hitEffectName) { rapidHitEfc = hitEffectName; }
+
 private:
-    std::string rapidMagic = "RapidFireMagic"; 
+    std::string rapidMagic = "RapidMagic"; // エフェクト本体
+    std::string rapidHitEfc = "RapidHit"; // ヒットエフェクト
     int currentSpawnIndex = 0;
     float rapidTimer = 0.0f;
     std::mt19937 rng{ std::random_device{}() };

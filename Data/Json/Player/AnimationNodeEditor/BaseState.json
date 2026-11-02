@@ -1109,6 +1109,26 @@
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/NormalMagicAttack.json",
             "type": 1
+        },
+        {
+            "StateName": "Intercept",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": true,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -383.0,
+                -183.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Intercept.json",
+            "type": 1
         }
     ]
 }

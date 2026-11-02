@@ -118,7 +118,6 @@ private:
 
 	// ── 物理・タイマー・その他 ──
 	void UpdateTimers(float elapsedTime);
-	void UpdateLockAt(float elapsedTime);
 	void CalculateStatusParameters();
 	void CalculateSpineRotation(float elapsedTime);
 
@@ -136,8 +135,14 @@ private:
 
 	void TurnToPosition(float elapsedTime, const DirectX::XMFLOAT3& target, float speed);
 
+	// ルックアット処理
+	void UpdateLockAt(float elapsedTime);
+
 	// 飛行中に身体を傾ける処理
 	void bank(float elapsedTime);
+
+	// 腕のIK
+	void ArmIK(float elapsedTime);
 
 	// カメラの照準の先で、最初に当たる点を返す
 	DirectX::XMFLOAT3 GetAimPoint(float range); 
@@ -192,6 +197,9 @@ private:
 	float flightBankX = 0.0f; // 飛行中のX軸の傾き
 	float flightBankZ = 0.0f; // 飛行中のZ軸の傾き
 	float bankSpeed = 5.0f; // 傾く速度
+	float armAimWeight = 0.0f;           // 腕を向ける強さ（0～1）
+	float interceptAimHeight = 1.2f;     // 敵のどの高さを狙うか
+	float interceptArmMaxAngle = 90.0f;  // 腕を回せる最大角度
 
 	// ── 入力バッファ・閾値・デバッグ ──
 	int bufferedButton = 0;
@@ -232,4 +240,6 @@ private:
 	bool showPlayerParameter = true;
 	bool showPlayer = true;
 	bool wasBreak = false;
+
+	float interceptStanceStopSeconds = 0.348f;
 };
