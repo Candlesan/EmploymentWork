@@ -791,11 +791,25 @@ void Player::MagicInput(float elapsedTime)
 		isShot = false;
 	}
 
+	// 通常攻撃中か（全身アニメなので構えの上半身を被せない）
+	bool isNormalAttack = isShot
+		|| currentState == "AS_Combo_Attack_04_02_Seq_0"
+		|| currentState == "AS_Combo_Attack_03_04_Seq_0";
+
+	// 通常攻撃が始まったら構えを解除する
+	if (isNormalAttack && !upperGraphStack.empty()
+		&& transitionGraphs[upperGraphStack.back()].graphName == "Intercept")
+	{
+		StopOverlayAnimation();
+		upperGraphStack.clear(); // Interceptは単独で積まれるのでまとめて下ろす
+	}
+
 	// 迎撃
 	if (status.isIntercept && CanControl())
 	{
-		if(flightController.IsFlying())
-		PlayActionGraph("Intercept");
+		// 通常攻撃中は構えに入らない
+		if (flightController.IsFlying() && !isNormalAttack)
+			PlayActionGraph("Intercept");
 
 		// 迎撃の中心位置
 		DirectX::XMFLOAT3 centerPos = {
@@ -2110,8 +2124,7 @@ void Player::ArmIK(float elapsedTime)
 	// 構えで止まっている間だけ腕を向ける
 	bool isStance = !isGround
 		&& currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
-		&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds
-		&& !(gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER);
+		&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds;
 
 	// 腕を敵に向ける時に補完する
 	float targetWeight = isStance ? 1.0f : 0.0f;
