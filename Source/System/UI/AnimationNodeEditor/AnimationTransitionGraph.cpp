@@ -215,6 +215,10 @@ bool AnimationTransitionGraph::EvaluateConditions(
 			result = ctx.IsAiming;
 			break;
 
+		case TransitionConditionType::IsFlying:
+			result = ctx.IsFlying;
+			break;
+
 		case TransitionConditionType::Always:
 			result = true;
 			break;

@@ -69,12 +69,6 @@ void FlightController::Update(Character* character, float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	// ”òs’†‚È‚ç‚²‚­”÷—Ê‚Ì–‚—Í‚ðÁ”ï
-	if (currentMode != FlightMode::OFF)
-	{
-		character->ConsumMagic(1.0f * elapsedTime, 0.0f);
-	}
-
 	switch (currentMode)
 	{
 	case FlightMode::OFF:

@@ -1715,6 +1715,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.IsDead = IsDead();
 	ctx.currentHP = status.currentHp;
 	ctx.IsAiming = status.isIntercept;
+	ctx.IsFlying = flightController.IsFlying();
 
 	// 移動速度を計算する
 	const DirectX::XMFLOAT3 v = GetVelocity();

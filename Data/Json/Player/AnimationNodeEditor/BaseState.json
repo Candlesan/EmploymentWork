@@ -99,10 +99,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": true,
+                    "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 10
+                    "type": 24
                 }
             ],
             "fromState": "State_Idle",
@@ -122,7 +122,7 @@
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.10000000149011612,
-                    "type": 14
+                    "type": 24
                 }
             ],
             "fromState": "State_Move",
@@ -139,10 +139,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 10
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -336,10 +336,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 10
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -400,10 +400,10 @@
                 },
                 {
                     "buttonMask": 0,
-                    "negate": true,
+                    "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 10
+                    "type": 24
                 }
             ],
             "fromState": "Fly",
@@ -412,12 +412,7 @@
             "toState": "State_Avoid"
         },
         {
-            "Actions": [
-                {
-                    "type": 0,
-                    "value": 0.0
-                }
-            ],
+            "Actions": [],
             "colorA": 1.0,
             "colorB": 1.0,
             "colorG": 1.0,
@@ -429,6 +424,13 @@
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 0
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 24
                 }
             ],
             "fromState": "State_Avoid",
@@ -601,6 +603,13 @@
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 21
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 24
                 }
             ],
             "fromState": "Fly",
@@ -783,10 +792,10 @@
                 },
                 {
                     "buttonMask": 0,
-                    "negate": true,
+                    "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 10
+                    "type": 24
                 }
             ],
             "fromState": "NormalMagicAttack",

@@ -1,626 +1,602 @@
 {
-    "links":  [
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  18
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  1,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  2,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_F_R_45_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  4,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_R_90_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  6,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_B_R_45_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  5,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_B_180_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  7,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_B_L_45_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  8,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_L_90_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  11
-                                         },
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  3,
-                                             "threshold":  0,
-                                             "type":  8
-                                         }
-                                     ],
-                      "fromState":  "Entry",
-                      "priority":  1,
-                      "toSlot":  0,
-                      "toState":  "AS_Roll_Combat_to_Run_F_L_45_Seq_0"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_R_90_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_B_180_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_L_90_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  },
-                  {
-                      "Actions":  [
-
-                                  ],
-                      "colorA":  1,
-                      "colorB":  1,
-                      "colorG":  1,
-                      "colorR":  1,
-                      "conditions":  [
-                                         {
-                                             "buttonMask":  0,
-                                             "negate":  false,
-                                             "targetDir":  0,
-                                             "threshold":  0,
-                                             "type":  0
-                                         }
-                                     ],
-                      "fromState":  "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
-                      "priority":  0,
-                      "toSlot":  0,
-                      "toState":  "Exit"
-                  }
-              ],
-    "nodes":  [
-                  {
-                      "StateName":  "Entry",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  false
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -335,
-                                       521
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "Exit",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  false
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       129,
-                                       521
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -220,
-                                       521
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       400
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_R_90_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_R_90_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       450
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       500
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_B_180_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_B_180_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       550
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       600
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_L_90_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_L_90_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       650
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  },
-                  {
-                      "StateName":  "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
-                      "assetName":  "",
-                      "config":  {
-                                     "animationName":  "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
-                                     "blendTime":  0.20000000298023224,
-                                     "loop":  false,
-                                     "targetBoneName":  "",
-                                     "useRootMotion":  false,
-                                     "useRootMotionEx":  true
-                                 },
-                      "mixRate":  0,
-                      "position":  [
-                                       -100,
-                                       700
-                                   ],
-                      "subGraphPath":  "",
-                      "type":  0
-                  }
-              ]
+    "links": [
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 24
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 1,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 2,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_F_R_45_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 4,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_R_90_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 6,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_B_R_45_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 5,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_B_180_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 7,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_B_L_45_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 8,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_L_90_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 3,
+                    "threshold": 0.0,
+                    "type": 8
+                }
+            ],
+            "fromState": "Entry",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "AS_Roll_Combat_to_Run_F_L_45_Seq_0"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_R_90_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_B_180_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_L_90_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Exit"
+        }
+    ],
+    "nodes": [
+        {
+            "StateName": "Entry",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -745.0,
+                1129.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "Exit",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                403.0,
+                1113.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_Fast_F_0_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -268.0,
+                921.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_F_R_45_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -137.0,
+                1017.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_R_90_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_R_90_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -10.0,
+                1081.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_B_R_45_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -108.0,
+                1161.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_B_180_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_B_180_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -268.0,
+                1225.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_B_L_45_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -457.0,
+                1161.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_L_90_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_L_90_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -569.0,
+                1097.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        },
+        {
+            "StateName": "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
+            "assetName": "",
+            "config": {
+                "animationName": "AS_Roll_Combat_to_Run_F_L_45_Seq_0",
+                "bakeTranslationY": false,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": true
+            },
+            "mixRate": 0.0,
+            "position": [
+                -457.0,
+                1017.0
+            ],
+            "subGraphPath": "",
+            "type": 0
+        }
+    ]
 }
