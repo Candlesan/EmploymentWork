@@ -43,7 +43,7 @@ void MagicProjectile::Update(float elapsedTime)
 
 			if (Magic != nullptr)
 			{
-				magicHandle = Magic->Play(position, config.scale);
+				magicHandle = Magic->Play(position, 1.0f);
 			}
 
 			state = ProjectileState::Fire;

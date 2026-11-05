@@ -27,8 +27,6 @@ public:
 
 	void Launch(const DirectX::XMFLOAT3& dir, const DirectX::XMFLOAT3& pos, float waitTime);
 
-	float GetWaitTimer() const { return waitTimer; }
-	float GetLifeTimer() const { return lifeTimer; }
 	float GetSpeed() const { return speed; }
 	void SetWaitTimer(float timer) { waitTimer = timer; }
 	void SetLifeTimer(float timer) { lifeTimer = timer; }
@@ -45,8 +43,6 @@ private:
 	int magicHandle = -1;
 
 	std::unique_ptr<IMagicMove> moveComponent;
-
-	MagicInfo config;
 
 	EffectHandle customEffect = InvalidEffect;
 	CustomEffectManager& effectManager = CustomEffectManager::Instance();

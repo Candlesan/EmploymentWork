@@ -268,6 +268,9 @@
     <Filter Include="Source\GamepPlay\Object\CameraShake">
       <UniqueIdentifier>{8e44ed97-7217-477c-b89a-8f05f5df1fb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\Loadout">
+      <UniqueIdentifier>{27cad3a5-1484-4106-a788-66afa74abc8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -627,6 +630,24 @@
     <ClInclude Include="Source\System\Core\DebugConfig.h">
       <Filter>Source\System\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\IMagicSkill.h">
+      <Filter>Source\GamepPlay\Object\Magic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicInputController.h">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicLoadout.h">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicSlot.h">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicContext.h">
+      <Filter>Source\GamepPlay\Object\Magic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -937,6 +958,18 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\CameraShake\CameraShake.cpp">
       <Filter>Source\GamepPlay\Object\CameraShake</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicInputController.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicLoadout.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicSlot.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,8 @@
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
+#include "GamePlay/Object/Magic/Loadout/MagicLoadout.h"
+#include "GamePlay/Object/Magic/Loadout/MagicInputController.h"
 
 #include <memory>
 
@@ -111,7 +113,6 @@ private:
 	TransitionContext InputTransitionContext(float elapsedTime);
 	void Player::EnterSubGraph(const std::string& subGraphPath, const TransitionContext& ctx);
 	void PlayActionGraph(const std::string& graphName);
-	void UpdateStateBehavior();
 	bool IsDownState();
 	bool IsReviveState();
 	bool CanControl();
@@ -147,6 +148,11 @@ private:
 	// カメラの照準の先で、最初に当たる点を返す
 	DirectX::XMFLOAT3 GetAimPoint(float range); 
 
+	// 魔法を作る関数
+	MagicContext MakeMagicContext();
+
+	// 敵の方を向き続けているか（向きと回避の両方で使う）
+	bool IsFacingEnemy() const;
 private:
 	// =========================================================================
 	//  メンバ変数
@@ -175,6 +181,9 @@ private:
 	NormalMagic normalMagic;
 	RapidMagic::RapidMagicConfig rapidMagicConfig;
 	RapidMagic rapidMagic;
+
+	MagicInputController magicInputController;
+	MagicLoadout magicLoadout;
 
 	float magicCoolDownTimer = 0.0f;
 	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
@@ -207,7 +216,6 @@ private:
 	float lerpSpeed = 3.0f;
 	float bButtonHoldTime = 0.0f;
 	float rbButtonHoldTime = 0.0f;
-	float rtButtonHoldTime = 0.0f;
 	float debug_degree = 0.0f;
 	int debug_dirIndex = 0;
 	float CollisionOffset = 0.5f;
@@ -240,6 +248,7 @@ private:
 	bool showPlayerParameter = true;
 	bool showPlayer = true;
 	bool wasBreak = false;
+	bool isTyping = false;
 
-	float interceptStanceStopSeconds = 0.348f;
+	float interceptDistanceStopSeconds = 0.348f;
 };

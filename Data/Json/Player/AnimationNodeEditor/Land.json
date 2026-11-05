@@ -32,7 +32,7 @@
                     "negate": false,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -56,10 +56,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -83,10 +83,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -110,10 +110,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -137,10 +137,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -164,10 +164,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -191,10 +191,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,
@@ -218,10 +218,10 @@
             "conditions": [
                 {
                     "buttonMask": 0,
-                    "negate": false,
+                    "negate": true,
                     "targetDir": 0,
                     "threshold": 0.0,
-                    "type": 11
+                    "type": 24
                 },
                 {
                     "buttonMask": 0,

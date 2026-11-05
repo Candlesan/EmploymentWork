@@ -21,7 +21,6 @@ enum class NormalMagicLevel { Normal, Charged };
 struct InterceptProfile
 {
 	NormalMagicLevel normalLevel = NormalMagicLevel::Normal; // 連射魔法の時は当たらない
-	float magicCost = 0.0f;   // 魔力の消費量
 	float magicRefund = 0.0f; // 迎撃成功時の返ってくる魔力量
 };
 
@@ -48,12 +47,6 @@ public:
 
 	// 方向取得 
 	const DirectX::XMFLOAT3& GetDirection() const { return direction; }
-
-	// スケール取得 
-	const DirectX::XMFLOAT3& GetScale() const { return scale; }
-
-	// トランスフォーム取得
-	const DirectX::XMFLOAT4X4& GetTransfor() const { return transform; }
 
 	// 半径取得
 	float GetRadius() const { return radius; }
@@ -103,7 +96,6 @@ public:
 		hitEffectName = name;
 		hitEffectScale = scale;
 	}
-	bool GetHitEffectPlayed() const { return hitEffectPlayed; }
 	const DirectX::XMFLOAT3& GetPrevPosition() const { return prevPosition; }
 
 	// カメラシェイクを渡す関数

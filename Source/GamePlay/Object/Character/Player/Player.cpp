@@ -6,10 +6,12 @@
 #include "System/Audio/Audio.h"
 
 // ゲームオブジェクト
+#include "GamePlay/Object/Stage/Stage.h"
+#include "GamePlay/Object/Character/Enemy/Enemy.h" 
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/CameraShake/CameraShake.h"
-#include "GamePlay/Object/Character/Enemy/Enemy.h" 
-#include "GamePlay/Object/Stage/Stage.h"
+#include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidShotSkill.h"
+
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -64,10 +66,15 @@ void Player::Initialize()
 
 	normalMagic.Initialize();
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
+
 	rapidMagic.Initialize();
 	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
+
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 	CustomEffectManager::Instance().LoadEffectConfig("Barreir", "Data/Json/Effect/Barreir.json"); // 防御魔法のエフェクトの読み込み
+
+	// 連射魔法をRTボタンに設定する
+	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<RapidShotSkill>());
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
@@ -224,7 +231,7 @@ void Player::Update(float elapsedTime)
 	}
 
 	// 今、文字入力中かどうかを取得
-	bool isTyping = ImGui::GetIO().WantCaptureKeyboard;
+	isTyping = ImGui::GetIO().WantCaptureKeyboard;
 
 	// GUIの表示/非表示
 	ShowDebugSwitch();
@@ -245,7 +252,6 @@ void Player::Update(float elapsedTime)
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	lockOn.Update(elapsedTime, camera.GetFront());
 
-#ifdef _DEBUG
 	if (!isTyping && !isPreviewMode)
 	{
 		// 移動処理
@@ -259,7 +265,7 @@ void Player::Update(float elapsedTime)
 
 		// 迎撃の構え：0.348秒で止める
 		if (currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
-			&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds && !status.isAvoid)
+			&& animator->GetUpperCurrentSeconds() >= interceptDistanceStopSeconds && !status.isAvoid)
 		{
 			animator->SetUpperSpeed(0.0f);
 		}
@@ -276,29 +282,6 @@ void Player::Update(float elapsedTime)
 		// もし普通にゲームしている最中に文字入力を始めたら、足踏みしないようにIdleに戻す
 		ChangeAnimationState("State_Idle");
 	}
-#endif // _DEBUG
-
-#ifdef NDEBUG
-	// 移動処理
-	InputMove(elapsedTime);
-
-	// 飛行更新
-	UpdateFly(elapsedTime);
-
-	// アニメーション遷移
-	UpdateStateTransitions(elapsedTime);
-
-	// 迎撃の構え：0.348秒で止める
-	if (currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
-		&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds && !status.isAvoid)
-	{
-		animator->SetUpperSpeed(0.0f);
-	}
-
-	// 上半身のアニメーション遷移
-	UpdateUpperBodyTransitions(elapsedTime);
-#endif // NDEBUG
-
 
 
 	// プレビューモード用の強制ループ処理
@@ -712,6 +695,9 @@ void Player::MagicInput(float elapsedTime)
 	MagicBase* targetMagic = nullptr;
 	auto& effectManager = CustomEffectManager::Instance();
 
+	// 入力を取得
+	MagicCommand cmd = magicInputController.Update(isTyping);
+
 	// 連射魔法用にカメラの前方向を取得する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	DirectX::XMFLOAT3 defultDir = camera.GetFront();
@@ -861,28 +847,6 @@ void Player::MagicInput(float elapsedTime)
 				targetMagic->OnTerminate();
 			}
 		}
-	}
-	// 連射魔法
-	else if (status.isRapidFire && CanControl())
-	{
-		rapidMagic.SetEffect("RapidMagic");
-		rapidMagic.SetHitEffect("RapidHit");
-		// 魔法の設定
-		MagicSpawnInfo spawnInfo;
-		spawnInfo.position = position;
-		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(position, rapidMagicConfig.speed);
-		spawnInfo.owner = this;
-		spawnInfo.target = enemy;
-		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(position, rapidMagicConfig.speed) : defultTarget;
-		spawnInfo.holdTime = rtButtonHoldTime;
-
-		rapidMagicConfig.damage = 0.01f;
-		rapidMagicConfig.gaurdDamage = 2.0f;
-		rapidMagicConfig.hitRadius = 0.25f;
-		rapidMagicConfig.speed = 150.0f;
-
-		// 連射魔法を呼び出す
-		rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, status.isRapidFire);
 	}
 
 	// 防御魔法
@@ -1143,7 +1107,7 @@ void Player::InputMove(float elapsedTime)
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-	bool isAimDodge = lockOn.IsHardLock() || status.isIntercept;
+	bool isAimDodge = lockOn.IsHardLock() || status.isIntercept || IsFacingEnemy();
 
 	if ((currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0"))
 	{
@@ -1192,7 +1156,7 @@ void Player::InputMove(float elapsedTime)
 		// 魔法中は敵の方を向く
 		TurnToPosition(elapsedTime, aimPos, turnSpeed);
 	}
-	else if ((status.isIntercept || status.isRapidFire) && flightController.IsFlying() && lockOn.IsLocked())
+	else if (IsFacingEnemy()) 
 	{
 		// 空中で迎撃・連射している時だけ敵の方を向く
 		TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
@@ -1676,18 +1640,6 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 		rbButtonHoldTime = 0.0f;
 	}
 
-	// RTボタンの長押し判定
-	if (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER)
-	{
-		rtButtonHoldTime += elapsedTime;
-	}
-	else
-	{
-		rtButtonHoldTime = 0.0f;
-	}
-
-	UpdateStateBehavior();
-
 	TransitionContext ctx;
 	ctx.position = GetPosition();
 	ctx.animSeconds = GetCurrentAnimationSeconds();
@@ -1714,7 +1666,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.IsDead = IsDead();
 	ctx.currentHP = status.currentHp;
-	ctx.IsAiming = status.isIntercept;
+	ctx.IsAiming = status.isIntercept || IsFacingEnemy();
 	ctx.IsFlying = flightController.IsFlying();
 
 	// 移動速度を計算する
@@ -1833,11 +1785,6 @@ void Player::PlayActionGraph(const std::string& graphName)
 	}
 }
 
-// 遷移以外の細かい条件
-void Player::UpdateStateBehavior()
-{
-}
-
 // ノードの設定を最新にする関数
 void Player::RefreshStateConfigs()
 {
@@ -1878,13 +1825,6 @@ void Player::CalculateStatusParameters()
 		PlayActionGraph("Break");
 	}
 	wasBreak = status.isBreak;
-
-	//GamePad& gamePad = Input::Instance().GetGamePad();
-	//if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
-	//{
-	//	hardLock = !hardLock;
-	//	lockOn.SetHardLock(hardLock);
-	//}
 
 	// 敵との距離の計算
 	DirectX::XMVECTOR Ppos = DirectX::XMLoadFloat3(&position);
@@ -2125,7 +2065,7 @@ void Player::ArmIK(float elapsedTime)
 	// 構えで止まっている間だけ腕を向ける
 	bool isStance = !isGround
 		&& currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
-		&& animator->GetUpperCurrentSeconds() >= interceptStanceStopSeconds;
+		&& animator->GetUpperCurrentSeconds() >= interceptDistanceStopSeconds;
 
 	// 腕を敵に向ける時に補完する
 	float targetWeight = isStance ? 1.0f : 0.0f;
@@ -2211,6 +2151,30 @@ DirectX::XMFLOAT3 Player::GetAimPoint(float range)
 
 	// どちらでもなければ「end」を返す
 	return end;
+}
+
+// 魔法を作る関数
+MagicContext Player::MakeMagicContext()
+{
+	MagicContext ctx;
+	ctx.base.owner = this;
+	ctx.base.target = enemy;
+	ctx.base.position = position;
+	ctx.base.angleY = angle.y;
+	ctx.magicManager = &magicManager;
+	ctx.lockOn = &lockOn;
+	ctx.defaultTarget = defultTarget;
+	ctx.canCast = CanControl() && !status.isIntercept; // 迎撃中は撃たない
+
+	return ctx;
+}
+
+// 敵の方を向き続けているか（向きと回避の両方で使う）
+bool Player::IsFacingEnemy() const
+{
+	return (status.isIntercept || status.isRapidFire)
+		&& flightController.IsFlying()
+		&& lockOn.IsLocked();
 }
 
 // 今ダウン中かを判定する
