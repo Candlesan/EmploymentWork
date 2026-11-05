@@ -50,7 +50,7 @@ void LockOnSystem::Update(float elapsedTime, const DirectX::XMFLOAT3& direction)
 
 void LockOnSystem::DrawGUI()
 {
-	if (ImGui::CollapsingHeader(u8"ロックオンシステム", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(u8"ロックオンシステム"))
 	{
 		switch (state)
 		{

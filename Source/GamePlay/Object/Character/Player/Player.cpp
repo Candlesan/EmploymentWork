@@ -68,9 +68,6 @@ void Player::Initialize()
 	normalMagic.Initialize();
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
 
-	rapidMagic.Initialize();
-	rapidMagicConfig.Load(); // 連射魔法の設定の読み込み
-
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 	CustomEffectManager::Instance().LoadEffectConfig("Barreir", "Data/Json/Effect/Barreir.json"); // 防御魔法のエフェクトの読み込み
 
@@ -84,9 +81,6 @@ void Player::Initialize()
 	SetupInitialAnimationState();    // 初期アニメーションの設定
 
 	InitializeHeadDirection(); // 頭の向きを初期化
-	CustomEffectManager::Instance().LoadEffectConfig("Barrier", "Data/Json/Effect/Barrier.json");
-	CustomEffectManager::Instance().LoadEffectConfig("Intercept", "Data/Json/Effect/Intercept.json");
-	CustomEffectManager::Instance().GetOrCreateResident("Intercept");
 }
 
 // シーケンサーの初期化
@@ -519,18 +513,10 @@ void Player::DrawGUI()
 			normalMagic.DrawGUI(normalMagicConfig);
 		}
 
-		if (ImGui::CollapsingHeader(u8"連射魔法"))
-		{
-			rapidMagic.DrawGUI(rapidMagicConfig);
-		}
+		magicLoadout.DrawGUI();
 
 		//　防御魔法
 		defenseMagic.DrawGUI();
-
-		if (ImGui::CollapsingHeader(u8"迎撃"))
-		{
-			ImGui::DragFloat(u8"迎撃をする距離", &interceptRadius, 0.1f);
-		}
 
 		// 当たり判定情報
 		if (ImGui::CollapsingHeader(u8"キャラクター当たり判定 (カプセル)"))
@@ -664,18 +650,6 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), { 0, 0, 1, 1 });
 	}
 
-	DirectX::XMFLOAT3 centerPos = {
-		position.x + interceptCenterOffset.x,
-		position.y + interceptCenterOffset.y,
-		position.z + interceptCenterOffset.z
-	};
-
-	if (lockOn.IsLocked())
-	{
-		DirectX::XMFLOAT3 predicted = lockOn.GetPredictedPosition(position, rapidMagicConfig.speed);
-		renderer->DrawSphere(predicted, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
-	}
-
 	renderer->DrawSphere(GetAimPoint(100.0f), 0.5f, {1, 0, 0, 1});
 
 	magicLoadout.RenderDebugPrimitive(MakeMagicContext(), renderer);
@@ -690,11 +664,12 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 void Player::MagicInput(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
-	MagicBase* targetMagic = nullptr;
 	auto& effectManager = CustomEffectManager::Instance();
 
 	// 入力を取得
 	MagicCommand cmd = magicInputController.Update(isTyping);
+
+	static constexpr float DEFAULT_AIM_DISTANCE = 450.0f; // ロックオンしていないときの狙い先までの距離
 
 	// 連射魔法用にカメラの前方向を取得する
 	Camera& camera = CameraManager::Instance().GetMainCamera();
@@ -702,7 +677,7 @@ void Player::MagicInput(float elapsedTime)
 	DirectX::XMFLOAT3 defultPos = camera.GetEye();
 	DirectX::XMVECTOR cameraPos = DirectX::XMLoadFloat3(&defultPos);
 	DirectX::XMVECTOR cameraFront = DirectX::XMLoadFloat3(&defultDir);
-	DirectX::XMVECTOR Target = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, rapidMagicConfig.speed * rapidMagicConfig.lifeTimer));
+	DirectX::XMVECTOR Target = DirectX::XMVectorAdd(cameraPos, DirectX::XMVectorScale(cameraFront, DEFAULT_AIM_DISTANCE));
 	DirectX::XMStoreFloat3(&defultTarget, Target);
 
 	// LTを押したら
@@ -734,10 +709,10 @@ void Player::MagicInput(float elapsedTime)
 			// フルチャージ発射（もう一度押した瞬間）
 			MagicSpawnInfo spawnInfo;
 			spawnInfo.position = position;
-			spawnInfo.direction = (targetMagic != nullptr) ? interceptDir : lockOn.GetAimDirection(muzzlePos, 100000.0f);// 即着弾やから数値をデカくしておく
+			spawnInfo.direction = lockOn.GetAimDirection(muzzlePos, 100000.0f);// 即着弾やから数値をデカくしておく
 			spawnInfo.owner = this;
 			spawnInfo.target = enemy;
-			spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : defultTarget;
+			spawnInfo.targetPos = defultTarget;
 			spawnInfo.holdTime = rbButtonHoldTime;
 			spawnInfo.angleY = angle.y;
 
@@ -759,8 +734,7 @@ void Player::MagicInput(float elapsedTime)
 
 		MagicSpawnInfo spawnInfo;
 		spawnInfo.position = position;
-		spawnInfo.direction = (targetMagic != nullptr) ? interceptDir
-			: lockOn.GetAuotAim() ? lockOn.GetAimDirection(muzzlePos, 100000.0f) : aimDir;
+		spawnInfo.direction = lockOn.GetAimDirection(muzzlePos, 100000.0f); // 即着弾やから数値
 		spawnInfo.owner = this;
 		spawnInfo.target = enemy;
 		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : aimPos;

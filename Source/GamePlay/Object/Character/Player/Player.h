@@ -11,10 +11,8 @@
 // ゲームオブジェクト
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
-#include "GamePlay/Object/Trail/Trail.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
-#include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidMagic.h"
 #include "GamePlay/Object/Magic/Loadout/MagicLoadout.h"
 #include "GamePlay/Object/Magic/Loadout/MagicInputController.h"
 
@@ -178,8 +176,6 @@ private:
 	MagicManager magicManager;
 	NormalMagic::NormalMagicConfig normalMagicConfig;
 	NormalMagic normalMagic;
-	RapidMagic::RapidMagicConfig rapidMagicConfig;
-	RapidMagic rapidMagic;
 
 	MagicInputController magicInputController;
 	MagicLoadout magicLoadout;
@@ -188,11 +184,8 @@ private:
 	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
 	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン
 	float magicRecoverDelay = 0.0f;			// 魔力を回復するまでの遅延
-	float interceptRadius = 50.0f;			// 迎撃用の半径
 	DirectX::XMFLOAT3 muzzlePos = { 0, 0, 0 }; // 発射方向
 	DirectX::XMFLOAT3 defultTarget = { 0, 0, 0 }; // 初期の狙ってる位置
-	DirectX::XMFLOAT3 interceptCenterOffset = { 0.0f, 1.0f, 0.0f }; // 迎撃用のオフセット位置
-	DirectX::XMFLOAT3 interceptDir = { 0.0f, 0.0f, 0.0f }; // 迎撃する方向
 	bool isShot = false;
 
 	// ── IK関係 ──

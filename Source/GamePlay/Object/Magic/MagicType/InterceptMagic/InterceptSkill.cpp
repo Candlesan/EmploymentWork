@@ -5,6 +5,9 @@
 #include "GamePlay/Object/CameraShake/CameraShake.h"
 #include "GamePlay/Object/Character/Character.h"
 
+#include <imgui.h>
+
+
 // コンストラクタ
 InterceptSkill::InterceptSkill()
 {
@@ -70,6 +73,10 @@ void InterceptSkill::OnHold(const MagicContext& ctx, float elapsedTime)
 // GUI描画
 void InterceptSkill::DrawGUI()
 {
+	if (ImGui::CollapsingHeader(u8"迎撃"))
+	{
+		ImGui::DragFloat(u8"迎撃をする距離", &interceptRadius, 0.1f);
+	}
 }
 
 // デバックプリミティブ描画

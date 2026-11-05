@@ -1,6 +1,9 @@
 #include "RapidShotSkill.h"
 #include "GamePlay/Object/LockOnSystem/LockOnSystem.h"
 
+#include <imgui.h>
+
+
 // コンストラクタ
 RapidShotSkill::RapidShotSkill()
 {
@@ -35,6 +38,21 @@ void RapidShotSkill::OnHold(const MagicContext& ctx, float elapsedTime)
 	rapidMagic.Update(elapsedTime, ctx.magicManager, spawnInfo, config, true);
 }
 
+// GUI描画
 void RapidShotSkill::DrawGUI()
 {
+	if (ImGui::CollapsingHeader(u8"連射魔法"))
+	{
+		rapidMagic.DrawGUI(config);
+	}
+}
+
+// デバックプリミティブ描画
+void RapidShotSkill::RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer)
+{
+	if (ctx.lockOn->IsLocked())
+	{
+		DirectX::XMFLOAT3 predicted = ctx.lockOn->GetPredictedPosition(ctx.base.position, config.speed);
+		renderer->DrawSphere(predicted, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
+	}
 }

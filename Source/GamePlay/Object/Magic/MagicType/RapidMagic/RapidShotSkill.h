@@ -9,6 +9,7 @@ public:
 	RapidShotSkill();
 	void OnHold(const MagicContext& ctx, float elapsedTime) override;
 	void DrawGUI() override;
+	void RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer) override;
 	const char* GetName() const override { return u8"˜AŽË–‚–@"; }
 
 private:
