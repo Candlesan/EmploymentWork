@@ -271,6 +271,9 @@
     <Filter Include="Source\GamepPlay\Object\Magic\Loadout">
       <UniqueIdentifier>{27cad3a5-1484-4106-a788-66afa74abc8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\InterceptMagic">
+      <UniqueIdentifier>{cfbbb8f4-b871-4f9e-a3ce-b03fc7c03448}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -648,6 +651,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\InterceptMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -969,7 +975,10 @@
       <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\RapidMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\InterceptMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

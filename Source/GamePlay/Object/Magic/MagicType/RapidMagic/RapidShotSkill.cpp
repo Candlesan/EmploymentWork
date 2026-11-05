@@ -21,7 +21,7 @@ RapidShotSkill::RapidShotSkill()
 
 void RapidShotSkill::OnHold(const MagicContext& ctx, float elapsedTime)
 {
-	if (ctx.canCast) return;
+	if (!ctx.canCast || ctx.isCounterActive) return;
 
 	MagicSpawnInfo spawnInfo = ctx.base; // MagicSpawnInfo‚ğ‚Ü‚Æ‚ß‚ÄƒRƒs[
 

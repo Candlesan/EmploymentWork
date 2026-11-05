@@ -11,6 +11,7 @@
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/CameraShake/CameraShake.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidShotSkill.h"
+#include "GamePlay/Object/Magic/MagicType/InterceptMagic/InterceptSkill.h"
 
 
 #include "imgui_node_editor.h"
@@ -75,6 +76,7 @@ void Player::Initialize()
 
 	// 連射魔法をRTボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<RapidShotSkill>());
+	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LT)).AddCandidate(std::make_unique<InterceptSkill>());
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
@@ -668,12 +670,6 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 		position.z + interceptCenterOffset.z
 	};
 
-	// 迎撃範囲の球
-	if (status.isIntercept)
-	{
-		renderer->DrawSphere(centerPos, interceptRadius, { 0.0f, 1.0f, 1.0f, 0.5f });
-	}
-
 	if (lockOn.IsLocked())
 	{
 		DirectX::XMFLOAT3 predicted = lockOn.GetPredictedPosition(position, rapidMagicConfig.speed);
@@ -681,6 +677,8 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 	}
 
 	renderer->DrawSphere(GetAimPoint(100.0f), 0.5f, {1, 0, 0, 1});
+
+	magicLoadout.RenderDebugPrimitive(MakeMagicContext(), renderer);
 }
 
 
@@ -708,8 +706,8 @@ void Player::MagicInput(float elapsedTime)
 	DirectX::XMStoreFloat3(&defultTarget, Target);
 
 	// LTを押したら
-	status.isIntercept = (gamePad.GetButton() & GamePad::BTN_LEFT_TRIGGER) != 0;
-	status.isRapidFire = (gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) != 0;
+	status.isIntercept = cmd.hold[static_cast<int>(MagicSlotIndex::LT)];
+	status.isRapidFire = cmd.hold[static_cast<int>(MagicSlotIndex::RT)];
 	bool isHold = (rbButtonHoldTime > RB_THRESHOLD); // RB長押しでチャージ（消える可能性あり）
 	
 	// 通常魔法系更新
@@ -790,64 +788,10 @@ void Player::MagicInput(float elapsedTime)
 		upperGraphStack.clear(); // Interceptは単独で積まれるのでまとめて下ろす
 	}
 
-	// 迎撃
-	if (status.isIntercept && CanControl())
-	{
-		// 通常攻撃中は構えに入らない
-		if (flightController.IsFlying() && !isNormalAttack)
-			PlayActionGraph("Intercept");
+	// 迎撃の構え（撃つ処理は InterceptSkill に移動）
+	if (status.isIntercept && CanControl() && flightController.IsFlying() && !isNormalAttack)
+		PlayActionGraph("Intercept");
 
-		// 迎撃の中心位置
-		DirectX::XMFLOAT3 centerPos = {
-			position.x + interceptCenterOffset.x,
-			position.y + interceptCenterOffset.y,
-			position.z + interceptCenterOffset.z
-		};
-
-		// 一番近い魔法を取得する
-		MagicManager& manager = enemy->GetMagicManager();
-		auto targets = manager.FindNearProjectiles(this, centerPos, interceptRadius);
-		if (!targets.empty())
-		{
-			targetMagic = targets[0];
-		}
-
-		if (targetMagic)
-		{
-			// 迎撃する方向を計算する
-			DirectX::XMVECTOR magicPos = DirectX::XMLoadFloat3(&targetMagic->GetPosition());
-			DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
-			DirectX::XMStoreFloat3(&interceptDir, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(magicPos, playerPos)));
-
-			// 撃つ前に見た目を迎撃用にする
-			rapidMagic.SetEffect("InterceptShot");
-			rapidMagic.SetHitEffect("Intercept");
-
-			// 魔法の設定
-			MagicSpawnInfo spawnInfo;
-			spawnInfo.position = position;
-			spawnInfo.direction = interceptDir;
-			spawnInfo.owner = this;
-			spawnInfo.target = enemy;
-			spawnInfo.targetPos = targetMagic->GetPosition();
-
-			rapidMagicConfig.damage = 0.0f;
-			rapidMagicConfig.gaurdDamage = 0.0f;
-			rapidMagicConfig.hitRadius = 0.25f;
-			rapidMagicConfig.speed = 80.0f;
-
-			rapidMagic.Update(elapsedTime, &magicManager, spawnInfo, rapidMagicConfig, true);
-
-			// 敵が連射魔法なら撃ち落とす
-			if (targetMagic->GetMagicKind() == MagicKind::Rapid && targetMagic->GetIsAlive())
-			{
-				RecoverMagic(targetMagic->GetMagicmagicRefund());
-				CustomEffectManager::Instance().PlayBurst("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1, 1 });
-				CameraShakeManager::Instance().Add(targetMagic->GetPosition(), 10.0f, 0.5f, 0.1f);
-				targetMagic->OnTerminate();
-			}
-		}
-	}
 
 	// 防御魔法
 	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)  && !status.isBreak && CanControl()) // ダウン状態でもバースト状態でもないとき
@@ -881,6 +825,9 @@ void Player::MagicInput(float elapsedTime)
 			barrierEffect = InvalidEffect;
 		}
 	}
+
+	// スロットに入っている技を動かす
+	magicLoadout.Update(MakeMagicContext(), cmd, elapsedTime);
 }
 
 // グラフを追加する
@@ -2162,9 +2109,11 @@ MagicContext Player::MakeMagicContext()
 	ctx.base.position = position;
 	ctx.base.angleY = angle.y;
 	ctx.magicManager = &magicManager;
+	ctx.opponentMagicManager = &enemy->GetMagicManager();
 	ctx.lockOn = &lockOn;
 	ctx.defaultTarget = defultTarget;
-	ctx.canCast = CanControl() && !status.isIntercept; // 迎撃中は撃たない
+	ctx.canCast = CanControl(); // 操作できるか
+	ctx.isCounterActive = status.isIntercept; // 迎撃中は撃たない
 
 	return ctx;
 }

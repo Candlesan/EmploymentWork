@@ -14,3 +14,13 @@ void MagicLoadout::Update(const MagicContext& ctx, const MagicCommand& cmd, floa
 		skill->Update(ctx, elapsedTime);
 	}
 }
+
+void MagicLoadout::RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		IMagicSkill* skill = slots[i].GetEquipped(); // ‘•”õ‚ðŽæ“¾‚·‚é
+		if (!skill) continue;
+		skill->RenderDebugPrimitive(ctx, renderer);
+	}
+}

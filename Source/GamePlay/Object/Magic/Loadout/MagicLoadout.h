@@ -2,6 +2,7 @@
 #include "GamePlay/Object/Magic/Loadout/MagicInputController.h"
 #include "GamePlay/Object/Magic/Loadout/MagicSlot.h"
 
+class ShapeRenderer;
 
 class MagicLoadout
 {
@@ -12,7 +13,11 @@ public:
 	// スロットの中身を消す関数
 	MagicSlot& GetSlot(int index) { return slots[static_cast<int>(index)]; }
 
+	// GUI描画
 	void DrawGUI();
+
+	// デバッグプリミティブ
+	void RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer);
 private:
 	MagicSlot slots[MAGIC_SLOT_COUNT];
 };
