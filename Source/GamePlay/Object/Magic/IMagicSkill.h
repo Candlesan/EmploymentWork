@@ -14,4 +14,6 @@ public:
 	virtual void DrawGUI() {}
 	virtual void RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer) {}
 	virtual const char* GetName() const = 0;
+	virtual bool IsBusy() const { return false; }
+	virtual bool IsReady() const { return true; } // ¡g‚¦‚éó‘Ô‚©
 };

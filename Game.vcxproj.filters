@@ -990,7 +990,7 @@
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

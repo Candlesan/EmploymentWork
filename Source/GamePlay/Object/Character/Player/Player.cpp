@@ -66,9 +66,6 @@ void Player::Initialize()
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
 
-	normalMagic.Initialize();
-	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
-
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
 	// 連射魔法をRTボタンに設定する
@@ -239,9 +236,6 @@ void Player::Update(float elapsedTime)
 
 	// GUIの表示/非表示
 	ShowDebugSwitch();
-
-	// タイマーを更新する関数
-	UpdateTimers(elapsedTime);
 
 	// ステータスの更新
 	UpdateStatus(elapsedTime);
@@ -418,7 +412,6 @@ void Player::DrawGUI()
 				ImGui::Text(u8"魔力 : %f.0", status.currentMagic);
 				ImGui::Text(u8"魔力の回復速度 : %f.0", status.currentMagicRecoverSpeed);
 				ImGui::Text(u8"魔力の回復する遅延 : %f.0", status.magicRecoverDelayTimer);
-				ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
 				ImGui::DragFloat(u8"魔力", &status.currentMagic, 0.1f);
 				ImGui::DragFloat(u8"基本の魔力回復速度", &status.magicRecoverSpeed, 0.1f);
 				ImGui::DragFloat(u8"魔力の回復する遅延", &magicRecoverDelay, 0.1f);
@@ -479,47 +472,6 @@ void Player::DrawGUI()
 			lockOn.DrawGUI();
 		}
 
-		// 魔法関係
-		if (ImGui::CollapsingHeader(u8"通常魔法"))
-		{
-			if (ImGui::Button(u8"保存##Normal"))
-			{
-				normalMagicConfig.Save();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button(u8"読み込み##Normal"))
-			{
-				normalMagicConfig.Load(); // JSONから読み込み
-			}
-			ImGui::Separator();
-
-			ImGui::Text(u8"(通常撃ち / チャージ切り替え時間: %.2f秒)", normalMagicConfig.chargeTimeThreshold);
-			ImGui::DragFloat(u8"切り替え閾値時間", &normalMagicConfig.chargeTimeThreshold, 0.05f, 0.1f, 3.0f);
-			ImGui::DragFloat(u8"射程距離 (Range)", &normalMagicConfig.range, 1.0f, 10.0f, 300.0f);
-			ImGui::Separator();
-
-			ImGui::Text(u8"--- 通常撃ち ---");
-			ImGui::DragFloat(u8"通常ダメージ", &normalMagicConfig.normalDamage, 1.0f);
-			ImGui::DragFloat(u8"通常判定の太さ (半径)", &normalMagicConfig.normalRadius, 0.1f, 0.1f, 5.0f);
-			ImGui::DragFloat(u8"通常の魔力消費量", &normalMagicConfig.normalMagicCost, 0.1f);
-			ImGui::Separator();
-
-			ImGui::Text(u8"--- チャージ撃ち  ---");
-			ImGui::DragFloat(u8"チャージダメージ", &normalMagicConfig.chargeDamage, 1.0f);
-			ImGui::DragFloat(u8"チャージ判定の太さ (半径)", &normalMagicConfig.chargeRadius, 0.1f, 0.1f, 10.0f);
-			ImGui::DragFloat(u8"チャージの魔力消費量", &normalMagicConfig.chargeMagicCost, 0.1f);
-			ImGui::DragFloat(u8"フルチャージの維持中の魔力消費量", &normalMagicConfig.chargeHoldMagicCost, 0.1f);
-			ImGui::Separator();
-
-			ImGui::DragFloat3(u8"手元オフセット##normal", &normalMagicConfig.spawnOffset.x, 0.1f);
-			ImGui::Separator();
-
-			ImGui::DragFloat(u8"クールダウン", &coolDownValue, 0.1f);
-			ImGui::DragFloat(u8"フルチャージのクールダウン", &fullcChargeCoolDownValue, 0.1f);
-			ImGui::Separator();
-
-			normalMagic.DrawGUI(normalMagicConfig);
-		}
 
 		magicLoadout.DrawGUI();
 
@@ -692,77 +644,11 @@ void Player::MagicInput(float elapsedTime)
 	status.isIntercept = cmd.hold[static_cast<int>(MagicSlotIndex::LT)];
 	status.isRapidFire = cmd.hold[static_cast<int>(MagicSlotIndex::RT)];
 
-	// 通常魔法の発射位置を計算する
-	muzzlePos = {
-		position.x + normalMagicConfig.spawnOffset.x,
-		position.y + normalMagicConfig.spawnOffset.y,
-		position.z + normalMagicConfig.spawnOffset.z,
-	};
-
-#if 0
-	bool isHold = (rbButtonHoldTime > RB_THRESHOLD); // RB長押しでチャージ（消える可能性あり）
-	
-	// 通常魔法系更新
-	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
-
-
-	// ボタンを離したら予約をする
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
-	{
-		isShot = true;
-	}
-
-	// チャージ魔法 (今後通所魔法と置き換えになるか消えるかもしれやん)
-	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
-	{
-		if (normalMagic.IsFullCharged())
-		{
-			// フルチャージ発射（もう一度押した瞬間）
-			MagicSpawnInfo spawnInfo;
-			spawnInfo.position = position;
-			spawnInfo.direction = lockOn.GetAimDirection(muzzlePos, 100000.0f);// 即着弾やから数値をデカくしておく
-			spawnInfo.owner = this;
-			spawnInfo.target = enemy;
-			spawnInfo.targetPos = defultTarget;
-			spawnInfo.holdTime = rbButtonHoldTime;
-			spawnInfo.angleY = angle.y;
-
-			normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
-			magicCoolDownTimer = fullcChargeCoolDownValue;
-			normalMagic.ResetCharge();
-		}
-	}
-
-	// 通常攻撃魔法
-	if (animSequence.GetEvent("shot") && isShot && magicCoolDownTimer <= 0.0f)
-	{
-		DirectX::XMFLOAT3 aimPos = GetAimPoint(normalMagicConfig.range + 10.0f);
-
-		DirectX::XMVECTOR Muzzle = DirectX::XMLoadFloat3(&muzzlePos);
-		DirectX::XMVECTOR Aim = DirectX::XMLoadFloat3(&aimPos);
-		DirectX::XMFLOAT3 aimDir;
-		DirectX::XMStoreFloat3(&aimDir, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Aim, Muzzle)));
-
-		MagicSpawnInfo spawnInfo;
-		spawnInfo.position = position;
-		spawnInfo.direction = lockOn.GetAimDirection(muzzlePos, 100000.0f); // 即着弾やから数値
-		spawnInfo.owner = this;
-		spawnInfo.target = enemy;
-		spawnInfo.targetPos = lockOn.IsLocked() ? lockOn.GetPredictedPosition(muzzlePos, 100000.0f) : aimPos;
-		spawnInfo.holdTime = rbButtonHoldTime;
-		spawnInfo.angleY = angle.y;
-
-		normalMagic.Emit(&magicManager, spawnInfo, normalMagicConfig);
-		CameraShakeManager::Instance().Add(0.05f, 0.15f); // 位置なし
-
-		magicCoolDownTimer = coolDownValue;
-		normalMagic.ResetCharge();
-		isShot = false;
-	}
-#endif
-
 	// 通常攻撃中か（全身アニメなので構えの上半身を被せない）
-	bool isNormalAttack = isShot
+	IMagicSkill* rbSkill = magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RB)).GetEquipped();
+
+	bool isNormalAttack = (rbSkill && rbSkill->IsBusy())
+		|| cmd.press[static_cast<int>(MagicSlotIndex::RB)]
 		|| currentState == "AS_Combo_Attack_04_02_Seq_0"
 		|| currentState == "AS_Combo_Attack_03_04_Seq_0";
 
@@ -1029,11 +915,6 @@ void Player::InputMove(float elapsedTime)
 		// ルートモーションを使ってる時の移動速度
 		Move(moveVec.x, moveVec.z, 0.0f);
 	}
-	else if (flightController.IsFlying() && normalMagic.IsFullCharged())
-	{
-		// 飛行中かつチャージ済み移動速度
-		Move(moveVec.x, moveVec.z, fullChargeSpeed);
-	}
 	else if (flightController.IsFlying())
 	{
 		// 飛行中の移動速度
@@ -1046,7 +927,7 @@ void Player::InputMove(float elapsedTime)
 	}
 
 	DirectX::XMFLOAT3 aimPos = lockOn.IsLocked()
-		? lockOn.GetPredictedPosition(muzzlePos, 100000.0f)
+		? lockOn.GetPredictedPosition(position, 100000.0f)
 		: defultTarget;
 
 	// 回転処理
@@ -1550,6 +1431,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 		ctx.animSeconds = ctx.animLength;
 	}
 
+
 	ctx.moveLength = moveLength;
 	ctx.enemyFromdistance = enemyFromDistance;
 	ctx.buttonDown = gamePad.GetButtonDown() | bufferedButton;
@@ -1572,6 +1454,13 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	const DirectX::XMFLOAT3 v = GetVelocity();
 	ctx.MoveSpeed = sqrtf(v.x * v.x + v.z * v.z);
 
+	// RB の技がクールダウン中なら、RB を押してないことにする（撃てないのにモーションだけ出るのを防ぐ）
+	IMagicSkill* rbSkill = magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RB)).GetEquipped();
+	if (rbSkill && !rbSkill->IsReady())
+	{
+		ctx.buttonDown &= ~GamePad::BTN_RIGHT_SHOULDER;
+		ctx.buttonHeld &= ~GamePad::BTN_RIGHT_SHOULDER;
+	}
 	return ctx;
 }
 
@@ -1705,16 +1594,6 @@ void Player::RefreshStateConfigs()
 // =========================================================================
 //  内部ヘルパー（物理・タイマー・その他）
 // =========================================================================
-
-// タイマー処理を更新する関数
-void Player::UpdateTimers(float elapsedTime)
-{
-	// 魔法のクールダウン
-	if (magicCoolDownTimer > 0.0f)
-	{
-		magicCoolDownTimer -= elapsedTime;
-	}
-}
 
 // プレイヤーの状態を計算する関数
 void Player::CalculateStatusParameters()
@@ -2066,7 +1945,7 @@ MagicContext Player::MakeMagicContext()
 	ctx.defaultTarget = defultTarget;
 	ctx.canCast = CanControl(); // 操作できるか
 	ctx.isCounterActive = status.isIntercept; // 迎撃中は撃たない
-
+	ctx.isShotEvent = animSequence.GetEvent("shot");
 	return ctx;
 }
 

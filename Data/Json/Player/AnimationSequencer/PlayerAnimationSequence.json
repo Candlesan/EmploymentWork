@@ -1349,12 +1349,12 @@
             ],
             "speedKeys": [
                 {
-                    "speed": 1.0,
+                    "speed": 0.6249997615814209,
                     "time": 0.0
                 },
                 {
-                    "speed": 0.3624997138977051,
-                    "time": 0.15046274662017822
+                    "speed": 0.13749974966049194,
+                    "time": 0.2112104594707489
                 },
                 {
                     "speed": 1.562500238418579,
@@ -1389,6 +1389,13 @@
                     "time": 2.066666603088379
                 }
             ]
+        },
+        {
+            "assetName": "NormalMagicAttack",
+            "events": [],
+            "name": "NormalMagicAttack",
+            "ranges": [],
+            "speedKeys": []
         }
     ]
 }

@@ -15,4 +15,5 @@ struct MagicContext
 	DirectX::XMFLOAT3 defaultTarget = {};		  // ロックオンしていない時の狙い先
 	bool canCast = false;						  // 今撃っていいか
 	bool isCounterActive = false;				  // LTの技を使用中か（RTの技はこれを見て止まる）
+	bool isShotEvent = false;					  // shotが来たか
 };

@@ -11,6 +11,10 @@ public:
 	void Update(const MagicContext& ctx, float elapsedTime) override;
 	void DrawGUI() override;
 	const char* GetName() const override { return u8"レーザー魔法"; }
+	bool IsBusy() const override { return isShot; }
+	bool IsReady() const override { return coolDownTimer <= 0.0f; }
+private:
+	void Fire(const MagicContext& ctx);
 
 private:
 	NormalMagic normalMagic; // 技専用のインスタンス
@@ -18,4 +22,7 @@ private:
 
 	float coolDown = 3.0f; // 撃った後のクールダウン
 	float coolDownTimer = 0.0f; // 残り時間
+
+	bool isShot = false; // 撃つ予約
+	float reserveTimer = 0.0f; // 予約してからの時間
 };

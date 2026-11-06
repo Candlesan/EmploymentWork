@@ -12,7 +12,6 @@
 #include "GamePlay/Object/Character/Character.h"
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
 #include "GamePlay/Object/Magic/MagicManager.h"
-#include "GamePlay/Object/Magic/MagicType/NormalMagic/NormalMagic.h"
 #include "GamePlay/Object/Magic/Loadout/MagicLoadout.h"
 #include "GamePlay/Object/Magic/Loadout/MagicInputController.h"
 
@@ -115,7 +114,6 @@ private:
 	bool CanControl();
 
 	// ── 物理・タイマー・その他 ──
-	void UpdateTimers(float elapsedTime);
 	void CalculateStatusParameters();
 	void CalculateSpineRotation(float elapsedTime);
 
@@ -174,19 +172,11 @@ private:
 
 	// ── 魔法 ──
 	MagicManager magicManager;
-	NormalMagic::NormalMagicConfig normalMagicConfig;
-	NormalMagic normalMagic;
-
 	MagicInputController magicInputController;
 	MagicLoadout magicLoadout;
 
-	float magicCoolDownTimer = 0.0f;
-	float coolDownValue = 1.0f;				// 通常攻撃魔法のクールダウン
-	float fullcChargeCoolDownValue = 3.0f;	// フルチャージショット後のクールダウン
 	float magicRecoverDelay = 0.0f;			// 魔力を回復するまでの遅延
-	DirectX::XMFLOAT3 muzzlePos = { 0, 0, 0 }; // 発射方向
 	DirectX::XMFLOAT3 defultTarget = { 0, 0, 0 }; // 初期の狙ってる位置
-	bool isShot = false;
 
 	// ── IK関係 ──
 	DirectX::XMFLOAT3 headLocalForward = { 0.0f, 0.0f, 1.0f }; // 頭の向きを保存
@@ -212,7 +202,6 @@ private:
 	int debug_dirIndex = 0;
 	float CollisionOffset = 0.5f;
 
-	const float RB_THRESHOLD = 0.5f;
 	float debugAngle = 0.0f;
 
 	// ── シーケンサー・ノードエディタ ──
