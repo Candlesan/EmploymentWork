@@ -13,6 +13,7 @@
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidShotSkill.h"
 #include "GamePlay/Object/Magic/MagicType/InterceptMagic/InterceptSkill.h"
 #include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseSkill.h"
+#include "GamePlay/Object/Magic/MagicType/NormalMagic/LaserShotSkill.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -72,6 +73,9 @@ void Player::Initialize()
 
 	// 連射魔法をRTボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<RapidShotSkill>());
+
+	// 通常魔法をRBボタンに設定する
+	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RB)).AddCandidate(std::make_unique<LaserShotSkill>());
 
 	// 迎撃をLTボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LT)).AddCandidate(std::make_unique<InterceptSkill>());
@@ -687,10 +691,6 @@ void Player::MagicInput(float elapsedTime)
 	// LTを押したら
 	status.isIntercept = cmd.hold[static_cast<int>(MagicSlotIndex::LT)];
 	status.isRapidFire = cmd.hold[static_cast<int>(MagicSlotIndex::RT)];
-	bool isHold = (rbButtonHoldTime > RB_THRESHOLD); // RB長押しでチャージ（消える可能性あり）
-	
-	// 通常魔法系更新
-	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
 
 	// 通常魔法の発射位置を計算する
 	muzzlePos = {
@@ -698,6 +698,13 @@ void Player::MagicInput(float elapsedTime)
 		position.y + normalMagicConfig.spawnOffset.y,
 		position.z + normalMagicConfig.spawnOffset.z,
 	};
+
+#if 0
+	bool isHold = (rbButtonHoldTime > RB_THRESHOLD); // RB長押しでチャージ（消える可能性あり）
+	
+	// 通常魔法系更新
+	normalMagic.Update(elapsedTime, this, normalMagicConfig, isHold);
+
 
 	// ボタンを離したら予約をする
 	if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER && CanControl())
@@ -752,6 +759,7 @@ void Player::MagicInput(float elapsedTime)
 		normalMagic.ResetCharge();
 		isShot = false;
 	}
+#endif
 
 	// 通常攻撃中か（全身アニメなので構えの上半身を被せない）
 	bool isNormalAttack = isShot

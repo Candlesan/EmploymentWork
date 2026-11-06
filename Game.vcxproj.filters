@@ -657,6 +657,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -985,6 +988,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

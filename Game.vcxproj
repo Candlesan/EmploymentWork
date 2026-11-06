@@ -173,6 +173,7 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.h" />
@@ -291,6 +292,7 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.cpp" />
