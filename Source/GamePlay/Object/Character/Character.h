@@ -121,6 +121,8 @@ public:
 	void SetIsGaurd(bool flag) { defenseMagic.SetIsActive(flag); }
 	float GetCurrentDefense() const { return status.currentDefenseDurability; } // Œ»İ‚Ì–hŒä–‚–@‚Ì‘Ï‹v’l
 
+	const DefenseMagic& GetDefenceMagic() { return defenseMagic; }
+
 	// ----- ˆÚ“® / ‰ñ“] -----
 
 	// ˆÚ“®ˆ—i“ü—Í vx, vz, speed ‚ğó‚¯æ‚éj

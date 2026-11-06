@@ -232,9 +232,6 @@ private:
 	// ── サウンド ──
 	std::unordered_map<std::string, std::unique_ptr<AudioSource>> sounds;
 
-	// エフェクト関係
-	EffectHandle barrierEffect = InvalidEffect; // 防御魔法のエフェクト
-
 	// ── デバック ──
 	bool showAnimarionTransitionEditor = true;
 	bool showPlayerParameter = true;

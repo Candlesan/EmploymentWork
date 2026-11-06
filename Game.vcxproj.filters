@@ -654,6 +654,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\InterceptMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -979,6 +982,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\InterceptMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\DefenseMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

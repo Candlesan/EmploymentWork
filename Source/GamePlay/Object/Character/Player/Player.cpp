@@ -12,7 +12,7 @@
 #include "GamePlay/Object/CameraShake/CameraShake.h"
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidShotSkill.h"
 #include "GamePlay/Object/Magic/MagicType/InterceptMagic/InterceptSkill.h"
-
+#include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseSkill.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -69,11 +69,15 @@ void Player::Initialize()
 	normalMagicConfig.Load(); // 通常魔法の設定の読み込み
 
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
-	CustomEffectManager::Instance().LoadEffectConfig("Barreir", "Data/Json/Effect/Barreir.json"); // 防御魔法のエフェクトの読み込み
 
 	// 連射魔法をRTボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<RapidShotSkill>());
+
+	// 迎撃をLTボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LT)).AddCandidate(std::make_unique<InterceptSkill>());
+
+	// 防御をLBボタンに設定する
+	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LB)).AddCandidate(std::make_unique<DefenseSkill>());
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
@@ -765,40 +769,6 @@ void Player::MagicInput(float elapsedTime)
 	// 迎撃の構え（撃つ処理は InterceptSkill に移動）
 	if (status.isIntercept && CanControl() && flightController.IsFlying() && !isNormalAttack)
 		PlayActionGraph("Intercept");
-
-
-	// 防御魔法
-	if ((gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER)  && !status.isBreak && CanControl()) // ダウン状態でもバースト状態でもないとき
-	{
-		SetIsGaurd(true);
-
-		// まだ生きているかを確認する
-		if (!effectManager.Exists(barrierEffect))
-		{
-			DirectX::XMFLOAT3 effectAngle = {
-				DirectX::XMConvertToDegrees(angle.x),
-				DirectX::XMConvertToDegrees(angle.y),
-				DirectX::XMConvertToDegrees(angle.z)
-			};
-			barrierEffect = CustomEffectManager::Instance().PlayEffect("Barreir", position, effectAngle, { 1.5f, 1.5f, 1.5f });
-		}
-		else
-		{
-			// 出してる間はプレイヤーに追従させる
-			effectManager.SetPosition(barrierEffect, defenseMagic.GetDefensePosition());
-		}
-	}
-	else
-	{
-		SetIsGaurd(false);
-
-		// ボタンを離したら止めて、ポインタも空に戻す
-		if (barrierEffect)
-		{
-			effectManager.Stop(barrierEffect);
-			barrierEffect = InvalidEffect;
-		}
-	}
 
 	// スロットに入っている技を動かす
 	magicLoadout.Update(MakeMagicContext(), cmd, elapsedTime);

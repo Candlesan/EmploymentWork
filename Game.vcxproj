@@ -170,6 +170,7 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicProjectile.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h" />
@@ -287,6 +288,7 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicProjectile.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseSkill.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\DefenseMagic\DefenseMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\InterceptMagic\InterceptSkill.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp" />
