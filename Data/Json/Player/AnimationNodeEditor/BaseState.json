@@ -1,46 +1,6 @@
 {
     "links": [
         {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 6
-                }
-            ],
-            "fromState": "State_Idle",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "State_Move"
-        },
-        {
-            "Actions": [],
-            "colorA": 1.0,
-            "colorB": 1.0,
-            "colorG": 1.0,
-            "colorR": 1.0,
-            "conditions": [
-                {
-                    "buttonMask": 0,
-                    "negate": false,
-                    "targetDir": 0,
-                    "threshold": 0.10000000149011612,
-                    "type": 7
-                }
-            ],
-            "fromState": "State_Move",
-            "priority": 0,
-            "toSlot": 0,
-            "toState": "State_Idle"
-        },
-        {
             "Actions": [
                 {
                     "type": 3,
@@ -856,6 +816,133 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "NormalMagicAttack"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Walk"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": "Walk",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Idle"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": "Walk",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.5,
+                    "type": 7
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Walk"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.5,
+                    "type": 6
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Move"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 7
+                }
+            ],
+            "fromState": "State_Move",
+            "priority": 1,
+            "toSlot": 0,
+            "toState": "State_Idle"
         }
     ],
     "nodes": [
@@ -873,8 +960,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -367.0,
-                345.0
+                -991.0,
+                329.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Idle.json",
             "type": 1
@@ -893,8 +980,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -620.0,
-                489.0
+                -991.0,
+                601.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Move.json",
             "type": 1
@@ -1137,6 +1224,26 @@
                 -183.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Intercept.json",
+            "type": 1
+        },
+        {
+            "StateName": "Walk",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": true,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -1020.0,
+                473.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Walk.json",
             "type": 1
         }
     ]
