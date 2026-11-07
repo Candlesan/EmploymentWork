@@ -14,6 +14,7 @@
 #include "GamePlay/Object/Magic/MagicType/InterceptMagic/InterceptSkill.h"
 #include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseSkill.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/LaserShotSkill.h"
+#include "GamePlay/Object/Magic/MagicType/ShotgunMagic/ShotgunSkill.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -67,6 +68,9 @@ void Player::Initialize()
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
 
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
+
+	// ショットガンをRTに設定する
+	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<ShotgunSkill>());
 
 	// 連射魔法をRTボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<RapidShotSkill>());

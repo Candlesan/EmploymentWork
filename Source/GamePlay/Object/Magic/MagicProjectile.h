@@ -32,12 +32,26 @@ public:
 	void SetLifeTimer(float timer) { lifeTimer = timer; }
 	void SetSpeed(float s) { speed = s; }
 
-
+	// ‹——£Œ¸Š‚Ìİ’èig‚í‚ñ’e‚ÍŒÄ‚Î‚ñ‚©‚Á‚½‚ç¡‚Ü‚Å’Ê‚èj
+	void SetFalloff(float start, float end, float minRate)
+	{
+		useFalloff = true;
+		falloffStart = start;
+		falloffEnd = end;
+		falloffMinRate = minRate;
+	}
+	float GetDamage() const override;
 private:
-	float waitTimer = 0.0f;
-	float lifeTimer = 3.0f;
-	float speed = 5.0f;
+	float waitTimer = 0.0f; // ‘Ò‹@ŠÔ
+	float lifeTimer = 3.0f; // õ–½
+	float speed = 5.0f; // ’e‘¬
 	enum class ProjectileState {Wait, Fire}state = ProjectileState::Wait;
+
+	DirectX::XMFLOAT3 launchPos = {};  // Œ‚‚Á‚½ˆÊ’u
+	bool  useFalloff = false;
+	float falloffStart = 0.0f;   // ‚±‚±‚Ü‚Å‚Í100%
+	float falloffEnd = 0.0f;     // ‚±‚±‚ÅÅ’á‚Ì”{—¦‚É‚È‚é
+	float falloffMinRate = 1.0f; // Å’á‚Ì”{—¦
 
 	Effect* Magic = nullptr;
 	int magicHandle = -1;

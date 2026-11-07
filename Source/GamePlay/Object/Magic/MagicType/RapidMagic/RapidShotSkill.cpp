@@ -14,12 +14,6 @@ RapidShotSkill::RapidShotSkill()
 	// エフェクトを設定
 	rapidMagic.SetEffect("RapidMagic");
 	rapidMagic.SetHitEffect("RapidHit");
-
-	// 連射魔法の設定
-	//config.damage		= 0.01f;  // キャラクターに与えるダメージ
-	//config.gaurdDamage	= 2.0f;	  // 防御魔法に与えるダメージ
-	//config.hitRadius	= 0.25f;  // 当たり判定の大きさ
-	//config.speed		= 150.0f; // 弾速
 }
 
 void RapidShotSkill::OnHold(const MagicContext& ctx, float elapsedTime)

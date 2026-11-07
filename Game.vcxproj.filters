@@ -274,6 +274,9 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicType\InterceptMagic">
       <UniqueIdentifier>{cfbbb8f4-b871-4f9e-a3ce-b03fc7c03448}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic">
+      <UniqueIdentifier>{bc61ef81-aef9-434e-a247-0f09d2667f6a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -660,6 +663,12 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunMagic.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunSkill.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -991,6 +1000,12 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\LaserShotSkill.cpp">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\NormalMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunMagic.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunSkill.cpp">
+      <Filter>Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

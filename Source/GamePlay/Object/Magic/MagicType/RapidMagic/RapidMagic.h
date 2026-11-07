@@ -13,7 +13,6 @@ public:
         float rapidInterval = 0.1; // 発射間隔
         float gaurdDamage = 2; // 防御魔法へのダメージ
         float diffusion = 0.0f; // 拡散
-        float magicCost = 6.0f; // 魔力消費量
         
        DirectX::XMFLOAT3 spawnOffsets[6] = {
             { -1.0f,  1.0f,   0.0f }, // 左上
@@ -34,7 +33,6 @@ public:
             SaveBase(j); // 親(共通部分)を保存
 
             j["rapidInterval"] = rapidInterval;
-            j["magicCost"] = magicCost;
             j["diffusion"] = diffusion;
             j["gaurdDamage"] = gaurdDamage;
             j["offsetPosition"] = { offsetPosition.x, offsetPosition.y, offsetPosition.z };
@@ -65,7 +63,6 @@ public:
 
                 LoadBase(j); // 親を読み込む
                 if (j.find("rapidInterval") != j.end()) rapidInterval = j["rapidInterval"];
-                if (j.find("magicCost") != j.end()) magicCost = j["magicCost"];
                 if (j.find("diffusion") != j.end()) diffusion = j["diffusion"];
                 if (j.find("gaurdDamage") != j.end()) gaurdDamage = j["gaurdDamage"];
                 if (j.find("offsetPosition") != j.end()) offsetPosition = { j["offsetPosition"][0], j["offsetPosition"][1], j["offsetPosition"][2] };
@@ -95,7 +92,7 @@ public:
     // 更新処理
     void Update(float elapsedTime, MagicManager* manager, const MagicSpawnInfo& info, const RapidMagicConfig& config, bool isTriggered);
 
-    // GUI描画 (config を参照で受け取る！)
+    // GUI描画
     void DrawGUI(RapidMagicConfig& config);
 
    // エフェクト用のセッター

@@ -12,7 +12,7 @@ class MagicManager;
 class Character;
 
 // –‚–@‚Ìí—Ş
-enum class MagicKind {Normal, Rapid};
+enum class MagicKind {Normal, Rapid, Shotgun};
 
 // ’Êí–‚–@‚Ìó‘Ô
 enum class NormalMagicLevel { Normal, Charged };

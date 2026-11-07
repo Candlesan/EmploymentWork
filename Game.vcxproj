@@ -177,6 +177,8 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunMagic.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunSkill.h" />
     <ClInclude Include="Source\GamePlay\Object\Particle\compute_particle_system.h" />
     <ClInclude Include="Source\GamePlay\Object\Particle\Compute_Particle.h" />
     <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h" />
@@ -296,6 +298,8 @@
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\NormalMagic\NormalMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidMagic.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\RapidMagic\RapidShotSkill.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunMagic.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunSkill.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Particle\Compute_Particle.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Particle\compute_particle_system.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp" />

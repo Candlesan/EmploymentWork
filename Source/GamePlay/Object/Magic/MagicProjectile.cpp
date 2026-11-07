@@ -1,8 +1,8 @@
-#include "MagicProjectile.h"
+ï»¿#include "MagicProjectile.h"
 #include "System/Effect/EffectManager.h"
 #include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 MagicProjectile::MagicProjectile(MagicManager* manager, const std::string& effectPath)
 	: MagicBase(manager), effectName(effectPath)
 {
@@ -10,12 +10,12 @@ MagicProjectile::MagicProjectile(MagicManager* manager, const std::string& effec
 	magicHandle = -1;
 }
 
-// ƒfƒXƒgƒ‰ƒNƒ^
+// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 MagicProjectile::~MagicProjectile()
 {
 }
 
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 void MagicProjectile::Update(float elapsedTime)
 {
 	if (!isAlive) return;
@@ -58,7 +58,7 @@ void MagicProjectile::Update(float elapsedTime)
 			moveComponent->UpdateMove(position, direction, speed, elapsedTime);
 		}
 
-		// ƒGƒtƒFƒNƒg‚ÌˆÊ’u‚ğXV
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ä½ç½®ã‚’æ›´æ–°
 
 		if (customEffect)
 		{
@@ -70,11 +70,11 @@ void MagicProjectile::Update(float elapsedTime)
 			Magic->SetPosition(magicHandle, position);
 		}
 
-		// õ–½ˆ—
+		// å¯¿å‘½å‡¦ç†
 		lifeTimer -= elapsedTime;
 		if (lifeTimer < 0.0f)
 		{
-			// õ–½‚ªs‚«‚½‚Ì‚ÅAÁ–Åˆ—‚ğŒÄ‚Ño‚·
+			// å¯¿å‘½ãŒå°½ããŸã®ã§ã€æ¶ˆæ»…å‡¦ç†ã‚’å‘¼ã³å‡ºã™
 			OnTerminate();
 			return;
 		}
@@ -82,31 +82,31 @@ void MagicProjectile::Update(float elapsedTime)
 		break;
 	}
 
-	//ƒIƒuƒWƒFƒNƒgs—ñ‚ğXV
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¡Œåˆ—ã‚’æ›´æ–°
 	UpdateTransform();
 }
 
-// •`‰æˆ—
+// æç”»å‡¦ç†
 void MagicProjectile::Render(const RenderContext& rc)
 {
 }
 
-// ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu•`‰æ
+// ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–æç”»
 void MagicProjectile::RenderDebugPrimitive(ShapeRenderer* renderer)
 {
 	switch (shape)
 	{
 	case HitBoxShape::Sphere:
-		// ‹…‚ğ•`‰æ
+		// çƒã‚’æç”»
 		renderer->DrawSphere(position, radius, { 1, 0, 1, 1 });
 
 		break;
 	case HitBoxShape::Capsule:
-		// ’†SÀ•WEŒü‚«E’·‚³‚©‚çƒJƒvƒZƒ‹•`‰æ—p‚Ìs—ñ‚ğì¬
-		DirectX::XMVECTOR cPos = DirectX::XMLoadFloat3(&position); // ’†SÀ•W
+		// ä¸­å¿ƒåº§æ¨™ãƒ»å‘ããƒ»é•·ã•ã‹ã‚‰ã‚«ãƒ—ã‚»ãƒ«æç”»ç”¨ã®è¡Œåˆ—ã‚’ä½œæˆ
+		DirectX::XMVECTOR cPos = DirectX::XMLoadFloat3(&position); // ä¸­å¿ƒåº§æ¨™
 		DirectX::XMVECTOR dir = DirectX::XMLoadFloat3(&direction);
 
-		// •ûŒüƒxƒNƒgƒ‹‚Ì’·‚³‚ª0‚È‚çAƒfƒtƒHƒ‹ƒg‚Ì‘O•ûŒü (0, 0, 1) ‚É·‚µ‘Ö‚¦‚é
+		// æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ãŒ0ãªã‚‰ã€ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®å‰æ–¹å‘ (0, 0, 1) ã«å·®ã—æ›¿ãˆã‚‹
 		if (DirectX::XMVector3Equal(dir, DirectX::XMVectorZero()))
 		{
 			dir = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -122,27 +122,27 @@ void MagicProjectile::RenderDebugPrimitive(ShapeRenderer* renderer)
 			up = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		}
 
-		DirectX::XMMATRIX view = DirectX::XMMatrixLookToLH(cPos, dir, up); // ‚±‚±‚ÅƒGƒ‰[‚ª‹N‚«‚Ä‚é
+		DirectX::XMMATRIX view = DirectX::XMMatrixLookToLH(cPos, dir, up); // ã“ã“ã§ã‚¨ãƒ©ãƒ¼ãŒèµ·ãã¦ã‚‹
 		DirectX::XMMATRIX world = DirectX::XMMatrixInverse(nullptr, view);
 
-		// Y²•ûŒü‚ÖL‚Î‚·‚½‚ß‚É90“x‰ñ“]
+		// Yè»¸æ–¹å‘ã¸ä¼¸ã°ã™ãŸã‚ã«90åº¦å›è»¢
 		world = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f)) * world;
 
 		DirectX::XMFLOAT4X4 capsuleTransform;
 		DirectX::XMStoreFloat4x4(&capsuleTransform, world);
 
-		// Œü‚«‚Ì‡‚Á‚½ƒJƒvƒZƒ‹‚ğ•`‰æI
+		// å‘ãã®åˆã£ãŸã‚«ãƒ—ã‚»ãƒ«ã‚’æç”»ï¼
 		renderer->DrawCapsule(capsuleTransform, radius, height, { 1.0f, 0.0f, 1.0f, 1.0f });
 
 		break;
 	}
 }
 
-// ƒGƒtƒFƒNƒg‚ğÁ‚·ŠÖ”
+// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’æ¶ˆã™é–¢æ•°
 void MagicProjectile::OnTerminate()
 {
 	if (!GetIsAlive())
-		return; // “ñ“xÁ‚³‚È‚¢
+		return; // äºŒåº¦æ¶ˆã•ãªã„
 
 	isAlive = false;
 
@@ -158,11 +158,11 @@ void MagicProjectile::OnTerminate()
 		customEffect = InvalidEffect;
 	}
 
-	// ©•ª‚ğíœ
+	// è‡ªåˆ†ã‚’å‰Šé™¤
 	Destroy();
 }
 
-// ”­Ë
+// ç™ºå°„
 void MagicProjectile::Launch(const DirectX::XMFLOAT3& dir, const DirectX::XMFLOAT3& pos, float waitTime)
 {
 	this->direction = dir;
@@ -170,4 +170,21 @@ void MagicProjectile::Launch(const DirectX::XMFLOAT3& dir, const DirectX::XMFLOA
 	this->prevPosition = pos;
 	this->waitTimer = waitTime;
 	this->state = ProjectileState::Wait;
+}
+
+float MagicProjectile::GetDamage() const
+{
+	if (!useFalloff) return damage;
+
+	// æ’ƒã£ãŸä½ç½®ã‹ã‚‰ã®è·é›¢
+	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(
+		DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&position), DirectX::XMLoadFloat3(&launchPos))));
+
+	// 0ï¼ˆæ¸›ã‚Šå§‹ã‚ï¼‰ã€œ1ï¼ˆæ¸›ã‚Šçµ‚ã‚ã‚Šï¼‰ã«ã™ã‚‹
+	float t = (dist - falloffStart) / (std::max)(falloffEnd - falloffStart, 0.001f);
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	// 1.0 ã‹ã‚‰æœ€ä½ã®å€ç‡ã¾ã§ã‚’ç·šå½¢ã§ã¤ãªã
+	float rate = 1.0f + (falloffMinRate - 1.0f) * t;
+	return damage * rate;
 }
