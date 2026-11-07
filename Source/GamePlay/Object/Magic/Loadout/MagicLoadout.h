@@ -18,6 +18,8 @@ public:
 
 	// デバッグプリミティブ
 	void RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer);
+
+	void Clear() { for (auto& slot : slots) slot.Clear(); }
 private:
 	MagicSlot slots[MAGIC_SLOT_COUNT];
 };

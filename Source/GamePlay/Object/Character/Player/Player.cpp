@@ -10,11 +10,14 @@
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
 #include "GamePlay/Object/Camera/Camera.h"
 #include "GamePlay/Object/CameraShake/CameraShake.h"
+
+// 装備スロット関係
 #include "GamePlay/Object/Magic/MagicType/RapidMagic/RapidShotSkill.h"
 #include "GamePlay/Object/Magic/MagicType/InterceptMagic/InterceptSkill.h"
 #include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseSkill.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/LaserShotSkill.h"
 #include "GamePlay/Object/Magic/MagicType/ShotgunMagic/ShotgunSkill.h"
+#include "GamePlay/Object/Magic/Loadout/LoadoutData.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -69,6 +72,8 @@ void Player::Initialize()
 
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
+	magicLoadout.Clear(); // 入り直したときに候補が増えないようにする
+
 	// ショットガンをRTに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<ShotgunSkill>());
 
@@ -83,6 +88,12 @@ void Player::Initialize()
 
 	// 防御をLBボタンに設定する
 	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LB)).AddCandidate(std::make_unique<DefenseSkill>());
+
+	// 決めた後にLoadoutDataの番号で装備を決める
+	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
+	{
+		magicLoadout.GetSlot(i).SetEquipped(LoadoutData::Instance().equippedIndex[i]);
+	}
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);

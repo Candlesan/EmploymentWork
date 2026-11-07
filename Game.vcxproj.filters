@@ -669,6 +669,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunSkill.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\LoadoutData.h">
+      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">

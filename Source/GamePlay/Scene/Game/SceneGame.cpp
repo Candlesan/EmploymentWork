@@ -12,6 +12,7 @@
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "Gameplay/Scene/Manager/SceneManager.h"
+#include "GamePlay/Scene/Load/SceneLoad.h"
 
 #include <imgui.h>
 #include <fstream>
@@ -624,6 +625,11 @@ void SceneGame::DrawGUI()
 
 			if (ImGui::Button(u8"再生時間を元に戻す")) {
 				timeScale = 1.0f;
+			}
+
+			if (ImGui::Button(u8"シーンゲームを作り直す"))
+			{
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
 			}
 		}
 		ImGui::End();

@@ -1,4 +1,6 @@
 #include "MagicLoadout.h"
+#include "GamePlay/Object/Magic/Loadout/LoadoutData.h"
+
 #include <imgui.h>
 
 // 更新処理
@@ -34,13 +36,16 @@ void MagicLoadout::DrawGUI()
 			{
 				bool selected = (c == slot.GetEquippedIndex());
 				if (ImGui::Selectable(slot.GetCandidate(c)->GetName(), selected))
+				{
+					LoadoutData::Instance().equippedIndex[i] = c;
 					slot.SetEquipped(c);
+				}
 			}
 			ImGui::EndCombo();
 		}
 	}
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
 	{
 		IMagicSkill* skill = slots[i].GetEquipped(); // 装備を取得する
 		if (!skill) continue;
@@ -52,7 +57,7 @@ void MagicLoadout::DrawGUI()
 // デバックプリミティブ描画
 void MagicLoadout::RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer)
 {
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
 	{
 		IMagicSkill* skill = slots[i].GetEquipped(); // 装備を取得する
 		if (!skill) continue;
