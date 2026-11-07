@@ -1,10 +1,13 @@
 #include "MagicLoadout.h"
+#include <imgui.h>
 
 // XVˆ—
 void MagicLoadout::Update(const MagicContext& ctx, const MagicCommand& cmd, float elapsedTime)
 {
 	for (int i = 0; i < 4; ++i)
 	{
+		slots[i].ApplyPending(ctx); // —\–ñ‚³‚ê‚Ä‚½‚çA‚±‚±‚Å“ü‚ê‘Ö‚¦‚é
+
 		IMagicSkill* skill = slots[i].GetEquipped(); // ‘•”õ‚ğæ“¾‚·‚é
 		if (!skill) continue;
 
@@ -18,6 +21,25 @@ void MagicLoadout::Update(const MagicContext& ctx, const MagicCommand& cmd, floa
 // GUI•`‰æ
 void MagicLoadout::DrawGUI()
 {
+	static const char* slotNames[MAGIC_SLOT_COUNT] = { "RB", "RT", "LB", "LT" };
+
+	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
+	{
+		MagicSlot& slot = slots[i];
+		IMagicSkill* equipped = slot.GetEquipped();
+
+		if (ImGui::BeginCombo(slotNames[i], equipped ? equipped->GetName() : "-"))
+		{
+			for (int c = 0; c < slot.GetCandidateCount(); ++c)
+			{
+				bool selected = (c == slot.GetEquippedIndex());
+				if (ImGui::Selectable(slot.GetCandidate(c)->GetName(), selected))
+					slot.SetEquipped(c);
+			}
+			ImGui::EndCombo();
+		}
+	}
+
 	for (int i = 0; i < 4; ++i)
 	{
 		IMagicSkill* skill = slots[i].GetEquipped(); // ‘•”õ‚ğæ“¾‚·‚é

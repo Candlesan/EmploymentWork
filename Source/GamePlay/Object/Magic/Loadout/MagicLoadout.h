@@ -10,7 +10,7 @@ public:
 	// 更新処理
 	void Update(const MagicContext& ctx, const MagicCommand& cmd, float elapsedTime);
 
-	// スロットの中身を消す関数
+	// スロットの中身を返す関数
 	MagicSlot& GetSlot(int index) { return slots[static_cast<int>(index)]; }
 
 	// GUI描画

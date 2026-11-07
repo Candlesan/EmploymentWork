@@ -11,6 +11,7 @@ public:
 	void OnRelease(const MagicContext& ctx) override;
 	void Update(const MagicContext& ctx, float elapsedTime) override;
 	void DrawGUI() override;
+	void OnUnequip(const MagicContext& ctx) override { OnRelease(ctx); }
 	const char* GetName() const override { return u8"–hŒä–‚–@"; }
 
 private:

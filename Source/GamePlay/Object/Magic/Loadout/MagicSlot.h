@@ -10,13 +10,26 @@ public:
 	// 候補を足す関数
 	void AddCandidate(std::unique_ptr<IMagicSkill> skill);
 
+	// 候補の数を返す関数
+	int GetCandidateCount() const;
+
+	// 選択された装備を返す関数
+	IMagicSkill* GetCandidate(int index) const;
+
 	// 装備中の技を返す関数
 	IMagicSkill* GetEquipped() const;
 
-	// 装備を切り替える関数
+	// 今装備している番号を返す関数
+	int GetEquippedIndex() const { return equippedIndex; }
+
+	// 装備を切り替えるを予約する関数
 	void SetEquipped(int index);
+
+	//　装備を切り替える関数
+	void ApplyPending(const MagicContext& ctx);
 
 private:
 	std::vector<std::unique_ptr<IMagicSkill>> candidates; // 候補の技リスト
 	int equippedIndex = 0; // 今どれを装備しているか
+	int pendingIndex = -1;
 };

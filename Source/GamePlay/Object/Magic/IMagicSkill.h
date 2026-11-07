@@ -16,4 +16,5 @@ public:
 	virtual const char* GetName() const = 0;
 	virtual bool IsBusy() const { return false; }
 	virtual bool IsReady() const { return true; } // ¡g‚¦‚éó‘Ô‚©
+	virtual void OnUnequip(const MagicContext& ctx) {} // ŠO‚³‚ê‚é‚Æ‚«
 };

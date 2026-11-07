@@ -16,11 +16,33 @@ IMagicSkill* MagicSlot::GetEquipped() const
 	return candidates[equippedIndex].get();
 }
 
-// ‘•”õ‚ğØ‚è‘Ö‚¦‚éŠÖ”
+// Œó•â‚Ì”‚ğ•Ô‚·ŠÖ”
+int MagicSlot::GetCandidateCount() const
+{
+	return static_cast<int>(candidates.size());
+}
+
+// ‘I‘ğ‚³‚ê‚½‘•”õ‚ğ•Ô‚·ŠÖ”
+IMagicSkill* MagicSlot::GetCandidate(int index) const
+{
+	if (index < 0 || index >= static_cast<int>(candidates.size())) return nullptr;
+	return candidates[index].get();
+}
+
+// ‘•”õ‚ğØ‚è‘Ö‚¦‚ğ—\–ñ‚·‚éŠÖ”
 void MagicSlot::SetEquipped(int index)
 {
 	// ”ÍˆÍŠO‚Ì”Ô†‚Í–³‹‚·‚é
 	if (index < 0 || index >= static_cast<int>(candidates.size())) return;
 
-	equippedIndex = index;
+	pendingIndex = index;
+}
+
+// ‘•”õ‚ğØ‚è‘Ö‚¦‚éŠÖ”
+void MagicSlot::ApplyPending(const MagicContext& ctx)
+{
+	if (pendingIndex < 0 || pendingIndex == equippedIndex) { pendingIndex = -1; return; }
+	if (IMagicSkill* old = GetEquipped()) old->OnUnequip(ctx);
+	equippedIndex = pendingIndex;
+	pendingIndex = -1;
 }
