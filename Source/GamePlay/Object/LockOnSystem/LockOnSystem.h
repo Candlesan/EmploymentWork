@@ -50,12 +50,18 @@ public:
 	
 	bool GetAuotAim() const { return autoAim; }
 	void SetAuotAim(bool flag) { autoAim = flag; }
+
+	float GetAssistAngle() const { return assistAngle; }
+	void SetAssistAngle(float value) { assistAngle = value; }
+
+	float GetTrackingStrength() const { return trackingStrength; }
+	void SetTrackingStrength(float value) { trackingStrength = value; }
 private:
 	// ロックオンが出来るか
-	bool IsTargetable(const DirectX::XMFLOAT3& aimDirection) const;
+	bool IsTargetable() const;
 
 	// 敵が画面内にいるか
-	bool IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Camera& camera) const;
+	bool IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Camera& camera, const DirectX::XMFLOAT2& limit = { 1, 1 }) const;
 private:
 	Character* owner = nullptr;
 	Character* target = nullptr;
@@ -69,8 +75,8 @@ private:
 	bool hardLock = false; // 敵が画面中央に固定されるフラグ
 
 	// GUI用
+	DirectX::XMFLOAT2 lockFrame = { 0.5, 0.5 }; // オートロックの範囲
 	float range = 100.0f; // 自動ロックオン射程距離
-	float lockAngle = 45.0f; // ロックオン判定の角度
 	float lockTime = 0.3; // ロックオン判定になるまでの時間(秒)
 	float leadError = 0.0f; // 偏差の誤差
 	bool autoAim = true; // オートエイムを使うか

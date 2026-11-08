@@ -483,8 +483,6 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"滑り度合い", &overSpeedDecel, 0.1f);
 				ImGui::DragFloat(u8"空中の摩擦係数", &airFrictionRate, 0.1f);
 			}
-
-			lockOn.DrawGUI();
 		}
 
 

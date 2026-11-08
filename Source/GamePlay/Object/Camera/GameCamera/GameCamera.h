@@ -47,7 +47,9 @@ private:
 	float currentFov = 45.0f; // 今の実際のFOV
 	float defaultFov = 45.0f; // 通常時のFOV
 	float maxFov = 65.0f; // 最大FOV
-	float targetFov = 0.0f;
+	float targetFov = 0.0f; // 目標のFOV
+	float fovVelocity = 0.0f; // FOVの速度
+
 	
 	float radius = 0.2f; // カメラの当たり判定
 	float assistStrength = 0.4f; // アシストの強さ(0～1)

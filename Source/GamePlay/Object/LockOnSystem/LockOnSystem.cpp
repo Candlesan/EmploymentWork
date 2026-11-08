@@ -23,7 +23,7 @@ void LockOnSystem::Update(float elapsedTime, const DirectX::XMFLOAT3& direction)
 
 
 	// ロックが可能ならタイマーを増やす
-	if (IsTargetable(aimDirection))
+	if (IsTargetable())
 	{
 		lockTimer += elapsedTime;
 
@@ -66,15 +66,11 @@ void LockOnSystem::DrawGUI()
 		}
 
 		ImGui::Checkbox(u8"オートエイム", &autoAim);
+		ImGui::DragFloat2(u8"ロックオンの感知範囲", &lockFrame.x, 0.01f, 0.0f, 1.0f);
 		ImGui::DragFloat(u8"ロックオンの感知距離", &range, 0.1f);
-		ImGui::DragFloat(u8"ロックオンの感知角度", &lockAngle, 0.1f);
 		ImGui::DragFloat(u8"ターゲット補足時間", &lockTime, 0.1f);
 		ImGui::Separator();
 
-		ImGui::DragFloat(u8"エイムアシストの感知角度", &assistAngle, 0.1f);
-		ImGui::DragFloat(u8"追尾の強さ", &trackingStrength, 0.1f);
-
-		ImGui::Separator();
 		ui.DrawGUI();
 	}
 }
@@ -247,32 +243,24 @@ DirectX::XMFLOAT2 LockOnSystem::GetTarckingAssist(const DirectX::XMFLOAT3& origi
 }
 
 // ロックオンできるか
-bool LockOnSystem::IsTargetable(const DirectX::XMFLOAT3& aimDirection) const
+bool LockOnSystem::IsTargetable() const
 {
+	DirectX::XMFLOAT3 enemy = target->GetPosition();
+	enemy.y += 0.8f;
+
 	// 距離の計算
 	DirectX::XMVECTOR ownerPos = DirectX::XMLoadFloat3(&owner->GetPosition());
-	DirectX::XMVECTOR targetPos = DirectX::XMLoadFloat3(&target->GetPosition());
+	DirectX::XMVECTOR targetPos = DirectX::XMLoadFloat3(&enemy);
 	DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(targetPos, ownerPos);
 	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec));
 	if (dist < 0.00001f) return false;
 
-	if (!hardLock)
-	{
-		// 角度の計算
-		DirectX::XMVECTOR ownerDirection = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&aimDirection));
-		DirectX::XMVECTOR targetDirection = DirectX::XMVector3Normalize(Vec);
-		float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(targetDirection, ownerDirection));
-
-		// その値がlockAngle以下ならfalse
-		if (dot < std::cosf(DirectX::XMConvertToRadians(lockAngle)))
-		{
-			return false;
-		}
-	}
+	// ハードロックは１でそれ以外はlockFrameを使う
+	DirectX::XMFLOAT2 limit = hardLock ? DirectX::XMFLOAT2{ 1.0f, 1.0f } : lockFrame;
 
 	// 画面外ならfalse
 	Camera& camera = CameraManager::Instance().GetMainCamera();
-	if (!IsEnemyInScreen(target->GetPosition(), camera))
+	if (!IsEnemyInScreen(target->GetPosition(), camera, lockFrame))
 	{
 		return false;
 	}
@@ -287,7 +275,7 @@ bool LockOnSystem::IsTargetable(const DirectX::XMFLOAT3& aimDirection) const
 }
 
 // 敵が画面内にいるか
-bool LockOnSystem::IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Camera& camera) const
+bool LockOnSystem::IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Camera& camera, const DirectX::XMFLOAT2& limit) const
 {
 	using namespace DirectX;
 
@@ -313,8 +301,8 @@ bool LockOnSystem::IsEnemyInScreen(const DirectX::XMFLOAT3& worldPos, const Came
 	float ndcY = clip.y / clip.w;
 
 	// 画面外ならfalse
-	if (ndcX < -1.0f || ndcX > 1.0f ||
-		ndcY < -1.0f || ndcY > 1.0f) 
+	if (ndcX < -limit.x || ndcX > limit.x ||
+		ndcY < -limit.y || ndcY > limit.y)
 	{
 		return false;
 	}

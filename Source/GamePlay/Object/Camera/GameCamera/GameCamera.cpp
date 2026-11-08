@@ -8,6 +8,7 @@
 #include "GamePlay/Object/CameraShake/CameraShake.h"
 
 #include <imgui.h>
+#include <cmath>
 #include <algorithm>
 
 // 更新処理
@@ -156,34 +157,22 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	eye.y = pivot.y - front.y * currentDistance;
 	eye.z = pivot.z - front.z * currentDistance;
 
-	targetFov = defaultFov;
-
 	std::string playerState = Player::Instance().GetCurrentState();
 	bool isWideFov = (playerState.find("Avoid") != std::string::npos
 		|| playerState.find("Dodge") != std::string::npos
-		|| playerState.find("AS_Run_") != std::string::npos);
+		|| playerState.find("AS_Run_") != std::string::npos
+		|| playerState.find("AS_Jump_") != std::string::npos);
 		
+	targetFov = isWideFov ? maxFov : defaultFov;
 
-	// 回避中なら、目標FOVを広くする
-	if (isWideFov)
-	{
-		targetFov = isWideFov ? maxFov : defaultFov;
-	}
+	// スプリング補間(バネの運動方程式：x(t) = (x₀ + (v₀ + ω x₀) t) × e^(-ωt))
+	float omega = (targetFov > currentFov) ? 20.0f : 7.0f; 
+	float diff = currentFov - targetFov; // 差分値
+	float temp = (fovVelocity + omega * diff) * elapsedTime; // 位置の更新
+	float decay = std::exp(-omega * elapsedTime); // どれだけの割合が残るか
 
-	float fovLerpSpeed = 5.0f;
-	if (targetFov > currentFov)
-	{
-		fovLerpSpeed = 20.0f;
-	}
-	else
-	{
-		fovLerpSpeed = 5.0f;
-	}
-
-	float lerpFactor = fovLerpSpeed * elapsedTime;
-	if (lerpFactor > 1.0f) lerpFactor = 1.0f;
-
-	currentFov += (targetFov - currentFov) * lerpFactor;
+	fovVelocity = (fovVelocity - omega * temp) * decay;
+	currentFov = targetFov + (diff + temp) * decay;
 
 	// カメラシェイク
 	DirectX::XMFLOAT3 shake = CameraShakeManager::Instance().GetOffset(player.GetPosition());
@@ -204,6 +193,8 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 
 void GameCamera::DrawGUI()
 {
+	Player& player = Player::Instance();
+
 	if (ImGui::CollapsingHeader(u8"調整"))
 	{
 		ImGui::DragFloat3(u8"オフセット", &offset.x, 0.01f, -3.0f, 3.0f);
@@ -218,10 +209,24 @@ void GameCamera::DrawGUI()
 		ImGui::DragFloat(u8"回避FOV", &maxFov, 0.1f, 10.0f, 120.0f);
 	}
 
+	player.GetLockOnSystem().DrawGUI();
+
 	if (ImGui::CollapsingHeader(u8"エイムアシスト"))
 	{
+		float assistAngle = player.GetLockOnSystem().GetAssistAngle();
+		float trackingStrength = player.GetLockOnSystem().GetTrackingStrength();
+
 		ImGui::Text(u8"アシスト: %.2f", Player::Instance().GetLockOnSystem().AimAssistScale());
 		ImGui::DragFloat(u8"エイムアシストの強さ", &assistStrength, 0.1f, 0.0f, 1.0f);
+		if (ImGui::DragFloat(u8"エイムアシストの感知角度", &assistAngle, 0.1f))
+		{
+			player.GetLockOnSystem().SetAssistAngle(assistAngle);
+		}
+		if (ImGui::DragFloat(u8"追尾の強さ", &trackingStrength, 0.1f))
+		{
+			player.GetLockOnSystem().SetTrackingStrength(trackingStrength);
+		}
+
 	}
 
 	if (ImGui::CollapsingHeader(u8"カメラシェイク"))
