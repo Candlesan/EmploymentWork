@@ -159,13 +159,15 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 	targetFov = defaultFov;
 
 	std::string playerState = Player::Instance().GetCurrentState();
-	bool isAvoiding = (playerState.find("Avoid") != std::string::npos ||
-		playerState.find("Dodge") != std::string::npos);
+	bool isWideFov = (playerState.find("Avoid") != std::string::npos
+		|| playerState.find("Dodge") != std::string::npos
+		|| playerState.find("AS_Run_") != std::string::npos);
+		
 
 	// 回避中なら、目標FOVを広くする
-	if (isAvoiding)
+	if (isWideFov)
 	{
-		targetFov = maxFov;
+		targetFov = isWideFov ? maxFov : defaultFov;
 	}
 
 	float fovLerpSpeed = 5.0f;
