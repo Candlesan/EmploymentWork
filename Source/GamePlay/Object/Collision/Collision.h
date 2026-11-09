@@ -63,6 +63,8 @@ public:
 	{
 		DirectX::XMFLOAT3 positions[3];
 		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT3 boundsMin; // 箱を囲む最小の点
+		DirectX::XMFLOAT3 boundsMax; // 箱を囲む最大の点
 	};
 	// エリアの定義
 	struct Area

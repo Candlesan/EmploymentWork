@@ -59,6 +59,10 @@ Stage::Stage()
 			DirectX::XMStoreFloat3(&triangle.positions[2], C);
 			DirectX::XMStoreFloat3(&triangle.normal, N);
 
+			// 箱に入る最小点と最大点を保存する
+			DirectX::XMStoreFloat3(&triangle.boundsMin, DirectX::XMVectorMin(A, DirectX::XMVectorMin(B, C)));
+			DirectX::XMStoreFloat3(&triangle.boundsMax, DirectX::XMVectorMax(A, DirectX::XMVectorMax(B, C)));
+
 			// モデル全体のAABBを計測
 			VolumeMin = DirectX::XMVectorMin(VolumeMin, A);
 			VolumeMin = DirectX::XMVectorMin(VolumeMin, B);

@@ -287,6 +287,18 @@ bool Collision::SphereCast(
         rayAABB.Extents.y += radius;
         rayAABB.Extents.z += radius;
 
+        // キャスト全体を囲む箱の最小点と最大点
+        const DirectX::XMFLOAT3 rayMin = {
+            rayAABB.Center.x - rayAABB.Extents.x,
+            rayAABB.Center.y - rayAABB.Extents.y,
+            rayAABB.Center.z - rayAABB.Extents.z,
+        };
+        const DirectX::XMFLOAT3 rayMax = {
+            rayAABB.Center.x + rayAABB.Extents.x,
+            rayAABB.Center.y + rayAABB.Extents.y,
+            rayAABB.Center.z + rayAABB.Extents.z,
+        };
+
         // エリアごとにチェック
         for (const Area& area : areas)
         {
@@ -297,6 +309,14 @@ bool Collision::SphereCast(
             for (int triIndex : area.triangleIndices)
             {
                 const Triangle& triangle = triangles[triIndex];
+
+                // 箱が重ならない三角形は重い判定をせずに飛ばす
+                if (triangle.boundsMax.x < rayMin.x || triangle.boundsMin.x > rayMax.x ||
+                    triangle.boundsMax.y < rayMin.y || triangle.boundsMin.y > rayMax.y ||
+                    triangle.boundsMax.z < rayMin.z || triangle.boundsMin.z > rayMax.z)
+                {
+                    continue;
+                }
 
                 // 接触部分の位置を読み込む
                 DirectX::XMVECTOR Positions[3] =
