@@ -171,7 +171,7 @@ private:
 	// ‚’¼ˆÚ“®XVˆ—
 	void UpdateVerticalMove(float elapsedTime);
 
-	bool MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical);
+	bool MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical, float snapDistance = 0.0f);
 
 	// •Ç‚É‚ß‚è‚ñ‚Å‚¢‚½‚ç‰Ÿ‚µo‚·
 	void PushOutFromWalls();

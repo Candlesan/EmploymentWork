@@ -344,7 +344,15 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		float my = velocity.y * elapsedTime;
 		if (my <= 0.0f) // 落下/接地
 		{
-			if (MoveAndSlide({ 0.0f, my, 0.0f }, true))
+			// 接地中は下り坂で地面から離れないように、坂を下る分だけ地面を長めに探す
+			float snapDistance = 1.0f;
+			if (isGround)
+			{
+				float horizontalSpeed = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+				snapDistance = horizontalSpeed * elapsedTime * tanf(slopeLimit) + 0.02f;
+			}
+
+			if (MoveAndSlide({ 0.0f, my, 0.0f }, true, snapDistance))
 			{
 				// 地面に着いたとき
 				velocity.y = 0.0f;
@@ -391,7 +399,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
 }
 
 // スフィアキャストを使用した壁ずり処理
-bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
+bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical, float snapDistance)
 {
 	DirectX::XMVECTOR Position = DirectX::XMLoadFloat3(&position);
 	DirectX::XMVECTOR Move = DirectX::XMLoadFloat3(&move);
@@ -412,7 +420,7 @@ bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
 			//縦移動はステップオフセット分もキャスト量を増やす
 			if (vertical)
 			{
-				distance += stepOffset;
+				distance += stepOffset + snapDistance;
 			}
 
 			DirectX::XMVECTOR Origin = DirectX::XMVectorAdd(Position, CenterOffset); //開始位置
@@ -462,6 +470,10 @@ bool Character::MoveAndSlide(const DirectX::XMFLOAT3& move, bool vertical)
 
 					// 急な面では持ち上げないようにする
 					if (moveDistance < 0.0f) moveDistance = 0.0f;
+
+					// 急面には吸着しない（本来の移動量より下には動かさない）
+					float maxMoveDistance = DirectX::XMVectorGetX(DirectX::XMVector3Length(Move));
+					if (moveDistance > maxMoveDistance) moveDistance = maxMoveDistance;
 				}
 				else
 				{

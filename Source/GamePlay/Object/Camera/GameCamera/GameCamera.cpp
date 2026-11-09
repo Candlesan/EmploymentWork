@@ -159,11 +159,22 @@ void GameCamera::Update(float elapsedTime, const std::vector<Collision::Triangle
 
 	std::string playerState = Player::Instance().GetCurrentState();
 	bool isWideFov = (playerState.find("Avoid") != std::string::npos
-		|| playerState.find("Dodge") != std::string::npos
-		|| playerState.find("AS_Run_") != std::string::npos
-		|| playerState.find("AS_Jump_") != std::string::npos);
+		|| playerState.find("Dodge") != std::string::npos);
 		
 	targetFov = isWideFov ? maxFov : defaultFov;
+
+	if (isWideFov)
+	{
+		targetFov = maxFov;
+	}
+	else if (playerState.find("AS_Run_") != std::string::npos || playerState.find("AS_Jump_") != std::string::npos)
+	{
+		targetFov = moveFov;
+	}
+	else
+	{
+		targetFov = defaultFov;
+	}
 
 	// スプリング補間(バネの運動方程式：x(t) = (x₀ + (v₀ + ω x₀) t) × e^(-ωt))
 	float omega = (targetFov > currentFov) ? 20.0f : 7.0f; 

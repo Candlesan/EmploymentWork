@@ -46,6 +46,7 @@ private:
 
 	float currentFov = 45.0f; // ¡‚ÌÀÛ‚ÌFOV
 	float defaultFov = 45.0f; // ’Êí‚ÌFOV
+	float moveFov = 50.0f; // ˆÚ“®‚ÌFOV
 	float maxFov = 65.0f; // Å‘åFOV
 	float targetFov = 0.0f; // –Ú•W‚ÌFOV
 	float fovVelocity = 0.0f; // FOV‚Ì‘¬“x
