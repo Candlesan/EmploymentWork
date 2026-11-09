@@ -27,6 +27,9 @@ Compute_Particle::Compute_Particle(ID3D11Device* device, int maxParticle) : devi
 
 void Compute_Particle::Update(ID3D11DeviceContext* dc, DirectX::XMFLOAT3 parent_delta, float elapsedTime)
 {
+    // 奥行きソート用にカメラの行列を Compute Shader へ渡す
+    dc->CSSetConstantBuffers(7, 1, sceneConstantBuffer.GetAddressOf());
+
     system->update(dc, parent_delta, elapsedTime);
 }
 
