@@ -307,6 +307,13 @@
                     "targetDir": 0,
                     "threshold": 7.0,
                     "type": 20
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 19
                 }
             ],
             "fromState": "Fly",
