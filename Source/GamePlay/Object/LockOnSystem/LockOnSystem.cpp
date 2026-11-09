@@ -50,7 +50,7 @@ void LockOnSystem::Update(float elapsedTime, const DirectX::XMFLOAT3& direction)
 
 void LockOnSystem::DrawGUI()
 {
-	if (ImGui::CollapsingHeader(u8"ロックオンシステム"))
+	if (ImGui::CollapsingHeader(u8"オートエイム"))
 	{
 		switch (state)
 		{
@@ -65,7 +65,12 @@ void LockOnSystem::DrawGUI()
 			break;
 		}
 
-		ImGui::Checkbox(u8"オートエイム", &autoAim);
+		const char* buttonLabel = autoAim ? u8"エイムアシストに切り替え" : u8"オートエイムに切り替え";
+		if (ImGui::Button(buttonLabel))
+		{
+			autoAim = !autoAim;
+			aimAssist = !aimAssist;
+		}
 		ImGui::DragFloat2(u8"ロックオンの感知範囲", &lockFrame.x, 0.01f, 0.0f, 1.0f);
 		ImGui::DragFloat(u8"ロックオンの感知距離", &range, 0.1f);
 		ImGui::DragFloat(u8"ターゲット補足時間", &lockTime, 0.1f);
@@ -174,7 +179,7 @@ float LockOnSystem::GetLockProgress() const
 float LockOnSystem::AimAssistScale()
 {
 	if (!target || assistAngle <= 0.0f) return 0.0f;
-
+	if (hardLock || !aimAssist) return 0.0f;
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 
 	// カメラの正面とカメラ->敵からアシスト判定の角度を計算する
@@ -260,7 +265,7 @@ bool LockOnSystem::IsTargetable() const
 
 	// 画面外ならfalse
 	Camera& camera = CameraManager::Instance().GetMainCamera();
-	if (!IsEnemyInScreen(target->GetPosition(), camera, lockFrame))
+	if (!IsEnemyInScreen(target->GetPosition(), camera, limit))
 	{
 		return false;
 	}

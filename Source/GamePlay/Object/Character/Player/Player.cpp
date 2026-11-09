@@ -623,8 +623,11 @@ void Player::RenderDebugPrimitive(ShapeRenderer* renderer)
 		renderer->DrawSphere(defenseMagic.GetDefensePosition(), defenseMagic.GetDefenseRadius(), { 0, 0, 1, 1 });
 	}
 
+	// 狙ってる位置を描画
+	if(!lockOn.GetAuotAim())
 	renderer->DrawSphere(GetAimPoint(100.0f), 0.5f, {1, 0, 0, 1});
 
+	// 魔法の当たり判定を描画
 	magicLoadout.RenderDebugPrimitive(MakeMagicContext(), renderer);
 }
 
@@ -944,7 +947,12 @@ void Player::InputMove(float elapsedTime)
 		: defultTarget;
 
 	// 回転処理
-	if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
+	if (lockOn.IsHardLock())
+	{
+		// ハードロックの時は敵の方を向く
+		TurnToPosition(elapsedTime, enemy->GetPosition(), turnSpeed);
+	}
+	else if (currentState == "AS_Combo_Attack_04_02_Seq_0" || currentState == "AS_Combo_Attack_03_04_Seq_0")
 	{
 		// 魔法中は敵の方を向く
 		TurnToPosition(elapsedTime, aimPos, turnSpeed);

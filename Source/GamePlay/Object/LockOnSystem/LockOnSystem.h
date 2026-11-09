@@ -80,6 +80,7 @@ private:
 	float lockTime = 0.3; // ロックオン判定になるまでの時間(秒)
 	float leadError = 0.0f; // 偏差の誤差
 	bool autoAim = true; // オートエイムを使うか
+	bool aimAssist = false; // エイムアシストを使うか
 
 	DirectX::XMFLOAT2 prevTargetAngle = { 0, 0 }; // 前のフレームの角度
 	bool hasPrevAngle = false; // 前フレームの角度があるか

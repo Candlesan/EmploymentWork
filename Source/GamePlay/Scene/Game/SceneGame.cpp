@@ -125,8 +125,6 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-	GamePad& gamePad = Input::Instance().GetGamePad();
-
 	// 演出用の倍率
 	float gameplayEffectScale = 1.0f;
 
@@ -209,13 +207,6 @@ void SceneGame::Update(float elapsedTime)
 
 		// プレイヤーのUI更新
 		playerUI.Update(Player::Instance().GetStatus());
-
-		// Rスティック押し込みでオートエイム/エイムアシスト切り替え
-		if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
-		{
-			LockOnSystem& lockOn = player.GetLockOnSystem();
-			lockOn.SetAuotAim(!lockOn.GetAuotAim());
-		}
 
 		// クロスヘア更新
 		playerUI.UpdateCrosshair(elapsedTime, player.GetLockOnSystem(), camera);
