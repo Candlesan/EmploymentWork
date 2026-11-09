@@ -7,7 +7,7 @@ void main()
 {
     //  死亡カウンターを取得&初期化
     uint destroy_counter = indirect_data_buffer.Load(IndirectArgumentsNumDeadParticle);
-    indirect_data_buffer.Store(IndirectArgumentsNumDeadParticle, 0);
+    //indirect_data_buffer.Store(IndirectArgumentsNumDeadParticle, 0);
     
     //  現在フレームでのパーティクル総数を再計算
     uint current_num_particle = indirect_data_buffer.Load(IndirectArgumentsNumCurrentParticle);

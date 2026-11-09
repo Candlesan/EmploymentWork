@@ -16,7 +16,12 @@
 #include <imgui.h>
 
 // 垂直同期間隔設定
+#ifdef _DEBUG
 static const int syncInterval = 0;
+#else
+static const int syncInterval = 1;
+#endif // _DEBUG
+
 
 // コンストラクタ
 Framework::Framework(HWND hWnd)

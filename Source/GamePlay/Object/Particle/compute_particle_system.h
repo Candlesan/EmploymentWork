@@ -73,7 +73,7 @@ public:
         DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // 拡大の加速度
 
         // 単一イージング
-        DirectX::XMFLOAT3 renderScale = { 1.0f, 1.0f, 1.0f };				// スケール(描画)
+        DirectX::XMFLOAT4 renderScale = { 1.0f, 1.0f, 1.0f, 1.0f };				// スケール(描画)
         float scaleUniformStart = 1.0f;										// 始点：中心
         float scaleUniformStartRandom = 0.0f;								// 始点：振れ幅
 
