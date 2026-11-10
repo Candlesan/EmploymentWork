@@ -700,6 +700,11 @@ void SceneGame::DrawGUI()
 				}
 			}
 
+			if (ImGui::CollapsingHeader(u8"スカイマップ", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::DragFloat(u8"空の明るさ", &skyMap->sky_intensity, 0.001f, 0.0f, 1.0f);
+			}
+
 			if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::DragFloat(u8"ブローム抽出閾値", &bloom_extraction, 0.01f, +0.0f, +5.0f);

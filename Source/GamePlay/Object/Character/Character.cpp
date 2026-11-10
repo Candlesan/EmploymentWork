@@ -345,7 +345,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
 		if (my <= 0.0f) // 落下/接地
 		{
 			// 接地中は下り坂で地面から離れないように、坂を下る分だけ地面を長めに探す
-			float snapDistance = 1.0f;
+			float snapDistance = 0.1f;
 			if (isGround)
 			{
 				float horizontalSpeed = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);

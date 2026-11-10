@@ -23,11 +23,16 @@ public:
 	// èIóπèàóù
 	void End(const RenderContext& rc);
 
+public:
+	float sky_intensity = 0.013f;
+
 private:
 	struct SkymapConstns
 	{
 		DirectX::XMFLOAT4X4 inverse_view_projection;
 		DirectX::XMFLOAT4 cameraPosition;
+		float skyIntensity;
+		DirectX::XMFLOAT3 pad;
 	};
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>       vertexShader;
@@ -37,4 +42,5 @@ private:
 	D3D11_TEXTURE2D_DESC						     skymap_texture2d_desc;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> skymap_shader_resource_view;
 	std::unique_ptr<Sprite>							 skymap_sprite;
+
 };

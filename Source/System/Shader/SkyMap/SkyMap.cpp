@@ -38,7 +38,7 @@ SkyMap::SkyMap(ID3D11Device* device)
     //　スカイマップ用の画像読み込み
     GpuResourceUtils::LoadTexture(
         device,
-        "Data/Sprite/SkyMap/Sky.png",
+        "Data/Sprite/SkyMap/qwantani_night_puresky_4k.hdr",
         skymap_shader_resource_view.GetAddressOf(),
         &skymap_texture2d_desc);
 
@@ -84,6 +84,7 @@ void SkyMap::Update(const RenderContext& rc, const Model::Mesh& mesh)
         rc.camera->GetEye().y,
         rc.camera->GetEye().z,
         1.0f);
+    skymap.skyIntensity = sky_intensity;
     dc->UpdateSubresource(skymap_constant_buffer.Get(), 0, 0, &skymap, 0, 0);
 
     // シェーダーリソースビュー設定

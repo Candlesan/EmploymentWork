@@ -35,9 +35,12 @@ PBRShader::PBRShader(ID3D11Device* device)
     // IBLテクスチャ読み込み（拡散反射・鏡面反射・LUT）
     {
         D3D11_TEXTURE2D_DESC texture2d_desc;
-        GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/diffuse_iem.dds", diffuse_iem_shader_resource_view.GetAddressOf(), &texture2d_desc);
-        GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/specular_pmrem.dds", specular_pmrem_shader_resource_view.GetAddressOf(), &texture2d_desc);
-        GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/lut_ggx.dds", lut_ggx_shader_resource_view.GetAddressOf(), &texture2d_desc);
+        //GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/BlueSky/diffuse_iem.dds", diffuse_iem_shader_resource_view.GetAddressOf(), &texture2d_desc);
+        //GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/BlueSky/specular_pmrem.dds", specular_pmrem_shader_resource_view.GetAddressOf(), &texture2d_desc);
+        //GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/BlueSky/lut_ggx.dds", lut_ggx_shader_resource_view.GetAddressOf(), &texture2d_desc);
+        GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/Night/diffuse_iem.dds", diffuse_iem_shader_resource_view.GetAddressOf(), &texture2d_desc);
+        GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/Night/specular_pmrem.dds", specular_pmrem_shader_resource_view.GetAddressOf(), &texture2d_desc);
+        GpuResourceUtils::LoadTexture(device, "Data/Sprite/IBLTexture/Night/lut_ggx.dds", lut_ggx_shader_resource_view.GetAddressOf(), &texture2d_desc);
     }
 }
 

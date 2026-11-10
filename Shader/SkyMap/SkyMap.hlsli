@@ -12,6 +12,8 @@ cbuffer SKY_MAP_CONSTAN_TBUFFER : register(b8)
 {
     row_major float4x4 inverse_view_projection;
     float4 cameraPosition;
+    float sky_intensity;
+    float3 pad;
 }
 
 #include "../Common/shading_functions.hlsli"
