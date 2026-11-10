@@ -74,7 +74,7 @@
                 1920.0,
                 1080.0
             ],
-            "texturePath": "Data\\Sprite\\Texture\\Title.png",
+            "texturePath": "Data\\Sprite\\Texture\\Scene\\TitleScene\\Title.png",
             "uvRect": [
                 0.0,
                 0.0,
@@ -157,7 +157,7 @@
                 1920.0,
                 1080.0
             ],
-            "texturePath": "Data\\Sprite\\Texture\\Fade.png",
+            "texturePath": "Data\\Sprite\\Texture\\Fade\\Fade.png",
             "uvRect": [
                 0.0,
                 0.0,

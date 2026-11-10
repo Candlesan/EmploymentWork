@@ -75,7 +75,7 @@
                 215.0,
                 212.0
             ],
-            "texturePath": "Data\\Sprite\\Texture\\Crosshair.PNG",
+            "texturePath": "Data\\Sprite\\Texture\\Cosshair\\Crosshair.PNG",
             "uvRect": [
                 0.0,
                 0.0,
@@ -259,7 +259,7 @@
                                 578.5999755859375,
                                 30.799999237060547
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\PlayerHP.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerHP.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -343,7 +343,7 @@
                                 577.5,
                                 31.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\PlayerMP.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerMP.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -427,7 +427,7 @@
                                 576.9000244140625,
                                 32.400001525878906
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\PlayerGU.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerGU.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -462,7 +462,7 @@
                         586.0,
                         87.0
                     ],
-                    "texturePath": "Data\\Sprite\\Texture\\PlayerFrame.PNG",
+                    "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerFrame.PNG",
                     "uvRect": [
                         0.0,
                         0.0,
@@ -681,7 +681,7 @@
                                 880.0,
                                 31.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\EnemyHP.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyHP.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -765,7 +765,7 @@
                                 874.7999877929688,
                                 34.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\EnemyGU.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyGU.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -800,7 +800,7 @@
                         885.0,
                         60.0
                     ],
-                    "texturePath": "Data\\Sprite\\Texture\\EnemyFrame.PNG",
+                    "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyFrame.PNG",
                     "uvRect": [
                         0.0,
                         0.0,

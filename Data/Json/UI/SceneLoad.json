@@ -74,7 +74,7 @@
                 256.0,
                 256.0
             ],
-            "texturePath": "Data\\Sprite\\Texture\\LoadingIcon.png",
+            "texturePath": "Data\\Sprite\\Texture\\Scene\\LoadScene\\LoadingIcon.png",
             "uvRect": [
                 0.0,
                 0.0,
