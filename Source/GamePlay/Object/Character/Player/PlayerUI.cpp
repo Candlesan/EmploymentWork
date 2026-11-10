@@ -14,9 +14,9 @@
 void PlayerUI::Initialize(UICanvas& uiCanvas)
 {
 	crosshair = uiCanvas.Find("Crosshair");
-	hp = uiCanvas.Find("HP");
-	mp = uiCanvas.Find("MP");
-	guard = uiCanvas.Find("Guard");
+	hp = uiCanvas.Find("PlayerHP");
+	mp = uiCanvas.Find("PlayerMP");
+	guard = uiCanvas.Find("PlayerGU");
 }
 
 // XVˆ—

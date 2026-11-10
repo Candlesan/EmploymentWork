@@ -13,7 +13,7 @@
 void EnemyUI::Initialize(UICanvas& uiCanvas)
 {
 	hpBar = uiCanvas.Find("EnemyHP");
-	guardBar = uiCanvas.Find("EnemyGuard");
+	guardBar = uiCanvas.Find("EnemyGU");
 }
 
 // XVˆ—

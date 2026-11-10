@@ -136,8 +136,8 @@
             "children": [
                 {
                     "anchor": [
-                        0.0,
-                        0.0
+                        1.0,
+                        9.5
                     ],
                     "animations": {
                         "fade": {
@@ -183,7 +183,260 @@
                             "to": 0.0
                         }
                     },
-                    "children": [],
+                    "children": [
+                        {
+                            "anchor": [
+                                0.0,
+                                0.0
+                            ],
+                            "animations": {
+                                "fade": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                },
+                                "move": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": [
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": [
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "rotation": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                },
+                                "scale": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                }
+                            },
+                            "children": [],
+                            "color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "fillMethod": 1,
+                            "name": "PlayerHP",
+                            "pivot": [
+                                0.0,
+                                0.5
+                            ],
+                            "position": [
+                                2.5999999046325684,
+                                19.899999618530273
+                            ],
+                            "rotation": 0.0,
+                            "scale": [
+                                1.0,
+                                1.0
+                            ],
+                            "size": [
+                                578.5999755859375,
+                                30.799999237060547
+                            ],
+                            "texturePath": "Data\\Sprite\\Texture\\PlayerHP.PNG",
+                            "uvRect": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "visible": true
+                        },
+                        {
+                            "anchor": [
+                                0.0,
+                                0.0
+                            ],
+                            "animations": {
+                                "fade": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                },
+                                "move": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": [
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": [
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "rotation": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                },
+                                "scale": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                }
+                            },
+                            "children": [],
+                            "color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "fillMethod": 1,
+                            "name": "PlayerMP",
+                            "pivot": [
+                                0.0,
+                                0.5
+                            ],
+                            "position": [
+                                2.430000066757202,
+                                43.79999923706055
+                            ],
+                            "rotation": 0.0,
+                            "scale": [
+                                1.0,
+                                1.0
+                            ],
+                            "size": [
+                                577.5,
+                                31.0
+                            ],
+                            "texturePath": "Data\\Sprite\\Texture\\PlayerMP.PNG",
+                            "uvRect": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "visible": true
+                        },
+                        {
+                            "anchor": [
+                                0.0,
+                                0.0
+                            ],
+                            "animations": {
+                                "fade": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                },
+                                "move": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": [
+                                        0.0,
+                                        0.0
+                                    ],
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": [
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "rotation": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                },
+                                "scale": {
+                                    "duration": 0.0,
+                                    "ease": 0,
+                                    "enabled": false,
+                                    "from": 0.0,
+                                    "loop": 0,
+                                    "loopCount": -1,
+                                    "to": 0.0
+                                }
+                            },
+                            "children": [],
+                            "color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "fillMethod": 1,
+                            "name": "PlayerGU",
+                            "pivot": [
+                                0.0,
+                                0.5
+                            ],
+                            "position": [
+                                3.5,
+                                68.80000305175781
+                            ],
+                            "rotation": 0.0,
+                            "scale": [
+                                1.0,
+                                1.0
+                            ],
+                            "size": [
+                                576.9000244140625,
+                                32.400001525878906
+                            ],
+                            "texturePath": "Data\\Sprite\\Texture\\PlayerGU.PNG",
+                            "uvRect": [
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "visible": true
+                        }
+                    ],
                     "color": [
                         1.0,
                         1.0,
@@ -191,14 +444,14 @@
                         1.0
                     ],
                     "fillMethod": 0,
-                    "name": "Frame_BackGround",
+                    "name": "PlayerFrame",
                     "pivot": [
                         0.0,
                         0.0
                     ],
                     "position": [
-                        11.899999618530273,
-                        11.100000381469727
+                        -59.20000076293945,
+                        0.0
                     ],
                     "rotation": 0.0,
                     "scale": [
@@ -206,10 +459,10 @@
                         1.0
                     ],
                     "size": [
-                        461.0,
-                        111.0
+                        586.0,
+                        87.0
                     ],
-                    "texturePath": "Data\\Sprite\\Texture\\Status_BackGround.PNG",
+                    "texturePath": "Data\\Sprite\\Texture\\PlayerFrame.PNG",
                     "uvRect": [
                         0.0,
                         0.0,
@@ -217,7 +470,92 @@
                         0.0
                     ],
                     "visible": true
+                }
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "fillMethod": 0,
+            "name": "PlayerStatus",
+            "pivot": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                0.0,
+                0.0
+            ],
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "size": [
+                100.0,
+                100.0
+            ],
+            "texturePath": "",
+            "uvRect": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "visible": true
+        },
+        {
+            "anchor": [
+                0.0,
+                0.0
+            ],
+            "animations": {
+                "fade": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
                 },
+                "move": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": [
+                        0.0,
+                        0.0
+                    ],
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                "rotation": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                },
+                "scale": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                }
+            },
+            "children": [
                 {
                     "anchor": [
                         0.0,
@@ -325,14 +663,14 @@
                                 1.0
                             ],
                             "fillMethod": 1,
-                            "name": "HP",
+                            "name": "EnemyHP",
                             "pivot": [
                                 0.0,
-                                0.0
+                                0.5
                             ],
                             "position": [
-                                104.9000015258789,
-                                21.299999237060547
+                                1.899999976158142,
+                                16.299999237060547
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -340,10 +678,10 @@
                                 1.0
                             ],
                             "size": [
-                                364.0,
-                                21.0
+                                880.0,
+                                31.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\HPBar.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\EnemyHP.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -409,14 +747,14 @@
                                 1.0
                             ],
                             "fillMethod": 1,
-                            "name": "MP",
+                            "name": "EnemyGU",
                             "pivot": [
                                 0.0,
-                                0.0
+                                0.5
                             ],
                             "position": [
-                                120.0999984741211,
-                                56.900001525878906
+                                5.099999904632568,
+                                43.0
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -424,94 +762,10 @@
                                 1.0
                             ],
                             "size": [
-                                350.1000061035156,
-                                22.0
+                                874.7999877929688,
+                                34.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\MPBar.PNG",
-                            "uvRect": [
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "visible": true
-                        },
-                        {
-                            "anchor": [
-                                0.0,
-                                0.0
-                            ],
-                            "animations": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "children": [],
-                            "color": [
-                                1.0,
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "fillMethod": 1,
-                            "name": "Guard",
-                            "pivot": [
-                                0.0,
-                                0.0
-                            ],
-                            "position": [
-                                101.9000015258789,
-                                96.4000015258789
-                            ],
-                            "rotation": 0.0,
-                            "scale": [
-                                1.0,
-                                1.0
-                            ],
-                            "size": [
-                                367.0,
-                                18.0
-                            ],
-                            "texturePath": "Data\\Sprite\\Texture\\GuardBar.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\EnemyGU.PNG",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -528,14 +782,14 @@
                         1.0
                     ],
                     "fillMethod": 0,
-                    "name": "Status",
+                    "name": "EnemtFrame",
                     "pivot": [
                         0.0,
                         0.0
                     ],
                     "position": [
-                        0.0,
-                        0.0
+                        494.79998779296875,
+                        22.299999237060547
                     ],
                     "rotation": 0.0,
                     "scale": [
@@ -543,94 +797,10 @@
                         1.0
                     ],
                     "size": [
-                        100.0,
-                        100.0
+                        885.0,
+                        60.0
                     ],
-                    "texturePath": "",
-                    "uvRect": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "visible": true
-                },
-                {
-                    "anchor": [
-                        0.0,
-                        0.0
-                    ],
-                    "animations": {
-                        "fade": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        },
-                        "move": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": [
-                                0.0,
-                                0.0
-                            ],
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": [
-                                0.0,
-                                0.0
-                            ]
-                        },
-                        "rotation": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        },
-                        "scale": {
-                            "duration": 0.0,
-                            "ease": 0,
-                            "enabled": false,
-                            "from": 0.0,
-                            "loop": 0,
-                            "loopCount": -1,
-                            "to": 0.0
-                        }
-                    },
-                    "children": [],
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "fillMethod": 0,
-                    "name": "Frame",
-                    "pivot": [
-                        0.0,
-                        0.0
-                    ],
-                    "position": [
-                        0.0,
-                        0.0
-                    ],
-                    "rotation": 0.0,
-                    "scale": [
-                        1.0,
-                        1.0
-                    ],
-                    "size": [
-                        495.0,
-                        137.0
-                    ],
-                    "texturePath": "Data\\Sprite\\Texture\\Frame.PNG",
+                    "texturePath": "Data\\Sprite\\Texture\\EnemyFrame.PNG",
                     "uvRect": [
                         0.0,
                         0.0,
@@ -647,14 +817,14 @@
                 1.0
             ],
             "fillMethod": 0,
-            "name": "PlayerStatus",
+            "name": "EnemyStatus",
             "pivot": [
                 0.0,
                 0.0
             ],
             "position": [
-                45.20000076293945,
-                900.0
+                0.0,
+                0.0
             ],
             "rotation": 0.0,
             "scale": [

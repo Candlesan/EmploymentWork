@@ -109,7 +109,7 @@ void SceneGame::Initialize()
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneGame.json");
 	playerUI.Initialize(uiCanvas);
-	//enemyUI.Initialize(uiCanvas);
+	enemyUI.Initialize(uiCanvas);
 }
 
 // 終了化
