@@ -1,4 +1,4 @@
-#include "SceneResult.h"
+#include "SceneTitle.h"
 
 // システム
 #include "System/Graphic/Graphics.h"
@@ -6,40 +6,52 @@
 
 // ゲーム
 #include "Gameplay/Scene/Manager/SceneManager.h"
-#include "GamePlay/Scene/Load/SceneLoad.h"
-#include "GamePlay/Scene/Title/SceneTitle.h"
+#include "GamePlay/Scene/scene/Load/SceneLoad.h"
+#include "GamePlay/Scene/scene/Build/SceneBuild.h"
 #include "Gameplay/Object/Camera/Camera.h"
-
 
 #include <imgui.h>
 
 
-void SceneResult::Initialize()
+// 初期化
+void SceneTitle::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
-	//uiCanvas.Load("Data/Json/UI/SceneTitle.json");
+	uiCanvas.Load("Data/Json/UI/SceneTitle.json");
 }
 
-void SceneResult::Finalize()
-{
-}
-
-void SceneResult::Update(float elapsedTime)
+// 更新処理
+void SceneTitle::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	if (gamePad.GetButtonDown() & GamePad::BTN_A)
-	{
-		SceneManager::Instance().ChangeScene(new SceneLoad(new SceneTitle));
-	}
+	UIElement* fade = uiCanvas.Find("fade");
 
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
+
+	// フェード中
+	if (isFadeing)
+	{
+		if (!uiCanvas.IsPlaying(fade))
+		{
+			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneBuild));
+		}
+		return; // フェード中は操作を受け付けない
+	}
+
+	// Xボタンを押してフェード開始
+	if (gamePad.GetButtonDown() & GamePad::BTN_X)
+	{
+		uiCanvas.Play(fade);
+		isFadeing = true;
+	}
 }
 
-void SceneResult::Render()
+// 描画処理
+void SceneTitle::Render()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 	RenderState* renderState = Graphics::Instance().GetRenderState();
@@ -63,13 +75,14 @@ void SceneResult::Render()
 	}
 }
 
-void SceneResult::DrawGUI()
+// GUI描画
+void SceneTitle::DrawGUI()
 {
 	uiEditor.DrawGUI();
 }
 
 // 画面比率修正関数
-void SceneResult::OnResize(float width, float height)
+void SceneTitle::OnResize(float width, float height)
 {
 	// カメラの比率を直す
 	Camera& camera = CameraManager::Instance().GetMainCamera();

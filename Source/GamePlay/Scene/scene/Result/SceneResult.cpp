@@ -1,4 +1,4 @@
-#include "SceneTitle.h"
+#include "SceneResult.h"
 
 // システム
 #include "System/Graphic/Graphics.h"
@@ -6,52 +6,40 @@
 
 // ゲーム
 #include "Gameplay/Scene/Manager/SceneManager.h"
-#include "GamePlay/Scene/Load/SceneLoad.h"
-#include "GamePlay/Scene/Game/SceneGame.h"
+#include "GamePlay/Scene/scene/Load/SceneLoad.h"
+#include "GamePlay/Scene/scene/Title/SceneTitle.h"
 #include "Gameplay/Object/Camera/Camera.h"
+
 
 #include <imgui.h>
 
 
-// 初期化
-void SceneTitle::Initialize()
+void SceneResult::Initialize()
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
-	uiCanvas.Load("Data/Json/UI/SceneTitle.json");
+	uiCanvas.Load("Data/Json/UI/SceneResult.json");
 }
 
-// 更新処理
-void SceneTitle::Update(float elapsedTime)
+void SceneResult::Finalize()
+{
+}
+
+void SceneResult::Update(float elapsedTime)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
-	UIElement* fade = uiCanvas.Find("fade");
+	if (gamePad.GetButtonDown() & GamePad::BTN_X)
+	{
+		SceneManager::Instance().ChangeScene(new SceneLoad(new SceneTitle));
+	}
 
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
-
-	// フェード中
-	if (isFadeing)
-	{
-		if (!uiCanvas.IsPlaying(fade))
-		{
-			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
-		}
-		return; // フェード中は操作を受け付けない
-	}
-
-	// Aボタンを押してフェード開始
-	if (gamePad.GetButtonDown() & GamePad::BTN_A)
-	{
-		uiCanvas.Play(fade);
-		isFadeing = true;
-	}
 }
 
-// 描画処理
-void SceneTitle::Render()
+void SceneResult::Render()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 	RenderState* renderState = Graphics::Instance().GetRenderState();
@@ -67,10 +55,6 @@ void SceneTitle::Render()
 	RenderContext rc;
 	rc.deviceContext = dc;
 	rc.renderState = renderState;
-	//rc.camera = &camera;
-	//rc.pbrMetalness = pbrMetalness;
-	//rc.pbrRoughness = pbrRoughness;
-	//rc.lightManager = &lightManager;
 
 	// 2Dスプライト描画
 	{
@@ -79,27 +63,17 @@ void SceneTitle::Render()
 	}
 }
 
-// GUI描画
-void SceneTitle::DrawGUI()
+void SceneResult::DrawGUI()
 {
 	uiEditor.DrawGUI();
 }
 
 // 画面比率修正関数
-void SceneTitle::OnResize(float width, float height)
+void SceneResult::OnResize(float width, float height)
 {
 	// カメラの比率を直す
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45), width / height, 0.1f, 1000.0f);
 
 	ID3D11Device* device = Graphics::Instance().GetDevice();
-
-	//framebuffers[0] = std::make_unique<framebuffer>(device, width, height, true);
-
-	//// ブルームを新しいサイズで丸ごと生成し直す
-	//bloomer = std::make_unique<bloom>(device, width, height);
-
-	//// 初期化時に設定していたパラメータを再設定
-	//bloomer->bloom_intensity = bloom_intensity;
-	//bloomer->bloom_extraction_threshold = bloom_extraction;
 }

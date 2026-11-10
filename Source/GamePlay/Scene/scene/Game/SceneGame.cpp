@@ -12,7 +12,8 @@
 #include "GamePlay/Object/Collision/Collision.h"
 #include "GamePlay/Object/Character/Player/Player.h"
 #include "Gameplay/Scene/Manager/SceneManager.h"
-#include "GamePlay/Scene/Load/SceneLoad.h"
+#include "GamePlay/Scene/scene/Load/SceneLoad.h"
+#include "GamePlay/Scene/scene/Result/SceneResult.h"
 
 #include <imgui.h>
 #include <fstream>
@@ -125,6 +126,18 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+	// インスタンス取得
+	Camera& camera = CameraManager::Instance().GetMainCamera();
+	GamePad& gamePad = Input::Instance().GetGamePad();
+	Player& player = Player::Instance();
+
+	// 仮でXボタンでシーンを変える
+	if (gamePad.GetButtonDown() & GamePad::BTN_X)
+	{
+		SceneManager::Instance().ChangeScene(new SceneLoad(new SceneResult));
+	}
+
+
 	// 演出用の倍率
 	float gameplayEffectScale = 1.0f;
 
@@ -154,12 +167,6 @@ void SceneGame::Update(float elapsedTime)
 	// --- デバッグ用の更新制御 ---
 	bool shouldUpdate = !isPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
-
-	// カメラ取得
-	Camera& camera = CameraManager::Instance().GetMainCamera();
-
-	// プレイヤーを取得
-	Player& player = Player::Instance();
 
 	// GUIの操作でゲーム用とデバック用のカメラを切り替え
 	if (cameraMode == CameraMode::Game)

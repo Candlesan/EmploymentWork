@@ -8,7 +8,7 @@
 
 // ÉQÅ[ÉÄ
 #include "Gameplay/Scene/Manager/SceneManager.h"
-#include "GamePlay/Scene/Game/SceneGame.h"
+#include "GamePlay/Scene/scene/Game/SceneGame.h"
 
 #include <imgui.h>
 
