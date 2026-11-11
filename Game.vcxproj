@@ -160,7 +160,6 @@
     <ClInclude Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicSkill.h" />
-    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\LoadoutData.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicInputController.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicLoadout.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicSlot.h" />
@@ -184,13 +183,14 @@
     <ClInclude Include="Source\GamePlay\Object\Particle\Compute_Particle.h" />
     <ClInclude Include="Source\GamePlay\Object\Stage\Stage.h" />
     <ClInclude Include="Source\GamePlay\Object\Trail\Trail.h" />
+    <ClInclude Include="Source\GamePlay\Scene\Manager\Scene.h" />
+    <ClInclude Include="Source\GamePlay\Scene\Manager\SceneManager.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Build\SceneBuild.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Game\SceneGame.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Load\SceneLoad.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Result\SceneResult.h" />
-    <ClInclude Include="Source\GamePlay\Scene\Scene\Scene.h" />
-    <ClInclude Include="Source\GamePlay\Scene\Scene\SceneManager.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Title\SceneTitle.h" />
+    <ClInclude Include="Source\GamePlay\Session\GameSession.h" />
     <ClInclude Include="Source\System\Audio\Audio.h" />
     <ClInclude Include="Source\System\Audio\AudioResource.h" />
     <ClInclude Include="Source\System\Audio\AudioSource.h" />
@@ -306,7 +306,6 @@
     <ClCompile Include="Source\GamePlay\Object\Particle\compute_particle_system.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Stage\Stage.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Trail\Trail.cpp" />
-    <ClCompile Include="Source\GamePlay\Scene\Manager\Scene.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\Manager\SceneManager.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\scene\Build\SceneBuild.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\scene\Game\SceneGame.cpp" />

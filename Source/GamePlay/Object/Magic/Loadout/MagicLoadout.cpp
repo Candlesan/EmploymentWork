@@ -1,5 +1,5 @@
 #include "MagicLoadout.h"
-#include "GamePlay/Object/Magic/Loadout/LoadoutData.h"
+#include "GamePlay/Session/GameSession.h"
 
 #include <imgui.h>
 
@@ -37,7 +37,7 @@ void MagicLoadout::DrawGUI()
 				bool selected = (c == slot.GetEquippedIndex());
 				if (ImGui::Selectable(slot.GetCandidate(c)->GetName(), selected))
 				{
-					LoadoutData::Instance().equippedIndex[i] = c;
+					GameSession::Instance().equippedIndex[i] = c;
 					slot.SetEquipped(c);
 				}
 			}

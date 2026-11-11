@@ -5,6 +5,8 @@
 #include "System/Core/Input/Input.h"
 #include "System/Audio/Audio.h"
 
+#include "GamePlay/Session/GameSession.h"
+
 // ゲームオブジェクト
 #include "GamePlay/Object/Stage/Stage.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h" 
@@ -17,7 +19,6 @@
 #include "GamePlay/Object/Magic/MagicType/DefenseMagic/DefenseSkill.h"
 #include "GamePlay/Object/Magic/MagicType/NormalMagic/LaserShotSkill.h"
 #include "GamePlay/Object/Magic/MagicType/ShotgunMagic/ShotgunSkill.h"
-#include "GamePlay/Object/Magic/Loadout/LoadoutData.h"
 
 #include "imgui_node_editor.h"
 #include <imgui.h>
@@ -92,7 +93,7 @@ void Player::Initialize()
 	// 決めた後にLoadoutDataの番号で装備を決める
 	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
 	{
-		magicLoadout.GetSlot(i).SetEquipped(LoadoutData::Instance().equippedIndex[i]);
+		magicLoadout.GetSlot(i).SetEquipped(GameSession::Instance().equippedIndex[i]);
 	}
 
 	// アニメーションポーズと初期ステートの設定

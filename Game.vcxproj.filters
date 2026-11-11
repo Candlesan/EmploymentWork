@@ -283,6 +283,9 @@
     <Filter Include="Source\GamepPlay\Scene\Scene\Build">
       <UniqueIdentifier>{c4ae042b-e32d-4855-b1c5-f14d783ad8ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Session">
+      <UniqueIdentifier>{621f5637-52b1-452d-ab58-c944e288469e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -555,12 +558,6 @@
     <ClInclude Include="Source\System\UI\UIEditor\UICanvas.h">
       <Filter>Source\System\UI\UIEditor</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Scene\Scene\Scene.h">
-      <Filter>Source\GamepPlay\Scene\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GamePlay\Scene\Scene\SceneManager.h">
-      <Filter>Source\GamepPlay\Scene\Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.h">
       <Filter>Source\System\Renderer\ImGuiRenderer</Filter>
     </ClInclude>
@@ -663,9 +660,6 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicType\ShotgunMagic\ShotgunSkill.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicType\ShotgunMagic</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\LoadoutData.h">
-      <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
-    </ClInclude>
     <ClInclude Include="Source\GamePlay\Scene\scene\Game\SceneGame.h">
       <Filter>Source\GamepPlay\Scene\Scene\Game</Filter>
     </ClInclude>
@@ -680,6 +674,15 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Scene\scene\Build\SceneBuild.h">
       <Filter>Source\GamepPlay\Scene\Scene\Build</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Session\GameSession.h">
+      <Filter>Source\GamepPlay\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Manager\SceneManager.h">
+      <Filter>Source\GamepPlay\Scene\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\Manager\Scene.h">
+      <Filter>Source\GamepPlay\Scene\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -920,9 +923,6 @@
     <ClCompile Include="Source\GamePlay\Scene\Manager\SceneManager.cpp">
       <Filter>Source\GamepPlay\Scene\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GamePlay\Scene\Manager\Scene.cpp">
-      <Filter>Source\GamepPlay\Scene\Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.cpp">
       <Filter>Source\System\Renderer\ImGuiRenderer</Filter>
     </ClCompile>
@@ -1020,7 +1020,7 @@
       <Filter>Source\GamepPlay\Scene\Scene\Title</Filter>
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Scene\scene\Build\SceneBuild.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\GamepPlay\Scene\Scene\Build</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
