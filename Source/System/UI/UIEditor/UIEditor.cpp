@@ -249,165 +249,181 @@ void UIEditor::DrawInspector()
 				}
 				ImGui::Separator();
 
-				ImGui::Checkbox(u8"移動アニメーション", &selectedElement.moveAnim.enabled);
-				if (selectedElement.moveAnim.enabled)
+				ImGui::Checkbox(u8"移動アニメーション", &selectedElement.anim.move.enabled);
+				if (selectedElement.anim.move.enabled)
 				{
 					if (ImGui::Button(u8"テスト##move"))
 					{
-						selectedElement.moveAnim.Start(selectedElement.moveAnim.from, selectedElement.moveAnim.to, selectedElement.moveAnim.duration,
-							selectedElement.moveAnim.ease,
-							selectedElement.moveAnim.loop,
-							selectedElement.moveAnim.loopCount);
+						selectedElement.anim.move.Start(selectedElement.anim.move.from, selectedElement.anim.move.to, selectedElement.anim.move.duration,
+							selectedElement.anim.move.ease,
+							selectedElement.anim.move.loop,
+							selectedElement.anim.move.loopCount);
 					}
 					ImGui::SameLine();
 					if (ImGui::Button(u8"停止##move"))
 					{
-						selectedElement.moveAnim.Stop();
+						selectedElement.anim.move.Stop();
 					}
 
-					int moveLoop = static_cast<int>(selectedElement.moveAnim.loop);
+					int moveLoop = static_cast<int>(selectedElement.anim.move.loop);
 					if (ImGui::Combo(u8"ループ##moveLoop", &moveLoop, loopItems, IM_ARRAYSIZE(loopItems)))
 					{
-						selectedElement.moveAnim.loop = static_cast<LoopType>(moveLoop);
+						selectedElement.anim.move.loop = static_cast<LoopType>(moveLoop);
 					}
-					if (selectedElement.moveAnim.loop == LoopType::PingPong)
+					if (selectedElement.anim.move.loop == LoopType::PingPong)
 					{
-						ImGui::DragInt(u8"往復回数", &selectedElement.moveAnim.loopCount, 1);
+						ImGui::DragInt(u8"往復回数", &selectedElement.anim.move.loopCount, 1);
 					}
 
 
-					int moveEase = static_cast<int>(selectedElement.moveAnim.ease);
+					int moveEase = static_cast<int>(selectedElement.anim.move.ease);
 					if (ImGui::Combo(u8"イージング##move", &moveEase, easingItems, IM_ARRAYSIZE(easingItems)))
 					{
-						selectedElement.moveAnim.ease = static_cast<EasingType>(moveEase);
+						selectedElement.anim.move.ease = static_cast<EasingType>(moveEase);
 					}
 
-					ImGui::DragFloat(u8"再生時間##move", &selectedElement.moveAnim.duration, 0.1f);
+					ImGui::DragFloat(u8"再生時間##move", &selectedElement.anim.move.duration, 0.1f);
 					ImGui::Separator();
 
-					ImGui::DragFloat2(u8"開始位置", &selectedElement.moveAnim.from.x, 0.1f);
-					ImGui::DragFloat2(u8"終了位置", &selectedElement.moveAnim.to.x, 0.1f);
+					ImGui::DragFloat2(u8"開始位置", &selectedElement.anim.move.from.x, 0.1f);
+					ImGui::DragFloat2(u8"終了位置", &selectedElement.anim.move.to.x, 0.1f);
 					ImGui::Separator();
 
 				}
 
-				ImGui::Checkbox(u8"回転アニメーション", &selectedElement.rotationAnim.enabled);
-				if (selectedElement.rotationAnim.enabled)
+				ImGui::Checkbox(u8"回転アニメーション", &selectedElement.anim.rotation.enabled);
+				if (selectedElement.anim.rotation.enabled)
 				{
 					if (ImGui::Button(u8"テスト##rotation"))
 					{
-						selectedElement.rotationAnim.Start(selectedElement.rotationAnim.from, selectedElement.rotationAnim.to, selectedElement.rotationAnim.duration,
-							selectedElement.rotationAnim.ease,
-							selectedElement.rotationAnim.loop,
-							selectedElement.rotationAnim.loopCount);
+						selectedElement.anim.rotation.Start(selectedElement.anim.rotation.from, selectedElement.anim.rotation.to, selectedElement.anim.rotation.duration,
+							selectedElement.anim.rotation.ease,
+							selectedElement.anim.rotation.loop,
+							selectedElement.anim.rotation.loopCount);
 					}
 					ImGui::SameLine();
 					if (ImGui::Button(u8"停止##rotation"))
 					{
-						selectedElement.rotationAnim.Stop();
+						selectedElement.anim.rotation.Stop();
 					}
 
-					int rotationLoop = static_cast<int>(selectedElement.rotationAnim.loop);
+					int rotationLoop = static_cast<int>(selectedElement.anim.rotation.loop);
 					if (ImGui::Combo(u8"ループ##rotation", &rotationLoop, loopItems, IM_ARRAYSIZE(loopItems)))
 					{
-						selectedElement.rotationAnim.loop = static_cast<LoopType>(rotationLoop);
+						selectedElement.anim.rotation.loop = static_cast<LoopType>(rotationLoop);
 					}
-					if (selectedElement.rotationAnim.loop == LoopType::PingPong)
+					if (selectedElement.anim.rotation.loop == LoopType::PingPong)
 					{
-						ImGui::DragInt(u8"往復回数", &selectedElement.rotationAnim.loopCount, 1);
+						ImGui::DragInt(u8"往復回数", &selectedElement.anim.rotation.loopCount, 1);
 					}
 
-					int rotationEase = static_cast<int>(selectedElement.rotationAnim.ease);
+					int rotationEase = static_cast<int>(selectedElement.anim.rotation.ease);
 					if (ImGui::Combo(u8"イージング##rotation", &rotationEase, easingItems, IM_ARRAYSIZE(easingItems)))
 					{
-						selectedElement.rotationAnim.ease = static_cast<EasingType>(rotationEase);
+						selectedElement.anim.rotation.ease = static_cast<EasingType>(rotationEase);
 					}
 
-					ImGui::DragFloat(u8"再生時間##rotation", &selectedElement.rotationAnim.duration, 0.1f);
+					ImGui::DragFloat(u8"再生時間##rotation", &selectedElement.anim.rotation.duration, 0.1f);
 					ImGui::Separator();
 
-					ImGui::DragFloat(u8"開始角度", &selectedElement.rotationAnim.from, 0.1f);
-					ImGui::DragFloat(u8"終了角度", &selectedElement.rotationAnim.to, 0.1f);
+					ImGui::DragFloat(u8"開始角度", &selectedElement.anim.rotation.from, 0.1f);
+					ImGui::DragFloat(u8"終了角度", &selectedElement.anim.rotation.to, 0.1f);
 				}
 
-				ImGui::Checkbox(u8"拡大アニメーション", &selectedElement.scaleAnim.enabled);
-				if (selectedElement.scaleAnim.enabled)
+				ImGui::Checkbox(u8"拡大アニメーション", &selectedElement.anim.scale.enabled);
+				if (selectedElement.anim.scale.enabled)
 				{
 					if (ImGui::Button(u8"テスト##scale"))
 					{
-						selectedElement.scaleAnim.Start(selectedElement.scaleAnim.from, selectedElement.scaleAnim.to, selectedElement.scaleAnim.duration,
-							selectedElement.scaleAnim.ease,
-							selectedElement.scaleAnim.loop,
-							selectedElement.scaleAnim.loopCount);
+						selectedElement.anim.scale.Start(selectedElement.anim.scale.from, selectedElement.anim.scale.to, selectedElement.anim.scale.duration,
+							selectedElement.anim.scale.ease,
+							selectedElement.anim.scale.loop,
+							selectedElement.anim.scale.loopCount);
 					}
 					ImGui::SameLine();
 					if (ImGui::Button(u8"停止##scale"))
 					{
-						selectedElement.scaleAnim.Stop();
+						selectedElement.anim.scale.Stop();
 					}
 
-					int scaleLoop = static_cast<int>(selectedElement.scaleAnim.loop);
+					int scaleLoop = static_cast<int>(selectedElement.anim.scale.loop);
 					if (ImGui::Combo(u8"ループ##scale", &scaleLoop, loopItems, IM_ARRAYSIZE(loopItems)))
 					{
-						selectedElement.scaleAnim.loop = static_cast<LoopType>(scaleLoop);
+						selectedElement.anim.scale.loop = static_cast<LoopType>(scaleLoop);
 					}
-					if (selectedElement.scaleAnim.loop == LoopType::PingPong)
+					if (selectedElement.anim.scale.loop == LoopType::PingPong)
 					{
-						ImGui::DragInt(u8"往復回数", &selectedElement.scaleAnim.loopCount, 1);
+						ImGui::DragInt(u8"往復回数", &selectedElement.anim.scale.loopCount, 1);
 					}
 
-					int scaleEase = static_cast<int>(selectedElement.scaleAnim.ease);
+					int scaleEase = static_cast<int>(selectedElement.anim.scale.ease);
 					if (ImGui::Combo(u8"イージング##scale", &scaleEase, easingItems, IM_ARRAYSIZE(easingItems)))
 					{
-						selectedElement.scaleAnim.ease = static_cast<EasingType>(scaleEase);
+						selectedElement.anim.scale.ease = static_cast<EasingType>(scaleEase);
 					}
 
-					ImGui::DragFloat(u8"再生時間##scale", &selectedElement.scaleAnim.duration, 0.1f);
+					ImGui::DragFloat(u8"再生時間##scale", &selectedElement.anim.scale.duration, 0.1f);
 					ImGui::Separator();
 
-					ImGui::DragFloat(u8"開始角度", &selectedElement.scaleAnim.from, 0.1f);
-					ImGui::DragFloat(u8"終了角度", &selectedElement.scaleAnim.to, 0.1f);
+					ImGui::DragFloat(u8"開始角度", &selectedElement.anim.scale.from, 0.1f);
+					ImGui::DragFloat(u8"終了角度", &selectedElement.anim.scale.to, 0.1f);
 				}
 
-				ImGui::Checkbox(u8"フェードアニメーション", &selectedElement.fadeAnim.enabled);
-				if (selectedElement.fadeAnim.enabled)
+				ImGui::Checkbox(u8"フェードアニメーション", &selectedElement.anim.fade.enabled);
+				if (selectedElement.anim.fade.enabled)
 				{
 					if (ImGui::Button(u8"テスト##fade"))
 					{
-						selectedElement.fadeAnim.Start(selectedElement.fadeAnim.from, selectedElement.fadeAnim.to, selectedElement.fadeAnim.duration,
-							selectedElement.fadeAnim.ease,
-							selectedElement.fadeAnim.loop,
-							selectedElement.fadeAnim.loopCount);
+						selectedElement.anim.fade.Start(selectedElement.anim.fade.from, selectedElement.anim.fade.to, selectedElement.anim.fade.duration,
+							selectedElement.anim.fade.ease,
+							selectedElement.anim.fade.loop,
+							selectedElement.anim.fade.loopCount);
 					}
 					ImGui::SameLine();
 					if (ImGui::Button(u8"停止##fade"))
 					{
-						selectedElement.fadeAnim.Stop();
+						selectedElement.anim.fade.Stop();
 					}
 
-					int fadeLoop = static_cast<int>(selectedElement.fadeAnim.loop);
+					int fadeLoop = static_cast<int>(selectedElement.anim.fade.loop);
 					if (ImGui::Combo(u8"ループ##fadeLoop", &fadeLoop, loopItems, IM_ARRAYSIZE(loopItems)))
 					{
-						selectedElement.fadeAnim.loop = static_cast<LoopType>(fadeLoop);
+						selectedElement.anim.fade.loop = static_cast<LoopType>(fadeLoop);
 					}
-					if (selectedElement.fadeAnim.loop == LoopType::PingPong)
+					if (selectedElement.anim.fade.loop == LoopType::PingPong)
 					{
-						ImGui::DragInt(u8"往復回数", &selectedElement.fadeAnim.loopCount, 1);
+						ImGui::DragInt(u8"往復回数", &selectedElement.anim.fade.loopCount, 1);
 					}
 
-					int fadeEase = static_cast<int>(selectedElement.fadeAnim.ease);
+					int fadeEase = static_cast<int>(selectedElement.anim.fade.ease);
 					if (ImGui::Combo(u8"イージング##fadeEase", &fadeEase, easingItems, IM_ARRAYSIZE(easingItems)))
 					{
-						selectedElement.fadeAnim.ease = static_cast<EasingType>(fadeEase);
+						selectedElement.anim.fade.ease = static_cast<EasingType>(fadeEase);
 					}
 
-					ImGui::DragFloat(u8"再生時間", &selectedElement.fadeAnim.duration, 0.1f);
+					ImGui::DragFloat(u8"再生時間", &selectedElement.anim.fade.duration, 0.1f);
 
-					ImGui::DragFloat(u8"開始不透明度", &selectedElement.fadeAnim.from, 0.1f);
-					ImGui::DragFloat(u8"終了不透明度", &selectedElement.fadeAnim.to, 0.1f);
+					ImGui::DragFloat(u8"開始不透明度", &selectedElement.anim.fade.from, 0.1f);
+					ImGui::DragFloat(u8"終了不透明度", &selectedElement.anim.fade.to, 0.1f);
 
 				}
 
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem(u8"ボタン"))
+			{
+				bool isButton = (selectedElement.focusIndex >= 0);
+				if (ImGui::Checkbox(u8"ボタンとして使う", &isButton))
+					selectedElement.focusIndex = isButton ? 0 : -1;
+
+				// ラジオボタンにする場合
+				ImGui::Text(u8"並び方（パネル用）");
+				if (ImGui::RadioButton(u8"縦", !selectedElement.focusHorizontal)) selectedElement.focusHorizontal = false;
+				ImGui::SameLine();
+				if (ImGui::RadioButton(u8"横", selectedElement.focusHorizontal)) selectedElement.focusHorizontal = true;
+				ImGui::Checkbox(u8"ループ", &selectedElement.focusLoop);
+				ImGui::DragInt(u8"選択番号", &selectedElement.focusIndex, 1, -1, 99);
 				ImGui::EndTabItem();
 			}
 

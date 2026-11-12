@@ -1,6 +1,7 @@
 #pragma once
 #include "System/UI/UIEditor/UITween.h"
 #include "System/Renderer/UIFillRenderer/UIFillRenderer.h"
+#include "System/Core/Input/GamePad.h"
 #include "json.hpp"
 
 #include <string>
@@ -11,6 +12,24 @@
 
 // 前方宣言
 class Sprite;
+
+// アニメーション情報
+struct UIAnimSet
+{
+	UITween<float> fade;				// フェードアニメーション
+	UITween<DirectX::XMFLOAT2> move;	// 移動アニメーション
+	UITween<float> rotation;			// 回転アニメーション
+	UITween<float> scale;				// 拡縮アニメーション
+
+	// 再生
+	void Play() { fade.Play(); move.Play(); rotation.Play(); scale.Play(); }
+
+	// 停止
+	void Stop() { fade.Stop(); move.Stop(); rotation.Stop(); scale.Stop(); }
+
+	// 再生中か
+	bool IsPlaying() const { return fade.playing || move.playing || rotation.playing || scale.playing; }
+};
 
 struct UIElement
 {
@@ -41,20 +60,23 @@ struct UIElement
 	// UIElementに持たせることでElementごとに違う画像が出せる
 	std::shared_ptr<Sprite> sprite;
 
-	UITween<float> fadeAnim;				// フェードのアニメーション
-	float fadeAlpha = 1.0f;					// フェード用の倍率
-
-	UITween<DirectX::XMFLOAT2> moveAnim;	// 移動のアニメーション
+	UIAnimSet anim; // UIアニメーション
+	float fadeAlpha = 1.0f;
 	DirectX::XMFLOAT2 animPosition = { 0.0f, 0.0f };
-
-	UITween<float> rotationAnim;			// 回転のアニメーション
 	float rotationValue = 0.0f;
-
-	UITween<float> scaleAnim;				// 拡大のアニメーション
 	float scaleValue = 1.0f;
 
+	// 塗りつぶし
 	FillMethod fillMethod = FillMethod::None;
-	float fillAmount;
+	float fillAmount = 1.0f;
+
+	// フォーカス
+	UIAnimSet focusAnim; // 選ばれたとき
+	UIAnimSet unfocusAnim; // 外れたとき
+
+	int  focusIndex = -1;    // -1: 選択不可, 0以上: 選択順
+	bool focusHorizontal = false; // パネル用: false=縦, true=横
+	bool focusLoop = false; // パネル用: 端で先頭に戻るか
 };
 
 struct Canvas
@@ -106,7 +128,12 @@ public:
 	// 要素のアニメーションを全部止めて、見た目を元に戻す
 	void ResetAnimation(UIElement* e);
 
+	// スプライトを作る
 	std::shared_ptr<Sprite> CreateSprite(const std::string& path);
+
+	void SetPanel(const std::string& name); // どのパネルを選ぶか決めて先頭にフォーカスする
+	void UpdateNavigation(const GamePad& pad);
+	UIElement* GetFocused(); // 今選んでいる要素を返す
 private:
 	void UpdateElement(UIElement* e, float elapsedTime);
 	void RenderElement(ID3D11DeviceContext* dc, UIElement* e, const DirectX::XMMATRIX& parentWorld, const DirectX::XMFLOAT4& parentColor);
@@ -114,8 +141,18 @@ private:
 	nlohmann::json SaveElement(const UIElement* e);
 	std::unique_ptr<UIElement> LoadElement(const nlohmann::json& je, UIElement* parent);
 
+	void Navigate(int dx, int dy); // 入力方向に動かす
+	void CollectFocusItems(); // パネルの子から選べる要素を集める
+
+	void ChangeFocus(int newPos); // フォーカス位置を変える
+	void SetHighlight(UIElement* e, bool on); // ハイライトを切り替える
 private:
 	ID3D11Device* device = nullptr; // デバイス保存用変数
 	Canvas canvas; 
 	UIFillRenderer uifillRenderer;
+
+	UIElement* currentPanel = nullptr;
+	std::vector<UIElement*> focusItems; // forcusIndexの位置にそのまま入れる
+	int focusPos = -1;
+	bool stickNeutral = true; // スティックを倒していない
 };

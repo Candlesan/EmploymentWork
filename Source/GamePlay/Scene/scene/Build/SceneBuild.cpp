@@ -9,6 +9,8 @@
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Game/SceneGame.h"
 
+#include "GamePlay/Session/GameSession.h"
+
 #include <imgui.h>
 
 
@@ -19,6 +21,7 @@ void SceneBuild::Initialize()
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneBuild.json");
+	uiCanvas.SetPanel("Build");
 }
 
 // 更新処理
@@ -31,6 +34,7 @@ void SceneBuild::Update(float elapsedTime)
 	// UI更新
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
+	uiCanvas.UpdateNavigation(gamePad);
 
 	// フェード中
 	if (isFadeing)
@@ -79,6 +83,9 @@ void SceneBuild::Render()
 void SceneBuild::DrawGUI()
 {
 	uiEditor.DrawGUI();
+
+	UIElement* f = uiCanvas.GetFocused();
+	ImGui::Text(u8"選択中: %s", f ? f->name.c_str() : u8"なし");
 }
 
 // 画面比率修正関数

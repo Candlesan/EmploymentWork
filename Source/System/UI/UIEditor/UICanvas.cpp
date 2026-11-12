@@ -6,6 +6,8 @@
 #include <fstream>
 #include <imgui.h>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
 
 
 // ヘルパー関数
@@ -15,6 +17,7 @@ static nlohmann::json ToJson(const DirectX::XMFLOAT2& v) { return { v.x, v.y }; 
 static void FromJson(const nlohmann::json& j, float& v) { v = j.get<float>(); }
 static void FromJson(const nlohmann::json& j, DirectX::XMFLOAT2& v) { v = { j[0], j[1] }; }
 
+// UITweenの保存
 template<typename T>
 static nlohmann::json SaveTween(const UITween<T>& tween)
 {
@@ -29,7 +32,6 @@ static nlohmann::json SaveTween(const UITween<T>& tween)
 	};
 }
 
-// Tween1個分の設定を読み込み(ない項目は今の値のまま)
 template<typename T>
 static void LoadTween(const nlohmann::json& j, UITween<T>& tween)
 {
@@ -42,6 +44,24 @@ static void LoadTween(const nlohmann::json& j, UITween<T>& tween)
 	tween.enabled = j.value("enabled", false);
 }
 
+// UIAnimの保存
+static nlohmann::json SaveAnimSet(const UIAnimSet& set)
+{
+	return {
+		{"fade",     SaveTween(set.fade)},
+		{"move",     SaveTween(set.move)},
+		{"rotation", SaveTween(set.rotation)},
+		{"scale",    SaveTween(set.scale)},
+	};
+}
+
+static void LoadAnimSet(const nlohmann::json& j, UIAnimSet& set)
+{
+	if (j.find("fade") != j.end())     LoadTween(j["fade"], set.fade);
+	if (j.find("move") != j.end())     LoadTween(j["move"], set.move);
+	if (j.find("rotation") != j.end()) LoadTween(j["rotation"], set.rotation);
+	if (j.find("scale") != j.end())    LoadTween(j["scale"], set.scale);
+}
 
 
 // 初期化
@@ -62,28 +82,28 @@ void UICanvas::Update(float elapsedTime)
 void UICanvas::UpdateElement(UIElement* e, float elapsedTime)
 {
 	// 自分自身を更新
-	if (e->fadeAnim.playing)
+	if (e->anim.fade.playing)
 	{
-		e->fadeAnim.Update(elapsedTime);
-		e->fadeAlpha = e->fadeAnim.GetValue();
+		e->anim.fade.Update(elapsedTime);
+		e->fadeAlpha = e->anim.fade.GetValue();
 	}
 
-	if (e->moveAnim.playing)
+	if ((e->anim.move.playing))
 	{
-		e->moveAnim.Update(elapsedTime);
-		e->animPosition = e->moveAnim.GetValue();
+		e->anim.move.Update(elapsedTime);
+		e->animPosition = e->anim.move.GetValue();
 	}
 
-	if (e->rotationAnim.playing)
+	if (e->anim.rotation.playing)
 	{
-		e->rotationAnim.Update(elapsedTime);
-		e->rotationValue = e->rotationAnim.GetValue();
+		e->anim.rotation.Update(elapsedTime);
+		e->rotationValue = e->anim.rotation.GetValue();
 	}
 
-	if (e->scaleAnim.playing)
+	if (e->anim.scale.playing)
 	{
-		e->scaleAnim.Update(elapsedTime);
-		e->scaleValue = e->scaleAnim.GetValue();
+		e->anim.scale.Update(elapsedTime);
+		e->scaleValue = e->anim.scale.GetValue();
 	}
 
 	// 子を更新する
@@ -136,7 +156,7 @@ void UICanvas::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 	DirectX::XMMATRIX Scale = DirectX::XMMatrixScaling(e->scale.x * e->scaleValue, e->scale.y * e->scaleValue, 1.0f);
 	DirectX::XMMATRIX Angle = DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(e->rotation + e->rotationValue)); // Z軸しか2Dは回転しやんからXMMatrixRotationZ
 
-	DirectX::XMFLOAT2 pos = e->moveAnim.enabled ? e->animPosition : e->position;
+	DirectX::XMFLOAT2 pos = e->anim.move.enabled ? e->animPosition : e->position;
 	DirectX::XMMATRIX Position = DirectX::XMMatrixTranslation(
 		anchorPos.x + pos.x,
 		anchorPos.y + pos.y,
@@ -250,14 +270,14 @@ nlohmann::json UICanvas::SaveElement(const UIElement* e)
 			{"color", { e->color.x, e->color.y, e->color.z, e->color.w }},
 			{"visible", e->visible},
 			{"fillMethod", static_cast<int>(e->fillMethod)},
+			{"focusIndex",      e->focusIndex},
+			{"focusHorizontal", e->focusHorizontal},
+			{"focusLoop",       e->focusLoop}, 
 	};
 
-	j["animations"] = {
-	{"fade", SaveTween(e->fadeAnim)},
-	{"move", SaveTween(e->moveAnim)},
-	{"rotation", SaveTween(e->rotationAnim)},
-	{"scale", SaveTween(e->scaleAnim)},
-	};
+	j["animations"] = SaveAnimSet(e->anim);
+	j["focusAnim"] = SaveAnimSet(e->focusAnim);
+	j["unfocusAnim"] = SaveAnimSet(e->unfocusAnim);
 
 	// 子は子自身に保存してもらう
 	j["children"] = json::array();
@@ -286,6 +306,10 @@ void UICanvas::Load(const std::string& path)
 	{
 		// 既存のElementを削除してリセット！
 		canvas.elements.clear();
+		currentPanel = nullptr;
+		focusItems.clear();
+		focusPos = -1;
+
 
 		for (const auto& je : j["elements"])   // je = 要素1個分のJSON
 		{
@@ -312,6 +336,9 @@ std::unique_ptr<UIElement> UICanvas::LoadElement(const nlohmann::json& je, UIEle
 	if (je.find("color") != je.end())    element->color = { je["color"][0], je["color"][1], je["color"][2], je["color"][3] };
 	element->visible = je.value("visible", true);
 	element->fillMethod = static_cast<FillMethod>(je.value("fillMethod", FillMethod::None));
+	element->focusIndex = je.value("focusIndex", -1);
+	element->focusHorizontal = je.value("focusHorizontal", false);
+	element->focusLoop = je.value("focusLoop", false);
 
 	// テクスチャを読み直す
 	if (!element->texturePath.empty())
@@ -319,14 +346,9 @@ std::unique_ptr<UIElement> UICanvas::LoadElement(const nlohmann::json& je, UIEle
 		element->sprite = CreateSprite(element->texturePath.c_str());;
 	}
 
-	if (je.find("animations") != je.end())
-	{
-		const auto& ja = je["animations"];
-		if (ja.find("fade") != ja.end())     LoadTween(ja["fade"], element->fadeAnim);
-		if (ja.find("move") != ja.end())     LoadTween(ja["move"], element->moveAnim);
-		if (ja.find("rotation") != ja.end()) LoadTween(ja["rotation"], element->rotationAnim);
-		if (ja.find("scale") != ja.end())    LoadTween(ja["scale"], element->scaleAnim);
-	}
+	if (je.find("animations") != je.end()) LoadAnimSet(je["animations"], element->anim);
+	if (je.find("focusAnim") != je.end()) LoadAnimSet(je["focusAnim"], element->focusAnim);
+	if (je.find("unfocusAnim") != je.end()) LoadAnimSet(je["unfocusAnim"], element->unfocusAnim);
 
 	// 読み込んだ設定で、アニメーションの開始の状態にしておく
 	ResetAnimation(element.get());
@@ -376,13 +398,10 @@ void UICanvas::Play(UIElement* e)
 {
 	if (!e) return; // UIが見つからなかったら処理をしない
 
-	if (IsPlaying(e)) return; // 再生中なら2重呼び出しをしないようにする
+	if (e->anim.IsPlaying()) return; // 再生中なら2重呼び出しをしないようにする
 
 	// 自分自身を再生する
-	e->moveAnim.Play();
-	e->rotationAnim.Play();
-	e->scaleAnim.Play();
-	e->fadeAnim.Play();
+	e->anim.Play();
 
 	for (auto& child : e->children)
 	{
@@ -403,18 +422,18 @@ void UICanvas::AllPlay()
 void UICanvas::Stop(UIElement* e)
 {
 	if (!e) return;
-	e->moveAnim.Stop();
-	e->rotationAnim.Stop();
-	e->scaleAnim.Stop();
-	e->fadeAnim.Stop();
+	e->anim.Stop();
+	e->anim.Stop();
+	e->anim.Stop();
+	e->anim.Stop();
 }
 
 // 再生中か
 bool UICanvas::IsPlaying(UIElement* e)
 {
 	if (!e) return false;
-	bool isPlaying = (e->moveAnim.playing || e->rotationAnim.playing ||
-		e->scaleAnim.playing || e->fadeAnim.playing);
+	bool isPlaying = (e->anim.move.playing || e->anim.rotation.playing ||
+		e->anim.scale.playing || e->anim.fade.playing);
 	return isPlaying;
 }
 
@@ -422,16 +441,16 @@ bool UICanvas::IsPlaying(UIElement* e)
 void UICanvas::ResetAnimation(UIElement* e)
 {
 	// 全部のTweenを止める(from・to・時間などの設定は残る)
-	e->fadeAnim.Stop();
-	e->moveAnim.Stop();
-	e->rotationAnim.Stop();
-	e->scaleAnim.Stop();
+	e->anim.Stop();
+	e->anim.Stop();
+	e->anim.Stop();
+	e->anim.Stop();
 
 	// アニメーションの結果を初期値に戻す
-	e->fadeAlpha = e->fadeAnim.enabled ? e->fadeAnim.from : 1.0f;
-	e->animPosition = e->moveAnim.enabled ? DirectX::XMFLOAT2(e->moveAnim.from.x, e->moveAnim.from.y) : DirectX::XMFLOAT2(0.0f, 0.0f);
-	e->rotationValue = e->rotationAnim.enabled ? e->rotationAnim.from : 0.0f;
-	e->scaleValue = e->scaleAnim.enabled ? e->scaleAnim.from : 1.0f;
+	e->fadeAlpha = e->anim.fade.enabled ? e->anim.fade.from : 1.0f;
+	e->animPosition = e->anim.move.enabled ? DirectX::XMFLOAT2(e->anim.move.from.x, e->anim.move.from.y) : DirectX::XMFLOAT2(0.0f, 0.0f);
+	e->rotationValue = e->anim.rotation.enabled ? e->anim.rotation.from : 0.0f;
+	e->scaleValue = e->anim.scale.enabled ? e->anim.scale.from : 1.0f;
 }
 
 std::shared_ptr<Sprite> UICanvas::CreateSprite(const std::string& path)
@@ -441,4 +460,115 @@ std::shared_ptr<Sprite> UICanvas::CreateSprite(const std::string& path)
 	auto sprite = std::make_shared<Sprite>(device, srv);
 	sprite->SetSpritePS(uifillRenderer.GetPixelShader());
 	return sprite;
+}
+
+// どのパネルを選ぶか決めて先頭にフォーカスする
+void UICanvas::SetPanel(const std::string& name)
+{
+	currentPanel = Find(name); // UIを探す
+	CollectFocusItems(); // ボタンを集める
+	ChangeFocus(focusItems.empty() ? -1 : 0); // 最初のボタンを決定する
+}
+
+// 入力された時の更新
+void UICanvas::UpdateNavigation(const GamePad& pad)
+{
+	int dx = 0, dy = 0;
+
+	// 十字キー
+	GamePadButton down = pad.GetButtonDown();
+	if (down & GamePad::BTN_LEFT)	dx = -1;
+	if (down & GamePad::BTN_RIGHT)	dx =  1;
+	if (down & GamePad::BTN_UP)		dy = -1;
+	if (down & GamePad::BTN_DOWN)	dy =  1;
+
+	// スティック
+	float lx = pad.GetAxisLX();
+	float ly = pad.GetAxisLY();
+	const float on = 0.5f; // これ以上倒したら入力
+	const float off = 0.3f; // これよりもどったら倒したら中央
+
+	if (stickNeutral)
+	{
+		if (lx < -on) { dx = -1; stickNeutral = false; }
+		else if (lx > on) { dx = 1; stickNeutral = false; }
+		else if (ly > on) { dy = -1; stickNeutral = false; } // 上に倒すと LY はプラス
+		else if (ly < -on) { dy = 1; stickNeutral = false; }
+	}
+	else if (fabsf(lx) < off && fabsf(ly) < off)
+	{
+		stickNeutral = true;
+	}
+
+	Navigate(dx, dy);
+}
+
+void UICanvas::Navigate(int dx, int dy)
+{
+	if (!currentPanel || focusItems.empty()) return; // 要素がないときは処理をしない
+	// パネルの向きで、使う入力を決める
+	int delta = currentPanel->focusHorizontal ? dx : dy;
+	if (delta == 0) return;
+
+	int count = static_cast<int>(focusItems.size());
+	int next = focusPos + delta;
+
+	// ループするかしないか
+	if (currentPanel->focusLoop)
+	{
+		next = (next % count + count) % count; // 端から反対側へ
+	}
+	else
+	{
+		next = std::clamp(next, 0, count - 1); // 端で止まる
+	}
+
+	ChangeFocus(next);
+}
+
+// focusIndexに詰める処理
+void UICanvas::CollectFocusItems()
+{
+	focusItems.clear();
+	if (!currentPanel) return;
+
+	for (auto& child : currentPanel->children)
+	{
+		int i = child->focusIndex;
+		if (i < 0 || !child->visible) continue; // ボタンとして使ってなくて非表示の時
+
+		if (i >= static_cast<int>(focusItems.size())) focusItems.resize(i + 1, nullptr); // 長さが足りないとき長さを伸ばす
+		assert(!focusItems[i] && "focusIndexが重複してる");
+		focusItems[i] = child.get();
+	}
+
+	for (UIElement* e : focusItems) assert(e && "focusIndexが飛んでいる");
+}
+
+// フォーカス位置を変える
+void UICanvas::ChangeFocus(int newPos)
+{
+	SetHighlight(GetFocused(), false); // 今のハイライトを消す
+	focusPos = newPos;
+	SetHighlight(GetFocused(), true); // 新しいボタンのハイライトを出す
+}
+
+// ハイライトを切り替える
+void UICanvas::SetHighlight(UIElement* e, bool on)
+{
+	if (!e) return;
+	UIElement* h = FindElement(e, "Highlight"); // ボタンの子から探す
+	if (!h) return;
+
+	h->visible = on;
+	if (on) Play(h); // ハイライトを再生
+	else ResetAnimation(h); // 消すとき止める
+}
+
+// 今選んでいる要素を返す
+UIElement* UICanvas::GetFocused()
+{
+	if (focusPos < 0 || focusPos >= static_cast<int>(focusItems.size())) return nullptr; // 範囲外なら処理をしない
+
+	return focusItems[focusPos];
 }

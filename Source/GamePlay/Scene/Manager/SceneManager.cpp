@@ -5,12 +5,14 @@ void SceneManager::Update(float elapsedTime)
 {
 	if (nextScene != nullptr)
 	{
+		//新しいシーンを設定
+		Scene* next = nextScene;
+		nextScene = nullptr;
+
 		//古いシーンを終了処理
 		Clear();
 
-		//新しいシーンを設定
-		currenScene = nextScene;
-		nextScene = nullptr;
+		currenScene = next;
 
 		//シーンを初期化
 		if (!currenScene->IsReady())
@@ -51,6 +53,12 @@ void SceneManager::Clear()
 		currenScene->Finalize();
 		delete currenScene;
 		currenScene = nullptr;
+	}
+	if (nextScene != nullptr)
+	{
+		if (nextScene->IsReady()) nextScene->Finalize();   // 初期化済みのときだけ片付ける
+		delete nextScene;
+		nextScene = nullptr;
 	}
 }
 

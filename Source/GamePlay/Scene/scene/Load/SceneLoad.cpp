@@ -37,6 +37,12 @@ void SceneLoad::Finalize()
 		delete thread;
 		thread = nullptr;
 	}
+	if (nextScene != nullptr) 
+	{
+		nextScene->Finalize();
+		delete nextScene;
+		nextScene = nullptr;
+	}
 }
 
 // XVˆ—

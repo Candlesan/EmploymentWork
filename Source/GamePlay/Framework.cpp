@@ -44,7 +44,7 @@ Framework::Framework(HWND hWnd)
 	EffectManager::Instance().Initialize();
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneTitle);
+	SceneManager::Instance().ChangeScene(new SceneBuild);
 
 
 	// 最初にボーダーレスのフルスクリーンを作る
