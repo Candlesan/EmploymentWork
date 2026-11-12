@@ -73,28 +73,7 @@ void Player::Initialize()
 
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
-	magicLoadout.Clear(); // 入り直したときに候補が増えないようにする
-
-	// ショットガンをRTに設定する
-	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<ShotgunSkill>());
-
-	// 連射魔法をRTボタンに設定する
-	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RT)).AddCandidate(std::make_unique<RapidShotSkill>());
-
-	// 通常魔法をRBボタンに設定する
-	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::RB)).AddCandidate(std::make_unique<LaserShotSkill>());
-
-	// 迎撃をLTボタンに設定する
-	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LT)).AddCandidate(std::make_unique<InterceptSkill>());
-
-	// 防御をLBボタンに設定する
-	magicLoadout.GetSlot(static_cast<int>(MagicSlotIndex::LB)).AddCandidate(std::make_unique<DefenseSkill>());
-
-	// 決めた後にLoadoutDataの番号で装備を決める
-	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
-	{
-		magicLoadout.GetSlot(i).SetEquipped(GameSession::Instance().equippedIndex[i]);
-	}
+	magicLoadout.SetupFromCatalog(); // ビルド構成を読み込む
 
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);

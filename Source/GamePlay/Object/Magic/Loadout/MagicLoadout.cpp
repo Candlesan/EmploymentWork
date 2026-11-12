@@ -1,5 +1,6 @@
 #include "MagicLoadout.h"
 #include "GamePlay/Session/GameSession.h"
+#include "GamePlay/Object/Magic/Loadout/MagicCatalog.h"
 
 #include <imgui.h>
 
@@ -63,5 +64,20 @@ void MagicLoadout::RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* 
 		if (!skill) continue;
 
 		skill->RenderDebugPrimitive(ctx, renderer);
+	}
+}
+
+// 表を読んで、スロットに候補を入れる
+void MagicLoadout::SetupFromCatalog()
+{
+	// スロットの中身を削除する
+	Clear();
+
+	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
+	{
+		for (const MagicEntry& entry : MagicCatalog::GetEntries(static_cast<MagicSlotIndex>(i)))
+		{
+			slots[i].AddCandidate(entry.create());
+		}
 	}
 }

@@ -160,6 +160,7 @@
     <ClInclude Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\IMagicSkill.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicCatalog.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicInputController.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicLoadout.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicSlot.h" />
@@ -285,6 +286,7 @@
     <ClCompile Include="Source\GamePlay\Object\Collision\CollisionManager.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Flight\FlightController.cpp" />
     <ClCompile Include="Source\GamePlay\Object\LockOnSystem\LockOnSystem.cpp" />
+    <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicCatalog.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicInputController.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicLoadout.cpp" />
     <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicSlot.cpp" />

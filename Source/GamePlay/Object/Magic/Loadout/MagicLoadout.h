@@ -20,6 +20,8 @@ public:
 	void RenderDebugPrimitive(const MagicContext& ctx, ShapeRenderer* renderer);
 
 	void Clear() { for (auto& slot : slots) slot.Clear(); }
+
+	void SetupFromCatalog(); // 表を読んで、スロットに候補を入れる
 private:
 	MagicSlot slots[MAGIC_SLOT_COUNT];
 };
