@@ -1,5 +1,6 @@
 ﻿#include "SceneGame.h"
 
+// システム
 #include "System/Graphic/Graphics.h"
 #include "System/Audio/Audio.h"
 #include "System/Effect/EffectManager.h"
@@ -7,13 +8,22 @@
 #include "System/Core/Input/Input.h"
 #include "System/UI/Dialog/Dialog.h"
 
-#include "Gameplay/Object/Camera/Camera.h"
-#include "GamePlay/Object/CameraShake/CameraShake.h"
-#include "GamePlay/Object/Collision/Collision.h"
-#include "GamePlay/Object/Character/Player/Player.h"
+// ゲームオブジェクト
+#include "GamePlay/Session/GameSession.h"
+
+// シーン
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Result/SceneResult.h"
+
+// カメラ
+#include "Gameplay/Object/Camera/Camera.h"
+#include "GamePlay/Object/CameraShake/CameraShake.h"
+
+// 当たり判定
+#include "GamePlay/Object/Collision/Collision.h"
+
+#include "GamePlay/Object/Character/Player/Player.h"
 
 #include <imgui.h>
 #include <fstream>
@@ -111,6 +121,10 @@ void SceneGame::Initialize()
 	uiCanvas.Load("Data/Json/UI/SceneGame.json");
 	playerUI.Initialize(uiCanvas);
 	enemyUI.Initialize(uiCanvas);
+
+	// ゲームの初期化をする
+	GameSession::Instance().ResetRun();
+	isFadeing = false;
 }
 
 // 終了化
@@ -129,19 +143,30 @@ void SceneGame::Update(float elapsedTime)
 	// インスタンス取得
 	Camera& camera = CameraManager::Instance().GetMainCamera();
 	GamePad& gamePad = Input::Instance().GetGamePad();
+	GameSession& session = GameSession::Instance();
 	Player& player = Player::Instance();
-
-	// 仮でXボタンでシーンを変える
-	if (gamePad.GetButtonDown() & GamePad::BTN_X)
-	{
-		SceneManager::Instance().ChangeScene(new SceneLoad(new SceneResult));
-	}
-
 
 	// 演出用の倍率
 	float gameplayEffectScale = 1.0f;
 
 	float delta = elapsedTime * timeScale * gameplayEffectScale;
+
+	if (session.isCreared)
+	{
+		// フェードを探す
+		fade = uiCanvas.Find("fade");
+
+		// フェードを再生する
+		uiCanvas.Play(fade);
+		isFadeing = true;
+	}
+
+	if (isFadeing)
+	{
+		uiCanvas.Update(delta);
+		if (!uiCanvas.IsPlaying(fade))
+			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneResult));
+	}
 
 	// --- キー入力：F5/F6 のエッジ検出（押下の立ち上がり） ---
 	{

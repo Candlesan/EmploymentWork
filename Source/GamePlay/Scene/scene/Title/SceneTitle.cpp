@@ -5,10 +5,13 @@
 #include "System/Core/Input/Input.h"
 
 // ゲーム
+#include "Gameplay/Object/Camera/Camera.h"
+
+#include "GamePlay/Session/GameSession.h"
+
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Build/SceneBuild.h"
-#include "Gameplay/Object/Camera/Camera.h"
 
 #include <imgui.h>
 
@@ -20,6 +23,9 @@ void SceneTitle::Initialize()
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneTitle.json");
+
+	// ゲームを初期状態に戻す
+	GameSession::Instance().ResetAll();
 }
 
 // 更新処理

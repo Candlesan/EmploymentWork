@@ -1,26 +1,34 @@
 ﻿#pragma once
+// ゲームオブジェクト
 #include "Gameplay/Scene/Manager/Scene.h"
 #include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
 #include "GamePlay/Object/Particle/Compute_Particle.h"
-#include <memory>
-#include <string>
 
 // モデル
 #include "Gameplay/Object/Stage/Stage.h"
-#include "GamePlay/Object/Character/Player/PlayerUI.h"
 #include "GamePlay/Object/Character/Enemy/Enemy.h"
-#include "GamePlay/Object/Character/Enemy/EnemyUI.h"
+
+// 当たり判定
 #include "GamePlay/Object/Collision/CollisionManager.h"
 
+// UI
+#include "GamePlay/Object/Character/Player/PlayerUI.h"
+#include "GamePlay/Object/Character/Enemy/EnemyUI.h"
+
+// シェーダー
 #include "System/Shader/FrameBuffer/FrameBuffer.h"
 #include "System/Shader/fullscreen_quad/fullscreen_quad.h"
 #include "System/Shader/SkyMap/SkyMap.h"
 #include "System/Shader/bloom/bloom.h"
+
+// エディター
 #include "System/UI/EffectEditor/EffectEditor.h"
 #include "System/UI/UIEditor/UIEditor.h"
 #include "System/UI/UIEditor/UICanvas.h"
 
+#include <memory>
+#include <string>
 
 // ゲームシーン
 class SceneGame : public Scene
@@ -151,4 +159,7 @@ private:
 
 	bool showModel = true; // モデルを表示するか
 	bool showUI = true; // UIを表示するか
+
+	UIElement* fade = nullptr;
+	bool isFadeing = false;
 };

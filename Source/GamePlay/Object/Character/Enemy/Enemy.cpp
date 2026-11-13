@@ -7,9 +7,14 @@
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Camera/Camera.h"
+#include "GamePlay/Session/GameSession.h"
+
+// モデル
+#include "GamePlay/Object/Character/Player/Player.h"
+
+// ビヘイビアツリー
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/ActionDerived.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/JudgmentDerived.h"
-#include "GamePlay/Object/Character/Player/Player.h"
 #include "GamePlay/Object/Character/Enemy/BehaviorTree/Base/NodeBase.h" 
 
 #include <imgui.h>
@@ -121,6 +126,11 @@ void Enemy::Initialize()
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
+	if (status.currentHp <= 0.0f)
+	{
+		GameSession::Instance().isCreared = true;
+	}
+
 	// スタートボタンを押してAI起動
 	GamePad& gamePad = Input::Instance().GetGamePad();
 	if (gamePad.GetButtonDown() & GamePad::BTN_START)
