@@ -42,8 +42,8 @@ void SceneTitle::Update(float elapsedTime)
 		return; // フェード中は操作を受け付けない
 	}
 
-	// Xボタンを押してフェード開始
-	if (gamePad.GetButtonDown() & GamePad::BTN_X)
+	// Aボタンを押してフェード開始
+	if (gamePad.GetButtonDown() & GamePad::BTN_A)
 	{
 		uiCanvas.Play(fade);
 		isFadeing = true;

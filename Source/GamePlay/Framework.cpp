@@ -10,7 +10,6 @@
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/scene/Title/SceneTitle.h"
 #include "GamePlay/Scene/scene/Game/SceneGame.h"
-#include "GamePlay/Scene/scene/Build/SceneBuild.h"
 #include "System/Audio/Audio.h"
 
 #include <sstream>
@@ -44,7 +43,7 @@ Framework::Framework(HWND hWnd)
 	EffectManager::Instance().Initialize();
 
 	// シーン初期化
-	SceneManager::Instance().ChangeScene(new SceneBuild);
+	SceneManager::Instance().ChangeScene(new SceneTitle);
 
 
 	// 最初にボーダーレスのフルスクリーンを作る

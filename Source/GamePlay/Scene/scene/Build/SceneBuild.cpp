@@ -98,10 +98,6 @@ void SceneBuild::Render()
 void SceneBuild::DrawGUI()
 {
 	uiEditor.DrawGUI();
-
-	UIElement* t = uiCanvas.GetFocused();
-	UIElement* m = uiCanvas.GetSubFocused();
-	ImGui::Text(u8"ƒ^ƒu: %s / –‚–@: %s", t ? t->name.c_str() : u8"‚È‚µ", m ? m->name.c_str() : u8"‚È‚µ");
 }
 
 // ‰æ–Ê”ä—¦C³ŠÖ”
