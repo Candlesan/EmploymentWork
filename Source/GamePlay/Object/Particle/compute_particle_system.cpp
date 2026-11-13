@@ -355,9 +355,6 @@ void compute_particle_system::render(ID3D11DeviceContext* immediate_context)
 	immediate_context->IASetVertexBuffers(0, 1, clear_buffer, strides, offsets);
 	immediate_context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
 
-	////	パーティクル情報分描画コール
-	//immediate_context->Draw(num_particles, 0);
-
 	//	GPU側で計算したパーティクルの描画数をCPU側で取得して描画コールを呼び出すのはもったいないので、
 	//	DrawIndirect命令を使ってGPU側だけで処理させる
 	immediate_context->DrawInstancedIndirect(indirect_data_buffer.Get(), DrawIndirectOffset);
@@ -368,9 +365,9 @@ void compute_particle_system::render(ID3D11DeviceContext* immediate_context)
 	immediate_context->PSSetShader(nullptr, nullptr, 0);
 
 	//	リソースクリア
-	ID3D11ShaderResourceView* clear_shader_resource_views[] = { nullptr };
+	ID3D11ShaderResourceView* clear_shader_resource_views[] = { nullptr, nullptr };
 	immediate_context->PSSetShaderResources(0, 1, clear_shader_resource_views);
-	immediate_context->GSSetShaderResources(0, 1, clear_shader_resource_views);
+	immediate_context->GSSetShaderResources(0, 2, clear_shader_resource_views);
 }
 
 void compute_particle_system::clear(ID3D11DeviceContext* immediate_context)

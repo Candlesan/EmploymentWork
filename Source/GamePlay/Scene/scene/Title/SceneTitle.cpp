@@ -35,6 +35,7 @@ void SceneTitle::Update(float elapsedTime)
 
 	UIElement* fade = uiCanvas.Find("fade");
 
+	// UIを更新する
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
 
@@ -61,8 +62,6 @@ void SceneTitle::Render()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
 	RenderState* renderState = Graphics::Instance().GetRenderState();
-	ModelRenderer* modelRenderer = Graphics::Instance().GetModelRenderer();
-	ShapeRenderer* shapeRenderer = Graphics::Instance().GetShapeRenderer();
 
 	// レンダーステート設定
 	dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);

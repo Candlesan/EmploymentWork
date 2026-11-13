@@ -1,6 +1,8 @@
 ﻿#pragma once
 // ゲームオブジェクト
 #include "Gameplay/Scene/Manager/Scene.h"
+#include "GamePlay/Scene/scene/Pause/PauseMenu.h"
+
 #include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
 #include "GamePlay/Object/Particle/Compute_Particle.h"
@@ -115,8 +117,8 @@ private:
 	std::unique_ptr<framebuffer> framebuffers[8];
 	std::unique_ptr<fullscreen_quad> bit_block_transfer;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
-	float bloom_extraction = 0.7f;
-	float bloom_intensity = 0.01f;
+	float bloom_extraction = 1.87f;
+	float bloom_intensity = 0.87f;
 
 	// パーティクル
 	std::unique_ptr<Compute_Particle> particleManager;
@@ -136,10 +138,15 @@ private:
 	PlayerUI playerUI;
 	EnemyUI enemyUI;
 	bool showUIEdlitor = true;
-	
+
+	UIElement* fade = nullptr;
+	bool isFadeing = false;
+
+	PauseMenu pauseMenu;
+	bool isPaused = false;
 
 	// ----- デバック機能 -----
-	bool isPaused = false;      // 一時停止中か
+	bool isDebugPaused = false;      // 一時停止中か
 	bool stepNextFrame = false; // 1フレームだけ進めるか
 
 	// キーのエッジ検出用（前フレームの押下状態を保持）
@@ -159,7 +166,4 @@ private:
 
 	bool showModel = true; // モデルを表示するか
 	bool showUI = true; // UIを表示するか
-
-	UIElement* fade = nullptr;
-	bool isFadeing = false;
 };

@@ -133,7 +133,7 @@ void Enemy::Update(float elapsedTime)
 
 	// スタートボタンを押してAI起動
 	GamePad& gamePad = Input::Instance().GetGamePad();
-	if (gamePad.GetButtonDown() & GamePad::BTN_START)
+	if (gamePad.GetButtonDown() & GamePad::BTN_BACK)
 	{
 		AISwitch = true;
 		if (status.isDead)

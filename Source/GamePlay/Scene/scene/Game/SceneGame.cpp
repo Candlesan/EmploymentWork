@@ -15,6 +15,7 @@
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Result/SceneResult.h"
+#include "GamePlay/Scene/scene/Title/SceneTitle.h"
 
 // カメラ
 #include "Gameplay/Object/Camera/Camera.h"
@@ -165,7 +166,43 @@ void SceneGame::Update(float elapsedTime)
 	{
 		uiCanvas.Update(delta);
 		if (!uiCanvas.IsPlaying(fade))
-			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneResult));
+		{
+			if (!isPaused)
+			{
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneResult));
+			}
+			else
+			{
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneTitle));
+			}
+		}
+	}
+
+	if (isPaused)
+	{
+		switch (pauseMenu.Update(elapsedTime))
+		{
+		case PauseMenu::Result::Resume:
+			isPaused = false;
+
+			break;
+		case PauseMenu::Result::ToTitle:
+			// フェードを探す
+			fade = uiCanvas.Find("fade");
+			uiCanvas.Play(fade);
+			isFadeing = true;
+
+			break;
+		}
+
+		return;
+	}
+
+	// スタートボタンでポーズ画面
+	if (gamePad.GetButtonDown() & GamePad::BTN_START)
+	{
+		isPaused = true;
+		pauseMenu.Initialize();
 	}
 
 	// --- キー入力：F5/F6 のエッジ検出（押下の立ち上がり） ---
@@ -174,7 +211,7 @@ void SceneGame::Update(float elapsedTime)
 		bool f5Down = (GetAsyncKeyState(VK_F5) & 0x8000) != 0;
 		if (f5Down && !wasF5DownLastFrame)
 		{
-			isPaused = !isPaused;
+			isDebugPaused = !isDebugPaused;
 		}
 		wasF5DownLastFrame = f5Down;
 
@@ -182,7 +219,7 @@ void SceneGame::Update(float elapsedTime)
 		bool f6Down = (GetAsyncKeyState(VK_F6) & 0x8000) != 0;
 		if (f6Down && !wasF6DownLastFrame)
 		{
-			if (isPaused)
+			if (isDebugPaused)
 			{
 				stepNextFrame = true;
 			}
@@ -190,7 +227,7 @@ void SceneGame::Update(float elapsedTime)
 		wasF6DownLastFrame = f6Down;
 	}
 	// --- デバッグ用の更新制御 ---
-	bool shouldUpdate = !isPaused || stepNextFrame;
+	bool shouldUpdate = !isDebugPaused || stepNextFrame;
 	stepNextFrame = false; // 1フレーム送りのフラグはすぐに折る
 
 	// GUIの操作でゲーム用とデバック用のカメラを切り替え
@@ -412,6 +449,7 @@ void SceneGame::Render()
 		if (showUI)
 		{
 			uiEditor.Render(dc);
+			if(isPaused) pauseMenu.Render();
 			uiCanvas.Render(dc);
 		}
 	}
@@ -610,16 +648,16 @@ void SceneGame::DrawGUI()
 		ImGui::Begin(u8"デバック");
 		{
 			// 一時停止ボタン
-			if (isPaused) {
-				if (ImGui::Button(u8"再開 (F5)")) isPaused = false;
+			if (isDebugPaused) {
+				if (ImGui::Button(u8"再開 (F5)")) isDebugPaused = false;
 			}
 			else {
-				if (ImGui::Button(u8"一時停止 (F5)")) isPaused = true;
+				if (ImGui::Button(u8"一時停止 (F5)")) isDebugPaused = true;
 			}
 			ImGui::SameLine();
 
 			// 1フレーム送りボタン（ポーズ中のみ有効）
-			if (!isPaused)
+			if (!isDebugPaused)
 			{
 				// ポーズ中じゃない時は、見た目をグレー（無効っぽく）にする
 				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
@@ -629,12 +667,12 @@ void SceneGame::DrawGUI()
 
 			if (ImGui::Button(u8"1フレーム進める (F6)")) {
 				// ポーズ中のみ処理を受け付ける
-				if (isPaused) {
+				if (isDebugPaused) {
 					stepNextFrame = true;
 				}
 			}
 
-			if (!isPaused)
+			if (!isDebugPaused)
 			{
 				// 色の設定を元に戻す
 				ImGui::PopStyleColor(3);

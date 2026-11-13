@@ -286,6 +286,9 @@
     <Filter Include="Source\GamepPlay\Session">
       <UniqueIdentifier>{621f5637-52b1-452d-ab58-c944e288469e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Pause">
+      <UniqueIdentifier>{ac34acb9-3f00-4ed2-ad2f-5d4bbbb83c51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -687,6 +690,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\Loadout\MagicCatalog.h">
       <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\scene\Pause\PauseMenu.h">
+      <Filter>Source\GamepPlay\Scene\Pause</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -1027,6 +1033,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Object\Magic\Loadout\MagicCatalog.cpp">
       <Filter>Source\GamepPlay\Object\Magic\Loadout</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\scene\Pause\PauseMenu.cpp">
+      <Filter>Source\GamepPlay\Scene\Pause</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

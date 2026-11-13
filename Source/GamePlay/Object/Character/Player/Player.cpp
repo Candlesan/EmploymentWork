@@ -233,7 +233,7 @@ void Player::Update(float elapsedTime)
 	}
 
 	// 今、文字入力中かどうかを取得
-	isTyping = ImGui::GetIO().WantCaptureKeyboard;
+	isTyping = ImGui::GetIO().WantTextInput;
 
 	// GUIの表示/非表示
 	ShowDebugSwitch();

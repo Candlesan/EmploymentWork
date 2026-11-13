@@ -1,10 +1,6 @@
 #pragma once
 #include "GamePlay/Scene/Manager/Scene.h"
 
-#include "System/Shader/FrameBuffer/FrameBuffer.h"
-#include "System/Shader/fullscreen_quad/fullscreen_quad.h"
-#include "System/Shader/SkyMap/SkyMap.h"
-#include "System/Shader/bloom/bloom.h"
 #include "System/UI/UIEditor/UIEditor.h"
 #include "System/UI/UIEditor/UICanvas.h"
 
