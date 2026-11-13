@@ -10,6 +10,7 @@
 #include "GamePlay/Scene/scene/Game/SceneGame.h"
 
 #include "GamePlay/Session/GameSession.h"
+#include "GamePlay/Object/Magic/Loadout/MagicCatalog.h"
 
 #include <imgui.h>
 
@@ -21,7 +22,8 @@ void SceneBuild::Initialize()
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneBuild.json");
-	uiCanvas.SetPanel("Build");
+	uiCanvas.SetPanel("Slot");
+	RefreshEquippedMarks();
 }
 
 // 更新処理
@@ -35,6 +37,19 @@ void SceneBuild::Update(float elapsedTime)
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
 	uiCanvas.UpdateNavigation(gamePad);
+
+	// Aボタンで装備する
+	if (gamePad.GetButtonDown() & GamePad::BTN_A)
+	{
+		int slot = uiCanvas.GetFocusIndex(); // タブの番号
+		int magic = uiCanvas.GetSubFocusIndex(); // タブの中の番号
+
+		if (slot >= 0 && magic >= 0 && magic < MagicCatalog::GetCount(static_cast<MagicSlotIndex>(slot))) // 表にある番号だけ
+		{
+			GameSession::Instance().equippedIndex[slot] = magic;
+			RefreshEquippedMarks(); // 印を付け直す
+		}
+	}
 
 	// フェード中
 	if (isFadeing)
@@ -84,8 +99,9 @@ void SceneBuild::DrawGUI()
 {
 	uiEditor.DrawGUI();
 
-	UIElement* f = uiCanvas.GetFocused();
-	ImGui::Text(u8"選択中: %s", f ? f->name.c_str() : u8"なし");
+	UIElement* t = uiCanvas.GetFocused();
+	UIElement* m = uiCanvas.GetSubFocused();
+	ImGui::Text(u8"タブ: %s / 魔法: %s", t ? t->name.c_str() : u8"なし", m ? m->name.c_str() : u8"なし");
 }
 
 // 画面比率修正関数
@@ -96,4 +112,24 @@ void SceneBuild::OnResize(float width, float height)
 	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45), width / height, 0.1f, 1000.0f);
 
 	ID3D11Device* device = Graphics::Instance().GetDevice();
+}
+
+// 装備中の魔法に Equipped の印を付ける
+void SceneBuild::RefreshEquippedMarks()
+{
+	static const char* tabNames[MAGIC_SLOT_COUNT] = { "List_RB", "List_RT", "List_LB", "List_LT" };
+
+	for (int slot = 0; slot < MAGIC_SLOT_COUNT; ++slot)
+	{
+		UIElement* tab = uiCanvas.Find(tabNames[slot]);
+		if (!tab) continue;
+
+		int equipped = GameSession::Instance().equippedIndex[slot];
+		for (auto& button : tab->children)
+		{
+			if (button->focusIndex < 0) continue;              // 魔法ボタン以外（タブの Highlight）は飛ばす
+			UIElement* mark = uiCanvas.FindElement(button.get(), "Equipped");
+			if (mark) mark->visible = (button->focusIndex == equipped);
+		}
+	}
 }

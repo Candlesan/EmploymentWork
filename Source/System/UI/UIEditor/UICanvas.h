@@ -85,6 +85,21 @@ struct Canvas
 	std::vector<std::unique_ptr<UIElement>> elements;
 };
 
+// 選んでいるUI
+struct FocusGroup
+{
+	UIElement* owner = nullptr; // 集める元
+	std::vector<UIElement*> items; // 選べる物
+	int pos = -1; // 現在選んでいるもの
+
+	UIElement* Focused() const
+	{
+		return (pos >= 0 && pos < static_cast<int>(items.size())) ? items[pos] : nullptr;
+	}
+
+	void Clear() { owner = nullptr; items.clear(); pos = -1; }
+};
+
 class UICanvas
 {
 public:
@@ -131,9 +146,14 @@ public:
 	// スプライトを作る
 	std::shared_ptr<Sprite> CreateSprite(const std::string& path);
 
+	// 
 	void SetPanel(const std::string& name); // どのパネルを選ぶか決めて先頭にフォーカスする
-	void UpdateNavigation(const GamePad& pad);
-	UIElement* GetFocused(); // 今選んでいる要素を返す
+	void UpdateNavigation(const GamePad& pad); // 入力を集める
+	UIElement* GetFocused() { return tabFocus.Focused(); }
+	UIElement* GetSubFocused() { return itemFocus.Focused(); }
+
+	int GetFocusIndex() const { return tabFocus.pos; }
+	int GetSubFocusIndex() const { return itemFocus.pos; }
 private:
 	void UpdateElement(UIElement* e, float elapsedTime);
 	void RenderElement(ID3D11DeviceContext* dc, UIElement* e, const DirectX::XMMATRIX& parentWorld, const DirectX::XMFLOAT4& parentColor);
@@ -141,18 +161,18 @@ private:
 	nlohmann::json SaveElement(const UIElement* e);
 	std::unique_ptr<UIElement> LoadElement(const nlohmann::json& je, UIElement* parent);
 
-	void Navigate(int dx, int dy); // 入力方向に動かす
-	void CollectFocusItems(); // パネルの子から選べる要素を集める
-
-	void ChangeFocus(int newPos); // フォーカス位置を変える
-	void SetHighlight(UIElement* e, bool on); // ハイライトを切り替える
+	void Navigate(int dx, int dy);								// 入力方向に動かす
+	void Collect(FocusGroup& g, UIElement* owner);				// ownerの子から選べる物を集める
+	void Select(FocusGroup& g, int newPos);					// ハイライトを付け替えて位置を変える
+	void SelectTab(int newPos);									// タブを変えた時に中の物を集め直す
+	void SetHighlight(UIElement* e, bool on);					// ハイライトを切り替える
 private:
 	ID3D11Device* device = nullptr; // デバイス保存用変数
 	Canvas canvas; 
 	UIFillRenderer uifillRenderer;
 
-	UIElement* currentPanel = nullptr;
-	std::vector<UIElement*> focusItems; // forcusIndexの位置にそのまま入れる
-	int focusPos = -1;
+	FocusGroup tabFocus;
+	FocusGroup itemFocus;
 	bool stickNeutral = true; // スティックを倒していない
+
 };

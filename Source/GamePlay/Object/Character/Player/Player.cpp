@@ -75,6 +75,12 @@ void Player::Initialize()
 
 	magicLoadout.SetupFromCatalog(); // ビルド構成を読み込む
 
+	// 
+	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
+	{
+		magicLoadout.GetSlot(i).SetEquipped(GameSession::Instance().equippedIndex[i]);
+	}
+
 	// アニメーションポーズと初期ステートの設定
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);

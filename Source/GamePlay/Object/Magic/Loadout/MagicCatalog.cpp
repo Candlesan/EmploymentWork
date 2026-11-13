@@ -15,7 +15,7 @@ static const std::vector<MagicEntry> entries[MAGIC_SLOT_COUNT] =
 {
     // ŠÖ”‚»‚Ì‚à‚Ì(‚ÌêŠ)‚ğ“n‚·
     /* RB */ { { &Create<LaserShotSkill> } },
-    /* RT */ { { &Create<ShotgunSkill> }, { &Create<RapidShotSkill> } },
+    /* RT */ { { &Create<RapidShotSkill> }, { &Create<ShotgunSkill> } },
     /* LB */ { { &Create<DefenseSkill> } },
     /* LT */ { { &Create<InterceptSkill> } },
 };

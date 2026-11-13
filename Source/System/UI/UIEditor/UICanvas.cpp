@@ -17,6 +17,23 @@ static nlohmann::json ToJson(const DirectX::XMFLOAT2& v) { return { v.x, v.y }; 
 static void FromJson(const nlohmann::json& j, float& v) { v = j.get<float>(); }
 static void FromJson(const nlohmann::json& j, DirectX::XMFLOAT2& v) { v = { j[0], j[1] }; }
 
+// 入力方向で次の位置を決める
+static int StepIndex(int pos, int delta, int count, bool loop)
+{
+	int next = pos + delta;
+	// ループするかしないか
+	if (loop)
+	{
+		next = (next % count + count) % count; // 端から反対側へ
+	}
+	else
+	{
+		next = std::clamp(next, 0, count - 1); // 端で止まる
+	}
+
+	return next;
+}
+
 // UITweenの保存
 template<typename T>
 static nlohmann::json SaveTween(const UITween<T>& tween)
@@ -306,9 +323,10 @@ void UICanvas::Load(const std::string& path)
 	{
 		// 既存のElementを削除してリセット！
 		canvas.elements.clear();
-		currentPanel = nullptr;
-		focusItems.clear();
-		focusPos = -1;
+		tabFocus.Clear();
+		itemFocus.Clear();
+		tabFocus.pos = -1;
+		itemFocus.pos = -1;
 
 
 		for (const auto& je : j["elements"])   // je = 要素1個分のJSON
@@ -465,9 +483,10 @@ std::shared_ptr<Sprite> UICanvas::CreateSprite(const std::string& path)
 // どのパネルを選ぶか決めて先頭にフォーカスする
 void UICanvas::SetPanel(const std::string& name)
 {
-	currentPanel = Find(name); // UIを探す
-	CollectFocusItems(); // ボタンを集める
-	ChangeFocus(focusItems.empty() ? -1 : 0); // 最初のボタンを決定する
+	Select(itemFocus, -1); // 前のハイライトを消す
+	Select(tabFocus, -1);
+	Collect(tabFocus, Find(name)); // パネルの子を集める
+	SelectTab(tabFocus.items.empty() ? -1 : 0);
 }
 
 // 入力された時の更新
@@ -503,72 +522,92 @@ void UICanvas::UpdateNavigation(const GamePad& pad)
 	Navigate(dx, dy);
 }
 
+// 入力方向に動かす
 void UICanvas::Navigate(int dx, int dy)
 {
-	if (!currentPanel || focusItems.empty()) return; // 要素がないときは処理をしない
+	if (!tabFocus.owner) return;
+
 	// パネルの向きで、使う入力を決める
-	int delta = currentPanel->focusHorizontal ? dx : dy;
-	if (delta == 0) return;
+	bool horizontal = tabFocus.owner->focusHorizontal;
+	int tabDelta  = horizontal ? dx : dy;
+	int itemDelta = horizontal ? dy : dx;
 
-	int count = static_cast<int>(focusItems.size());
-	int next = focusPos + delta;
-
-	// ループするかしないか
-	if (currentPanel->focusLoop)
+	// タブの位置の切り替え
+	if (tabDelta != 0 && !tabFocus.items.empty())
 	{
-		next = (next % count + count) % count; // 端から反対側へ
-	}
-	else
-	{
-		next = std::clamp(next, 0, count - 1); // 端で止まる
+		int next = StepIndex(tabFocus.pos, tabDelta, tabFocus.items.size(), tabFocus.owner->focusLoop);
+		if (next != tabFocus.pos) SelectTab(next); // 端で止まらないようにループさせる
+		return;
 	}
 
-	ChangeFocus(next);
+	// アイテムの位置の切り替え
+	if (itemDelta != 0 && !itemFocus.items.empty())
+	{
+		int next = StepIndex(itemFocus.pos, itemDelta, itemFocus.items.size(), itemFocus.owner->focusLoop);
+		if (next != itemFocus.pos) Select(itemFocus, next); // 端で止まらないようにループさせる
+	}
 }
 
-// focusIndexに詰める処理
-void UICanvas::CollectFocusItems()
+// ownerの子から選べる物を集める
+void UICanvas::Collect(FocusGroup& g, UIElement* owner)
 {
-	focusItems.clear();
-	if (!currentPanel) return;
+	g.Clear();
+	g.owner = owner;
+	if (!owner) return;
 
-	for (auto& child : currentPanel->children)
+	for (auto& child : owner->children)
 	{
 		int i = child->focusIndex;
 		if (i < 0 || !child->visible) continue; // ボタンとして使ってなくて非表示の時
 
-		if (i >= static_cast<int>(focusItems.size())) focusItems.resize(i + 1, nullptr); // 長さが足りないとき長さを伸ばす
-		assert(!focusItems[i] && "focusIndexが重複してる");
-		focusItems[i] = child.get();
+		if (i >= static_cast<int>(g.items.size())) g.items.resize(i + 1, nullptr); // 長さが足りないとき長さを伸ばす
+		assert(!g.items[i] && "focusIndexが重複してる");
+		g.items[i] = child.get();
 	}
 
-	for (UIElement* e : focusItems) assert(e && "focusIndexが飛んでいる");
+	for (UIElement* e : g.items) assert(e && "focusIndexが飛んでいる");
 }
 
-// フォーカス位置を変える
-void UICanvas::ChangeFocus(int newPos)
+// ハイライトを付け替えて位置を変える
+void UICanvas::Select(FocusGroup& g, int newPos)
 {
-	SetHighlight(GetFocused(), false); // 今のハイライトを消す
-	focusPos = newPos;
-	SetHighlight(GetFocused(), true); // 新しいボタンのハイライトを出す
+	SetHighlight(g.Focused(), false); // 今のハイライトを消す
+	g.pos = newPos;
+	SetHighlight(g.Focused(), true); // 新しいボタンのハイライトを出す
+}
+
+// タブを変えた時に中の物を集め直す
+void UICanvas::SelectTab(int newPos)
+{
+	Select(itemFocus, -1);								 // 古いタブのハイライトを消す
+	Select(tabFocus, newPos);							 // タブを付け替える
+	Collect(itemFocus, tabFocus.Focused());				 // 新しいタブの中を集める
+	Select(itemFocus, itemFocus.items.empty() ? -1 : 0); // 先頭を光らせる
 }
 
 // ハイライトを切り替える
 void UICanvas::SetHighlight(UIElement* e, bool on)
 {
 	if (!e) return;
-	UIElement* h = FindElement(e, "Highlight"); // ボタンの子から探す
-	if (!h) return;
 
-	h->visible = on;
-	if (on) Play(h); // ハイライトを再生
-	else ResetAnimation(h); // 消すとき止める
-}
-
-// 今選んでいる要素を返す
-UIElement* UICanvas::GetFocused()
-{
-	if (focusPos < 0 || focusPos >= static_cast<int>(focusItems.size())) return nullptr; // 範囲外なら処理をしない
-
-	return focusItems[focusPos];
+	// 選ばれたタブを表示
+	for (auto& c : e->children)
+	{
+		if (c->name == "Highlight")
+		{
+			c->visible = on;
+			if (on)
+			{
+				Play(c.get()); // ハイライト再生
+			}
+			else
+			{
+				ResetAnimation(c.get()); // アニメーション停止
+			}
+		}
+		else if (c->focusIndex >= 0) // 選べる子（＝タブの中の魔法ボタン）
+		{
+			c->visible = on;
+		}
+	}
 }

@@ -28,6 +28,8 @@ public:
 	// ‰æ–Ê”ä—¦C³ŠÖ”
 	void OnResize(float width, float height);
 
+	// ‘•”õ’†‚Ì–‚–@‚É Equipped ‚Ìˆó‚ğ•t‚¯‚é
+	void RefreshEquippedMarks();
 private:
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
