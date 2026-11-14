@@ -2,6 +2,7 @@
 // ゲームオブジェクト
 #include "Gameplay/Scene/Manager/Scene.h"
 #include "GamePlay/Scene/scene/Pause/PauseMenu.h"
+#include "GamePlay/Scene/scene/Retry/RetryMenu.h"
 
 #include "Gameplay/Object/Camera/DebugCamera/DebugCamera.h"
 #include "Gameplay/Object/Camera/GameCamera/GameCamera.h"
@@ -144,6 +145,12 @@ private:
 
 	PauseMenu pauseMenu;
 	bool isPaused = false;
+
+	RetryMenu retryMenu;
+	bool playerDead = false;
+	bool isRetry = false;
+	bool reBuild = false;
+	bool toTitle = false;
 
 	// ----- デバック機能 -----
 	bool isDebugPaused = false;      // 一時停止中か

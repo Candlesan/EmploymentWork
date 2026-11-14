@@ -139,6 +139,12 @@ void CustomEffectManager::RenderMeshVFX(ModelRenderer* modelRenderer)
 }
 
 // 全クリア
+// 再生中のエフェクトだけ全部消す（読み込んだ設定は残す）
+void CustomEffectManager::StopAll()
+{
+	activeEffects.clear();
+}
+
 void CustomEffectManager::Clear()
 {
 	activeEffects.clear();

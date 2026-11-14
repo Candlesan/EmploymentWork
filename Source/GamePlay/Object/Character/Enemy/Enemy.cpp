@@ -126,9 +126,10 @@ void Enemy::Initialize()
 // 更新処理
 void Enemy::Update(float elapsedTime)
 {
+	// 死んだらゲームクリアにする
 	if (status.currentHp <= 0.0f)
 	{
-		GameSession::Instance().isCreared = true;
+		GameSession::Instance().isCleared = true;
 	}
 
 	// スタートボタンを押してAI起動

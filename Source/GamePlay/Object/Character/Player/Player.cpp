@@ -29,7 +29,21 @@
 // =========================================================================
 
 // 初期化
+// Player はシングルトンなので、SceneGame を作り直しても前のゲームの状態が残る。
+// 重い読み込みは最初の1回だけにして、状態のリセットは毎回やる。
 void Player::Initialize()
+{
+	if (!isLoaded)
+	{
+		LoadResources();
+		isLoaded = true;
+	}
+
+	ResetForNewRun();
+}
+
+// モデルやエディターの読み込み（最初の1回だけ）
+void Player::LoadResources()
 {
 	// デバイスを取得
 	ID3D11Device* device = Graphics::Instance().GetDevice();
@@ -39,26 +53,6 @@ void Player::Initialize()
 	weapon.model = std::make_shared<Model>(device, "Data/Model/Weapon/Player/Weapon/wizard_staff.gltf");
 	weapon.scale.x = weapon.scale.y = weapon.scale.z = 0.01f; //　武器の大きさを調整
 
-	// アニメーターを生成
-	animator = std::make_unique<Animator>();
-	animator->Initialize(player);
-
-	// パラメータ初期化
-	moveSpeed = 7.0f;
-	maxMoveSpeed = 20.0f;
-	status.currentHp = 100.0f;
-	status.maxHp = 100.0f;
-	status.currentMagic = 100.0f;
-	status.maxMagic = 100.0f;
-	status.maxDefenseDurability = 100.0f;
-	status.currentDefenseDurability = 100.0f;
-
-	// 当たり判定の設定
-	weight = 0.5f;
-	radius = 0.8f;
-	height = 1.0f;
-	CollisionOffset = 0.8;
-
 	// 杖の位置設定
 	weapon.position = { 0.07f, 0.0f, 0.03f };
 	weapon.angle = { -0.06, 0.23f, -1.13f };
@@ -67,26 +61,120 @@ void Player::Initialize()
 	rootMotionNodeName = "root";
 	upperBodyNodeName = "spine_01";
 
-	// 各種システムの初期化（
+	// 各種システムの初期化（中で push_back してるので2回呼ばないこと）
 	InitializeSequencer();          // シーケンサーの初期化
 	InitializeAnimationNodeEditor(); // ノードエディターの初期化
 
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
-	magicLoadout.SetupFromCatalog(); // ビルド構成を読み込む
+	// 読み込み直後の姿勢を覚えておく（リトライ時にこの姿勢へ戻す）
+	player->GetNodePoses(initialNodePoses);
 
-	// 
+	InitializeHeadDirection(); // 頭の向きを初期化（初期姿勢で計算する必要がある）
+}
+
+// ゲームが始まるたびに状態を戻す
+void Player::ResetForNewRun()
+{
+	// ── 位置・移動 ──
+	position = { 0.0f, 0.0f, 0.0f };
+	angle = { 0.0f, 0.0f, 0.0f };
+	velocity = { 0.0f, 0.0f, 0.0f };
+	moveVecX = 0.0f;
+	moveVecZ = 0.0f;
+	isGround = true;
+	falling = false;
+	moveLength = 0.0f;
+	flightController.SetFlightMode(FlightMode::OFF);
+
+	// ── パラメータ ──
+	// moveSpeed と turnSpeed はノードエディターの遷移アクションで書き換わるので、
+	// 死んだときの値（回転速度0など）が残らないように必ず戻す
+	moveSpeed = 7.0f;
+	turnSpeed = DirectX::XMConvertToRadians(720);
+	maxMoveSpeed = 20.0f;
+	status = CharacterStatus{}; // ダウン・飛行・回避などのフラグもまとめて戻す
+	status.currentHp = 100.0f;
+	status.maxHp = 100.0f;
+	status.currentMagic = 100.0f;
+	status.maxMagic = 100.0f;
+	status.maxDefenseDurability = 100.0f;
+	status.currentDefenseDurability = 100.0f;
+	status.isDead = false;
+	magicRecoverDelay = 0.0f;
+
+	// 当たり判定の設定
+	weight = 0.5f;
+	radius = 0.8f;
+	height = 1.0f;
+	CollisionOffset = 0.8;
+
+	// ── 魔法 ──
+	magicManager.Clear();            // 前のゲームで撃った魔法を消す
+	defenseMagic.SetIsActive(false); // 防御魔法を閉じる
+
+	magicLoadout.SetupFromCatalog(); // ビルド構成を読み込む（中で Clear してる）
 	for (int i = 0; i < MAGIC_SLOT_COUNT; ++i)
 	{
 		magicLoadout.GetSlot(i).SetEquipped(GameSession::Instance().equippedIndex[i]);
 	}
 
-	// アニメーションポーズと初期ステートの設定
+	// ── ロックオン・入力 ──
+	hasLockOnTarget = false;
+	hardLock = false;
+	lockOn.SetHardLock(false);
+	enemyFromDistance = 0.0f;
+	lockedEnemyDistance = 0.0f;
+	bufferedButton = 0;
+	isSubGraphExited = false;
+	bButtonHoldTime = 0.0f;
+	rbButtonHoldTime = 0.0f;
+
+	// ── IK・傾き ──
+	previousAngleY = 0.0f;
+	currentBankAngle = 0.0f;
+	lookAtWeight = 0.0f;
+	flightBankX = 0.0f;
+	flightBankZ = 0.0f;
+	armAimWeight = 0.0f;
+
+	// ── アニメーション ──
+	isPreviewMode = false;
+	activeGraphStack.clear();
+	upperGraphStack.clear();
+	currentGraphIndex = 0;
+
+	currentState = "";
+	previousState = "";
+	currentOverlayState = "";
+	animationIndex = -1;
+	animationSeconds = 0.0f;
+	oldAnimationSeconds = 0.0f;
+	animationBlendSeconds = 0.0f;
+	isBlending = true;
+	justChangedAnimation = true;
+	animationLoop = false;
+	isFinished = false;
+	hitStop = false;
+	hitStopLastSeconds = 0.0f;
+	baseSpeed = 1.0f;
+	speedUp = 0.0f;
+	overlayAnimationIndex = -1;
+	overlayAnimationSeconds = 0.0f;
+	overlayAnimationLoop = false;
+	isOverlayPlaying = false;
+	smoothMoveLength = 0.0f;
+	weapon.isVisible = false;
+
+	// アニメーターを作り直す（上半身の再生状態なども消える）
+	animator = std::make_unique<Animator>();
+	animator->Initialize(player);
+
+	// 死んだときの姿勢が残らないように、読み込み直後の姿勢に戻す
+	player->SetNodePoses(initialNodePoses);
 	player->GetNodePoses(nodePoses);
 	player->GetNodePoses(oldNodePoses);
 	SetupInitialAnimationState();    // 初期アニメーションの設定
-
-	InitializeHeadDirection(); // 頭の向きを初期化
 }
 
 // シーケンサーの初期化
@@ -225,8 +313,14 @@ void Player::Finalize()
 // 更新処理
 void Player::Update(float elapsedTime)
 {
+	// 体力がなくなったら
+	if (status.currentHp <= 0.0f)
+	{
+		status.isDead = true;
+	}
+
 	GamePad& gamePad = Input::Instance().GetGamePad();
-	if (gamePad.GetButtonDown() & GamePad::BTN_START)
+	if (gamePad.GetButtonDown() & GamePad::BTN_BACK)
 	{
 		status.isDead = false;
 		status.currentHp = status.maxHp;

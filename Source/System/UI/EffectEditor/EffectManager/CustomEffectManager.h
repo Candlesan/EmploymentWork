@@ -47,6 +47,8 @@ public:
 
 	// 全部クリア
 	void Clear();
+	// 再生中のエフェクトだけ全部消す（読み込んだ設定は残す）
+	void StopAll();
 
 	// 設定済みにのエフェクトをインスタンス化してポインタを返す関数
 	std::unique_ptr<CustomEffect> CreateEffect(const std::string& effectName);

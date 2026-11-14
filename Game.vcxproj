@@ -191,6 +191,7 @@
     <ClInclude Include="Source\GamePlay\Scene\scene\Load\SceneLoad.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Pause\PauseMenu.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Result\SceneResult.h" />
+    <ClInclude Include="Source\GamePlay\Scene\scene\Retry\RetryMenu.h" />
     <ClInclude Include="Source\GamePlay\Scene\scene\Title\SceneTitle.h" />
     <ClInclude Include="Source\GamePlay\Session\GameSession.h" />
     <ClInclude Include="Source\System\Audio\Audio.h" />
@@ -315,6 +316,7 @@
     <ClCompile Include="Source\GamePlay\Scene\scene\Load\SceneLoad.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\scene\Pause\PauseMenu.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\scene\Result\SceneResult.cpp" />
+    <ClCompile Include="Source\GamePlay\Scene\scene\Retry\RetryMenu.cpp" />
     <ClCompile Include="Source\GamePlay\Scene\scene\Title\SceneTitle.cpp" />
     <ClCompile Include="Source\System\Audio\Audio.cpp" />
     <ClCompile Include="Source\System\Audio\AudioResource.cpp" />

@@ -35,6 +35,8 @@ public:
 	//  ライフサイクル（ゲームの根幹の流れ）
 	// =========================================================================
 	void Initialize();
+	void LoadResources();   // モデルやエディターの読み込み（最初の1回だけ）
+	void ResetForNewRun();  // ゲームが始まるたびに状態を戻す
 	void InitializeSequencer();
 	void InitializeAnimationNodeEditor();
 	void InitializeHeadDirection();
@@ -155,6 +157,10 @@ private:
 	// ── 3Dモデルと装備 ──
 	std::shared_ptr<Model> player;
 	Enemy* enemy = nullptr;
+
+	// ── 読み込み管理 ──
+	bool isLoaded = false;                         // LoadResources() 済みか
+	std::vector<Model::NodePose> initialNodePoses; // 読み込み直後の姿勢（リトライ時に戻す用）
 
 	// ── 基本パラメータ（移動・回転） ──
 	float moveSpeed = 5.0f;

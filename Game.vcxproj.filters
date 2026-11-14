@@ -289,6 +289,9 @@
     <Filter Include="Source\GamepPlay\Scene\Pause">
       <UniqueIdentifier>{ac34acb9-3f00-4ed2-ad2f-5d4bbbb83c51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Scene\Scene\Retry">
+      <UniqueIdentifier>{63ca0d2d-e6b4-4ca5-adc1-9dda81c23578}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -693,6 +696,9 @@
     <ClInclude Include="Source\GamePlay\Scene\scene\Pause\PauseMenu.h">
       <Filter>Source\GamepPlay\Scene\Pause</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GamePlay\Scene\scene\Retry\RetryMenu.h">
+      <Filter>Source\GamepPlay\Scene\Scene\Retry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -1036,6 +1042,9 @@
     </ClCompile>
     <ClCompile Include="Source\GamePlay\Scene\scene\Pause\PauseMenu.cpp">
       <Filter>Source\GamepPlay\Scene\Pause</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GamePlay\Scene\scene\Retry\RetryMenu.cpp">
+      <Filter>Source\GamepPlay\Scene\Scene\Retry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

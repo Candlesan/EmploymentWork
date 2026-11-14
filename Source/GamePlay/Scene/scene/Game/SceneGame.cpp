@@ -15,6 +15,7 @@
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Result/SceneResult.h"
+#include "GamePlay/Scene/scene/Build/SceneBuild.h"
 #include "GamePlay/Scene/scene/Title/SceneTitle.h"
 
 // カメラ
@@ -66,6 +67,8 @@ void SceneGame::Initialize()
 
 	// 自作エフェクトマネージャー初期化
 	CustomEffectManager::Instance().Initialize(device);
+	// シングルトンなので、リトライ前のゲームで出ていたエフェクト（防御魔法など）が残らないように消す
+	CustomEffectManager::Instance().StopAll();
 
 	// プレイヤー初期化
 	Player& player = Player::Instance();
@@ -123,9 +126,16 @@ void SceneGame::Initialize()
 	playerUI.Initialize(uiCanvas);
 	enemyUI.Initialize(uiCanvas);
 
+	// フェードを探す
+	fade = uiCanvas.Find("fade");
+
 	// ゲームの初期化をする
 	GameSession::Instance().ResetRun();
 	isFadeing = false;
+	playerDead = false;
+	isRetry = false;
+	reBuild = false;
+	toTitle = false;
 }
 
 // 終了化
@@ -152,11 +162,8 @@ void SceneGame::Update(float elapsedTime)
 
 	float delta = elapsedTime * timeScale * gameplayEffectScale;
 
-	if (session.isCreared)
+	if (session.isCleared)
 	{
-		// フェードを探す
-		fade = uiCanvas.Find("fade");
-
 		// フェードを再生する
 		uiCanvas.Play(fade);
 		isFadeing = true;
@@ -167,17 +174,29 @@ void SceneGame::Update(float elapsedTime)
 		uiCanvas.Update(delta);
 		if (!uiCanvas.IsPlaying(fade))
 		{
-			if (!isPaused)
+			if (session.isCleared)
 			{
 				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneResult));
 			}
-			else
+			else if (isRetry)
 			{
+				isRetry = false;
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
+			}
+			else if (reBuild)
+			{
+				reBuild = false;
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneBuild));
+			}
+			else if(toTitle)
+			{
+				toTitle = false;
 				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneTitle));
 			}
 		}
 	}
 
+	// ポーズ画面
 	if (isPaused)
 	{
 		switch (pauseMenu.Update(elapsedTime))
@@ -187,9 +206,37 @@ void SceneGame::Update(float elapsedTime)
 
 			break;
 		case PauseMenu::Result::ToTitle:
-			// フェードを探す
-			fade = uiCanvas.Find("fade");
 			uiCanvas.Play(fade);
+			toTitle = true;
+			isFadeing = true;
+
+			break;
+		}
+
+		return;
+	}
+
+	if (playerDead)
+	{
+		switch (retryMenu.Update(elapsedTime))
+		{
+		case RetryMenu::Retry::Retry:
+			uiCanvas.Play(fade);
+			isRetry = true;
+			isFadeing = true;
+
+			break;
+
+		case RetryMenu::Retry::ReBuild:
+			uiCanvas.Play(fade);
+			reBuild = true;
+			isFadeing = true;
+
+			break;
+
+		case RetryMenu::Retry::ToTitle:
+			uiCanvas.Play(fade);
+			toTitle = true;
 			isFadeing = true;
 
 			break;
@@ -203,6 +250,13 @@ void SceneGame::Update(float elapsedTime)
 	{
 		isPaused = true;
 		pauseMenu.Initialize();
+	}
+
+	// プレイヤーが死んだら
+	if (player.GetStatus().isDead)
+	{
+		playerDead = true;
+		retryMenu.Initialize();
 	}
 
 	// --- キー入力：F5/F6 のエッジ検出（押下の立ち上がり） ---
@@ -450,7 +504,14 @@ void SceneGame::Render()
 		{
 			uiEditor.Render(dc);
 			if(isPaused) pauseMenu.Render();
-			uiCanvas.Render(dc);
+			if (playerDead)
+			{
+				retryMenu.Render();
+			}
+			else
+			{
+				uiCanvas.Render(dc);
+			}
 		}
 	}
 }

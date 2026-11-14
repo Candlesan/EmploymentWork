@@ -8,13 +8,13 @@ void UIFillRenderer::Initialize(ID3D11Device* device)
     GpuResourceUtils::LoadPixelShader(
         device,
         "Data/Shader/UIFillPS.cso",
-        pixelShader.GetAddressOf());
+        pixelShader.ReleaseAndGetAddressOf());
 
     // 定数バッファ作成
     GpuResourceUtils::CreateConstantBuffer(
         device,
         sizeof(UIFillConstants),
-        constantBuffer.GetAddressOf());
+        constantBuffer.ReleaseAndGetAddressOf());
 }
 
 // CB更新＆バインド

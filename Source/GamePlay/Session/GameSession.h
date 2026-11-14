@@ -17,7 +17,7 @@ public:
 
 	// 今回のプレイの結果
 	float clearTime = 0.0f;
-	bool isCreared = false;
+	bool isCleared = false;
 
 	// スタート画面に戻った時
 	void ResetAll()
@@ -30,6 +30,6 @@ public:
 	void ResetRun()
 	{
 		clearTime = 0.0f;
-		isCreared = false;
+		isCleared = false;
 	}
 };

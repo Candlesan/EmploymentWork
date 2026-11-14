@@ -11,8 +11,6 @@
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Title/SceneTitle.h"
 
-#include <imgui.h>
-
 
 void PauseMenu::Initialize()
 {
@@ -37,7 +35,7 @@ PauseMenu::Result PauseMenu::Update(float elapsedTime)
 
 		if (index >= 0 && index < 3) return items[index];
 	}
-	if (gamePad.GetButtonDown() & GamePad::BTN_B) return Result::Resume;
+	if (gamePad.GetButtonDown() & GamePad::BTN_B || gamePad.GetButtonDown() & GamePad::BTN_START) return Result::Resume;
 
 	return Result::None;
 }
