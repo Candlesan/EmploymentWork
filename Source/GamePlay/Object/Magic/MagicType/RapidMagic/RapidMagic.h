@@ -13,7 +13,8 @@ public:
         float rapidInterval = 0.1; // î≠éÀä‘äu
         float gaurdDamage = 2; // ñhå‰ñÇñ@Ç÷ÇÃÉ_ÉÅÅ[ÉW
         float diffusion = 0.0f; // ägéU
-        
+        float interceptBonus = 1.0f; // å}åÇÇ≥ÇÍÇΩéûÇ…ëäéËÇ…ï‘Ç∑ñÇóÕÇÃÉ{Å[ÉiÉX
+
        DirectX::XMFLOAT3 spawnOffsets[6] = {
             { -1.0f,  1.0f,   0.0f }, // ç∂è„
             { -2.0f,  0.5f,   0.0f }, // ç∂íÜ
@@ -35,6 +36,7 @@ public:
             j["rapidInterval"] = rapidInterval;
             j["diffusion"] = diffusion;
             j["gaurdDamage"] = gaurdDamage;
+            j["interceptBonus"] = interceptBonus;
             j["offsetPosition"] = { offsetPosition.x, offsetPosition.y, offsetPosition.z };
             j["offsetAngle"] = { offsetAngle.x, offsetAngle.y, offsetAngle.z };
             j["offsetScale"] = { offsetScale.x, offsetScale.y, offsetScale.z };
@@ -65,6 +67,7 @@ public:
                 if (j.find("rapidInterval") != j.end()) rapidInterval = j["rapidInterval"];
                 if (j.find("diffusion") != j.end()) diffusion = j["diffusion"];
                 if (j.find("gaurdDamage") != j.end()) gaurdDamage = j["gaurdDamage"];
+                if (j.find("interceptBonus") != j.end()) interceptBonus = j["interceptBonus"];
                 if (j.find("offsetPosition") != j.end()) offsetPosition = { j["offsetPosition"][0], j["offsetPosition"][1], j["offsetPosition"][2] };
                 if (j.find("offsetAngle") != j.end()) offsetAngle = { j["offsetAngle"][0], j["offsetAngle"][1], j["offsetAngle"][2] };
                 if (j.find("offsetScale") != j.end()) offsetScale = { j["offsetScale"][0], j["offsetScale"][1], j["offsetScale"][2] };

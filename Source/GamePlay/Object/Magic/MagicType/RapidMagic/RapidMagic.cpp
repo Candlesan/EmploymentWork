@@ -98,17 +98,12 @@ void RapidMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const R
 	magic->SetShape(HitBoxShape::Sphere);  // 当たり判定の形状
 
 	magic->SetRadius(config.hitRadius);			// 当たり判定の半径
-	magic->SetDamage(0.01f);					// 生身へのダメージ
+	magic->SetDamage(config.damage);			// 生身へのダメージ
 	magic->SetGuardDamage(config.gaurdDamage);	// 防御魔法へのダメージ
 
 	if (info.owner != nullptr)
 	{
-		const float magicCost =
-			info.owner->GetStatus().rapidFireMagicCost;
-
-		const float interceptBonus = 1.0f; // 迎撃成功時のボーナス
-
-		magic->SetMagicmagicRefund(magicCost + interceptBonus);
+		magic->SetMagicmagicRefund(config.magicCost + config.interceptBonus);
 	}
 
 	magic->SetSpeed(config.speed);				// 弾速
@@ -160,6 +155,7 @@ void RapidMagic::DrawGUI(RapidMagicConfig& config)
 	ImGui::DragFloat(u8"防御魔法へのダメージ", &config.gaurdDamage, 0.1f);
 	ImGui::DragFloat(u8"魔法の速度", &config.speed, 0.1f);
 	ImGui::DragFloat(u8"魔力消費量", &config.magicCost, 0.1f);
+	ImGui::DragFloat(u8"迎撃時の還元ボーナス", &config.interceptBonus, 0.1f);
 
 
 	ImGui::DragFloat3(u8"手元オフセット##rapid", &config.spawnOffset.x, 0.1f);

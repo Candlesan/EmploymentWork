@@ -1,9 +1,12 @@
 {
-    "damage": 0.009999999776482582,
+    "damage": 0.05000000074505806,
     "diffusion": 0.02500000037252903,
     "gaurdDamage": 2.0,
+    "guardDamage": 1.0,
     "hitHeight": 1.0,
     "hitRadius": 0.25,
+    "interceptBonus": 0.05000000074505806,
+    "interval": 1.0,
     "lifeTimer": 3.0,
     "magicCost": 0.5,
     "offsetAngle": [

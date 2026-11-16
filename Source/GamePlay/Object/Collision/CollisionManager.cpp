@@ -37,11 +37,6 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 		{
 			target->ApplyDamage(magic->GetDamage());
 		}
-		else if (target->GetIsGaurd() && magic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
-		{
-			// 防御魔法を展開してかつチャージ魔法だったら半分のダメージを与える
-			target->ApplyDamage(magic->GetDamage() * 0.5f);
-		}
 
 		if (!target->GetIsGaurd())magic->PlayHitEffect(ComputeHitPosition(a, b));
 		magic->OnTerminate(); // 当たったら魔法を消す
@@ -58,7 +53,7 @@ void CollisionManager::ResolveCollision(const Collider& a, const Collider& b,
 
 		if (magic->GetMagicKind() == MagicKind::Normal && magic->GetNormalMagicLevel() == NormalMagicLevel::Charged)
 		{
-			guardOwner->OnGuardHit(200);
+			guardOwner->OnGuardHit(35);
 		}
 
 		if (magic->GetMagicKind() == MagicKind::Rapid) magic->PlayHitEffect(a.pos);

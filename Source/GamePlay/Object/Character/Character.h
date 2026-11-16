@@ -31,7 +31,6 @@ struct CharacterStatus
 	float magicRecoverDelayTimer = 0.0f;   // –‚—Í‚ª‰ñ•œ‚µn‚ß‚é‚Ü‚Å‚Ì’x‰„
 
 	float interceptMagicCost = 10.0f;	// Œ}Œ‚’†‚Ì–‚—ÍÁ”ï—Ê
-	float rapidFireMagicCost = 6;
 
 	// --- –hŒäŒn ---
 	float maxDefenseDurability = 100.0f;		// –hŒä–‚–@‚ÌÅ‘å‘Ï‹v’l
