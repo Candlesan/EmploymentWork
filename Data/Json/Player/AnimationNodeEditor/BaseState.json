@@ -1058,6 +1058,72 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "Fly"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 19
+                }
+            ],
+            "fromState": "Walk",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Down"
+        },
+        {
+            "Actions": [
+                {
+                    "type": 2,
+                    "value": 720.0
+                }
+            ],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 19
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.10000000149011612,
+                    "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.5,
+                    "type": 7
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "Down",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "Walk"
         }
     ],
     "nodes": [
@@ -1115,8 +1181,8 @@
             },
             "mixRate": 0.0,
             "position": [
-                -620.0,
-                585.0
+                -607.0,
+                665.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/State_Avoid.json",
             "type": 1

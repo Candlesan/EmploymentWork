@@ -22,7 +22,7 @@
         },
         {
             "from": "Root",
-            "to": "牽制連射"
+            "to": "連射魔法"
         }
     ],
     "nodes": [
@@ -121,14 +121,14 @@
                     "judgmentValue": 5.0
                 },
                 {
-                    "compareType": 3,
-                    "conditionType": "Random",
-                    "judgmentValue": 40.0
-                },
-                {
                     "compareType": 0,
                     "conditionType": "EnemyCurrentMagic",
                     "judgmentValue": 40.0
+                },
+                {
+                    "compareType": 4,
+                    "conditionType": "IsPlayerDefending",
+                    "judgmentValue": 0.0
                 }
             ],
             "config": {
@@ -223,18 +223,13 @@
             "selectRule": 0
         },
         {
-            "StateName": "牽制連射",
+            "StateName": "連射魔法",
             "actionType": "RapidFire",
             "conditions": [
                 {
-                    "compareType": 3,
-                    "conditionType": "Random",
-                    "judgmentValue": 25.0
-                },
-                {
                     "compareType": 0,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 70.0
+                    "judgmentValue": 20.0
                 }
             ],
             "config": {
@@ -245,11 +240,11 @@
                 "useRootMotionEx": false
             },
             "interruptible": false,
-            "name": "牽制連射",
+            "name": "連射魔法",
             "parentName": "Root",
             "position": [
-                300.0,
-                280.0
+                298.0,
+                276.0
             ],
             "priority": 6,
             "selectRule": 0

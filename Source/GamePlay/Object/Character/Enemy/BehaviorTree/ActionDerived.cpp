@@ -439,7 +439,7 @@ ActionBase::State InterceptMagic::Run(float elapsedTime)
             owner->SetIsIntercept(true);
             owner->SetIsRapidFire(true);
 
-            rapidFireConfig.speed = 80.0f;
+            rapidFireConfig.speed = 40.0f;
 
             rapidMagic.Emit(&owner->GetMagicManager(), info, rapidFireConfig);
             fireTimer = rapidFireConfig.rapidInterval;

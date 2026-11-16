@@ -23,7 +23,7 @@ InterceptSkill::InterceptSkill()
 	config.damage		= 0.0f;  // キャラクターに与えるダメージ
 	config.gaurdDamage	= 0.0f;	  // 防御魔法に与えるダメージ
 	config.hitRadius	= 0.25f;  // 当たり判定の大きさ
-	config.speed		= 80.0f; // 弾速
+	config.speed		= 40.0f; // 弾速
 
 }
 
