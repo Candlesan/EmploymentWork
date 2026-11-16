@@ -162,13 +162,14 @@ void SceneGame::Update(float elapsedTime)
 
 	float delta = elapsedTime * timeScale * gameplayEffectScale;
 
-	if (session.isCleared)
+	if (session.isCleared && !isFadeing)
 	{
 		// フェードを再生する
 		uiCanvas.Play(fade);
 		isFadeing = true;
 	}
 
+	// フェードが終わったらシーン遷移
 	if (isFadeing)
 	{
 		uiCanvas.Update(delta);
@@ -216,6 +217,7 @@ void SceneGame::Update(float elapsedTime)
 		return;
 	}
 
+	// リトライ画面を表示
 	if (playerDead)
 	{
 		switch (retryMenu.Update(elapsedTime))
@@ -302,6 +304,11 @@ void SceneGame::Update(float elapsedTime)
 		debugCamera->SyncControllerToCamera(camera);
 	}
 
+	if (!session.isCleared)
+	{
+		session.clearTime += elapsedTime;
+	}
+
 	if (shouldUpdate)
 	{
 		// ステージ更新
@@ -339,7 +346,6 @@ void SceneGame::Update(float elapsedTime)
 
 		// UIエディターの更新
 		uiEditor.Update(delta);
-		uiCanvas.Update(delta);
 	}
 }
 
@@ -503,8 +509,11 @@ void SceneGame::Render()
 		if (showUI)
 		{
 			uiEditor.Render(dc);
-			if(isPaused) pauseMenu.Render();
-			if (playerDead)
+			if (isPaused)
+			{
+				pauseMenu.Render();
+			}
+			else if (playerDead)
 			{
 				retryMenu.Render();
 			}
@@ -753,6 +762,8 @@ void SceneGame::DrawGUI()
 			{
 				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
 			}
+
+			ImGui::DragFloat(u8"ゲーム時間", &GameSession::Instance().clearTime, 0.01f);
 		}
 		ImGui::End();
 

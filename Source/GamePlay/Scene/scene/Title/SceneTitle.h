@@ -10,6 +10,9 @@
 class SceneTitle : public Scene
 {
 public:
+	enum class GameMenu { None, GameStart, Config, GameEnd };
+
+public:
 	SceneTitle() {}
 	~SceneTitle() override {}
 
@@ -33,6 +36,9 @@ public:
 private:
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
+
+	GameMenu items[3] = { GameMenu::GameStart, GameMenu::Config, GameMenu::GameEnd };
+	GameMenu selected = GameMenu::None;   // フェード後にどこへ行くか
 
 	bool isFadeing = false;
 };

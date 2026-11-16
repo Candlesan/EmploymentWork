@@ -113,7 +113,7 @@ void Framework::Render(float elapsedTime)
 	std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
 
 	// 画面クリア
-	Graphics::Instance().Clear(0, 0, 1.0f, 1);
+	Graphics::Instance().Clear(0, 0, 0, 1);
 
 	// レンダーターゲット設定
 	Graphics::Instance().SetRenderTargets();

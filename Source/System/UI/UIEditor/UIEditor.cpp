@@ -219,6 +219,7 @@ void UIEditor::DrawInspector()
 
 				ImGui::DragFloat2(u8"位置", &selectedElement.position.x, 0.1f);
 				ImGui::DragFloat2(u8"画像サイズ", &selectedElement.size.x, 0.1f);
+				ImGui::DragFloat4(u8"切り抜き範囲(x,y,幅,高さ)", &selectedElement.uvRect.x, 1.0f);
 				ImGui::DragFloat2(u8"拡大率", &selectedElement.scale.x, 0.1f);
 				ImGui::DragFloat(u8"回転", &selectedElement.rotation, 0.1f);
 				ImGui::ColorEdit4(u8"色", &selectedElement.color.x);

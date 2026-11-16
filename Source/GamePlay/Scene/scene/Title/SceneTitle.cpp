@@ -23,7 +23,8 @@ void SceneTitle::Initialize()
 	uiEditor.Initialize(device);
 	uiCanvas.Initialize(device);
 	uiCanvas.Load("Data/Json/UI/SceneTitle.json");
-
+	uiCanvas.SetPanel("Slot");
+	
 	// ゲームを初期状態に戻す
 	GameSession::Instance().ResetAll();
 }
@@ -38,13 +39,26 @@ void SceneTitle::Update(float elapsedTime)
 	// UIを更新する
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
+	uiCanvas.UpdateNavigation(gamePad);
 
 	// フェード中
 	if (isFadeing)
 	{
 		if (!uiCanvas.IsPlaying(fade))
 		{
-			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneBuild));
+			switch (selected)
+			{
+			case SceneTitle::GameMenu::GameStart:
+				// ビルド画面に遷移する
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneBuild));
+
+				break;
+			case SceneTitle::GameMenu::Config:
+				break;
+			case SceneTitle::GameMenu::GameEnd:
+				PostQuitMessage(0); // ゲームを終了する
+				break;
+			}
 		}
 		return; // フェード中は操作を受け付けない
 	}
@@ -52,8 +66,23 @@ void SceneTitle::Update(float elapsedTime)
 	// Aボタンを押してフェード開始
 	if (gamePad.GetButtonDown() & GamePad::BTN_A)
 	{
-		uiCanvas.Play(fade);
-		isFadeing = true;
+		int index = uiCanvas.GetFocusIndex(); // スロット番号を取得
+		if (index < 0 || index >= 3) return;
+
+		selected = items[index];
+
+		switch (selected)
+		{
+		case SceneTitle::GameMenu::GameStart:
+		case SceneTitle::GameMenu::GameEnd:
+			uiCanvas.Play(fade); // フェードを再生する
+			isFadeing = true;
+
+			break;
+
+		case SceneTitle::GameMenu::Config:
+			break;
+		}
 	}
 }
 
