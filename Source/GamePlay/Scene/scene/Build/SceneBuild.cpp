@@ -8,6 +8,7 @@
 #include "Gameplay/Scene/Manager/SceneManager.h"
 #include "GamePlay/Scene/scene/Load/SceneLoad.h"
 #include "GamePlay/Scene/scene/Game/SceneGame.h"
+#include "GamePlay/Scene/scene/Title/SceneTitle.h"
 
 #include "GamePlay/Session/GameSession.h"
 #include "GamePlay/Object/Magic/Loadout/MagicCatalog.h"
@@ -37,14 +38,24 @@ void SceneBuild::Update(float elapsedTime)
 	uiEditor.Update(elapsedTime);
 	uiCanvas.Update(elapsedTime);
 	uiCanvas.UpdateNavigation(gamePad);
+	int slot = uiCanvas.GetFocusIndex(); // タブの番号
+	int magic = uiCanvas.GetSubFocusIndex(); // タブの中の番号
+	const int START_SLOT = 4;   // 「ゲームへ」ボタンの選択番号
+
+	if (slot >= 0 && slot < MAGIC_SLOT_COUNT)
+	{
+		lastMagicSlot = slot;   // 魔法のタブにいるときは覚えておく
+	}
+	else if (slot == START_SLOT)
+	{
+		ShowMagicList(lastMagicSlot);   // スタートにいるときは、最後のタブの一覧を出す
+	}
 
 	// Aボタンで装備する
-	if (gamePad.GetButtonDown() & GamePad::BTN_A)
+	if (gamePad.GetButtonDown() & GamePad::BTN_A && slot < MAGIC_SLOT_COUNT)
 	{
-		int slot = uiCanvas.GetFocusIndex(); // タブの番号
-		int magic = uiCanvas.GetSubFocusIndex(); // タブの中の番号
 
-		if (slot >= 0 && magic >= 0 && magic < MagicCatalog::GetCount(static_cast<MagicSlotIndex>(slot))) // 表にある番号だけ
+		if (magic >= 0 && magic < MagicCatalog::GetCount(static_cast<MagicSlotIndex>(slot))) // 表にある番号だけ
 		{
 			GameSession::Instance().equippedIndex[slot] = magic;
 			RefreshEquippedMarks(); // 印を付け直す
@@ -56,13 +67,29 @@ void SceneBuild::Update(float elapsedTime)
 	{
 		if (!uiCanvas.IsPlaying(fade))
 		{
-			SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
+			if (!backTitle)
+			{
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneGame));
+			}
+			else
+			{
+				SceneManager::Instance().ChangeScene(new SceneLoad(new SceneTitle));
+			}
 		}
 		return; // フェード中は操作を受け付けない
 	}
 
+	if ((gamePad.GetButtonDown() & GamePad::BTN_B))
+	{
+		uiCanvas.Play(fade);
+		isFadeing = true;
+		backTitle = true;
+	}
+
+
 	// Xボタンを押してフェード開始
-	if (gamePad.GetButtonDown() & GamePad::BTN_X)
+	if ((gamePad.GetButtonDown() & GamePad::BTN_X) 
+		|| (gamePad.GetButtonDown() & GamePad::BTN_A) && slot == START_SLOT)
 	{
 		uiCanvas.Play(fade);
 		isFadeing = true;
@@ -126,6 +153,23 @@ void SceneBuild::RefreshEquippedMarks()
 			if (button->focusIndex < 0) continue;              // 魔法ボタン以外（タブの Highlight）は飛ばす
 			UIElement* mark = uiCanvas.FindElement(button.get(), "Equipped");
 			if (mark) mark->visible = (button->focusIndex == equipped);
+		}
+	}
+}
+
+// 指定したタブの魔法を表示する
+void SceneBuild::ShowMagicList(int slotIndex)
+{
+	UIElement* e = uiCanvas.Find("Slot");
+	if (!e) return;
+
+	for (auto& tab : e->children)
+	{
+		if (tab->focusIndex != slotIndex) continue;
+
+		for (auto& item : tab->children)
+		{
+			if (item->focusIndex >= 0) item->visible = true;
 		}
 	}
 }

@@ -30,9 +30,14 @@ public:
 
 	// 装備中の魔法に Equipped の印を付ける
 	void RefreshEquippedMarks();
+	
+	// 指定したタブの魔法を表示する
+	void ShowMagicList(int slotIndex);
 private:
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
 
 	bool isFadeing = false;
+	bool backTitle = false;
+	int lastMagicSlot = 0;   // 最後に見てた魔法スロット
 };
