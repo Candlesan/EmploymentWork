@@ -82,6 +82,7 @@ public:
 
 	// 速度取得 / 設定
 	const DirectX::XMFLOAT3& GetVelocity() const { return velocity; }
+	const DirectX::XMFLOAT3& GetActualVelocity() const { return actualVelocity; }
 	void SetVelocity(const DirectX::XMFLOAT3& v) { velocity = v; }
 
 	// 当たり判定情報取得
@@ -216,6 +217,7 @@ protected:
 
 	// 速度
 	DirectX::XMFLOAT3 velocity = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 actualVelocity = { 0.0f, 0.0f, 0.0f }; // 偏差計算用
 
 	// 移動関連
 	float maxMoveSpeed = 20.0f;   // 最大速度

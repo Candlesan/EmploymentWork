@@ -87,7 +87,7 @@ DirectX::XMFLOAT3 LockOnSystem::GetPredictedPosition(const DirectX::XMFLOAT3& mu
 
 	DirectX::XMVECTOR E = DirectX::XMLoadFloat3(&target->GetPosition());
 	E = DirectX::XMVectorAdd(E, DirectX::XMVectorSet(0, 0.7f, 0, 0)); // ‘_‚¤ˆÊ’u‚ğ“G‚Ì˜“–‚½‚è‚É‚·‚é
-	DirectX::XMVECTOR V = DirectX::XMLoadFloat3(&target->GetVelocity());
+	DirectX::XMVECTOR V = DirectX::XMLoadFloat3(&target->GetActualVelocity()); // ÀÛ‚ÌˆÚ“®—Ê‚©‚ç‘¬“x‚ğ‹‚ß‚½‚à‚Ì‚ğg‚¤
 	DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&muzzlePos);
 	DirectX::XMVECTOR D = DirectX::XMVectorSubtract(E, P);
 

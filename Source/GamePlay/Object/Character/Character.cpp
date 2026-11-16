@@ -318,8 +318,16 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 {
 	if (stage)
 	{
+		DirectX::XMFLOAT3 prev = position;
 		PushOutFromWalls();
 		MoveAndSlide({ velocity.x * elapsedTime, 0.0f, velocity.z * elapsedTime }, false);
+		if (elapsedTime > 0.0f)
+		{
+			// 今フレームの実際の移動量から速度を出す
+			actualVelocity.x = (position.x - prev.x) / elapsedTime;
+			actualVelocity.z = (position.z - prev.z) / elapsedTime;
+		}
+		actualVelocity.y = velocity.y;
 	}
 	else
 	{
@@ -563,12 +571,10 @@ void Character::PushOutFromWalls()
 			// 押し出す方向（三角形の一番近い点 → 球の中心）
 			DirectX::XMVECTOR PushDir = result.normal;
 
-			// 中心が壁の裏まで入っていたら、面の向きで押し出す
+			// 中心が壁の裏側なら、反対側へワープさせないためにこの三角形は無視する
 			DirectX::XMVECTOR FaceNormal = DirectX::XMLoadFloat3(&tri.normal);
 			if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(PushDir, FaceNormal)) < 0.0f)
 			{
-				//PushDir = FaceNormal;
-				//depth = collisionRadius + result.distance;
 				continue;
 			}
 
