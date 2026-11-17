@@ -8,6 +8,13 @@
 #include <ctime>
 #include <cstdlib>
 
+// 中心±振れ幅で値を決める。時間がマイナスや0にならないように下限で止める
+static float RollTime(float center, float amplitude, float minValue)
+{
+    float v = center + Mathf::RandomRange(-amplitude, amplitude);
+    return (std::max)(minValue, v);
+}
+
 
 // 初期化
 void CustomEffect::Initialize(ID3D11Device* device, const EffectConfig& config)
@@ -182,6 +189,7 @@ void CustomEffect::Play(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 angle, Dir
         node.started = false;
         node.emitting = false;
         node.finished = false;
+        node.currentDelay = RollTime(node.config.delayTime, node.config.delayTimeRandom, 0.0f);
     }
 }
 
@@ -266,11 +274,11 @@ void CustomEffect::Update(float elapsedTime)
 
         if (!node.started)
         {
-            if (effectTimer < node.config.delayTime) continue; // 待機時間内ならスキップ
+            if (effectTimer < node.currentDelay) continue; // 待機時間内ならスキップ
 
             // 待機時間が終わったらスタートする
             node.started = true;
-            node.localTime = effectTimer - node.config.delayTime;
+            node.localTime = effectTimer - node.currentDelay;
             BeginNodeCycle(node, true); // エフェクトの設定をする
         }
         else
@@ -282,7 +290,7 @@ void CustomEffect::Update(float elapsedTime)
         const bool isParticle = (node.config.type == RenderType::Particle);
 
         // パーティクルはエフェクト全体の生存時間で、それ以外は特殊で寿命で判定を取る
-        const float cycle = isParticle ? node.config.duration : node.config.lifeTime; 
+        const float cycle = isParticle ? node.config.duration : node.currentLifeTime; 
 
         // 周期が0以上でノードごとの再生時間が周期よりも大きかったら
         if (cycle > 0.0f && node.localTime >= cycle) // 0は無限とする
@@ -291,14 +299,14 @@ void CustomEffect::Update(float elapsedTime)
             if (node.config.isLoop)
             {
                 // ループ：巻き戻して次の周期へ
-                node.localTime = fmodf(node.localTime, cycle);
+                node.localTime -= cycle; // 終わった周期分戻す
                 BeginNodeCycle(node, false); // 周期ごとに生成する
             }
             else if (isParticle)
             {
                 // ループしないパーティクルは発生を止めて最後のパーティクルが消えるまで待つ
                 node.emitting = false;
-                if (node.localTime >= cycle + node.config.lifeTime)
+                if (node.localTime >= cycle + node.config.lifeTime + node.config.lifeTimeRandom)
                 {
                     node.finished = true;
                 }
@@ -493,25 +501,36 @@ void CustomEffect::EmitParticles(float elapsedTime)
         // ノード個別のタイマーを進める
         node.spawnTimer += elapsedTime;
 
-        float rand = Mathf::RandFloat();
-
-        const bool local = (pConfig.particleFollowMode == 1);
-
-        if (node.spawnTimer >=pConfig.spawnInterval)
+        if (node.spawnTimer >= node.currentSpawnInterval)
         {
-            node.spawnTimer -= pConfig.spawnInterval;
+            node.spawnTimer -= node.currentSpawnInterval;
             EmitNode(node);
+
+            // 次の間隔で決め直す
+            node.currentSpawnInterval = RollTime(pConfig.spawnInterval, pConfig.spawnIntervalRandom, 0.001f);
         }
     }
 }
 
+// ノードの情報を設定していく
 void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
 {
+    // パーティクル以外のノードの時
+    if (node.config.type != RenderType::Particle)
+    {
+        node.currentLifeTime = RollTime(node.config.lifeTime, node.config.delayTimeRandom, 0.01f);
+    }
+
     if (node.config.type == RenderType::Particle)
     {
         if (isFirstCycle)
         {
             node.spawnTimer = node.config.spawnInterval;
+            node.currentSpawnInterval = RollTime(
+                node.config.spawnInterval,
+                node.config.spawnIntervalRandom,
+                0.001f
+            );
         }
 
         node.emitting = true;
@@ -585,7 +604,7 @@ DirectX::XMMATRIX CustomEffect::ComputeLocalMatrix(const RuntimeNode& node) cons
             break;
         case ScaleMode::UniformEasing:
         {
-            float progress = (c.lifeTime > 0.0f) ? t / c.lifeTime : 0.0f;
+            float progress = (c.lifeTime > 0.0f) ? t / node.currentLifeTime : 0.0f;
             float easeT = Mathf::EaseCurve(progress, node.config.scaleUniformStartSpeed, node.config.scaleUniformEndSpeed);
 
             float uniform = Mathf::Lerp(node.meshUniformStartScale, node.meshUniformEndScale, easeT);
@@ -822,12 +841,13 @@ void CustomEffect::EmitNode(RuntimeNode& node)
     {
         // 常駐モードは位置が Burst のたびに変わるので、相対位置モードでもワールド座標で出す
         const bool local = !isResident && (node.config.particleFollowMode == 1);
+        const float life = RollTime(node.config.lifeTime, node.currentSpawnInterval, 0.01f);
 
         compute_particle_system::emit_particle_data data;
         data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
 
         data.parameter.x = static_cast<float>(node.config.spriteType);
-        data.parameter.y = node.config.lifeTime;
+        data.parameter.y = life;
         data.parameter.z = node.config.uvScrollSpeed.x;
         data.parameter.w = node.config.uvScrollSpeed.y;
 
@@ -840,7 +860,7 @@ void CustomEffect::EmitNode(RuntimeNode& node)
 
         data.fade_param.x = node.config.IsFadeIn ? node.config.fadeInTime : 0.0f;
         data.fade_param.y = node.config.IsFadeOut ? node.config.fadeOutTime : 0.0f;
-        data.fade_param.z = node.config.lifeTime;
+        data.fade_param.z = life;
         data.fade_param.w = static_cast<float>(packedSpeed);
 
         // 発生位置をワールド行列からとる
@@ -949,7 +969,7 @@ void CustomEffect::EmitNode(RuntimeNode& node)
             data.scaleUniformStart = this->scale.x * actualStart;
             data.scaleUniformEnd = this->scale.x * actualEnd;
             data.scale_param.x = scaleEasingSpeed;
-            data.scale_param.y = node.config.lifeTime;
+            data.scale_param.y = life;
             break;
         }
         data.scale_param.z = node.config.stretchScale; // 速度方向に伸ばす量
@@ -967,7 +987,7 @@ void CustomEffect::EmitNode(RuntimeNode& node)
             data.start_color = node.config.color;
             data.end_color = node.config.color;
             data.color_param.x = -1.0f; // イージング無しのフラグ
-            data.color_param.y = node.config.lifeTime;
+            data.color_param.y = life;
 
             break;
 
@@ -981,7 +1001,7 @@ void CustomEffect::EmitNode(RuntimeNode& node)
             data.start_color = data.color;
             data.end_color = data.color;
             data.color_param.x = -1.0f;
-            data.color_param.y = node.config.lifeTime;
+            data.color_param.y = life;
 
 
             break;
@@ -1001,7 +1021,7 @@ void CustomEffect::EmitNode(RuntimeNode& node)
             data.end_color.w = Mathf::RandomRange(node.config.colorEndMin.w, node.config.colorEndMax.w);
 
             data.color_param.x = colorEasingSpeed;
-            data.color_param.y = node.config.lifeTime;
+            data.color_param.y = life;
 
             break;
         }

@@ -263,15 +263,19 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
 
             ImGui::Separator();
 
-            ImGui::DragFloat(u8"õ–½##Particle", &node.lifeTime, 0.05f, 0.1f, 10.0f);
-            ImGui::Separator();
-
             ImGui::Checkbox(u8"ƒ‹[ƒvÄ¶##Particle", &node.isLoop);
             ImGui::Separator();
 
+            ImGui::DragFloat(u8"õ–½##Particle", &node.lifeTime, 0.05f, 0.1f, 10.0f);
+            ImGui::DragFloat(u8"õ–½‚Ìƒoƒ‰‚Â‚«##Particle", &node.lifeTimeRandom, 0.05f, 0.1f, 10.0f);
+            ImGui::Separator();
+
             ImGui::DragFloat(u8"¶¬ŠÔŠu(•b)##Particle", &node.spawnInterval, 0.01f, 0.01f, 5.0f, "%.2fs");
+            ImGui::DragFloat(u8"¶¬ŠÔŠu‚Ìƒoƒ‰‚Â‚«##Particle", &node.spawnIntervalRandom, 0.01f, 0.01f, 5.0f, "%.2fs");
+
             ImGui::DragFloat(u8"‘¶‘±ŠÔ(•b)##Particle", &node.duration, 0.1f, 0.0f, 60.0f, u8"%.1fs (0=–³ŒÀ)");
             ImGui::DragFloat(u8"”­¶’x‰„(•b)##Particle", &node.delayTime, 0.05f, 0.0f, 10.0f, "%.2fs");
+            ImGui::DragFloat(u8"”­¶’x‰„‚Ìƒoƒ‰‚Â‚«##Particle", &node.delayTimeRandom, 0.05f, 0.0f, 10.0f, "%.2fs");
             ImGui::Separator();
 
             if (node.type == RenderType::Particle)

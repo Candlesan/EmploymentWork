@@ -70,6 +70,11 @@ void SceneGame::Initialize()
 	// シングルトンなので、リトライ前のゲームで出ていたエフェクト（防御魔法など）が残らないように消す
 	CustomEffectManager::Instance().StopAll();
 
+	// ステージの常時エフェクト（StopAllの後で再生する）
+	CustomEffectManager::Instance().LoadEffectConfig("StageMana", "Data/Json/Effect/StageMana.json");
+	CustomEffectManager::Instance().PlayEffect(
+		"StageMana", { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+
 	// プレイヤー初期化
 	Player& player = Player::Instance();
 	player.Initialize();
@@ -146,6 +151,7 @@ void SceneGame::Finalize()
 	enemy->SetStage(stage.get());
 	CameraShakeManager::Instance().Clear();
 	player.Finalize();
+	CustomEffectManager::Instance().StopAll();
 }
 
 // 更新処理

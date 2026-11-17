@@ -70,9 +70,12 @@ struct NodeConfig
 	int emitCount = 1;													// パーティクルの生成数
 	int maxParticle = 128;												// 同時生成数
 	float lifeTime = 1.0f;												// 消滅までの寿命
+	float lifeTimeRandom = 0.0f;										// 消滅までの寿命の振れ幅
 	float delayTime = 0.0f;												// パーティクルを生成するまでの時間
+	float delayTimeRandom = 0.0f;										// パーティクルを生成するまでの時間の振れ幅
 	float duration = 1.0f;												// エフェクト全体の生存時間
 	float spawnInterval = 1.0f;											// 次のパーティクルを出すまでの間隔(秒)
+	float spawnIntervalRandom = 0.0f;									// 次のパーティクルを出すまでの間隔(秒)の振れ幅
 	int blendMode = 0;													// 0: Alpha, 1: Add
 	bool isLoop = true;													// ループするか
 

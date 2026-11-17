@@ -34,6 +34,9 @@ private:
 		};
 
 		float spawnTimer = 0.0f;							// 毎フレーム進める発生計算用タイマー
+		float currentDelay = 0.0f;          // 今回の再生で使う生成開始時間（Play で決定）
+		float currentSpawnInterval = 1.0f;  // 次の発生までの間隔（発生ごとに決定）
+		float currentLifeTime = 1.0f;       // メッシュ系の今の周期の寿命（周期ごとに決定）
 		DirectX::XMFLOAT4 meshRandomColor = { 1, 1, 1, 1 };	// 色のランダム(計算用)
 		DirectX::XMFLOAT4 meshStartColor = { 1, 1, 1, 1 };	// 始点の色(計算用)
 		DirectX::XMFLOAT4 meshEndColor = { 1, 1, 1, 1 };	// 終点の色(計算用)

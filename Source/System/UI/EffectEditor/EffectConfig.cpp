@@ -61,9 +61,12 @@ void EffectConfig::Save(const std::string& filePath)
         n["emitCount"] = node.emitCount;
         n["maxParticle"] = node.maxParticle;
         n["lifeTime"] = node.lifeTime;
+        n["lifeTimeRandom"] = node.lifeTimeRandom;
         n["delayTime"] = node.delayTime;
+        n["delayTimeRandom"] = node.delayTimeRandom;
         n["duration"] = node.duration;
         n["spawnInterval"] = node.spawnInterval;
+        n["spawnIntervalRandom"] = node.spawnIntervalRandom;
         n["isLoop"] = node.isLoop;
 
         // フェードイン
@@ -223,10 +226,13 @@ void EffectConfig::Load(const std::string& filePath)
                 node.emitCount = nodeJson.value("emitCount", 1);
                 node.maxParticle = nodeJson.value("maxParticle", 128);
                 node.lifeTime  = nodeJson.value("lifeTime", 1.0f);
+                node.lifeTimeRandom  = nodeJson.value("lifeTimeRandom", 0.0f);
                 node.isLoop    = nodeJson.value("isLoop", true);
                 node.spawnInterval = nodeJson.value("spawnInterval", 0.1f);
+                node.spawnIntervalRandom = nodeJson.value("spawnIntervalRandom", 0.0f);
                 node.duration =  nodeJson.value("duration", 1.0f);
                 node.delayTime = nodeJson.value("delayTime", 0.0f);
+                node.delayTimeRandom = nodeJson.value("delayTimeRandom", 0.0f);
                 node.blendMode = nodeJson.value("blendMode", 0.0f);
 
                 // フェードイン

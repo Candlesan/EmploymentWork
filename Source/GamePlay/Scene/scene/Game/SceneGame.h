@@ -101,7 +101,7 @@ private:
 	// PBR調整用
 	float pbrMetalness = 0.0f;
 	float pbrRoughness = 0.0f;
-	float ambientIntensity = 0.5;
+	float ambientIntensity = 0.01f;
 
 	// シャドウマップ調整用
 	float stageShadowAttenuation = 0.0f;
@@ -119,7 +119,7 @@ private:
 	std::unique_ptr<fullscreen_quad> bit_block_transfer;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
 	float bloom_extraction = 1.87f;
-	float bloom_intensity = 0.87f;
+	float bloom_intensity = 1.79f;
 
 	// パーティクル
 	std::unique_ptr<Compute_Particle> particleManager;
