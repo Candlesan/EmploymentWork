@@ -151,6 +151,7 @@ void ModelRenderer::Render(const RenderContext& rc)
 				(mesh.material->baseColor.w > 0.01f && mesh.material->baseColor.w < 0.99f))
 			{
 				TransparencyDrawInfo& transparencyDrawInfo = transparencyDrawInfos.emplace_back();
+				transparencyDrawInfo.shaderId = drawInfo.shaderId;
 				transparencyDrawInfo.mesh = &mesh;
 				// ƒJƒƒ‰‚Æ‚Ì‹——£‚ðŽZo
 				DirectX::XMVECTOR Position = DirectX::XMVectorSet(

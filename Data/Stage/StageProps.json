@@ -1,0 +1,136 @@
+{
+    "props": [
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 0.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\pedestal\\sm_plinthprickett.gltf",
+            "position": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.5,
+                1.5,
+                1.5
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.10000000149011612,
+            "bobSpeed": 0.10000000149011612,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\MoonStorn\\Moonstone_07.gltf",
+            "position": [
+                0.0,
+                1.7999999523162842,
+                0.0
+            ],
+            "rotateSpeed": 10.0,
+            "scale": [
+                10.0,
+                10.0,
+                10.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": true,
+            "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
+            "position": [
+                18.299999237060547,
+                0.0,
+                18.299999237060547
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                5.0,
+                5.0,
+                5.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": true,
+            "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
+            "position": [
+                18.299999237060547,
+                0.0,
+                -18.299999237060547
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                5.0,
+                5.0,
+                5.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": true,
+            "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
+            "position": [
+                -18.299999237060547,
+                0.0,
+                18.299999237060547
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                5.0,
+                5.0,
+                5.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": true,
+            "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
+            "position": [
+                -18.299999237060547,
+                0.0,
+                -18.299999237060547
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                5.0,
+                5.0,
+                5.0
+            ]
+        }
+    ]
+}

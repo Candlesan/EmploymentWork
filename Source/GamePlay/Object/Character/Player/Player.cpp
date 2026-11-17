@@ -77,7 +77,7 @@ void Player::LoadResources()
 void Player::ResetForNewRun()
 {
 	// ── 位置・移動 ──
-	position = { 0.0f, 0.0f, 0.0f };
+	position = { 0.0f, 0.0f, -10.0f };
 	angle = { 0.0f, 0.0f, 0.0f };
 	velocity = { 0.0f, 0.0f, 0.0f };
 	moveVecX = 0.0f;

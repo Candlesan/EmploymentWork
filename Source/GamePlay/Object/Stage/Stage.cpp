@@ -1,31 +1,229 @@
-#include "Stage.h"
+ï»¿#include "Stage.h"
 #include "System/Graphic/Graphics.h"
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
+#include "System/UI/Dialog/Dialog.h"
+#include "json.hpp"
 
+
+#include <fstream>
 #include <imgui.h>
+#include <filesystem>
 
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 Stage::Stage()
 {
-	// ƒfƒoƒCƒXæ“¾
+	// ãƒ‡ãƒã‚¤ã‚¹å–å¾—
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
-	// ƒXƒe[ƒWƒ‚ƒfƒ‹“Ç‚İ‚İ
-	stage = std::make_shared<Model>(device, "Data/Model/Stage/circle_of_death.gltf");
-
+	// ã‚¹ãƒ†ãƒ¼ã‚¸ãƒ¢ãƒ‡ãƒ«èª­ã¿è¾¼ã¿
+	stage = std::make_shared<Model>(device, "Data/Model/Stage/Stage/circle_of_death.gltf");
 	scale.x = scale.y = scale.z = 0.025f;
 
-	DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
-	DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
+	LoadProps(PropsFilePath);
+	BuildCollision();
+}
 
-	// 	// ’¸“_ƒf[ƒ^‚ğƒ[ƒ‹ƒh‹óŠÔ•ÏŠ·‚µAOŠpŒ`ƒf[ƒ^‚ğì¬
-	for (const Model::Mesh& mesh : stage->GetMeshes())
+// æ›´æ–°å‡¦ç†
+void Stage::Update(float elapsedTime)
+{
+	transform = MakeTransform(position, angle, scale); // æœ¬ä½“
+	stage->UpdateTransform(transform); // ãƒ¢ãƒ‡ãƒ«ã®è¡Œåˆ—ã‚’æ›´æ–°ã™ã‚‹
+
+	time += elapsedTime;
+
+	// å„è£…é£¾ã®è¡Œåˆ—ã‚’æ›´æ–°ã™ã‚‹
+	for (auto& prop : props)
+	{
+		DirectX::XMFLOAT3 pos = prop.position;
+		DirectX::XMFLOAT3 angle = prop.angle;
+
+		pos.y += sinf(time * prop.bobSpeed * DirectX::XM_2PI) * prop.bobHeight;
+		angle.y += DirectX::XMConvertToRadians(prop.rotateSpeed) * time;
+
+		prop.transform = MakeTransform(pos, angle, prop.scale);
+		prop.model->UpdateTransform(prop.transform);
+	}
+}
+
+// æç”»å‡¦ç†
+void Stage::Render(const RenderContext& rc, ModelRenderer* renderer)
+{
+	if(drawStage)
+	// Drawã§æç”»ã‚’ãŸã‚ã¦Renderã§æç”»ã™ã‚‹
+	renderer->Draw(ShaderId::PBR, stage);
+
+	// è£…é£¾ç‰©ã‚’æç”»ã™ã‚‹
+	for (auto& p : props)
+	{
+		renderer->Draw(ShaderId::PBR, p.model);
+	}
+}
+
+// ãƒ‡ãƒãƒƒã‚¯ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–æç”»
+void Stage::RenderDebugPrimitive(ShapeRenderer* renderer)
+{
+	if(drawArea)
+	renderer->DrawCylinder(areaPosition, areaRadius, areaHeight, { 1.0f, 0.5f, 0.5f, 1.0f });
+}
+
+// GUIæç”»
+void Stage::DrawGUI()
+{
+	// F8ã§ã‚¹ãƒ†ãƒ¼ã‚¸ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®è¡¨ç¤ºã‚’ON/OFF
+	static bool wasF8DownLastFrame = false;
+	bool f8Down = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
+	if (f8Down && !wasF8DownLastFrame)
+	{
+		showStageParameter = !showStageParameter;
+	}
+	wasF8DownLastFrame = f8Down;
+
+	if (showStageParameter)
+	{
+		ImGui::Begin(u8"ã‚¹ãƒ†ãƒ¼ã‚¸");
+		ImGui::Checkbox(u8"ã‚¹ãƒ†ãƒ¼ã‚¸ã®è¡¨ç¤º", &drawStage);
+		ImGui::Checkbox(u8"ã‚¨ãƒªã‚¢ã®è¡¨ç¤º", &drawArea);
+		ImGui::Separator();
+
+		ImGui::DragFloat3(u8"ã‚¨ãƒªã‚¢ã®ä½ç½®", &areaPosition.x, 0.1f);
+		ImGui::DragFloat(u8"ã‚¨ãƒªã‚¢ã®åŠå¾„", &areaRadius, 0.1f);
+		ImGui::DragFloat(u8"ã‚¨ãƒªã‚¢ã®é«˜ã•", &areaHeight, 0.1f);
+		ImGui::Separator();
+
+		ImGui::Text(u8"è£…é£¾");
+		if (ImGui::Button(u8"ä¿å­˜"))     SaveProps(PropsFilePath);
+		ImGui::SameLine();
+		if (ImGui::Button(u8"å†èª­ã¿è¾¼ã¿")) LoadProps(PropsFilePath);
+		ImGui::Separator();
+
+		if (ImGui::Button(u8"è¿½åŠ "))
+		{
+			char filePath[MAX_PATH] = { 0 };
+			HWND hwnd = Graphics::Instance().GetWindowHandle();
+			if (Dialog::OpenFileName(filePath, MAX_PATH,
+				"Model File\0*.gltf;*.glb;*.fbx\0All Files\0*.*\0\0",
+				"è£…é£¾ãƒ¢ãƒ‡ãƒ«ã‚’é¸æŠ", hwnd) == DialogResult::OK)
+			{
+				std::string path = filePath;
+				size_t pos = path.find("Data");
+				if (pos != std::string::npos) path = path.substr(pos); // ç›¸å¯¾ãƒ‘ã‚¹ã«ã™ã‚‹
+
+				if (AddProp(path))
+					selectedProp = static_cast<int>(props.size()) - 1;
+			}
+		}
+
+		// ä¸€è¦§
+		if (ImGui::ListBoxHeader(u8"##props"))
+		{
+			for (int i = 0; i < static_cast<int>(props.size()); ++i)
+			{
+				std::string label = std::to_string(i) + ": "
+					+ std::filesystem::path(props[i].path).stem().string();
+
+				ImGui::PushID(i);
+				if (ImGui::Selectable(label.c_str(), selectedProp == i))
+					selectedProp = i;
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("%s", props[i].path.c_str()); // ãƒ•ãƒ«ãƒ‘ã‚¹ã¯ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—ã§
+				ImGui::PopID();
+			}
+			ImGui::ListBoxFooter();
+		}
+
+		// é¸æŠä¸­ã®ç·¨é›†
+		if (selectedProp >= 0 && selectedProp < static_cast<int>(props.size()))
+		{
+			StageProp& prop = props[selectedProp];
+			ImGui::DragFloat3(u8"ä½ç½®", &prop.position.x, 0.1f);
+			DirectX::XMFLOAT3 deg = {
+				DirectX::XMConvertToDegrees(prop.angle.x),
+				DirectX::XMConvertToDegrees(prop.angle.y),
+				DirectX::XMConvertToDegrees(prop.angle.z) 
+			};
+			if (ImGui::DragFloat3(u8"å›è»¢", &deg.x, 1.0f))
+			{
+				prop.angle = {
+				DirectX::XMConvertToRadians(deg.x),
+				DirectX::XMConvertToRadians(deg.y),
+				DirectX::XMConvertToRadians(deg.z) };
+			}
+			ImGui::DragFloat3(u8"ã‚¹ã‚±ãƒ¼ãƒ«", &prop.scale.x, 0.001f);
+			ImGui::Separator();
+
+			ImGui::DragFloat(u8"å›è»¢é€Ÿåº¦", &prop.rotateSpeed, 1.0f);
+			ImGui::DragFloat(u8"ä¸Šä¸‹ã®æŒ¯ã‚Œå¹…", &prop.bobHeight, 0.001f);
+			ImGui::DragFloat(u8"ä¸Šä¸‹ã®é€Ÿã•", &prop.bobSpeed, 0.001f);
+			ImGui::Separator();
+
+			ImGui::Checkbox(u8"å½“ãŸã‚Šåˆ¤å®š", &prop.hasCollision);
+
+			if (ImGui::Button(u8"å‰Šé™¤"))
+			{
+				props.erase(props.begin() + selectedProp);
+				selectedProp = -1;
+			}
+		}
+
+		ImGui::End();
+	}
+}
+
+// è¡Œåˆ—ã‚’ä½œã‚‹
+DirectX::XMFLOAT4X4 Stage::MakeTransform(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& scale)
+{
+	//ã‚¹ã‚±ãƒ¼ãƒ«è¡Œåˆ—ä½œæˆ
+	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+
+	//å›è»¢è¡Œåˆ—ã‚’ä½œæˆ
+	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
+
+	//ä½ç½®è¡Œåˆ—ã‚’ä½œæˆ
+	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+	//3ã¤ã®è¡Œåˆ—ã‚’çµ„ã¿åˆã‚ã›,ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’ä½œæˆ
+	DirectX::XMMATRIX W = S * R * T;
+
+	//è¨ˆç®—ã—ãŸãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’å–ã‚Šå‡ºã™
+	DirectX::XMFLOAT4X4 transform;
+	DirectX::XMStoreFloat4x4(&transform, W);
+
+	return transform;
+}
+
+// å½“ãŸã‚Šåˆ¤å®šã‚’ä½œã‚Šç›´ã™
+void Stage::BuildCollision()
+{
+	triangles.clear();
+
+	// è¡Œåˆ—ã‚’ä½œã‚‹
+	transform = MakeTransform(position, angle, scale);
+	AddCollisionTriangles(stage.get(), transform); // ã‚¹ãƒ†ãƒ¼ã‚¸æœ¬ä½“ã®ä¸‰è§’å½¢ã‚’é›†ã‚ã‚‹
+
+	for (StageProp& p : props)
+	{
+		if (!p.hasCollision) continue;
+		p.transform = MakeTransform(p.position, p.angle, p.scale);
+		AddCollisionTriangles(p.model.get(), p.transform); // è£…é£¾ã®ä¸‰è§’å½¢ã‚’é›†ã‚ã‚‹
+	}
+
+	BuildCollisionAreas();
+}
+
+// ä¸‰è§’å½¢ã‚’é›†ã‚ã‚‹
+void Stage::AddCollisionTriangles(Model* model, const DirectX::XMFLOAT4X4& transform)
+{
+	// å…ˆã«ãƒ¢ãƒ‡ãƒ«ã«è¡Œåˆ—ã‚’åæ˜ ã•ã›ã‚‹
+	model->UpdateTransform(transform);
+
+	// 	// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“å¤‰æ›ã—ã€ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆ
+	for (const Model::Mesh& mesh : model->GetMeshes())
 	{
 		DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&mesh.node->worldTransform);
 		for (size_t i = 0; i < mesh.indices.size(); i += 3)
 		{
-			// ’¸“_ƒf[ƒ^‚ğƒ[ƒ‹ƒh‹óŠÔ•ÏŠ·
+			// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“å¤‰æ›
 			uint32_t a = mesh.indices.at(i + 0);
 			uint32_t b = mesh.indices.at(i + 1);
 			uint32_t c = mesh.indices.at(i + 2);
@@ -37,83 +235,77 @@ Stage::Stage()
 			B = DirectX::XMVector3Transform(B, WorldTransform);
 			C = DirectX::XMVector3Transform(C, WorldTransform);
 
-			// ƒ‚ƒfƒ‹‚ÌÀ•W‘S‘Ì‚É‘Î‚µ‚ÄƒXƒP[ƒ‹‚ğŠ|‚¯‚Ä‚ ‚°‚é
-			A = DirectX::XMVectorMultiply(A, Scale);
-			B = DirectX::XMVectorMultiply(B, Scale);
-			C = DirectX::XMVectorMultiply(C, Scale);
-
-			// –@ü‚×ƒNƒgƒ‹‚ğZo
+			// æ³•ç·šã¹ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
 			DirectX::XMVECTOR N = DirectX::XMVector3Cross(DirectX::XMVectorSubtract(B, A),
-									DirectX::XMVectorSubtract(C, A));
+				DirectX::XMVectorSubtract(C, A));
 			if (DirectX::XMVector3Equal(N, DirectX::XMVectorZero()))
 			{
-				// –Ê‚ğ\¬‚Å‚«‚È‚¢ê‡‚ÍœŠO
+				// é¢ã‚’æ§‹æˆã§ããªã„å ´åˆã¯é™¤å¤–
 				continue;
 			}
 			N = DirectX::XMVector3Normalize(N);
 
-			// OŠpŒ`ƒf[ƒ^‚ğŠi”[
+			// ä¸‰è§’å½¢ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´
 			Collision::Triangle& triangle = triangles.emplace_back();
 			DirectX::XMStoreFloat3(&triangle.positions[0], A);
 			DirectX::XMStoreFloat3(&triangle.positions[1], B);
 			DirectX::XMStoreFloat3(&triangle.positions[2], C);
 			DirectX::XMStoreFloat3(&triangle.normal, N);
 
-			// ” ‚É“ü‚éÅ¬“_‚ÆÅ‘å“_‚ğ•Û‘¶‚·‚é
+			// ç®±ã«å…¥ã‚‹æœ€å°ç‚¹ã¨æœ€å¤§ç‚¹ã‚’ä¿å­˜ã™ã‚‹
 			DirectX::XMStoreFloat3(&triangle.boundsMin, DirectX::XMVectorMin(A, DirectX::XMVectorMin(B, C)));
 			DirectX::XMStoreFloat3(&triangle.boundsMax, DirectX::XMVectorMax(A, DirectX::XMVectorMax(B, C)));
-
-			// ƒ‚ƒfƒ‹‘S‘Ì‚ÌAABB‚ğŒv‘ª
-			VolumeMin = DirectX::XMVectorMin(VolumeMin, A);
-			VolumeMin = DirectX::XMVectorMin(VolumeMin, B);
-			VolumeMin = DirectX::XMVectorMin(VolumeMin, C);
-			VolumeMax = DirectX::XMVectorMax(VolumeMax, A);
-			VolumeMax = DirectX::XMVectorMax(VolumeMax, B);
-			VolumeMax = DirectX::XMVectorMax(VolumeMax, C);
 		}
 	}
+}
 
-	// ƒ‚ƒfƒ‹‘S‘Ì‚ÌAABB
+// ã‚¨ãƒªã‚¢ã¨åˆ†å‰²ã‚’ä½œã‚‹
+void Stage::BuildCollisionAreas()
+{
+	DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
+	DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
+
+	// ä¸‰è§’å½¢ã®ãƒ«ãƒ¼ãƒ—
+	for (const Collision::Triangle& t : triangles)
+	{
+		VolumeMin = DirectX::XMVectorMin(VolumeMin, DirectX::XMLoadFloat3(&t.boundsMin));
+		VolumeMax = DirectX::XMVectorMax(VolumeMax, DirectX::XMLoadFloat3(&t.boundsMax));
+	}
+
+	// ãƒ¢ãƒ‡ãƒ«å…¨ä½“ã®AABB
 	DirectX::XMStoreFloat3(&volumeMin, VolumeMin);
 	DirectX::XMStoreFloat3(&volumeMax, VolumeMax);
 
-	// ƒ‚ƒfƒ‹‘S‘Ì‚ÌAABB‚©‚çXZ•½–Ê‚Éw’è‚ÌƒTƒCƒY‚Å•ªŠ„‚³‚ê‚½ƒRƒŠƒWƒ‡ƒ“ƒGƒŠƒA‚ğì¬‚·‚é
+	areas.clear();
+
+	// ãƒ¢ãƒ‡ãƒ«å…¨ä½“ã®AABBã‚’XZå¹³é¢ã§ cellSize ã”ã¨ã«åˆ†ã‘ã¦ã‚¨ãƒªã‚¢ã‚’ä½œã‚‹
 	{
 		const int cellSize = 32;
 		for (float x = volumeMin.x; x < volumeMax.x; x += cellSize)
 		{
 			for (float z = volumeMin.z; z < volumeMax.z; z += cellSize)
 			{
-				//AABB‚ğZo
+				// ã‚¨ãƒªã‚¢ã®AABB
 				Collision::Area& area = areas.emplace_back();
-				//ƒGƒŠƒA‚ÌÅ‘å’l‚ÆÅ¬’l‚ğo‚·
 				DirectX::XMFLOAT3 min = { x, volumeMin.y, z };
 				DirectX::XMFLOAT3 max = { x + cellSize, volumeMax.y, z + cellSize };
 
-				//ƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒX‚Ì’†S‚ğo‚·
 				area.boundingBox.Center.x = (min.x + max.x) * 0.5f;
 				area.boundingBox.Center.y = (min.y + max.y) * 0.5f;
 				area.boundingBox.Center.z = (min.z + max.z) * 0.5f;
 
-				//’†S‚©‚ç‚ÌŠe•ûŒü‚Ì‘å‚«‚³‚ğo‚·
 				area.boundingBox.Extents.x = (max.x - min.x) * 0.5f;
 				area.boundingBox.Extents.y = (max.y - min.y) * 0.5f;
 				area.boundingBox.Extents.z = (max.z - min.z) * 0.5f;
 
-				//AABB‚ÉŠ‘®‚·‚éOŠpŒ`‚ğ’Šo
+				// ã“ã®ã‚¨ãƒªã‚¢ã«é‡ãªã‚‹ä¸‰è§’å½¢ã‚’ç™»éŒ²
 				for (int i = 0; i < static_cast<int>(triangles.size()); ++i)
 				{
 					Collision::Triangle& tri = triangles[i];
-					DirectX::XMFLOAT3& P0 = tri.positions[0];
-					DirectX::XMFLOAT3& P1 = tri.positions[1];
-					DirectX::XMFLOAT3& P2 = tri.positions[2];
-
-					//OŠpŒ`‚Ì‚R“_‚ğg‚Á‚ÄƒoƒEƒ“ƒfƒBƒ“ƒOƒ{ƒbƒNƒX‚ğì‚é
-					DirectX::XMFLOAT3 points[3] = { P0, P1, P2 };
+					DirectX::XMFLOAT3 points[3] = { tri.positions[0], tri.positions[1], tri.positions[2] };
 					DirectX::BoundingBox triangleBB;
 					DirectX::BoundingBox::CreateFromPoints(triangleBB, 3, points, sizeof(DirectX::XMFLOAT3));
 
-					//ƒGƒŠƒA‚ÌAABB‚ÆOŠpŒ`‚ÌAABB‚ªŒğ·‚µ‚Ä‚½‚ç’Ç‰Á
 					if (area.boundingBox.Intersects(triangleBB))
 					{
 						area.triangleIndices.push_back(i);
@@ -124,71 +316,85 @@ Stage::Stage()
 	}
 }
 
-// XVˆ—
-void Stage::Update(float elapsedTime)
+// è£…é£¾ã®è¿½åŠ 
+Stage::StageProp* Stage::AddProp(const std::string& path)
 {
-	// “Á‚É‰½‚à‚·‚é‚±‚Æ‚ª‚È‚¢‚Í‚¸
-	UpdateTransform();
-	stage->UpdateTransform(transform); // ƒ‚ƒfƒ‹‚Ìs—ñ‚ğXV‚·‚é
-}
-
-// •`‰æˆ—
-void Stage::Render(const RenderContext& rc, ModelRenderer* renderer)
-{
-	if(drawStage)
-	// Draw‚Å•`‰æ‚ğ‚½‚ß‚ÄRender‚Å•`‰æ‚·‚é
-	renderer->Draw(ShaderId::PBR, stage);
-}
-
-// ƒfƒoƒbƒNƒvƒŠƒ~ƒeƒBƒu•`‰æ
-void Stage::RenderDebugPrimitive(ShapeRenderer* renderer)
-{
-	if(drawArea)
-	renderer->DrawCylinder(areaPosition, areaRadius, areaHeight, { 1.0f, 0.5f, 0.5f, 1.0f });
-}
-
-// GUI•`‰æ
-void Stage::DrawGUI()
-{
-	// F8‚ÅƒXƒe[ƒWƒpƒ‰ƒ[ƒ^[‚Ì•\¦‚ğON/OFF
-	static bool wasF8DownLastFrame = false;
-	bool f8Down = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
-	if (f8Down && !wasF8DownLastFrame)
+	// ãƒ‘ã‚¹é•ã„ã§Modelã®ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãŒè½ã¡ãªã„ã‚ˆã†ã«ãƒã‚§ãƒƒã‚¯
+	if (!std::filesystem::exists(path))
 	{
-		showStageParameter = !showStageParameter;
+		return nullptr;
 	}
-	wasF8DownLastFrame = f8Down;
 
-	if (showStageParameter)
+	ID3D11Device* device = Graphics::Instance().GetDevice();
+
+	StageProp& prop = props.emplace_back();
+	prop.path = path;
+	prop.model = std::make_shared<Model>(device, path.c_str());
+	prop.transform = MakeTransform(prop.position, prop.angle, prop.scale);
+
+	return &prop;
+}
+
+void Stage::SaveProps(const std::string& path)
+{
+	using json = nlohmann::json;
+	json j;
+	j["props"] = json::array();
+
+	for (const StageProp& p : props)
 	{
-		ImGui::Begin(u8"ƒXƒe[ƒW");
-		ImGui::Checkbox(u8"ƒXƒe[ƒW‚Ì•\¦", &drawStage);
-		ImGui::Checkbox(u8"ƒGƒŠƒA‚Ì•\¦", &drawArea);
-		ImGui::Separator();
+		j["props"].push_back({
+			{ "path",      p.path },
+			{ "position",  { p.position.x, p.position.y, p.position.z } },
+			{ "angle",     { p.angle.x,    p.angle.y,    p.angle.z } },
+			{ "scale",     { p.scale.x,    p.scale.y,    p.scale.z } },
+			{ "rotateSpeed",      p.rotateSpeed },
+			{ "bobHeight",      p.bobHeight },
+			{ "bobSpeed",      p.bobSpeed },
+			{ "collision", p.hasCollision },
+			});
+	}
 
-		ImGui::DragFloat3(u8"ƒGƒŠƒA‚ÌˆÊ’u", &areaPosition.x, 0.1f);
-		ImGui::DragFloat(u8"ƒGƒŠƒA‚Ì”¼Œa", &areaRadius, 0.1f);
-		ImGui::DragFloat(u8"ƒGƒŠƒA‚Ì‚‚³", &areaHeight, 0.1f);
+	// ãƒ•ã‚©ãƒ«ãƒ€ãŒãªã„ã¨ ofstream ã¯å¤±æ•—ã™ã‚‹ã®ã§ä½œã£ã¦ãŠã
+	std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
-		ImGui::End();
+	std::ofstream file(path);
+	if (file.is_open())
+	{
+		file << j.dump(4);
 	}
 }
 
-// s—ñXV
-void Stage::UpdateTransform()
+void Stage::LoadProps(const std::string& path)
 {
-	//ƒXƒP[ƒ‹s—ñì¬
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	using json = nlohmann::json;
+	std::ifstream file(path);
+	if (!file.is_open()) return;   // åˆå›ã¯ãƒ•ã‚¡ã‚¤ãƒ«ãŒãªã„ã®ã§ä½•ã‚‚ã—ãªã„
 
-	//‰ñ“]s—ñ‚ğì¬
-	DirectX::XMMATRIX R = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
+	json j;
+	file >> j;
+	if (!(j.find("props") != j.end()) || !j["props"].is_array()) return;
 
-	//ˆÊ’us—ñ‚ğì¬
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	props.clear();
+	selectedProp = -1;
 
-	//3‚Â‚Ìs—ñ‚ğ‘g‚İ‡‚í‚¹,ƒ[ƒ‹ƒhs—ñ‚ğì¬
-	DirectX::XMMATRIX W = S * R * T;
+	for (const json& jp : j["props"])
+	{
+		StageProp* p = AddProp(jp.value("path", ""));
+		if (!p) continue;          // ãƒ¢ãƒ‡ãƒ«ãŒè¦‹ã¤ã‹ã‚‰ãªã„ã‚‚ã®ã¯é£›ã°ã™
 
-	//ŒvZ‚µ‚½ƒ[ƒ‹ƒhs—ñ‚ğæ‚èo‚·
-	DirectX::XMStoreFloat4x4(&transform, W);
+		auto readFloat3 = [&](const char* key, DirectX::XMFLOAT3& out)
+			{
+				if (jp.find(key) != jp.end())
+					out = { jp[key][0].get<float>(), jp[key][1].get<float>(), jp[key][2].get<float>() };
+			};
+		readFloat3("position", p->position);
+		readFloat3("angle", p->angle);
+		readFloat3("scale", p->scale);
+		p->hasCollision = jp.value("collision", false);
+		p->rotateSpeed = jp.value("rotateSpeed", 0.0f);
+		p->bobHeight = jp.value("bobHeight", 0.0f);
+		p->bobSpeed = jp.value("bobSpeed", 0.0f);
+		p->transform = MakeTransform(p->position, p->angle, p->scale);
+	}
 }

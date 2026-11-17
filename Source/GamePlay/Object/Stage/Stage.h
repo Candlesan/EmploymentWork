@@ -3,6 +3,8 @@
 #include "GamePlay/Object/Collision/Collision.h"
 
 #include <memory>
+#include <string>
+#include <DirectXMath.h>
 
 // 前方宣言
 class ShapeRenderer;
@@ -10,6 +12,21 @@ class ShapeRenderer;
 // ステージ
 class Stage
 {
+public:
+	// ステージの装飾構造体
+	struct StageProp
+	{
+		std::string path; // モデルのパス
+		std::shared_ptr<Model> model;
+		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+		float rotateSpeed = 0.0f;   // Y軸の回転速度（度/秒）
+		float bobHeight = 0.0f;   // 上下の振れ幅
+		float bobSpeed = 1.0f;   // 上下の速さ（往復/秒）
+		DirectX::XMFLOAT4X4 transform{};
+		bool hasCollision = false; // 分割レイキャストのフラグ
+	};
 public:
 	Stage();
 
@@ -25,8 +42,8 @@ public:
 	// GUI描画
 	void DrawGUI();
 
-	// 行列更新
-	void UpdateTransform();
+	// 行列を生成する
+	static DirectX::XMFLOAT4X4 MakeTransform(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& scale);
 
 	const std::vector<Collision::Triangle>& GetTriangles() const { return triangles; }
 	const std::vector<Collision::Area>& GetAreas() const { return areas; }
@@ -37,6 +54,19 @@ public:
 
 	const DirectX::XMFLOAT3& GetVolumeMin() const { return volumeMin; }
 	const DirectX::XMFLOAT3& GetVolumeMax() const { return volumeMax; }
+
+private:
+	// 当たり判定の三角形を作る
+	void BuildCollision(); // 当たり判定を作り直す
+	void AddCollisionTriangles(Model* model, const DirectX::XMFLOAT4X4& transform);
+	void BuildCollisionAreas(); // AABBの計算と分割エリアを計算する
+private:
+	// 装飾の追加
+	StageProp* AddProp(const std::string& path);
+
+	static constexpr const char* PropsFilePath = "Data/Stage/StageProps.json";
+	void SaveProps(const std::string& path);
+	void LoadProps(const std::string& path);
 private:
 	std::shared_ptr<Model> stage;
 	std::vector<Collision::Triangle> triangles;
@@ -58,10 +88,15 @@ private:
 	DirectX::XMFLOAT3 areaPosition = { 0.0f, -10.0f, 0.0f }; // 移動範囲の位置
 	float areaRadius = 98.0f; // 移動範囲の半径
 	float areaHeight = 60.0f; // 移動範囲の高さ
-	bool drawArea = true;
+	bool drawArea = true; // モデルの表示
 
-	bool showStageParameter = true;
+	bool showStageParameter = true; // GUIの表示
 
 	DirectX::XMFLOAT3 volumeMin;
 	DirectX::XMFLOAT3 volumeMax;
+
+	std::vector<StageProp> props; // モデルの装飾
+	int selectedProp = -1; // 選択中のインデックス
+	char propPathBuffer[256] = "Data/Model/Stage/";
+	float time = 0.0f;
 };
