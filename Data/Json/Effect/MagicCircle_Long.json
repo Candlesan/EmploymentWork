@@ -54,6 +54,9 @@
             ],
             "colorStartSpeed": 3,
             "delayTime": 0.0,
+            "delayTimeRandom": 0.0,
+            "dissolveMode": 0,
+            "dissolveSoftness": 0.05000000074505806,
             "distortionPower": 0.0,
             "drag": 0.0,
             "duration": 1.5,
@@ -68,6 +71,8 @@
             "id": 1,
             "isLoop": false,
             "lifeTime": 1.5,
+            "lifeTimeRandom": 0.0,
+            "maxParticle": 128,
             "meshPath": "",
             "name": "Node",
             "noisePath": "",
@@ -204,6 +209,7 @@
                 0.0
             ],
             "spawnInterval": 1.5,
+            "spawnIntervalRandom": 0.0,
             "splitCount": [
                 1,
                 1
@@ -276,6 +282,9 @@
             ],
             "colorStartSpeed": 3,
             "delayTime": 0.0,
+            "delayTimeRandom": 0.0,
+            "dissolveMode": 0,
+            "dissolveSoftness": 0.05000000074505806,
             "distortionPower": 0.0,
             "drag": 0.0,
             "duration": 1.5,
@@ -290,6 +299,8 @@
             "id": 2,
             "isLoop": false,
             "lifeTime": 1.5,
+            "lifeTimeRandom": 0.0,
+            "maxParticle": 128,
             "meshPath": "",
             "name": "Node 2",
             "noisePath": "",
@@ -426,6 +437,7 @@
                 0.0
             ],
             "spawnInterval": 1.5,
+            "spawnIntervalRandom": 0.0,
             "splitCount": [
                 1,
                 1

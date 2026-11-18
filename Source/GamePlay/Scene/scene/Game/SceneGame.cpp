@@ -45,7 +45,7 @@ void SceneGame::Initialize()
 		DirectX::XMConvertToRadians(45),	// 画角
 		screenWidth / screenHeight,			// 画面アスペクト比
 		0.1f,								// ニアクリップ
-		1000.0f								// ファークリップ
+		1500.0f								// ファークリップ
 	);
 	camera.SetLookAt(
 		{ 0, 10, 10 },		// 視点

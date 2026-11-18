@@ -524,12 +524,13 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
     {
         if (isFirstCycle)
         {
-            node.spawnTimer = node.currentSpawnInterval;
             node.currentSpawnInterval = RollTime(
                 node.config.spawnInterval,
                 node.config.spawnIntervalRandom,
                 0.001f
             );
+
+            node.spawnTimer = node.currentSpawnInterval;
         }
 
         node.emitting = true;

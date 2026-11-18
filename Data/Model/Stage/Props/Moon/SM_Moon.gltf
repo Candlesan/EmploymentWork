@@ -1,0 +1,231 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 158,
+      "max": [
+        0.5,
+        0.5049225091934204,
+        0.5011457800865173
+      ],
+      "min": [
+        -0.5,
+        -0.5049269199371338,
+        -0.4999999403953552
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 158,
+      "max": [
+        1.0,
+        0.9998760223388672,
+        0.9946886897087097
+      ],
+      "min": [
+        -1.0,
+        -0.9999380111694336,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 158,
+      "max": [
+        0.9999690055847168,
+        0.08639483898878098,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -0.9999690055847168,
+        -0.0632040947675705,
+        -1.0,
+        1.0
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 158,
+      "max": [
+        1.0048828125,
+        1.0048828125
+      ],
+      "min": [
+        -0.003932952880859375,
+        -0.004955291748046875
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 158,
+      "max": [
+        0.99658203125,
+        0.9970703125
+      ],
+      "min": [
+        0.0027027130126953125,
+        0.0038166046142578125
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5125,
+      "count": 798,
+      "max": [
+        157
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 1896,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1896,
+      "byteOffset": 1896,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2528,
+      "byteOffset": 3792,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1264,
+      "byteOffset": 6320,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1264,
+      "byteOffset": 7584,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3192,
+      "byteOffset": 8848,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 12040,
+      "uri": "SM_Moon.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "MI_Moon_Base.DDS"
+    },
+    {
+      "uri": "MI_Moon_Emissive.DDS"
+    }
+  ],
+  "materials": [
+    {
+      "emissiveFactor": [
+        0.14990234375,
+        0.14990234375,
+        0.14990234375
+      ],
+      "emissiveTexture": {
+        "index": 1
+      },
+      "name": "MI_Moon",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.0
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3,
+            "TEXCOORD_1": 4
+          },
+          "indices": 5,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Mesh",
+      "rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "translation": [
+        -0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "samplers": [
+    {
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    }
+  ]
+}
