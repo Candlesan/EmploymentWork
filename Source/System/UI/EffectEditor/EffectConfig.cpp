@@ -228,7 +228,7 @@ void EffectConfig::Load(const std::string& filePath)
                 node.lifeTime  = nodeJson.value("lifeTime", 1.0f);
                 node.lifeTimeRandom  = nodeJson.value("lifeTimeRandom", 0.0f);
                 node.isLoop    = nodeJson.value("isLoop", true);
-                node.spawnInterval = nodeJson.value("spawnInterval", 0.1f);
+                node.spawnInterval = nodeJson.value("spawnInterval", 1.0f);
                 node.spawnIntervalRandom = nodeJson.value("spawnIntervalRandom", 0.0f);
                 node.duration =  nodeJson.value("duration", 1.0f);
                 node.delayTime = nodeJson.value("delayTime", 0.0f);

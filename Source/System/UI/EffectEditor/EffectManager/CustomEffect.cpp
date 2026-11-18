@@ -501,12 +501,11 @@ void CustomEffect::EmitParticles(float elapsedTime)
         // ノード個別のタイマーを進める
         node.spawnTimer += elapsedTime;
 
-        if (node.spawnTimer >= node.currentSpawnInterval)
+        int guard = 0;
+        while (node.spawnTimer >= node.currentSpawnInterval && guard++ < 64)
         {
             node.spawnTimer -= node.currentSpawnInterval;
-            EmitNode(node);
-
-            // 次の間隔で決め直す
+            EmitNode(node, elapsedTime - node.spawnTimer);
             node.currentSpawnInterval = RollTime(pConfig.spawnInterval, pConfig.spawnIntervalRandom, 0.001f);
         }
     }
@@ -518,14 +517,14 @@ void CustomEffect::BeginNodeCycle(RuntimeNode& node, bool isFirstCycle)
     // パーティクル以外のノードの時
     if (node.config.type != RenderType::Particle)
     {
-        node.currentLifeTime = RollTime(node.config.lifeTime, node.config.delayTimeRandom, 0.01f);
+        node.currentLifeTime = RollTime(node.config.lifeTime, node.config.lifeTimeRandom, 0.01f);
     }
 
     if (node.config.type == RenderType::Particle)
     {
         if (isFirstCycle)
         {
-            node.spawnTimer = node.config.spawnInterval;
+            node.spawnTimer = node.currentSpawnInterval;
             node.currentSpawnInterval = RollTime(
                 node.config.spawnInterval,
                 node.config.spawnIntervalRandom,
@@ -833,7 +832,7 @@ void CustomEffect::UpdateNodeTransforms()
 }
 
 // 1ノード分のパーティクルを発生させる
-void CustomEffect::EmitNode(RuntimeNode& node)
+void CustomEffect::EmitNode(RuntimeNode& node, float lifeOffset)
 {
 
     // 生成数分 for 文で回す
@@ -841,13 +840,13 @@ void CustomEffect::EmitNode(RuntimeNode& node)
     {
         // 常駐モードは位置が Burst のたびに変わるので、相対位置モードでもワールド座標で出す
         const bool local = !isResident && (node.config.particleFollowMode == 1);
-        const float life = RollTime(node.config.lifeTime, node.currentSpawnInterval, 0.01f);
+        const float life = RollTime(node.config.lifeTime, node.config.lifeTimeRandom, 0.01f);
 
         compute_particle_system::emit_particle_data data;
         data.parameter = { 0.0f, 0.0f, 0.0f, 0.0f };
 
         data.parameter.x = static_cast<float>(node.config.spriteType);
-        data.parameter.y = life;
+        data.parameter.y = life + lifeOffset;  // 残り寿命だけ補正する
         data.parameter.z = node.config.uvScrollSpeed.x;
         data.parameter.w = node.config.uvScrollSpeed.y;
 

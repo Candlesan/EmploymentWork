@@ -114,7 +114,7 @@ private:
 	void UpdateNodeTransforms();
 
 	// 1ノード分のパーティクルを発生させる
-	void EmitNode(RuntimeNode& node);
+	void EmitNode(RuntimeNode& node, float lifeOffset = 0.0f); // Burst からは 0 のまま
 
 private:
 
