@@ -20,7 +20,7 @@ struct RenderContext
 	ID3D11DeviceContext*	deviceContext;
 	const RenderState*		renderState;
 	const Camera*			camera;
-	const LightManager*		lightManager = nullptr;
+	LightManager*		lightManager = nullptr;
 
 	const ShadowMapData* stageShadowMapData = nullptr;
 	const ShadowMapData* characterShadowMapData = nullptr;

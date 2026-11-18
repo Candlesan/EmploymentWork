@@ -292,6 +292,9 @@
     <Filter Include="Source\GamepPlay\Scene\Scene\Pause">
       <UniqueIdentifier>{ac34acb9-3f00-4ed2-ad2f-5d4bbbb83c51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Light">
+      <UniqueIdentifier>{36aadbc1-1b94-4c2b-b835-a3cbefe7c0c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -1046,6 +1049,9 @@
     <ClCompile Include="Source\GamePlay\Scene\scene\Retry\RetryMenu.cpp">
       <Filter>Source\GamepPlay\Scene\Scene\Retry</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\Renderer\Light\Light.cpp">
+      <Filter>Source\System\Renderer\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -1099,6 +1105,9 @@
     </None>
     <None Include="Shader\meshVFX\meshVFX.hlsli">
       <Filter>Shader\meshVFX</Filter>
+    </None>
+    <None Include="Shader\Light\Light.hlsli">
+      <Filter>Shader\Light</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

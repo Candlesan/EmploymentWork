@@ -64,7 +64,7 @@ private:
 	// ‘•ü‚Ì’Ç‰Á
 	StageProp* AddProp(const std::string& path);
 
-	static constexpr const char* PropsFilePath = "Data/Stage/StageProps.json";
+	static constexpr const char* PropsFilePath = "Data/Json/Stage/StageProps.json";
 	void SaveProps(const std::string& path);
 	void LoadProps(const std::string& path);
 private:

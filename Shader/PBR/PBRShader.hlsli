@@ -1,4 +1,5 @@
 #include "../Common/Scene.hlsli"
+#include "../Light/Light.hlsli"
 
 
 struct VS_OUT

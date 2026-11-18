@@ -334,6 +334,7 @@
     <ClCompile Include="Source\System\Graphic\Graphics.cpp" />
     <ClCompile Include="Source\System\Graphic\RenderState.cpp" />
     <ClCompile Include="Source\System\Renderer\ImGuiRenderer\ImGuiRenderer.cpp" />
+    <ClCompile Include="Source\System\Renderer\Light\Light.cpp" />
     <ClCompile Include="Source\System\Renderer\ModelRenderer\ModelRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\PrimitiveRenderer\PrimitiveRenderer.cpp" />
     <ClCompile Include="Source\System\Renderer\ShapeRenderer\ShapeRenderer.cpp" />
@@ -376,6 +377,7 @@
     <None Include="Shader\Common\shading_functions.hlsli" />
     <None Include="Shader\Common\Skinning.hlsli" />
     <None Include="Shader\Lambert\Lambert.hlsli" />
+    <None Include="Shader\Light\Light.hlsli" />
     <None Include="Shader\meshVFX\meshVFX.hlsli" />
     <None Include="Shader\Particle\compute_particle.hlsli" />
     <None Include="Shader\Particle\compute_particle_bitonic_sort.hlsli" />

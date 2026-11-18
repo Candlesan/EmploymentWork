@@ -41,7 +41,7 @@ public:
 public:
 	float bloom_extraction_threshold = 0.57f;
 	float bloom_intensity = 1.0f;
-	float exposure = 0.67;
+	float exposure = 0.45;
 	static const size_t downsampled_count = 3;
 
 private:

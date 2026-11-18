@@ -97,6 +97,7 @@ void SceneGame::Initialize()
 	light.intensity = 2.0f;
 
 	lightManager.SetDirectionalLight(light);
+	lightManager.Load(LightManager::LightsFilePath);
 
 	// フレームバッファ
 	framebuffers[0] = std::make_unique<framebuffer>(device, screenWidth, screenHeight, true);
@@ -446,6 +447,7 @@ void SceneGame::Render()
 			enemy->RenderDebugPrimitive(shapeRenderer);
 			stage->RenderDebugPrimitive(shapeRenderer);
 			CameraShakeManager::Instance().RenderDebugPrimitive(shapeRenderer);
+			rc.lightManager->RenderDebugPrimitive(shapeRenderer);
 		}
 #endif // DEBUG
 
@@ -818,6 +820,81 @@ void SceneGame::DrawGUI()
 				ImGui::Text(u8"向き: %.3f, %.3f, %.3f", light.direction.x, light.direction.y, light.direction.z);
 
 				ImGui::ColorEdit3(u8"ライトの色", &light.color.x);
+			}
+
+			if (ImGui::Button(u8"ライト保存"))       lightManager.Save(LightManager::LightsFilePath);
+			ImGui::SameLine();
+			if (ImGui::Button(u8"ライト再読み込み")) lightManager.Load(LightManager::LightsFilePath);
+
+			if (ImGui::CollapsingHeader(u8"点光源"))
+			{
+				auto& points = lightManager.GetPointLights();
+				if (ImGui::Button(u8"追加##point") && points.size() < LightManager::MaxPointLights)
+				{
+					points.emplace_back();
+				}
+				ImGui::SameLine();
+				ImGui::Text(u8"%d / %d", (int)points.size(), LightManager::MaxPointLights);
+
+				for (int i = 0; i < (int)points.size(); ++i)
+				{
+					ImGui::PushID(i);
+					PointLight& p = points[i];
+					bool remove = false;
+					if (ImGui::TreeNode("point", u8"点光源 %d", i))
+					{
+						ImGui::Checkbox(u8"有効", &p.enabled);
+						ImGui::DragFloat3(u8"位置", &p.position.x, 0.1f);
+						ImGui::ColorEdit3(u8"色", &p.color.x);
+						ImGui::DragFloat(u8"強さ", &p.intensity, 0.05f, 0.0f, 50.0f);
+						ImGui::DragFloat(u8"範囲", &p.range, 0.05f, 0.1f, 100.0f);
+						remove = ImGui::Button(u8"削除");
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+					if (remove)
+					{
+						points.erase(points.begin() + i);
+						break;   // 配列が変わったのでこのフレームはここで抜ける
+					}
+				}
+			}
+
+			if (ImGui::CollapsingHeader(u8"スポットライト"))
+			{
+				auto& spots = lightManager.GetSpotLights();
+				if (ImGui::Button(u8"追加##spot") && spots.size() < LightManager::MaxSpotLights)
+				{
+					spots.emplace_back();
+				}
+				ImGui::SameLine();
+				ImGui::Text(u8"%d / %d", (int)spots.size(), LightManager::MaxSpotLights);
+
+				for (int i = 0; i < (int)spots.size(); ++i)
+				{
+					ImGui::PushID(i + 1000);
+					SpotLight& s = spots[i];
+					bool remove = false;
+					if (ImGui::TreeNode("spot", u8"スポット %d", i))
+					{
+						ImGui::Checkbox(u8"有効", &s.enabled);
+						ImGui::DragFloat3(u8"位置", &s.position.x, 0.1f);
+						ImGui::DragFloat3(u8"向き", &s.direction.x, 0.01f, -1.0f, 1.0f);
+						ImGui::ColorEdit3(u8"色", &s.color.x);
+						ImGui::DragFloat(u8"強さ", &s.intensity, 0.05f, 0.0f, 50.0f);
+						ImGui::DragFloat(u8"範囲", &s.range, 0.05f, 0.1f, 200.0f);
+						ImGui::SliderFloat(u8"インナー角", &s.innerAngle, 0.0f, 89.0f, u8"%.1f°");
+						ImGui::SliderFloat(u8"アウター角", &s.outerAngle, s.innerAngle, 89.0f, u8"%.1f°");
+						remove = ImGui::Button(u8"削除");
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+					if (remove)
+					{
+						spots.erase(spots.begin() + i);
+						break;
+					}
+				}
 			}
 
 			if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))

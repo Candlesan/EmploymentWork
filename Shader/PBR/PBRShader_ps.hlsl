@@ -140,6 +140,50 @@ float4 main(VS_OUT pin, bool is_front_face : SV_IsFrontFace) : SV_TARGET
             total_diffuse += diffuse;
             total_specular += specular;
         }
+        
+        // 点光源の処理
+        [loop] // 意味：ループを展開しないで、本当にループとしてコンパイルしてという指示
+        for (int i = 0; i < pointLightCount; ++i)
+        {
+            float3 toPixel = pin.w_position.xyz - pointLights[i].position.xyz; // ライト→ピクセル
+            float dist = length(toPixel);
+            float range = pointLights[i].position.w;
+            if (dist >= range) continue; // 範囲外は計算しない
+            
+            float3 L = toPixel / max(dist, 0.0001f); // 0除算よけ
+            if (dot(N, -L) <= 0.0f) continue; // 裏側から当たる光は無視する
+
+            float atten = CalcDistanceAttenuation(dist, range);
+            
+            float3 diffuse = 0, specular = 0;
+            DirectBRDF(diffuse_reflectance, F0, N, V, L, pointLights[i].color.rgb, final_roughness, diffuse, specular);
+            total_diffuse += diffuse * atten;
+            total_specular += specular * atten;
+        }
+        
+        // スポットライトの処理
+        [loop]
+        for (int j = 0; j < spotLightCount; ++j)
+        {
+            float3 toPixel = pin.w_position.xyz - spotLights[j].position.xyz; // ライト→ピクセル
+            float dist = length(toPixel);
+            float range = spotLights[j].position.w;
+            if (dist >= range) continue; // 範囲外は計算しない
+                
+            float3 L = toPixel / max(dist, 0.0001f); // 0除算よけ
+            if (dot(N, -L) <= 0.0f) continue; // 裏側から当たる光は無視する
+               
+            float spot = CalcSpotAttenuation(L, spotLights[j].direction.xyz,
+                                            spotLights[j].cone.x, spotLights[j].cone.y);
+            if (spot <= 0.0f) continue; // コーンの外
+            
+            float atten = CalcDistanceAttenuation(dist, range) * spot;
+            
+            float3 diffuse = 0, specular = 0;
+            DirectBRDF(diffuse_reflectance, F0, N, V, L, spotLights[j].color.rgb, final_roughness, diffuse, specular);
+            total_diffuse += diffuse * atten;
+            total_specular += specular * atten;
+        }
     }
     
     // IBL処理

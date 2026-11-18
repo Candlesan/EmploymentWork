@@ -22,6 +22,12 @@ ModelRenderer::ModelRenderer(ID3D11Device* device)
 		sizeof(CbSkeleton),
 		skeletonConstantBuffer.GetAddressOf());
 
+	// ライト用定数バッファ
+	GpuResourceUtils::CreateConstantBuffer(
+		device,
+		sizeof(CbLight),
+		lightConstantBuffer.GetAddressOf());
+
 	// シェーダー生成
 	shaders[static_cast<int>(ShaderId::Basic)] = std::make_unique<BasicShader>(device);
 	shaders[static_cast<int>(ShaderId::Lambert)] = std::make_unique<LambertShader>(device);
@@ -68,6 +74,49 @@ void ModelRenderer::Render(const RenderContext& rc)
 		cbScene.cameraPosition.y = eye.y;
 		cbScene.cameraPosition.z = eye.z;
 		dc->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
+
+		// ライト用定数バッファ更新
+		{
+			CbLight cbLight{};
+
+			// 点光源
+			for (const PointLight& p : lightManager->GetPointLights())
+			{
+				if (!p.enabled || p.range <= 0.0f) continue; // ライトが点いているまたは長さが0以下の場合は飛ばす
+				if (cbLight.pointLightCount >= LightManager::MaxPointLights) break; // 置けるライトの最大数を超えていたら
+
+				CbPointLight& dst = cbLight.pointLights[cbLight.pointLightCount++];
+				dst.position = { p.position.x, p.position.y, p.position.z, p.range };
+				dst.color = { p.color.x * p.intensity, p.color.y * p.intensity, p.color.z * p.intensity, 0.0f };
+			}
+
+			// スポットライト
+			for (const SpotLight& s : lightManager->GetSpotLights())
+			{
+				if (!s.enabled || s.range <= 0.0f) continue; // ライトが点いているまたは長さが0以下の場合はやり直し
+				if (cbLight.spotLightCount >= LightManager::MaxSpotLights) break; // 置けるライトの最大数を超えていたら
+
+				DirectX::XMVECTOR dir = DirectX::XMLoadFloat3(&s.direction);
+				if (DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(dir)) < 1e-6f) continue; // 向きが0なら飛ばす
+				DirectX::XMFLOAT3 d;
+				DirectX::XMStoreFloat3(&d, DirectX::XMVector3Normalize(dir));
+
+				// インナー < アウターを保証(等しいとき0除算)
+				float inner = (std::max)(s.innerAngle, 0.0f);
+				float outer = (std::max)(s.outerAngle, inner + 0.5f);
+
+				CbSpotLight& dst = cbLight.spotLights[cbLight.spotLightCount++];
+				dst.position = { s.position.x, s.position.y, s.position.z, s.range };
+				dst.direction = { d.x, d.y, d.z, 0.0f };
+				dst.color = { s.color.x * s.intensity, s.color.y * s.intensity, s.color.z * s.intensity, 0.0f };
+				dst.cone = {
+					cosf(DirectX::XMConvertToRadians(inner)),
+					cosf(DirectX::XMConvertToRadians(outer)),
+					0.0f, 0.0f };
+			}
+
+			dc->UpdateSubresource(lightConstantBuffer.Get(), 0, 0, &cbLight, 0, 0);
+		}
 	}
 
 	// 定数バッファ設定
@@ -82,6 +131,7 @@ void ModelRenderer::Render(const RenderContext& rc)
 	};
 	dc->VSSetConstantBuffers(6, _countof(vsConstantBuffers), vsConstantBuffers);
 	dc->PSSetConstantBuffers(7, _countof(psConstantBuffers), psConstantBuffers);
+	dc->PSSetConstantBuffers(12, 1, lightConstantBuffer.GetAddressOf());
 
 	// サンプラステート設定
 	ID3D11SamplerState* samplerStates[] =
@@ -218,6 +268,8 @@ void ModelRenderer::Render(const RenderContext& rc)
 	for (ID3D11Buffer*& psConstantBuffer : psConstantBuffers) { psConstantBuffer = nullptr; }
 	dc->VSSetConstantBuffers(6, _countof(vsConstantBuffers), vsConstantBuffers);
 	dc->PSSetConstantBuffers(7, _countof(psConstantBuffers), psConstantBuffers);
+	ID3D11Buffer* nullBuffer = nullptr;
+	dc->PSSetConstantBuffers(12, 1, &nullBuffer);
 
 	// サンプラステート設定解除
 	for (ID3D11SamplerState*& samplerState : samplerStates) { samplerState = nullptr; }

@@ -50,6 +50,30 @@ private:
 		DirectX::XMFLOAT4X4		inverseView;
 	};
 
+	struct CbPointLight
+	{
+		DirectX::XMFLOAT4 position; // xyz:位置 w:range
+		DirectX::XMFLOAT4 color; // rgb×強さ
+	};
+
+	struct CbSpotLight
+	{
+		DirectX::XMFLOAT4 position; // xyz:位置 w:range
+		DirectX::XMFLOAT4 direction; // xyz:向き(正規化済みを渡す)
+		DirectX::XMFLOAT4 color; // rgb×強さ
+		DirectX::XMFLOAT4 cone; // x:cos(インナー) y:cos(アウター)
+	};
+
+	struct CbLight
+	{
+		int pointLightCount;
+		int spotLightCount;
+		int pad[2];
+		CbPointLight pointLights[LightManager::MaxPointLights]; // 16個
+		CbSpotLight spotLights[LightManager::MaxSpotLights]; // 8個
+	};
+	static_assert(sizeof(CbLight) % 16 == 0, "16バイトの倍数に直してください");
+
 	struct CbSkeleton
 	{
 		DirectX::XMFLOAT4X4		boneTransforms[256];
@@ -75,4 +99,5 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer>	sceneConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>	skeletonConstantBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer>	lightConstantBuffer;
 };
