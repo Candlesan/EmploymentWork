@@ -60,7 +60,7 @@
             "distortionPower": 0.0,
             "drag": 0.0,
             "duration": 1.0,
-            "emitCount": 300,
+            "emitCount": 1000,
             "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
@@ -72,6 +72,8 @@
             "isLoop": true,
             "lifeTime": 3.000499963760376,
             "lifeTimeRandom": 2.049999952316284,
+            "lightIntensity": 1.0,
+            "lightRange": 1.0,
             "maxParticle": 2048,
             "meshPath": "",
             "name": "Node",
@@ -98,9 +100,9 @@
                 1.0
             ],
             "positionRange": [
-                100.0,
-                100.0,
-                100.0
+                200.0,
+                200.0,
+                200.0
             ],
             "positionVelocity": [
                 0.0,

@@ -73,8 +73,8 @@ void SceneGame::Initialize()
 	// ステージの常時エフェクト（StopAllの後で再生する）
 	CustomEffectManager::Instance().LoadEffectConfig("StageMana", "Data/Json/Effect/StageMana.json");
 	CustomEffectManager::Instance().LoadEffectConfig("MoonStone_Light", "Data/Json/Effect/MoonStone_Light.json");
-	CustomEffectManager::Instance().PlayEffect(
-		"StageMana", { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	//CustomEffectManager::Instance().PlayEffect(
+	//	"StageMana", { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 	CustomEffectManager::Instance().PlayEffect(
 		"MoonStone_Light", { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 
@@ -97,7 +97,7 @@ void SceneGame::Initialize()
 	// ここに ImGui で決めた数値をそのまま入れる
 	light.direction = CalcLightDirection(); // 例：斜め上から
 	light.color = { 0.25f, 0.8f, 0.9f }; // 青白い色
-	light.intensity = 0.4;
+	light.intensity = 5.0f;
 
 	lightManager.SetDirectionalLight(light);
 	lightManager.Load(LightManager::LightsFilePath);
@@ -106,7 +106,7 @@ void SceneGame::Initialize()
 	playerLight.intensity = 23.25f;
 	playerLight.range = 6.65;
 
-	enemyLight.color = { 1, 1, 0 }; // 黄色
+	enemyLight.color = { 1, 1, 1 }; // 黄色
 	enemyLight.intensity = 18.75;
 	enemyLight.range = 7.8;
 
@@ -342,12 +342,22 @@ void SceneGame::Update(float elapsedTime)
 		lightManager.ClearFrameLights();
 		{
 			DirectX::XMFLOAT3 pos = player.GetPosition();
-			playerLight.position = { pos.x, pos.y + playerLightHeight, pos.z };
+			float yaw = player.GetAngle().y;
+
+			float forntX = sinf(yaw);
+			float forntZ = cosf(yaw);
+
+			playerLight.position = { pos.x + playerLightPos.x * forntX, pos.y + playerLightPos.y, pos.z + playerLightPos.z * forntZ };
 			lightManager.AddFramePointLight(playerLight);
 		}
 		{
 			DirectX::XMFLOAT3 pos = enemy->GetPosition();
-			enemyLight.position = { pos.x, pos.y + enemyLightHeight, pos.z };
+			float yaw = enemy->GetAngle().y;
+
+			float forntX = sinf(yaw);
+			float forntZ = cosf(yaw);
+
+			enemyLight.position = { pos.x + enemyLightPos.x * forntX, pos.y + enemyLightPos.y, pos.z + enemyLightPos.z * forntZ };
 			lightManager.AddFramePointLight(enemyLight);
 		}
 
@@ -929,13 +939,13 @@ void SceneGame::DrawGUI()
 				ImGui::ColorEdit3(u8"プレイヤー色", &playerLight.color.x);
 				ImGui::DragFloat(u8"プレイヤー強さ", &playerLight.intensity, 0.05f, 0.0f, 50.0f);
 				ImGui::DragFloat(u8"プレイヤー範囲", &playerLight.range, 0.05f, 0.1f, 30.0f);
-				ImGui::DragFloat(u8"プレイヤー高さ", &playerLightHeight, 0.05f, -2.0f, 5.0f);
+				ImGui::DragFloat3(u8"プレイヤーライトの位置", &playerLightPos.x, 0.01f);
 				ImGui::Separator();
 				ImGui::Checkbox(u8"エネミー有効", &enemyLight.enabled);
 				ImGui::ColorEdit3(u8"エネミー色", &enemyLight.color.x);
 				ImGui::DragFloat(u8"エネミー強さ", &enemyLight.intensity, 0.05f, 0.0f, 50.0f);
 				ImGui::DragFloat(u8"エネミー範囲", &enemyLight.range, 0.05f, 0.1f, 30.0f);
-				ImGui::DragFloat(u8"エネミー高さ", &enemyLightHeight, 0.05f, -2.0f, 5.0f);
+				ImGui::DragFloat3(u8"エネミーライトの位置", &enemyLightPos.x, 0.01f);
 			}
 
 			if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))

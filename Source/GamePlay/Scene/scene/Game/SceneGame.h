@@ -98,15 +98,17 @@ private:
 
 	PointLight playerLight; // 周りを照らす用の弱い照明
 	PointLight enemyLight;
-	float playerLightHeight = 2.55f; // ライトの位置（高さ）
-	float enemyLightHeight = 2.55f; 
+	PointLight playerFaceLight; // キャラクターの顔を照らすライト
+	PointLight enemyFaceLight;
+	DirectX::XMFLOAT3 playerLightPos = { 1, 2.02f, 0.76f };
+	DirectX::XMFLOAT3 enemyLightPos  = { 1, 2.02f, 0.76f };
 
 	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 
 	// PBR調整用
 	float pbrMetalness = 0.0f;
 	float pbrRoughness = 0.0f;
-	float ambientIntensity = 0.0f;
+	float ambientIntensity = 0.01f;
 
 	// シャドウマップ調整用
 	float stageShadowAttenuation = 0.0f;
