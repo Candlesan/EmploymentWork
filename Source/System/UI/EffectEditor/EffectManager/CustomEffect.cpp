@@ -461,6 +461,28 @@ void CustomEffect::DrawGUI()
 
 }
 
+
+void CustomEffect::CollectLights(std::vector<PointLight>& out) const
+{
+    if (!isPlaying) return;
+
+    for (const RuntimeNode& node : runTimeNodes)
+    {
+        if (node.config.type != RenderType::Light) continue;
+        if (!node.started || node.finished) continue;   // まだ出ていない・もう終わった
+
+        DirectX::XMFLOAT4 c = ComputeNodeColor(node);   // rgb：色  a：フェード
+        if (c.w <= 0.0f) continue;
+
+        PointLight light;
+        light.position = { node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
+        light.color = { c.x, c.y, c.z };
+        light.intensity = node.config.lightIntensity * c.w;
+        light.range = node.config.lightRange;
+        out.push_back(light);
+    }
+}
+
 // エフェクト終了関数
 bool CustomEffect::IsFinished()
 {

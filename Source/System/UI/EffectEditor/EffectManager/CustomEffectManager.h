@@ -2,6 +2,7 @@
 #include "System/Graphic/RenderContext.h"
 #include "System/UI/EffectEditor/EffectConfig.h"
 #include "System/UI/EffectEditor/EffectManager/CustomEffect.h"
+#include "System/Renderer/Light/Light.h"
 
 #include <string>
 #include <vector>
@@ -52,6 +53,8 @@ public:
 
 	// 設定済みにのエフェクトをインスタンス化してポインタを返す関数
 	std::unique_ptr<CustomEffect> CreateEffect(const std::string& effectName);
+
+	void CollectLights(LightManager& lightManager) const;
 
 	bool Exists(EffectHandle handle) const; // まだ生きているか
 	void Stop(EffectHandle handle);	// 停止関数

@@ -10,6 +10,7 @@ enum class EffectNodeType
 	Particle,
 	Mesh,
 	Trail,
+	Light,
 };
 
 // ブレンドモードの定義
@@ -22,11 +23,12 @@ enum class BlendMode
 // 描画方式
 enum class RenderType
 {
-	Particle = 0, // 2Dビルボード
-	Mesh = 1, // 3DメッシュVFX
-	Trail = 2, // 軌跡
-	Ring = 4, // リング
-	None = 3,
+	Particle = 0,	// 2Dビルボード
+	Mesh = 1,		// 3DメッシュVFX
+	Trail = 2,		// 軌跡
+	Ring = 4,		// リング
+	Light = 5,		// ライト
+	None = 3,		// 無し
 };
 
 // Lerpの速度
@@ -179,6 +181,10 @@ struct NodeConfig
 	DirectX::XMFLOAT4 ringOuterColor = { 1, 1, 1, 1 };
 	DirectX::XMFLOAT4 ringCenterColor = { 1, 1, 1, 1 };
 	DirectX::XMFLOAT4 ringInnerColor = { 1, 1, 1, 1 };
+
+	// [Light用]
+	float lightIntensity = 1.0f;										// 光の強さ
+	float lightRange = 1.0f;											// 光の影響範囲
 
 	// ディゾルブ
 	int dissolveMode = 0; // 0:無し 1:ディゾルブ 2:トゥーン調ディゾルブ

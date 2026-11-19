@@ -36,6 +36,7 @@ public:
 	void Render(const RenderContext& rc, ModelRenderer* modelRenderer);
 	void RenderMeshVFX(ModelRenderer* modelRenderer);
 
+	void CollectLights(LightManager& lightManager) const;
 private:
 	// UIの描画パーツ
 	void DrawNodeInspector(NodeConfig& node);
@@ -45,6 +46,8 @@ private:
 	// ヘルパー関数
 	void RebuildPreview(); // 今の設定でプレビュー用のエフェクトを作り直す
 	void DrawNodeTreeItem(int index, int depth);
+	void DrawFadeGUI(NodeConfig& node);
+
 private:
 	EffectConfig currentConfig; // 現在調整中の設定データ
 

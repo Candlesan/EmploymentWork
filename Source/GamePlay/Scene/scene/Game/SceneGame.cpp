@@ -359,12 +359,14 @@ void SceneGame::Update(float elapsedTime)
 
 		// エフェクトエディターの更新
 		effectEditor->Update(Graphics::Instance().GetDeviceContext(), delta);
+		effectEditor->CollectLights(lightManager);
 
 		// エフェクト更新処理 
 		EffectManager::Instance().Update(delta);
 
 		// 自作エフェクトマネージャ更新
 		CustomEffectManager::Instance().Update(delta);
+		CustomEffectManager::Instance().CollectLights(lightManager);
 
 		// プレイヤーのUI更新
 		playerUI.Update(Player::Instance().GetStatus());

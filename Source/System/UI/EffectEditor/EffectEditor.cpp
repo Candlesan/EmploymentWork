@@ -157,6 +157,15 @@ void EffectEditor::RebuildPreview()
     preview->Initialize(Graphics::Instance().GetDevice(), currentConfig);
 }
 
+void EffectEditor::CollectLights(LightManager& lightManager) const
+{
+    if (!preview) return;
+
+    std::vector<PointLight> lights;
+    preview->CollectLights(lights);   // 再生中のプレビューから集める
+    for (const PointLight& l : lights) lightManager.AddFramePointLight(l);
+}
+
 // ノード1つと、その子をツリーで描く
 void EffectEditor::DrawNodeTreeItem(int index, int depth)
 {
@@ -192,6 +201,7 @@ void EffectEditor::DrawNodeTreeItem(int index, int depth)
     if (node.type == RenderType::Mesh)  label = u8"[モデル] ";
     else if (node.type == RenderType::Trail) label = u8"[軌跡] ";
     else if (node.type == RenderType::Ring)  label = u8"[リング] ";
+    else if (node.type == RenderType::Light)  label = u8"[ライト] ";
     else if (node.type == RenderType::None)  label = u8"[無し] ";
     label += node.name;
 
@@ -214,6 +224,36 @@ void EffectEditor::DrawNodeTreeItem(int index, int depth)
     }
 
     ImGui::PopID();
+}
+
+void EffectEditor::DrawFadeGUI(NodeConfig& node)
+{
+    const char* speedItem[] = { u8"低速3", u8"低速2",  u8"低速1",  u8"等速",  u8"高速1",  u8"高速2",  u8"高速3" };
+    ImGui::Checkbox(u8"フェードイン", &node.IsFadeIn);
+    if (node.IsFadeIn)
+    {
+        ImGui::DragFloat(u8"終了時間##FadeIn", &node.fadeInTime, 0.1f);
+        ImGui::Separator();
+
+        ImGui::Combo(u8"始点速度##FadeIn", &node.fadeInStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+        ImGui::Separator();
+
+        ImGui::Combo(u8"終点速度##FadeIn", &node.fadeInEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+        ImGui::Separator();
+    }
+
+    ImGui::Checkbox(u8"フェードアウト", &node.IsFadeOut);
+    if (node.IsFadeOut)
+    {
+        ImGui::DragFloat(u8"終了時間##FadeOut", &node.fadeOutTime, 0.1f);
+        ImGui::Separator();
+
+        ImGui::Combo(u8"始点速度##FadeOut", &node.fadeOutStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+        ImGui::Separator();
+
+        ImGui::Combo(u8"終点速度##FadeOut", &node.fadeOutEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
+        ImGui::Separator();
+    }
 }
 
 // UIの描画パーツ
@@ -373,7 +413,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
         }
 
         // 描画共通タブ
-        if (ImGui::BeginTabItem(u8"描画共通"))
+        if (node.type != RenderType::Light && ImGui::BeginTabItem(u8"描画共通")) 
         {
             // テクスチャ選択
             if (ImGui::Button(u8"読込##Particle"))
@@ -426,40 +466,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             ImGui::Combo(u8"ブレンドモード##Mesh", &node.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
             ImGui::Separator();
 
-            const char* speedItem[] = { u8"低速3", u8"低速2",  u8"低速1",  u8"等速",  u8"高速1",  u8"高速2",  u8"高速3" };
-            ImGui::Checkbox(u8"フェードイン", &node.IsFadeIn);
-            if (node.IsFadeIn)
-            {
-                ImGui::DragFloat(u8"終了時間##FadeIn", &node.fadeInTime, 0.1f);
-                ImGui::Separator();
-
-                ImGui::Combo(u8"始点速度##FadeIn", &node.fadeInStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
-                ImGui::Separator();
-
-                ImGui::Combo(u8"終点速度##FadeIn", &node.fadeInEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
-                ImGui::Separator();
-            }
-            else
-            {
-                node.IsFadeIn = false;
-            }
-
-            ImGui::Checkbox(u8"フェードアウト", &node.IsFadeOut);
-            if (node.IsFadeOut)
-            {
-                ImGui::DragFloat(u8"終了時間##FadeOut", &node.fadeOutTime, 0.1f);
-                ImGui::Separator();
-
-                ImGui::Combo(u8"始点速度##FadeOut", &node.fadeOutStartSpeed, speedItem, IM_ARRAYSIZE(speedItem));
-                ImGui::Separator();
-
-                ImGui::Combo(u8"終点速度##FadeOut", &node.fadeOutEndSpeed, speedItem, IM_ARRAYSIZE(speedItem));
-                ImGui::Separator();
-            }
-            else
-            {
-                node.IsFadeOut = false;
-            }
+            DrawFadeGUI(node);
 
             const char* dissolveItems[] = { u8"無し", u8"ディゾルブ",  u8"トゥーン調ディゾルブ" };
             ImGui::Combo(u8"ディゾルブ", &node.dissolveMode, dissolveItems, IM_ARRAYSIZE(dissolveItems));
@@ -488,6 +495,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 RenderType::Mesh,
                 RenderType::Trail,
                 RenderType::Ring,
+                RenderType::Light,
             };
             const char* renderTypeItems[] = {
                 u8"無し",
@@ -495,6 +503,7 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 u8"モデル",
                 u8"軌跡",
                 u8"リング",
+                u8"ライト",
             };
 
             int currentType = 0;
@@ -658,6 +667,12 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 ImGui::ColorEdit4(u8"外輪色", &node.ringOuterColor.x);
                 ImGui::ColorEdit4(u8"中心色", &node.ringCenterColor.x);
                 ImGui::ColorEdit4(u8"内輪色", &node.ringInnerColor.x);
+            }
+            else if (node.type == RenderType::Light)
+            {
+                ImGui::DragFloat(u8"光の強さ", &node.lightIntensity, 0.01f, 0.0f, 50.0f);
+                ImGui::DragFloat(u8"光の影響範囲", &node.lightRange, 0.01f, 0.0f, 100.0f);
+                DrawFadeGUI(node);
             }
 
             ImGui::EndTabItem();

@@ -88,6 +88,8 @@ public:
 	// 設置位置調整用にGUI
 	void DrawGUI();
 
+	void CollectLights(std::vector<PointLight>& out) const;
+
 	// ゲッター・セッター
 	void SetPosition(const DirectX::XMFLOAT3& pos) { this->position = pos; }
 	void SetAngle(const DirectX::XMFLOAT3& rot) { this->angle = rot; }

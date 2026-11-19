@@ -116,7 +116,7 @@ void EffectConfig::Save(const std::string& filePath)
         n["scaleUniformStartSpeed"] = node.scaleUniformStartSpeed;
         n["scaleUniformEndSpeed"] = node.scaleUniformEndSpeed;
 
-
+        // 色
         n["color"] = { node.color.x, node.color.y, node.color.z, node.color.w };
         n["colorMode"] = static_cast<int>(node.colorMode);
         n["colorMin"] = { node.colorMin.x, node.colorMin.y, node.colorMin.z, node.colorMin.w };
@@ -170,6 +170,10 @@ void EffectConfig::Save(const std::string& filePath)
         // ディゾルブ
         n["dissolveMode"] = node.dissolveMode;
         n["dissolveSoftness"] = node.dissolveSoftness;
+
+        // ライト
+        n["lightIntensity"] = node.lightIntensity;
+        n["lightRange"] = node.lightRange;
 
         j["nodes"].push_back(n);
     }
@@ -334,9 +338,13 @@ void EffectConfig::Load(const std::string& filePath)
                 if (nodeJson.find("ringCenterColor") != nodeJson.end()) node.ringCenterColor = { nodeJson["ringCenterColor"][0], nodeJson["ringCenterColor"][1], nodeJson["ringCenterColor"][2], nodeJson["ringCenterColor"][3] };
                 if (nodeJson.find("ringInnerColor") != nodeJson.end()) node.ringInnerColor = { nodeJson["ringInnerColor"][0], nodeJson["ringInnerColor"][1], nodeJson["ringInnerColor"][2], nodeJson["ringInnerColor"][3] };
 
-                // ディゾルブ
+                // [ディゾルブ用]
                 node.dissolveMode = nodeJson.value("dissolveMode", 0);
                 node.dissolveSoftness = nodeJson.value("dissolveSoftness", 0.05f);
+
+                // [ライト]
+                node.lightIntensity = nodeJson.value("lightIntensity", 1.0f);
+                node.lightRange = nodeJson.value("lightRange", 1.0f);
 
                 // 読み込んだノードを追加
                 nodes.push_back(node);

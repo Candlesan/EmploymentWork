@@ -164,6 +164,15 @@ std::unique_ptr<CustomEffect> CustomEffectManager::CreateEffect(const std::strin
 	return effect;
 }
 
+void CustomEffectManager::CollectLights(LightManager& lightManager) const
+{
+	std::vector<PointLight> lights;
+	for (const auto& [handle, effect] : activeEffects)   effect->CollectLights(lights);
+	for (const auto& [name, effect] : residentEffects) effect->CollectLights(lights);
+
+	for (const PointLight& l : lights) lightManager.AddFramePointLight(l);
+}
+
 bool CustomEffectManager::Exists(EffectHandle handle) const
 {
 	return activeEffects.find(handle) != activeEffects.end();
