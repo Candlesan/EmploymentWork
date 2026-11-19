@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -13,142 +13,142 @@
 class compute_particle_system
 {
 public:
-	// ƒp[ƒeƒBƒNƒ‹ƒXƒŒƒbƒh”
+	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã‚¹ãƒ¬ãƒƒãƒ‰æ•°
 	static constexpr UINT NumParticleThread = 1024;
 
-	// ƒp[ƒeƒBƒNƒ‹¶¬—p\‘¢‘Ì
+	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆç”¨æ§‹é€ ä½“
 	struct emit_particle_data
 	{
-        DirectX::XMFLOAT4 parameter; // x : ƒp[ƒeƒBƒNƒ‹ˆ—ƒ^ƒCƒv,yF¶‘¶ŠÔ,zwF‹ó‚«
+        DirectX::XMFLOAT4 parameter; // x : ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«å‡¦ç†ã‚¿ã‚¤ãƒ—,yï¼šç”Ÿå­˜æ™‚é–“,zwï¼šç©ºã
 
-        DirectX::XMFLOAT4 position = { 0, 0, 0, 0 }; // ¶¬À•W
-        DirectX::XMFLOAT4 rotation = { 0, 0, 0, 0 };// ‰ñ“]î•ñ
-        DirectX::XMFLOAT4 scale = { 1, 1, 1, 0 }; // Šgkî•ñ 
+        DirectX::XMFLOAT4 position = { 0, 0, 0, 0 }; // ç”Ÿæˆåº§æ¨™
+        DirectX::XMFLOAT4 rotation = { 0, 0, 0, 0 };// å›è»¢æƒ…å ±
+        DirectX::XMFLOAT4 scale = { 1, 1, 1, 0 }; // æ‹¡ç¸®æƒ…å ± 
 
-        DirectX::XMFLOAT4 posVelocity = { 0, 0, 0, 0 };     // ˆÊ’u‚Ì‰‘¬
-        DirectX::XMFLOAT4 posAcceleration = { 0, 0, 0, 0 }; // ˆÊ’u‚Ì‰Á‘¬“x
+        DirectX::XMFLOAT4 posVelocity = { 0, 0, 0, 0 };     // ä½ç½®ã®åˆé€Ÿ
+        DirectX::XMFLOAT4 posAcceleration = { 0, 0, 0, 0 }; // ä½ç½®ã®åŠ é€Ÿåº¦
 
-        DirectX::XMFLOAT4 rotVelocity = { 0, 0, 0, 0 };     // ‰ñ“]‰‘¬
-        DirectX::XMFLOAT4 rotAcceleration = { 0, 0, 0, 0 }; // ‰ñ“]‰Á‘¬“x
+        DirectX::XMFLOAT4 rotVelocity = { 0, 0, 0, 0 };     // å›è»¢åˆé€Ÿ
+        DirectX::XMFLOAT4 rotAcceleration = { 0, 0, 0, 0 }; // å›è»¢åŠ é€Ÿåº¦
 
-        DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // Šg‘å‚Ì‰‘¬
-        DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // Šg‘å‚Ì‰Á‘¬“x
+        DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // æ‹¡å¤§ã®åˆé€Ÿ
+        DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // æ‹¡å¤§ã®åŠ é€Ÿåº¦
 
-        // ’PˆêƒC[ƒWƒ“ƒO
-        DirectX::XMFLOAT4 renderScale = { 1.0f, 1.0f, 1.0f, 1.0f };				// ƒXƒP[ƒ‹(•`‰æ)
-        float scaleUniformStart = 1.0f;	// n“_F’†S
-        float scaleUniformStartRandom = 0.0f; // n“_FU‚ê•
+        // å˜ä¸€ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°
+        DirectX::XMFLOAT4 renderScale = { 1.0f, 1.0f, 1.0f, 1.0f };				// ã‚¹ã‚±ãƒ¼ãƒ«(æç”»)
+        float scaleUniformStart = 1.0f;	// å§‹ç‚¹ï¼šä¸­å¿ƒ
+        float scaleUniformStartRandom = 0.0f; // å§‹ç‚¹ï¼šæŒ¯ã‚Œå¹…
 
-        float scaleUniformEnd = 1.0f; // I“_F’†S
-        float scaleUniformEndRandom = 0.0f;	// I“_FU‚ê•
-        DirectX::XMFLOAT4 scale_param = { -1, 0, 0, 0 }; // x:ƒC[ƒWƒ“ƒO‚Ì‘¬“x, y: õ–½, z:‹ó‚«, w:‹ó‚«
+        float scaleUniformEnd = 1.0f; // çµ‚ç‚¹ï¼šä¸­å¿ƒ
+        float scaleUniformEndRandom = 0.0f;	// çµ‚ç‚¹ï¼šæŒ¯ã‚Œå¹…
+        DirectX::XMFLOAT4 scale_param = { -1, 0, 0, 0 }; // x:ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°ã®é€Ÿåº¦, y: å¯¿å‘½, z:ç©ºã, w:ç©ºã
 
 
-        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // F
-        DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // n“_‚ÌF
-        DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // I“_‚ÌF
-        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:FƒC[ƒWƒ“ƒO‚Ìn“_EI“_‚Ì‘¬“x, y:õ–½, z:‹ó‚«, w:‹ó‚«
+        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // è‰²
+        DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // å§‹ç‚¹ã®è‰²
+        DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // çµ‚ç‚¹ã®è‰²
+        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:è‰²ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°ã®å§‹ç‚¹ãƒ»çµ‚ç‚¹ã®é€Ÿåº¦, y:å¯¿å‘½, z:ç©ºã, w:ç©ºã
 
-        // x:ƒtƒF[ƒhƒCƒ“•b”, y:ƒtƒF[ƒhƒAƒEƒg•b”, z:ƒtƒF[ƒhƒCƒ“‚Ì‘¬“xİ’èin“_EI“_‘¬“xj, w:ƒtƒF[ƒhƒAƒEƒg‚Ì‘¬“xİ’èin“_EI“_‘¬“xj
+        // x:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ç§’æ•°, y:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆç§’æ•°, z:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã®é€Ÿåº¦è¨­å®šï¼ˆå§‹ç‚¹ãƒ»çµ‚ç‚¹é€Ÿåº¦ï¼‰, w:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã®é€Ÿåº¦è¨­å®šï¼ˆå§‹ç‚¹ãƒ»çµ‚ç‚¹é€Ÿåº¦ï¼‰
         DirectX::XMFLOAT4 fade_param;
 
 	};
 
-    // ƒp[ƒeƒBƒNƒ‹\‘¢‘Ì
-    // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‘¤‚Å‚Íg—p‚µ‚È‚¢‚ªAŒ`®‚Æ‚µ‚Ä•K—v‚È‚½‚ß‚±‚±‚ÅéŒ¾‚µ‚Ä‚¨‚­
+    // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æ§‹é€ ä½“
+    // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å´ã§ã¯ä½¿ç”¨ã—ãªã„ãŒã€å½¢å¼ã¨ã—ã¦å¿…è¦ãªãŸã‚ã“ã“ã§å®£è¨€ã—ã¦ãŠã
     struct particle_data
     {
-        DirectX::XMFLOAT4 parameter; // x : ƒp[ƒeƒBƒNƒ‹ˆ—ƒ^ƒCƒv,yF¶‘¶ŠÔ,zwF‹ó‚«
+        DirectX::XMFLOAT4 parameter; // x : ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«å‡¦ç†ã‚¿ã‚¤ãƒ—,yï¼šç”Ÿå­˜æ™‚é–“,zwï¼šç©ºã
 
-        DirectX::XMFLOAT4 position; // ¶¬À•W
-        DirectX::XMFLOAT4 rotation; // Šgkî•ñ
-        DirectX::XMFLOAT4 scale; // ‰ñ“]î•ñ
+        DirectX::XMFLOAT4 position; // ç”Ÿæˆåº§æ¨™
+        DirectX::XMFLOAT4 rotation; // æ‹¡ç¸®æƒ…å ±
+        DirectX::XMFLOAT4 scale; // å›è»¢æƒ…å ±
 
-        DirectX::XMFLOAT4 posVelocity = { 0, 0, 0, 0 };     // ˆÊ’u‚Ì‰‘¬
-        DirectX::XMFLOAT4 posAcceleration = { 0, 0, 0, 0 }; // ˆÊ’u‚Ì‰Á‘¬“x
+        DirectX::XMFLOAT4 posVelocity = { 0, 0, 0, 0 };     // ä½ç½®ã®åˆé€Ÿ
+        DirectX::XMFLOAT4 posAcceleration = { 0, 0, 0, 0 }; // ä½ç½®ã®åŠ é€Ÿåº¦
 
-        DirectX::XMFLOAT4 rotVelocity = { 0, 0, 0, 0 };     // ‰ñ“]‰‘¬
-        DirectX::XMFLOAT4 rotAcceleration = { 0, 0, 0, 0 }; // ‰ñ“]‰Á‘¬“x
+        DirectX::XMFLOAT4 rotVelocity = { 0, 0, 0, 0 };     // å›è»¢åˆé€Ÿ
+        DirectX::XMFLOAT4 rotAcceleration = { 0, 0, 0, 0 }; // å›è»¢åŠ é€Ÿåº¦
 
-        DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // Šg‘å‚Ì‰‘¬
-        DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // Šg‘å‚Ì‰Á‘¬“x
+        DirectX::XMFLOAT4 scaleVelocity = { 0, 0, 0, 0 };       // æ‹¡å¤§ã®åˆé€Ÿ
+        DirectX::XMFLOAT4 scaleAcceleration = { 0, 0, 0, 0 };   // æ‹¡å¤§ã®åŠ é€Ÿåº¦
 
-        // ’PˆêƒC[ƒWƒ“ƒO
-        DirectX::XMFLOAT4 renderScale = { 1.0f, 1.0f, 1.0f, 1.0f };				// ƒXƒP[ƒ‹(•`‰æ)
-        float scaleUniformStart = 1.0f;										// n“_F’†S
-        float scaleUniformStartRandom = 0.0f;								// n“_FU‚ê•
+        // å˜ä¸€ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°
+        DirectX::XMFLOAT4 renderScale = { 1.0f, 1.0f, 1.0f, 1.0f };				// ã‚¹ã‚±ãƒ¼ãƒ«(æç”»)
+        float scaleUniformStart = 1.0f;										// å§‹ç‚¹ï¼šä¸­å¿ƒ
+        float scaleUniformStartRandom = 0.0f;								// å§‹ç‚¹ï¼šæŒ¯ã‚Œå¹…
 
-        float scaleUniformEnd = 1.0f;										// I“_F’†S
-        float scaleUniformEndRandom = 0.0f;									// I“_FU‚ê•
-        DirectX::XMFLOAT4 scale_param; // x:ƒC[ƒWƒ“ƒO‚Ì‘¬“x, y: ‹ó‚«, z:‹ó‚«, w:‹ó‚«
+        float scaleUniformEnd = 1.0f;										// çµ‚ç‚¹ï¼šä¸­å¿ƒ
+        float scaleUniformEndRandom = 0.0f;									// çµ‚ç‚¹ï¼šæŒ¯ã‚Œå¹…
+        DirectX::XMFLOAT4 scale_param; // x:ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°ã®é€Ÿåº¦, y: ç©ºã, z:ç©ºã, w:ç©ºã
 
-        DirectX::XMFLOAT4 texcoord; // UVÀ•W
+        DirectX::XMFLOAT4 texcoord; // UVåº§æ¨™
 
-        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // F
-        DirectX::XMFLOAT4 renderColor = { 1, 1, 1, 1 }; // F
-        DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // n“_‚ÌF
-        DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // I“_‚ÌF
-        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:FƒC[ƒWƒ“ƒO‚Ìn“_‘¬“x, y:FƒC[ƒWƒ“ƒO‚ÌI“_‘¬“x, z:‹ó‚«, w:‹ó‚«
+        DirectX::XMFLOAT4 color = { 1, 1, 1, 1 }; // è‰²
+        DirectX::XMFLOAT4 renderColor = { 1, 1, 1, 1 }; // è‰²
+        DirectX::XMFLOAT4 start_color = { 1, 1, 1, 1 }; // å§‹ç‚¹ã®è‰²
+        DirectX::XMFLOAT4 end_color = { 1, 1, 1, 1 }; // çµ‚ç‚¹ã®è‰²
+        DirectX::XMFLOAT4 color_param = { -1, 0, 0, 0 }; // x:è‰²ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°ã®å§‹ç‚¹é€Ÿåº¦, y:è‰²ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°ã®çµ‚ç‚¹é€Ÿåº¦, z:ç©ºã, w:ç©ºã
 
-        // x:ƒtƒF[ƒhƒCƒ“•b”, y:ƒtƒF[ƒhƒAƒEƒg•b”, z:ƒtƒF[ƒhƒCƒ“‚Ì‘¬“xİ’èin“_EI“_‘¬“xj, w:ƒtƒF[ƒhƒAƒEƒg‚Ì‘¬“xİ’èin“_EI“_‘¬“xj
+        // x:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ç§’æ•°, y:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆç§’æ•°, z:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã®é€Ÿåº¦è¨­å®šï¼ˆå§‹ç‚¹ãƒ»çµ‚ç‚¹é€Ÿåº¦ï¼‰, w:ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã®é€Ÿåº¦è¨­å®šï¼ˆå§‹ç‚¹ãƒ»çµ‚ç‚¹é€Ÿåº¦ï¼‰
         DirectX::XMFLOAT4 fade_param;
     };
 
-    //	ƒp[ƒeƒBƒNƒ‹ƒwƒbƒ_[\‘¢‘Ì
+    //	ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ãƒ˜ãƒƒãƒ€ãƒ¼æ§‹é€ ä½“
     struct particle_header
     {
-        UINT	alive;			//	¶‘¶ƒtƒ‰ƒO
-        UINT	particle_index;	//	ƒp[ƒeƒBƒNƒ‹”Ô†
-        float	depth;			//	[“x
+        UINT	alive;			//	ç”Ÿå­˜ãƒ•ãƒ©ã‚°
+        UINT	particle_index;	//	ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç•ªå·
+        float	depth;			//	æ·±åº¦
         UINT	dummy;
     };
 
-    //	ƒp[ƒeƒBƒNƒ‹ƒwƒbƒ_[ƒoƒbƒtƒ@
+    //	ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ãƒ˜ãƒƒãƒ€ãƒ¼ãƒãƒƒãƒ•ã‚¡
     Microsoft::WRL::ComPtr<ID3D11Buffer> particle_header_buffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particle_header_shader_resource_view;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particle_header_unordered_access_view;
 
-    // ”Ä—pî•ñ’è‹`
+    // æ±ç”¨æƒ…å ±å®šç¾©
     struct common_constants
     {
-        float elapsed_time;                     // Œo‰ßŠÔ
-        DirectX::XMUINT2 texture_split_count;   // ƒeƒNƒXƒ`ƒƒ‚Ì•ªŠ„”
-        UINT system_num_particles;              // ƒp[ƒeƒBƒNƒ‹‘”
-        UINT total_emit_count;		            //	Œ»İ‚ÌƒtƒŒ[ƒ€‚Å‚Ìƒp[ƒeƒBƒNƒ‹‘¶¬”
+        float elapsed_time;                     // çµŒéæ™‚é–“
+        DirectX::XMUINT2 texture_split_count;   // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®åˆ†å‰²æ•°
+        UINT system_num_particles;              // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç·æ•°
+        UINT total_emit_count;		            //	ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç·ç”Ÿæˆæ•°
 
-        DirectX::XMFLOAT3 parent_delta;      // e‚ÌˆÊ’u
+        DirectX::XMFLOAT3 parent_delta;      // è¦ªã®ä½ç½®
 
-        DirectX::XMFLOAT4X4 parent_world; // e‚Ìƒ[ƒ‹ƒhs—ñ
-        UINT local_space; // 1 = ‘Š‘ÎˆÊ’u‚Å“®‚©‚µ‚ÄA•`‚­‚Æ‚«‚É parent_world 
+        DirectX::XMFLOAT4X4 parent_world; // è¦ªã®ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—
+        UINT local_space; // 1 = ç›¸å¯¾ä½ç½®ã§å‹•ã‹ã—ã¦ã€æãã¨ãã« parent_world 
 
         UINT dissolve_mode;
         float dissolve_softness;
 
-        UINT  trail_head;        // ¡‘‚¢‚Ä‚¢‚éƒXƒƒbƒg
-        UINT  trail_points;      // ‚P–{‚ ‚½‚è‚Ì“_‚Ì”
-        float trail_width;       // ‘Ñ‚Ì•
-        UINT  trail_enable;      // ‚P —š—ğ‚ğ‘‚­
-        UINT  trail_align;       // 0:ƒJƒƒ‰‚ğŒü‚­ 1:°‚ÉQ‚©‚¹‚é
+        UINT  trail_head;        // ä»Šæ›¸ã„ã¦ã„ã‚‹ã‚¹ãƒ­ãƒƒãƒˆ
+        UINT  trail_points;      // ï¼‘æœ¬ã‚ãŸã‚Šã®ç‚¹ã®æ•°
+        float trail_width;       // å¸¯ã®å¹…
+        UINT  trail_enable;      // ï¼‘ï¼ å±¥æ­´ã‚’æ›¸ã
+        UINT  trail_align;       // 0:ã‚«ãƒ¡ãƒ©ã‚’å‘ã 1:åºŠã«å¯ã‹ã›ã‚‹
 
-        DirectX::XMFLOAT4 force_vortex;   // xyz:², w:‹­‚³
-        DirectX::XMFLOAT4 force_attract;  // xyz:’†S(ƒ[ƒJƒ‹), w:‹­‚³(•‰‚Å”½”­)
-        DirectX::XMFLOAT4 force_noise;    // x:‹­‚³, y:ü”g”, z:ŠÔ, w:‹ó‚«
+        DirectX::XMFLOAT4 force_vortex;   // xyz:è»¸, w:å¼·ã•
+        DirectX::XMFLOAT4 force_attract;  // xyz:ä¸­å¿ƒ(ãƒ­ãƒ¼ã‚«ãƒ«), w:å¼·ã•(è² ã§åç™º)
+        DirectX::XMFLOAT4 force_noise;    // x:å¼·ã•, y:å‘¨æ³¢æ•°, z:æ™‚é–“, w:ç©ºã
     };
 
-    //	DispatchIndirect—p\‘¢‘Ì
-    using	dispatch_indirect = DirectX::XMUINT3;	//	UINT3‚Å\•ª
+    //	DispatchIndirectç”¨æ§‹é€ ä½“
+    using	dispatch_indirect = DirectX::XMUINT3;	//	UINT3ã§ååˆ†
 
-    //	00ƒoƒCƒg–ÚFŒ»İ‚Ìƒp[ƒeƒBƒNƒ‹‘”
-    //	04ƒoƒCƒg–ÚF1F‘O‚Ìƒp[ƒeƒBƒNƒ‹‘”
-    //	08ƒoƒCƒg–ÚFƒp[ƒeƒBƒNƒ‹”jŠü”
-    //	12ƒoƒCƒg–ÚFƒp[ƒeƒBƒNƒ‹¶¬—pDispatchIndirectî•ñ
+    //	00ãƒã‚¤ãƒˆç›®ï¼šç¾åœ¨ã®ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç·æ•°
+    //	04ãƒã‚¤ãƒˆç›®ï¼š1Få‰ã®ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç·æ•°
+    //	08ãƒã‚¤ãƒˆç›®ï¼šãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç ´æ£„æ•°
+    //	12ãƒã‚¤ãƒˆç›®ï¼šãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆç”¨DispatchIndirectæƒ…å ±
     static	constexpr	UINT	NumCurrentParticleOffset = 0;
     static	constexpr	UINT	NumPreviousParticleOffset = NumCurrentParticleOffset + sizeof(UINT);
     static	constexpr	UINT	NumDeadParticleOffset = NumPreviousParticleOffset + sizeof(UINT);
     static	constexpr	UINT	EmitDispatchIndirectOffset = NumDeadParticleOffset + sizeof(UINT);
     //static	constexpr	UINT	DrawIndirectSize = EmitDispatchIndirectOffset + sizeof(dispatch_indirect);
 
-    //	DrawInstanced—pDrawIndirect—p\‘¢‘Ì
+    //	DrawInstancedç”¨DrawIndirectç”¨æ§‹é€ ä½“
     struct draw_indirect
     {
         UINT	vertex_count_per_instance;
@@ -156,15 +156,15 @@ public:
         UINT	start_vertex_location;
         UINT	start_instance_location;
     };
-    //	24ƒoƒCƒg–ÚFƒp[ƒeƒBƒNƒ‹XV—pDispatchIndirectî•ñ
-    //	36ƒoƒCƒg–ÚFƒp[ƒeƒBƒNƒ‹¶¬‚Ég—p‚·‚éƒCƒ“ƒfƒbƒNƒX(Append/Consume‚Ì‘ã‚í‚è)
-    //	40ƒoƒCƒg–ÚFDrawIndirectî•ñ
+    //	24ãƒã‚¤ãƒˆç›®ï¼šãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æ›´æ–°ç”¨DispatchIndirectæƒ…å ±
+    //	36ãƒã‚¤ãƒˆç›®ï¼šãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆæ™‚ã«ä½¿ç”¨ã™ã‚‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹(Append/Consumeã®ä»£ã‚ã‚Š)
+    //	40ãƒã‚¤ãƒˆç›®ï¼šDrawIndirectæƒ…å ±
     static	constexpr	UINT	UpdateDispatchIndirectOffset = EmitDispatchIndirectOffset + sizeof(dispatch_indirect);
     static	constexpr	UINT	NumEmitParticleIndexOffset = UpdateDispatchIndirectOffset + sizeof(dispatch_indirect);
     static	constexpr	UINT	DrawIndirectOffset = NumEmitParticleIndexOffset + sizeof(UINT);
     static	constexpr	UINT	DrawIndirectSize = DrawIndirectOffset + sizeof(draw_indirect);
 
-    //	ƒoƒCƒgƒjƒbƒNƒ\[ƒgî•ñ’è‹`
+    //	ãƒã‚¤ãƒˆãƒ‹ãƒƒã‚¯ã‚½ãƒ¼ãƒˆæƒ…å ±å®šç¾©
     struct bitonic_sort_constants
     {
         UINT	increment;
@@ -180,7 +180,7 @@ public:
     static Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_b2_shader;
     static Microsoft::WRL::ComPtr<ID3D11ComputeShader> sort_c2_shader;
 
-    //	DrawIndirect‚ğ—p‚¢‚é‚½‚ßARWStrcturedBuffer‚ğ—p‚¢‚é•¨‚É•ÏX
+    //	DrawIndirectã‚’ç”¨ã„ã‚‹ãŸã‚ã€RWStrcturedBufferã‚’ç”¨ã„ã‚‹ç‰©ã«å¤‰æ›´
     Microsoft::WRL::ComPtr<ID3D11Buffer> indirect_data_buffer;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> indirect_data_unordered_access_view;
 
@@ -200,7 +200,7 @@ public:
 
     void clear(ID3D11DeviceContext* immediate_context);
 
-    // ƒQƒbƒ^[ƒZƒbƒ^[
+    // ã‚²ãƒƒã‚¿ãƒ¼ã‚»ãƒƒã‚¿ãƒ¼
     void set_texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, DirectX::XMUINT2 split_count = { 1, 1 })
     {
         shader_resource_view = srv;
@@ -219,12 +219,22 @@ public:
         dissolve_softness = value;
     }
 
-    void set_trail(bool enable, float width, float interval, int align)
+    void set_trail(bool enable, float width, float interval, int align, int points)
     {
         trail_enable = enable;
         trail_width = width;
-        trail_interval = (std::max)(interval, 0.0001f); // 0‚¾‚Æupdate()‚Ìwhile‚ª~‚Ü‚ç‚È‚¢
+        trail_interval = (std::max)(interval, 0.0001f);
         trail_align = static_cast<UINT>(align);
+
+        // ç‚¹ã®æ•°ï¼ˆ2ã€œæœ€å¤§ï¼‰
+        UINT count = static_cast<UINT>((std::clamp)(points, 2, static_cast<int>(MaxTrailPoints)));
+        if (count != trail_point_count)
+        {
+            trail_point_count = count;
+            trail_head = 0;
+            // ä¸€åº¦ã§ã‚‚å‹•ã„ãŸå¾Œãªã‚‰ã€ç”Ÿãã¦ã„ã‚‹ç²’ã®å±¥æ­´ãŒãšã‚Œã‚‹ã®ã§å…¨éƒ¨æ¶ˆã™
+            if (one_shot_initialize) trail_points_dirty = true;
+        }
     }
 
     void set_forces(const DirectX::XMFLOAT4& vortex,
@@ -246,20 +256,20 @@ private:
     std::vector<emit_particle_data> emit_particles;
     Microsoft::WRL::ComPtr<ID3D11Buffer> common_constant_buffer;
 
-    // ƒp[ƒeƒBƒNƒ‹ƒoƒbƒtƒ@
+    // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ãƒãƒƒãƒ•ã‚¡
     Microsoft::WRL::ComPtr<ID3D11Buffer> particle_data_buffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particle_data_shader_resource_view;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particle_data_unordered_access_view;
 
-    // –¢g—pƒp[ƒeƒBƒNƒ‹”Ô†‚ğŠi”[‚çAppend/Cosumeƒoƒbƒtƒ@
+    // æœªä½¿ç”¨ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç•ªå·ã‚’æ ¼ç´æ°ã‚‰Append/Cosumeãƒãƒƒãƒ•ã‚¡
     Microsoft::WRL::ComPtr<ID3D11Buffer> particle_append_consume_buffer;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particle_append_consume_unordered_access_view;
 
-    // ƒp[ƒeƒBƒNƒ‹¶¬î•ñ‚ğŠi”[‚µ‚½
+    // ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ç”Ÿæˆæƒ…å ±ã‚’æ ¼ç´ã—ãŸ
     Microsoft::WRL::ComPtr<ID3D11Buffer> particle_emit_buffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particle_emit_shader_resource_view;
 
-    // ŠeíƒVƒF[ƒ_[
+    // å„ç¨®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
     static Microsoft::WRL::ComPtr<ID3D11ComputeShader> init_shader;
     static Microsoft::WRL::ComPtr<ID3D11ComputeShader> emit_shader;
     static Microsoft::WRL::ComPtr<ID3D11ComputeShader> update_shader;
@@ -268,30 +278,32 @@ private:
     static Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometry_shader;
     static Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader;
 
-    // eqŠÖŒW
+    // è¦ªå­é–¢ä¿‚
     DirectX::XMFLOAT4X4 parent_world = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
     bool local_space = false;
 
-    // ƒfƒBƒ]ƒ‹ƒu
+    // ãƒ‡ã‚£ã‚¾ãƒ«ãƒ–
     int dissolve_mode = 0;
     float dissolve_softness = 0.05f;
 
-    // ƒgƒŒƒCƒ‹
-    static constexpr UINT TrailPoints = 24;
+    // ãƒˆãƒ¬ã‚¤ãƒ«
+    static constexpr UINT MaxTrailPoints = 64; // ãƒãƒƒãƒ•ã‚¡ã®å¤§ãã•
+    UINT trail_point_count = 24; // å®Ÿéš›ã«ä½¿ã†ç‚¹ã®æ•°
+    bool trail_points_dirty = false; // ç‚¹ã®æ•°ãŒå¤‰ã‚ã£ãŸ->æ¬¡ã®updateã§å…¨éƒ¨æ¶ˆã™
     Microsoft::WRL::ComPtr<ID3D11Buffer> trail_history_buffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> trail_history_srv;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> trail_history_uav;
     
-    UINT  trail_head = 0;        // ¡‘‚¢‚Ä‚¢‚éƒXƒƒbƒg
+    UINT  trail_head = 0;        // ä»Šæ›¸ã„ã¦ã„ã‚‹ã‚¹ãƒ­ãƒƒãƒˆ
     float trail_timer = 0.0f;
-    float trail_interval = 0.02f; // ‰½•b‚²‚Æ‚É“_‚ğŒÅ’è‚·‚é‚©
+    float trail_interval = 0.02f; // ä½•ç§’ã”ã¨ã«ç‚¹ã‚’å›ºå®šã™ã‚‹ã‹
     float trail_width = 0.3f;
     bool  trail_enable = false;
     UINT trail_align = 0;
 
-    DirectX::XMFLOAT4 force_vortex = {0, 1, 0, 0};   // xyz:², w:‹­‚³
-    DirectX::XMFLOAT4 force_attract = {0, 0, 0, 0};  // xyz:’†S(ƒ[ƒJƒ‹), w:‹­‚³(•‰‚Å”½”­)
-    DirectX::XMFLOAT4 force_noise = {0, 1, 0, 0};    // x:‹­‚³, y:ü”g”, z:ŠÔ, w:‹ó‚«
+    DirectX::XMFLOAT4 force_vortex = {0, 1, 0, 0};   // xyz:è»¸, w:å¼·ã•
+    DirectX::XMFLOAT4 force_attract = {0, 0, 0, 0};  // xyz:ä¸­å¿ƒ(ãƒ­ãƒ¼ã‚«ãƒ«), w:å¼·ã•(è² ã§åç™º)
+    DirectX::XMFLOAT4 force_noise = {0, 1, 0, 0};    // x:å¼·ã•, y:å‘¨æ³¢æ•°, z:æ™‚é–“, w:ç©ºã
     float noise_time = 0.0f;
 
     static Microsoft::WRL::ComPtr<ID3D11VertexShader> trail_vertex_shader;

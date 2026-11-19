@@ -126,7 +126,7 @@ compute_particle_system::compute_particle_system(ID3D11Device* device, UINT part
 	{
 		D3D11_BUFFER_DESC desc = {};
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-		desc.ByteWidth = sizeof(DirectX::XMFLOAT4) * num_particles * TrailPoints; // パーティクルの数×点の数
+		desc.ByteWidth = sizeof(DirectX::XMFLOAT4) * num_particles * MaxTrailPoints; // パーティクルの数×点の数
 		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 		desc.StructureByteStride = sizeof(DirectX::XMFLOAT4);
 		desc.Usage = D3D11_USAGE_DEFAULT;
@@ -222,12 +222,19 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		immediate_context->CSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
 		immediate_context->CSSetConstantBuffers(11, 1, bitonic_sort_constant_buffer.GetAddressOf());
 
+		// 点の数が変わったら、生きている粒を全部消す（履歴の並びがずれるため）
+		if (trail_points_dirty)
+		{
+			clear(immediate_context);
+			trail_points_dirty = false;
+		}
+
 		// トレイルのヘッドを一定間隔で進める
 		trail_timer += elapsed_time;
 		while (trail_timer >= trail_interval)
 		{
 			trail_timer -= trail_interval;
-			trail_head = (trail_head + 1) % TrailPoints;
+			trail_head = (trail_head + 1) % MaxTrailPoints;
 		}
 		noise_time += elapsed_time;
 
@@ -243,8 +250,9 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		constant.dissolve_mode = dissolve_mode;
 		constant.dissolve_softness = dissolve_softness;
 
+		trail_head = (trail_head + 1) % trail_point_count;
 		constant.trail_head = trail_head;
-		constant.trail_points = TrailPoints;
+		constant.trail_points = trail_point_count;
 		constant.trail_width = trail_width;
 		constant.trail_enable = trail_enable ? 1 : 0;
 		constant.trail_align = trail_align;
@@ -444,7 +452,7 @@ void compute_particle_system::render_trail(ID3D11DeviceContext* immediate_contex
 	immediate_context->PSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
 
 	// 頂点数 = 点の数×2(左右)、インスタンス数 = 粒の最大数
-	immediate_context->DrawInstanced(TrailPoints * 2, num_particles, 0, 0);
+	immediate_context->DrawInstanced(trail_point_count * 2, num_particles, 0, 0);
 
 	// 後片付け
 	ID3D11ShaderResourceView* null_srvs[] = { nullptr, nullptr, nullptr };

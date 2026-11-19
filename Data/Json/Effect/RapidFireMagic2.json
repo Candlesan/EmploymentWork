@@ -224,9 +224,10 @@
             "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
             "trailAlign": 0,
             "trailEnable": true,
-            "trailInterval": 0.02500000037252903,
+            "trailInterval": 1.0,
             "trailLength": 0.30000001192092896,
-            "trailWidth": 0.7400000095367432,
+            "trailPoints": 19,
+            "trailWidth": 1.0,
             "type": 0,
             "uvScrollSpeed": [
                 0.0,

@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <vector>
 #include <DirectXMath.h>
 #include "json.hpp"
 
-// ƒm[ƒh‚Ìí—Ş
+// ãƒãƒ¼ãƒ‰ã®ç¨®é¡
 enum class EffectNodeType
 {
 	Particle,
@@ -13,198 +13,199 @@ enum class EffectNodeType
 	Light,
 };
 
-// ƒuƒŒƒ“ƒhƒ‚[ƒh‚Ì’è‹`
+// ãƒ–ãƒ¬ãƒ³ãƒ‰ãƒ¢ãƒ¼ãƒ‰ã®å®šç¾©
 enum class BlendMode
 {
-	Alpha,    // ’Êí”¼“§–¾ (Transparency)
-	Add,      // ‰ÁZ‡¬ (Additive)
+	Alpha,    // é€šå¸¸åŠé€æ˜ (Transparency)
+	Add,      // åŠ ç®—åˆæˆ (Additive)
 };
 
-// •`‰æ•û®
+// æç”»æ–¹å¼
 enum class RenderType
 {
-	Particle = 0,	// 2Dƒrƒ‹ƒ{[ƒh
-	Mesh = 1,		// 3DƒƒbƒVƒ…VFX
-	Trail = 2,		// ‹OÕ
-	Ring = 4,		// ƒŠƒ“ƒO
-	Light = 5,		// ƒ‰ƒCƒg
-	None = 3,		// –³‚µ
+	Particle = 0,	// 2Dãƒ“ãƒ«ãƒœãƒ¼ãƒ‰
+	Mesh = 1,		// 3Dãƒ¡ãƒƒã‚·ãƒ¥VFX
+	Trail = 2,		// è»Œè·¡
+	Ring = 4,		// ãƒªãƒ³ã‚°
+	Light = 5,		// ãƒ©ã‚¤ãƒˆ
+	None = 3,		// ç„¡ã—
 };
 
-// Lerp‚Ì‘¬“x
+// Lerpã®é€Ÿåº¦
 enum class SpeedType
 {
-	Slow3 = 0,	// ’á‘¬3
-	Slow2,		// ’á‘¬2
-	Slow1,		// ’á‘¬1
-	Linear,		// “™‘¬
-	Fast1,		// ‚‘¬1
-	Fast2,		// ‚‘¬2
-	Fast3,		// ‚‘¬3
+	Slow3 = 0,	// ä½é€Ÿ3
+	Slow2,		// ä½é€Ÿ2
+	Slow1,		// ä½é€Ÿ1
+	Linear,		// ç­‰é€Ÿ
+	Fast1,		// é«˜é€Ÿ1
+	Fast2,		// é«˜é€Ÿ2
+	Fast3,		// é«˜é€Ÿ3
 };
 
-// Šg‘åk¬‚Ìƒ‚[ƒh
+// æ‹¡å¤§ç¸®å°ã®ãƒ¢ãƒ¼ãƒ‰
 enum class ScaleMode
 {
-	Fixed,			// ŒÅ’è
-	UniformEasing,	// ’PˆêƒC[ƒWƒ“ƒO
+	Fixed,			// å›ºå®š
+	UniformEasing,	// å˜ä¸€ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°
 };
 
-// F‚Ìƒ‚[ƒh
+// è‰²ã®ãƒ¢ãƒ¼ãƒ‰
 enum class ColorMode
 {
-	Fixed = 0,	// ŒÅ’èF
-	Random,		// ƒ‰ƒ“ƒ_ƒ€(Å¬`Å‘å‚ÌŠÔ‚Å¶¬‚ÉŒˆ’è)
-	Easing		// ƒC[ƒWƒ“ƒO(n“_F‚©‚çI“_F‚Öõ–½‚Å•Ï‰»)
+	Fixed = 0,	// å›ºå®šè‰²
+	Random,		// ãƒ©ãƒ³ãƒ€ãƒ (æœ€å°ï½æœ€å¤§ã®é–“ã§ç”Ÿæˆæ™‚ã«æ±ºå®š)
+	Easing		// ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°(å§‹ç‚¹è‰²ã‹ã‚‰çµ‚ç‚¹è‰²ã¸å¯¿å‘½ã§å¤‰åŒ–)
 };
 
-// ƒm[ƒhİ’è
+// ãƒãƒ¼ãƒ‰è¨­å®š
 struct NodeConfig 
 {
-	int id = 0;															// ƒm[ƒh‚ğ‹æ•Ê‚·‚é”Ô†
-	int parentId = -1;													// eƒm[ƒh‚Ìid(-1 = ƒGƒtƒFƒNƒg’¼‰º)
+	int id = 0;															// ãƒãƒ¼ãƒ‰ã‚’åŒºåˆ¥ã™ã‚‹ç•ªå·
+	int parentId = -1;													// è¦ªãƒãƒ¼ãƒ‰ã®id(-1 = ã‚¨ãƒ•ã‚§ã‚¯ãƒˆç›´ä¸‹)
 
-	std::string name = "New Node";										// ƒm[ƒh‚Ì•\¦–¼
-	RenderType type = RenderType::Particle;								// ƒm[ƒh‚Ìí—Ş
-	bool visible = true;												// ƒGƒfƒBƒ^[‚Å‚Ì•\¦/”ñ•\¦ƒtƒ‰ƒO
+	std::string name = "New Node";										// ãƒãƒ¼ãƒ‰ã®è¡¨ç¤ºå
+	RenderType type = RenderType::Particle;								// ãƒãƒ¼ãƒ‰ã®ç¨®é¡
+	bool visible = true;												// ã‚¨ãƒ‡ã‚£ã‚¿ãƒ¼ã§ã®è¡¨ç¤º/éè¡¨ç¤ºãƒ•ãƒ©ã‚°
 
-	// --- ‹¤’Êƒpƒ‰ƒ[ƒ^iŠÔE¶¬EˆÚ“®ŒvZj---
-	int emitCount = 1;													// ƒp[ƒeƒBƒNƒ‹‚Ì¶¬”
-	int maxParticle = 128;												// “¯¶¬”
-	float lifeTime = 1.0f;												// Á–Å‚Ü‚Å‚Ìõ–½
-	float lifeTimeRandom = 0.0f;										// Á–Å‚Ü‚Å‚Ìõ–½‚ÌU‚ê•
-	float delayTime = 0.0f;												// ƒp[ƒeƒBƒNƒ‹‚ğ¶¬‚·‚é‚Ü‚Å‚ÌŠÔ
-	float delayTimeRandom = 0.0f;										// ƒp[ƒeƒBƒNƒ‹‚ğ¶¬‚·‚é‚Ü‚Å‚ÌŠÔ‚ÌU‚ê•
-	float duration = 1.0f;												// ƒGƒtƒFƒNƒg‘S‘Ì‚Ì¶‘¶ŠÔ
-	float spawnInterval = 1.0f;											// Ÿ‚Ìƒp[ƒeƒBƒNƒ‹‚ğo‚·‚Ü‚Å‚ÌŠÔŠu(•b)
-	float spawnIntervalRandom = 0.0f;									// Ÿ‚Ìƒp[ƒeƒBƒNƒ‹‚ğo‚·‚Ü‚Å‚ÌŠÔŠu(•b)‚ÌU‚ê•
+	// --- å…±é€šãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ï¼ˆæ™‚é–“ãƒ»ç”Ÿæˆãƒ»ç§»å‹•è¨ˆç®—ï¼‰---
+	int emitCount = 1;													// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã®ç”Ÿæˆæ•°
+	int maxParticle = 128;												// åŒæ™‚ç”Ÿæˆæ•°
+	float lifeTime = 1.0f;												// æ¶ˆæ»…ã¾ã§ã®å¯¿å‘½
+	float lifeTimeRandom = 0.0f;										// æ¶ˆæ»…ã¾ã§ã®å¯¿å‘½ã®æŒ¯ã‚Œå¹…
+	float delayTime = 0.0f;												// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã‚’ç”Ÿæˆã™ã‚‹ã¾ã§ã®æ™‚é–“
+	float delayTimeRandom = 0.0f;										// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã‚’ç”Ÿæˆã™ã‚‹ã¾ã§ã®æ™‚é–“ã®æŒ¯ã‚Œå¹…
+	float duration = 1.0f;												// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆå…¨ä½“ã®ç”Ÿå­˜æ™‚é–“
+	float spawnInterval = 1.0f;											// æ¬¡ã®ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã‚’å‡ºã™ã¾ã§ã®é–“éš”(ç§’)
+	float spawnIntervalRandom = 0.0f;									// æ¬¡ã®ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ã‚’å‡ºã™ã¾ã§ã®é–“éš”(ç§’)ã®æŒ¯ã‚Œå¹…
 	int blendMode = 0;													// 0: Alpha, 1: Add
-	bool isLoop = true;													// ƒ‹[ƒv‚·‚é‚©
+	bool isLoop = true;													// ãƒ«ãƒ¼ãƒ—ã™ã‚‹ã‹
 
-	// --- ƒtƒF[ƒhƒCƒ“ ---
-	bool IsFadeIn = false;												// ƒtƒF[ƒhƒCƒ“‚·‚é‚©
-	float fadeInTime = 0.0f;											// ƒtƒF[ƒhƒCƒ“‚ªI‚í‚éŠÔ
-	int fadeInStartSpeed = static_cast<int>(SpeedType::Linear);			// ¶¬‚³‚ê‚Ä‚©‚ç‚Ì‘¬“x
-	int fadeInEndSpeed = static_cast<int>(SpeedType::Linear);			// ¶‘¶ŠÔ‚ªI‚í‚é‚É‚Â‚ê‚Ä‚Ì‘¬“x
+	// --- ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ ---
+	bool IsFadeIn = false;												// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã™ã‚‹ã‹
+	float fadeInTime = 0.0f;											// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ãŒçµ‚ã‚ã‚‹æ™‚é–“
+	int fadeInStartSpeed = static_cast<int>(SpeedType::Linear);			// ç”Ÿæˆã•ã‚Œã¦ã‹ã‚‰ã®é€Ÿåº¦
+	int fadeInEndSpeed = static_cast<int>(SpeedType::Linear);			// ç”Ÿå­˜æ™‚é–“ãŒçµ‚ã‚ã‚‹ã«ã¤ã‚Œã¦ã®é€Ÿåº¦
 
-	// --- ƒtƒF[ƒhƒAƒEƒg ---
-	bool IsFadeOut = false;												// ƒtƒF[ƒhƒCƒ“‚·‚é‚©
-	float fadeOutTime = 0.0f;											// ƒtƒF[ƒhƒCƒ“‚ªI‚í‚éŠÔ
-	int fadeOutStartSpeed = static_cast<int>(SpeedType::Linear);		// ¶¬‚³‚ê‚Ä‚©‚ç‚Ì‘¬“x
-	int fadeOutEndSpeed = static_cast<int>(SpeedType::Linear);			// ¶‘¶ŠÔ‚ªI‚í‚é‚É‚Â‚ê‚Ä‚Ì‘¬“x
+	// --- ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ ---
+	bool IsFadeOut = false;												// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã™ã‚‹ã‹
+	float fadeOutTime = 0.0f;											// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ãŒçµ‚ã‚ã‚‹æ™‚é–“
+	int fadeOutStartSpeed = static_cast<int>(SpeedType::Linear);		// ç”Ÿæˆã•ã‚Œã¦ã‹ã‚‰ã®é€Ÿåº¦
+	int fadeOutEndSpeed = static_cast<int>(SpeedType::Linear);			// ç”Ÿå­˜æ™‚é–“ãŒçµ‚ã‚ã‚‹ã«ã¤ã‚Œã¦ã®é€Ÿåº¦
 
-	DirectX::XMFLOAT2 uvScrollSpeed = { 0.0f, 0.0f };					// ƒeƒNƒXƒ`ƒƒ‚ÌUVƒXƒNƒ[ƒ‹
-	DirectX::XMFLOAT2 noiseUvOffset = { 0.0f, 0.0f };					// ƒmƒCƒYƒeƒNƒXƒ`ƒƒ‚ÌUVƒXƒNƒ[ƒ‹
+	DirectX::XMFLOAT2 uvScrollSpeed = { 0.0f, 0.0f };					// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®UVã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
+	DirectX::XMFLOAT2 noiseUvOffset = { 0.0f, 0.0f };					// ãƒã‚¤ã‚ºãƒ†ã‚¯ã‚¹ãƒãƒ£ã®UVã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 
-	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€
-	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };					// ˆÊ’u
-	DirectX::XMFLOAT3 positionRange = { 0.0f, 0.0f, 0.0f };				// ”­¶ˆÊ’u‚Ìƒoƒ‰‚Â‚«
-	DirectX::XMFLOAT3 positionVelocity = { 0.0f, 0.0f, 0.0f };			// ‘¬“x
-	DirectX::XMFLOAT3 positionVelocityRange = { 0.0f, 0.0f, 0.0f };		// ”ò‚ÑU‚é•ûŒü‚Ìƒoƒ‰‚Â‚«
-	DirectX::XMFLOAT3 positionAcceleration = { 0.0f, 0.0f, 0.0f };		// ˆÊ’u‚Ì‰Á‘¬“x
-	DirectX::XMFLOAT3 positionAccelerationRange = { 0.0f, 0.0f, 0.0f };	// ˆÊ’u‚Ì‰Á‘¬“x‚Ì‚Î‚ç‚Â‚«
+	// ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ 
+	DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };					// ä½ç½®
+	DirectX::XMFLOAT3 positionRange = { 0.0f, 0.0f, 0.0f };				// ç™ºç”Ÿä½ç½®ã®ãƒãƒ©ã¤ã
+	DirectX::XMFLOAT3 positionVelocity = { 0.0f, 0.0f, 0.0f };			// é€Ÿåº¦
+	DirectX::XMFLOAT3 positionVelocityRange = { 0.0f, 0.0f, 0.0f };		// é£›ã³æ•£ã‚‹æ–¹å‘ã®ãƒãƒ©ã¤ã
+	DirectX::XMFLOAT3 positionAcceleration = { 0.0f, 0.0f, 0.0f };		// ä½ç½®ã®åŠ é€Ÿåº¦
+	DirectX::XMFLOAT3 positionAccelerationRange = { 0.0f, 0.0f, 0.0f };	// ä½ç½®ã®åŠ é€Ÿåº¦ã®ã°ã‚‰ã¤ã
 
-	DirectX::XMFLOAT3 rotation = { 0.0f, 0.0f, 0.0f };					// ‰ñ“]
-	DirectX::XMFLOAT3 rotationRange = { 0.0f, 0.0f, 0.0f };				// ‰Šú‰ñ“]‚Ìƒoƒ‰‚Â‚«
-	DirectX::XMFLOAT3 rotationVelocity = { 0.0f, 0.0f, 0.0f };			// Šp‘¬“xi‰ñ“]ƒXƒs[ƒhj
-	DirectX::XMFLOAT3 rotationVelocityRange = { 0.0f, 0.0f, 0.0f };		// Šp‘¬“x‚Ì‚Î‚ç‚Â‚«
-	DirectX::XMFLOAT3 rotationAcceleration = { 0.0f, 0.0f, 0.0f };		// ‰ñ“]‚Ì‰Á‘¬“x
-	DirectX::XMFLOAT3 rotationAccelerationRange = { 0.0f, 0.0f, 0.0f }; // ‰ñ“]‚Ì‰Á‘¬“x‚Ìƒoƒ‰‚Â‚«
+	DirectX::XMFLOAT3 rotation = { 0.0f, 0.0f, 0.0f };					// å›è»¢
+	DirectX::XMFLOAT3 rotationRange = { 0.0f, 0.0f, 0.0f };				// åˆæœŸå›è»¢ã®ãƒãƒ©ã¤ã
+	DirectX::XMFLOAT3 rotationVelocity = { 0.0f, 0.0f, 0.0f };			// è§’é€Ÿåº¦ï¼ˆå›è»¢ã‚¹ãƒ”ãƒ¼ãƒ‰ï¼‰
+	DirectX::XMFLOAT3 rotationVelocityRange = { 0.0f, 0.0f, 0.0f };		// è§’é€Ÿåº¦ã®ã°ã‚‰ã¤ã
+	DirectX::XMFLOAT3 rotationAcceleration = { 0.0f, 0.0f, 0.0f };		// å›è»¢ã®åŠ é€Ÿåº¦
+	DirectX::XMFLOAT3 rotationAccelerationRange = { 0.0f, 0.0f, 0.0f }; // å›è»¢ã®åŠ é€Ÿåº¦ã®ãƒãƒ©ã¤ã
 
-	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };						// ƒXƒP[ƒ‹
-	DirectX::XMFLOAT3 renderScale = { 1.0f, 1.0f, 1.0f };				// ƒXƒP[ƒ‹(•`‰æ)
-	DirectX::XMFLOAT3 scaleRange = { 0.0f, 0.0f, 0.0f };				// ‘å‚«‚³‚Ìƒoƒ‰‚Â‚«
-	DirectX::XMFLOAT3 scaleVelocity = { 0.0f, 0.0f, 0.0f };				// Šg‘å‘¬“x
-	DirectX::XMFLOAT3 scaleVelocityRange = { 0.0f, 0.0f, 0.0f };		// Šg‘å‘¬“x‚Ì‚Î‚ç‚Â‚«
-	DirectX::XMFLOAT3 scaleAcceleration = { 0.0f, 0.0f, 0.0f };			// Šg‘å‘¬“x‚Ì‰Á‘¬“x
-	DirectX::XMFLOAT3 scaleAccelerationRange = { 0.0f, 0.0f, 0.0f };	// Šg‘å‘¬“x‚Ì‰Á‘¬“x‚Ìƒoƒ‰‚Â‚«
+	DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };						// ã‚¹ã‚±ãƒ¼ãƒ«
+	DirectX::XMFLOAT3 renderScale = { 1.0f, 1.0f, 1.0f };				// ã‚¹ã‚±ãƒ¼ãƒ«(æç”»)
+	DirectX::XMFLOAT3 scaleRange = { 0.0f, 0.0f, 0.0f };				// å¤§ãã•ã®ãƒãƒ©ã¤ã
+	DirectX::XMFLOAT3 scaleVelocity = { 0.0f, 0.0f, 0.0f };				// æ‹¡å¤§é€Ÿåº¦
+	DirectX::XMFLOAT3 scaleVelocityRange = { 0.0f, 0.0f, 0.0f };		// æ‹¡å¤§é€Ÿåº¦ã®ã°ã‚‰ã¤ã
+	DirectX::XMFLOAT3 scaleAcceleration = { 0.0f, 0.0f, 0.0f };			// æ‹¡å¤§é€Ÿåº¦ã®åŠ é€Ÿåº¦
+	DirectX::XMFLOAT3 scaleAccelerationRange = { 0.0f, 0.0f, 0.0f };	// æ‹¡å¤§é€Ÿåº¦ã®åŠ é€Ÿåº¦ã®ãƒãƒ©ã¤ã
 
-	// ’PˆêƒC[ƒWƒ“ƒOiŠg‘åk¬j
+	// å˜ä¸€ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°ï¼ˆæ‹¡å¤§ç¸®å°ï¼‰
 	ScaleMode scaleMode = ScaleMode::Fixed;
-	float scaleUniformStart = 1.0f;										// n“_F’†S
-	float scaleUniformStartRandom = 0.0f;								// n“_FU‚ê•
+	float scaleUniformStart = 1.0f;										// å§‹ç‚¹ï¼šä¸­å¿ƒ
+	float scaleUniformStartRandom = 0.0f;								// å§‹ç‚¹ï¼šæŒ¯ã‚Œå¹…
 
-	float scaleUniformEnd = 1.0f;										// I“_F’†S
-	float scaleUniformEndRandom = 0.0f;									// I“_FU‚ê•
+	float scaleUniformEnd = 1.0f;										// çµ‚ç‚¹ï¼šä¸­å¿ƒ
+	float scaleUniformEndRandom = 0.0f;									// çµ‚ç‚¹ï¼šæŒ¯ã‚Œå¹…
 
-	int scaleUniformStartSpeed = static_cast<int>(SpeedType::Linear);	// ¶¬‚³‚ê‚Ä‚©‚ç‚Ì‘¬“x
-	int scaleUniformEndSpeed = static_cast<int>(SpeedType::Linear);		// ¶‘¶ŠÔ‚ªI‚í‚é‚É‚Â‚ê‚Ä‚Ì‘¬“x
+	int scaleUniformStartSpeed = static_cast<int>(SpeedType::Linear);	// ç”Ÿæˆã•ã‚Œã¦ã‹ã‚‰ã®é€Ÿåº¦
+	int scaleUniformEndSpeed = static_cast<int>(SpeedType::Linear);		// ç”Ÿå­˜æ™‚é–“ãŒçµ‚ã‚ã‚‹ã«ã¤ã‚Œã¦ã®é€Ÿåº¦
 
-	// --- ƒJƒ‰[ --- 
+	// --- ã‚«ãƒ©ãƒ¼ --- 
 	ColorMode colorMode = ColorMode::Fixed;
-	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };				// Šî–{F
-	DirectX::XMFLOAT4 colorMin = { 1.0f, 1.0f, 1.0f, 1.0f };			// ƒJƒ‰[‚ÌÅ¬’liƒ‰ƒ“ƒ_ƒ€—pj
-	DirectX::XMFLOAT4 colorMax = { 1.0f, 1.0f, 1.0f, 1.0f };			// ƒJƒ‰[‚ÌÅ‘å’liƒ‰ƒ“ƒ_ƒ€—pj
-	DirectX::XMFLOAT4 colorStartMin = { 1.0f, 1.0f, 1.0f, 1.0f };		// n“_‚ÌƒJƒ‰[Å¬’l
-	DirectX::XMFLOAT4 colorStartMax = { 1.0f, 1.0f, 1.0f, 1.0f };		// n“_‚ÌƒJƒ‰[Å¬’l
-	DirectX::XMFLOAT4 colorEndMin = { 1.0f, 1.0f, 1.0f, 1.0f };			// n“_‚ÌƒJƒ‰[Å¬’l
-	DirectX::XMFLOAT4 colorEndMax = { 1.0f, 1.0f, 1.0f, 1.0f };			// n“_‚ÌƒJƒ‰[Å¬’l
-	int colorStartSpeed = static_cast<int>(SpeedType::Linear);			// ¶¬‚³‚ê‚Ä‚©‚ç‚Ì‘¬“x
-	int colorEndSpeed = static_cast<int>(SpeedType::Linear);			// ¶‘¶ŠÔ‚ªI‚í‚é‚É‚Â‚ê‚Ä‚Ì‘¬“x
+	DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };				// åŸºæœ¬è‰²
+	DirectX::XMFLOAT4 colorMin = { 1.0f, 1.0f, 1.0f, 1.0f };			// ã‚«ãƒ©ãƒ¼ã®æœ€å°å€¤ï¼ˆãƒ©ãƒ³ãƒ€ãƒ ç”¨ï¼‰
+	DirectX::XMFLOAT4 colorMax = { 1.0f, 1.0f, 1.0f, 1.0f };			// ã‚«ãƒ©ãƒ¼ã®æœ€å¤§å€¤ï¼ˆãƒ©ãƒ³ãƒ€ãƒ ç”¨ï¼‰
+	DirectX::XMFLOAT4 colorStartMin = { 1.0f, 1.0f, 1.0f, 1.0f };		// å§‹ç‚¹ã®ã‚«ãƒ©ãƒ¼æœ€å°å€¤
+	DirectX::XMFLOAT4 colorStartMax = { 1.0f, 1.0f, 1.0f, 1.0f };		// å§‹ç‚¹ã®ã‚«ãƒ©ãƒ¼æœ€å°å€¤
+	DirectX::XMFLOAT4 colorEndMin = { 1.0f, 1.0f, 1.0f, 1.0f };			// å§‹ç‚¹ã®ã‚«ãƒ©ãƒ¼æœ€å°å€¤
+	DirectX::XMFLOAT4 colorEndMax = { 1.0f, 1.0f, 1.0f, 1.0f };			// å§‹ç‚¹ã®ã‚«ãƒ©ãƒ¼æœ€å°å€¤
+	int colorStartSpeed = static_cast<int>(SpeedType::Linear);			// ç”Ÿæˆã•ã‚Œã¦ã‹ã‚‰ã®é€Ÿåº¦
+	int colorEndSpeed = static_cast<int>(SpeedType::Linear);			// ç”Ÿå­˜æ™‚é–“ãŒçµ‚ã‚ã‚‹ã«ã¤ã‚Œã¦ã®é€Ÿåº¦
 
-	// ¶¬•û–@
-	int emitShape = 0;													// 0:”  1:•úË
+	// ç”Ÿæˆæ–¹æ³•
+	int emitShape = 0;													// 0:ç®± 1:æ”¾å°„
 
-	// ‹…
-	float drag = 0.0f;													// ‹ó‹C’ïR
-	float burstSpeedMin = 0.0f;											// Å’á‰‘¬“x
-	float burstSpeedMax = 1.0f;											// Å‘å‰‘¬“x
+	// çƒ
+	float drag = 0.0f;													// ç©ºæ°—æŠµæŠ—
+	float burstSpeedMin = 0.0f;											// æœ€ä½åˆé€Ÿåº¦
+	float burstSpeedMax = 1.0f;											// æœ€å¤§åˆé€Ÿåº¦
 
-	// --- •`‰æƒ^ƒCƒv‚²‚Æ‚ÌŒÅ—Lƒpƒ‰ƒ[ƒ^ ---
-	// [Particle—p]
-	std::string texturePath = "";										// g‚¤png‰æ‘œ
-	int splitCount[2] = { 1, 1 };										// ‰æ‘œ‚Ì•ªŠ„”iX, YBƒfƒtƒHƒ‹ƒg‚Í4x4j
-	int spriteType = 0;													// ƒRƒ}”Ô†
-	int billboardType = 1;												// 0:‚È‚µ 1:ƒrƒ‹ƒ{[ƒh 2:‘¬“x•ûŒü‚ÉL‚Î‚·
-	float stretchScale = 0.1f;											// ‘¬“x•ûŒü‚ÉL‚Î‚·—Ê
+	// --- æç”»ã‚¿ã‚¤ãƒ—ã”ã¨ã®å›ºæœ‰ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ ---
+	// [Particleç”¨]
+	std::string texturePath = "";										// ä½¿ã†pngç”»åƒ
+	int splitCount[2] = { 1, 1 };										// ç”»åƒã®åˆ†å‰²æ•°ï¼ˆX, Yã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯4x4ï¼‰
+	int spriteType = 0;													// ã‚³ãƒç•ªå·
+	int billboardType = 1;												// 0:ãªã— 1:ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰ 2:é€Ÿåº¦æ–¹å‘ã«ä¼¸ã°ã™
+	float stretchScale = 0.1f;											// é€Ÿåº¦æ–¹å‘ã«ä¼¸ã°ã™é‡
 
-	// [Particle—p]‹OÕ
-	bool trailEnable = false;											// ƒgƒŒƒCƒ‹‚ğg‚¤‚©
-	int trailAlign = 0;													// 0:ƒJƒƒ‰‚ğŒü‚­ 1:°‚ÉQ‚©‚¹‚é
-	float trailWidth = 0.3f;											// ƒgƒŒƒCƒ‹‚Ì•
-	float trailInterval = 0.02f;										// “_‚Ì”z’uŠÔŠu
+	// [Particleç”¨]è»Œè·¡
+	bool trailEnable = false;											// ãƒˆãƒ¬ã‚¤ãƒ«ã‚’ä½¿ã†ã‹
+	int trailAlign = 0;													// 0:ã‚«ãƒ¡ãƒ©ã‚’å‘ã 1:åºŠã«å¯ã‹ã›ã‚‹
+	int trailPoints = 24;												// è»Œè·¡ã®ç‚¹ã®æ•°ï¼ˆ2ã€œ64ï¼‰ã€‚é•·ã• â‰’ ç‚¹ã®æ•° Ã— è¨˜éŒ²é–“éš”
+	float trailWidth = 0.3f;											// ãƒˆãƒ¬ã‚¤ãƒ«ã®å¹…
+	float trailInterval = 0.02f;										// ç‚¹ã®é…ç½®é–“éš”
 
-	// [Particle—p]
-	DirectX::XMFLOAT3 vortexAxis = { 0.0f, 1.0f, 0.0f };				// ‰Q‚Ì²
-	float vortexStrength = 0.0f;										// ‰Q‚Ì‹­‚³i•‰‚Å‹t‰ñ‚èj
-	float attractStrength = 0.0f;										// ˆø—Íi•‰‚Å”½”­j
-	float noiseStrength = 0.0f;											// ƒmƒCƒY‚Ì‹­‚³
+	// [Particleç”¨]
+	DirectX::XMFLOAT3 vortexAxis = { 0.0f, 1.0f, 0.0f };				// æ¸¦ã®è»¸
+	float vortexStrength = 0.0f;										// æ¸¦ã®å¼·ã•ï¼ˆè² ã§é€†å›ã‚Šï¼‰
+	float attractStrength = 0.0f;										// å¼•åŠ›ï¼ˆè² ã§åç™ºï¼‰
+	float noiseStrength = 0.0f;											// ãƒã‚¤ã‚ºã®å¼·ã•
 	float noiseFrequency = 1.0f;
 
-	// [Mesh—p]
-	std::string meshPath = "";											// ƒ‚ƒfƒ‹ƒpƒX
-	std::string noisePath = "";											// ƒmƒCƒYƒeƒNƒXƒ`ƒƒƒpƒX
-	float distortionPower = 0.0f;										// ˜c‚İ‚Ì‹­‚³
-	int particleFollowMode = 0;											// 0:¶¬‚Ì‚İi‚»‚Ìê‚ÉoŒ»j1:í‚Ée‚É’Ç]
+	// [Meshç”¨]
+	std::string meshPath = "";											// ãƒ¢ãƒ‡ãƒ«ãƒ‘ã‚¹
+	std::string noisePath = "";											// ãƒã‚¤ã‚ºãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ‘ã‚¹
+	float distortionPower = 0.0f;										// æ­ªã¿ã®å¼·ã•
+	int particleFollowMode = 0;											// 0:ç”Ÿæˆæ™‚ã®ã¿ï¼ˆãã®å ´ã«å‡ºç¾ï¼‰1:å¸¸ã«è¦ªã«è¿½å¾“
 
-	// [Trail—p]
+	// [Trailç”¨]
 	float width = 1.0f;													
-	float widthStart = 1.0f;											// æ’[
-	float widthMiddle = 1.0f;											// ’†‰›
-	float widthEnd = 0.0f;												// ––’[
-	float trailLength = 0.3f;											// ‘Ñ‚Ì’·‚³(•b)
+	float widthStart = 1.0f;											// å…ˆç«¯
+	float widthMiddle = 1.0f;											// ä¸­å¤®
+	float widthEnd = 0.0f;												// æœ«ç«¯
+	float trailLength = 0.3f;											// å¸¯ã®é•·ã•(ç§’)
 
-	// [Ring—p]
-	int ringDivision = 32;												// •ªŠ„”(‰½ŠpŒ`‚Å‰~‚ğ‚Â‚­‚é‚©)
-	DirectX::XMFLOAT2 ringOuter = { 1.0f, 0.0f };						// ŠO—Ö (X = ”¼Œa, Y = ‚‚³)
-	DirectX::XMFLOAT2 ringInner = { 0.5f, 0.0f };						// “à—Ö (X = ”¼Œa, Y = ‚‚³)
-	float ringStartAngle = 0.0f;										// ŠJnŠp“x(“x)
-	float ringEndAngle = 360.0f;										// I—¹Šp“x(“x)B180‚Å”¼‰~
-	float ringCenterRatio = 0.5f;										// ’†S‚ÌˆÊ’ui0 = ŠO—Ö, 1 = “à—Öj
+	// [Ringç”¨]
+	int ringDivision = 32;												// åˆ†å‰²æ•°(ä½•è§’å½¢ã§å††ã‚’ã¤ãã‚‹ã‹)
+	DirectX::XMFLOAT2 ringOuter = { 1.0f, 0.0f };						// å¤–è¼ª (X = åŠå¾„, Y = é«˜ã•)
+	DirectX::XMFLOAT2 ringInner = { 0.5f, 0.0f };						// å†…è¼ª (X = åŠå¾„, Y = é«˜ã•)
+	float ringStartAngle = 0.0f;										// é–‹å§‹è§’åº¦(åº¦)
+	float ringEndAngle = 360.0f;										// çµ‚äº†è§’åº¦(åº¦)ã€‚180ã§åŠå††
+	float ringCenterRatio = 0.5f;										// ä¸­å¿ƒã®ä½ç½®ï¼ˆ0 = å¤–è¼ª, 1 = å†…è¼ªï¼‰
 	DirectX::XMFLOAT4 ringOuterColor = { 1, 1, 1, 1 };
 	DirectX::XMFLOAT4 ringCenterColor = { 1, 1, 1, 1 };
 	DirectX::XMFLOAT4 ringInnerColor = { 1, 1, 1, 1 };
 
-	// [Light—p]
-	float lightIntensity = 1.0f;										// Œõ‚Ì‹­‚³
-	float lightRange = 1.0f;											// Œõ‚Ì‰e‹¿”ÍˆÍ
+	// [Lightç”¨]
+	float lightIntensity = 1.0f;										// å…‰ã®å¼·ã•
+	float lightRange = 1.0f;											// å…‰ã®å½±éŸ¿ç¯„å›²
 
-	// ƒfƒBƒ]ƒ‹ƒu
-	int dissolveMode = 0; // 0:–³‚µ 1:ƒfƒBƒ]ƒ‹ƒu 2:ƒgƒD[ƒ“’²ƒfƒBƒ]ƒ‹ƒu
-	float dissolveSoftness = 0.05f; // —ÖŠs‚Ìò‚µ•i‚O‚Åƒp‚«‚Á‚Æ‚µ‚½Š´‚¶A‚¨‚¨‚«‚¢’öƒŠƒAƒ‹j
+	// ãƒ‡ã‚£ã‚¾ãƒ«ãƒ–
+	int dissolveMode = 0; // 0:ç„¡ã— 1:ãƒ‡ã‚£ã‚¾ãƒ«ãƒ– 2:ãƒˆã‚¥ãƒ¼ãƒ³èª¿ãƒ‡ã‚£ã‚¾ãƒ«ãƒ–
+	float dissolveSoftness = 0.05f; // è¼ªéƒ­ã®æšˆã—å¹…ï¼ˆï¼ã§ãƒ‘ãã£ã¨ã—ãŸæ„Ÿã˜ã€ãŠãŠãã„ç¨‹ãƒªã‚¢ãƒ«ï¼‰
 };
 
-// 1‚Â‚ÌVFXƒAƒZƒbƒg
+// 1ã¤ã®VFXã‚¢ã‚»ãƒƒãƒˆ
 struct EffectConfig
 {
 	std::string effectName = "NewEffect";
@@ -220,13 +221,13 @@ struct EffectConfig
 		nodes.push_back(defaultNode);
 	}
 
-	// V‚µ‚¢ƒm[ƒh—p‚ÉA‚Ü‚¾g‚í‚ê‚Ä‚¢‚È‚¢id‚ğ•Ô‚·i¡‚ ‚éÅ‘å’l‚Ì{‚Pj
+	// æ–°ã—ã„ãƒãƒ¼ãƒ‰ç”¨ã«ã€ã¾ã ä½¿ã‚ã‚Œã¦ã„ãªã„idã‚’è¿”ã™ï¼ˆä»Šã‚ã‚‹æœ€å¤§å€¤ã®ï¼‹ï¼‘ï¼‰
 	int GenerateNodeId() const;
 
-	// id‚©‚ç”z—ñ‚Ì‰½”Ô–Ú‚©‚ğ’T‚·
+	// idã‹ã‚‰é…åˆ—ã®ä½•ç•ªç›®ã‹ã‚’æ¢ã™
 	int FindNodeIndex(int id) const;
 
-	// candidateId ‚Ìƒm[ƒh‚ª ancestorId ‚Ìq‘·‚©ie‚ğ‚½‚Ç‚Á‚Ä ancestorId ‚É’…‚¢‚½‚çq‘·j
+	// candidateId ã®ãƒãƒ¼ãƒ‰ãŒ ancestorId ã®å­å­«ã‹ï¼ˆè¦ªã‚’ãŸã©ã£ã¦ ancestorId ã«ç€ã„ãŸã‚‰å­å­«ï¼‰
 	bool IsDescendant(int candidateId, int ancestorId) const;
 
 	void Save(const std::string& filepath);

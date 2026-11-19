@@ -473,7 +473,8 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
                 ImGui::Combo(u8"‘Ñ‚ÌŒü‚«##Trail", &node.trailAlign, alignItems, IM_ARRAYSIZE(alignItems));
                 ImGui::DragFloat(u8"‹OÕ‚Ì•##Trail", &node.trailWidth, 0.01f, 0.0f, 10.0f);
                 ImGui::DragFloat(u8"‹L˜^ŠÔŠu(•b)##Trail", &node.trailInterval, 0.001f, 0.001f, 0.2f, "%.3fs");
-                ImGui::TextDisabled(u8"‹OÕ‚Ì’·‚³ à %.2f •b", node.trailInterval * 24.0f);
+                ImGui::SliderInt(u8"“_‚Ì”##Trail", &node.trailPoints, 2, 64);
+                ImGui::TextDisabled(u8"‹OÕ‚Ì’·‚³ à %.2f •b", node.trailInterval* node.trailPoints);
             }
             ImGui::Separator();
 
