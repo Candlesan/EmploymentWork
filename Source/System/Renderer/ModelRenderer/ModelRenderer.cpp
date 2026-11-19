@@ -79,16 +79,20 @@ void ModelRenderer::Render(const RenderContext& rc)
 		{
 			CbLight cbLight{};
 
-			// 点光源
-			for (const PointLight& p : lightManager->GetPointLights())
+			auto& pushPoint = [&](const PointLight& p)
 			{
-				if (!p.enabled || p.range <= 0.0f) continue; // ライトが点いているまたは長さが0以下の場合は飛ばす
-				if (cbLight.pointLightCount >= LightManager::MaxPointLights) break; // 置けるライトの最大数を超えていたら
+				if (!p.enabled || p.range <= 0.0f) return; // ライトが点いているまたは長さが0以下の場合は飛ばす
+				if (cbLight.pointLightCount >= LightManager::MaxPointLights) return; // 置けるライトの最大数を超えていたら
 
 				CbPointLight& dst = cbLight.pointLights[cbLight.pointLightCount++];
 				dst.position = { p.position.x, p.position.y, p.position.z, p.range };
 				dst.color = { p.color.x * p.intensity, p.color.y * p.intensity, p.color.z * p.intensity, 0.0f };
-			}
+
+			};
+
+			// 点光源
+			for (const PointLight& p : lightManager->GetFramePointLights()) pushPoint(p);
+			for (const PointLight& p : lightManager->GetPointLights()) pushPoint(p);
 
 			// スポットライト
 			for (const SpotLight& s : lightManager->GetSpotLights())

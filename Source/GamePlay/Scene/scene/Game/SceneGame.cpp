@@ -72,8 +72,11 @@ void SceneGame::Initialize()
 
 	// ステージの常時エフェクト（StopAllの後で再生する）
 	CustomEffectManager::Instance().LoadEffectConfig("StageMana", "Data/Json/Effect/StageMana.json");
+	CustomEffectManager::Instance().LoadEffectConfig("MoonStone_Light", "Data/Json/Effect/MoonStone_Light.json");
 	CustomEffectManager::Instance().PlayEffect(
 		"StageMana", { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	CustomEffectManager::Instance().PlayEffect(
+		"MoonStone_Light", { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 
 	// プレイヤー初期化
 	Player& player = Player::Instance();
@@ -93,11 +96,19 @@ void SceneGame::Initialize()
 	DirectionalLight light;
 	// ここに ImGui で決めた数値をそのまま入れる
 	light.direction = CalcLightDirection(); // 例：斜め上から
-	light.color = { 0.25f, 0.8f, 0.9f }; // 白色
-	light.intensity = 2.0f;
+	light.color = { 0.25f, 0.8f, 0.9f }; // 青白い色
+	light.intensity = 0.4;
 
 	lightManager.SetDirectionalLight(light);
 	lightManager.Load(LightManager::LightsFilePath);
+
+	playerLight.color = { 1, 1, 1 };   // 白色
+	playerLight.intensity = 23.25f;
+	playerLight.range = 6.65;
+
+	enemyLight.color = { 1, 1, 0 }; // 黄色
+	enemyLight.intensity = 18.75;
+	enemyLight.range = 7.8;
 
 	// フレームバッファ
 	framebuffers[0] = std::make_unique<framebuffer>(device, screenWidth, screenHeight, true);
@@ -326,6 +337,19 @@ void SceneGame::Update(float elapsedTime)
 
 		// エネミー更新
 		enemy->Update(delta);
+
+		// キャラクターについてくるライト
+		lightManager.ClearFrameLights();
+		{
+			DirectX::XMFLOAT3 pos = player.GetPosition();
+			playerLight.position = { pos.x, pos.y + playerLightHeight, pos.z };
+			lightManager.AddFramePointLight(playerLight);
+		}
+		{
+			DirectX::XMFLOAT3 pos = enemy->GetPosition();
+			enemyLight.position = { pos.x, pos.y + enemyLightHeight, pos.z };
+			lightManager.AddFramePointLight(enemyLight);
+		}
 
 		// 当たり判定更新
 		collisonManager.Update(player, *enemy, *stage);
@@ -895,6 +919,21 @@ void SceneGame::DrawGUI()
 						break;
 					}
 				}
+			}
+
+			if (ImGui::CollapsingHeader(u8"キャラクターのライト"))
+			{
+				ImGui::Checkbox(u8"プレイヤー有効", &playerLight.enabled);
+				ImGui::ColorEdit3(u8"プレイヤー色", &playerLight.color.x);
+				ImGui::DragFloat(u8"プレイヤー強さ", &playerLight.intensity, 0.05f, 0.0f, 50.0f);
+				ImGui::DragFloat(u8"プレイヤー範囲", &playerLight.range, 0.05f, 0.1f, 30.0f);
+				ImGui::DragFloat(u8"プレイヤー高さ", &playerLightHeight, 0.05f, -2.0f, 5.0f);
+				ImGui::Separator();
+				ImGui::Checkbox(u8"エネミー有効", &enemyLight.enabled);
+				ImGui::ColorEdit3(u8"エネミー色", &enemyLight.color.x);
+				ImGui::DragFloat(u8"エネミー強さ", &enemyLight.intensity, 0.05f, 0.0f, 50.0f);
+				ImGui::DragFloat(u8"エネミー範囲", &enemyLight.range, 0.05f, 0.1f, 30.0f);
+				ImGui::DragFloat(u8"エネミー高さ", &enemyLightHeight, 0.05f, -2.0f, 5.0f);
 			}
 
 			if (ImGui::CollapsingHeader(u8"PBR（物理ベース）", ImGuiTreeNodeFlags_DefaultOpen))

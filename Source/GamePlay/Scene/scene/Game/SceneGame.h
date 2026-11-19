@@ -96,12 +96,17 @@ private:
 	float lightYaw = 0.0f;   // 方位角（度）  0〜360
 	float lightPitch = 40.0;  // 仰角（度）   0=地平線, 90=真上
 
+	PointLight playerLight; // 周りを照らす用の弱い照明
+	PointLight enemyLight;
+	float playerLightHeight = 2.55f; // ライトの位置（高さ）
+	float enemyLightHeight = 2.55f; 
+
 	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 
 	// PBR調整用
 	float pbrMetalness = 0.0f;
 	float pbrRoughness = 0.0f;
-	float ambientIntensity = 0.01f;
+	float ambientIntensity = 0.0f;
 
 	// シャドウマップ調整用
 	float stageShadowAttenuation = 0.0f;

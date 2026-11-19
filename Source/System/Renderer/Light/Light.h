@@ -48,6 +48,11 @@ public:
 	void Save(const std::string& path) const;
 	void Load(const std::string& path);
 
+	// 毎フレーム作り直す一時ライト(分ける理由はライトのリストに入れると保存されてその位置に置きっぱになるから)
+	void ClearFrameLights() { framePointLights.clear(); }
+	void AddFramePointLight(const PointLight& light) { framePointLights.push_back(light); }
+	const std::vector<PointLight>& GetFramePointLights() const { return framePointLights; }
+
 	// 平行光源設定
 	void SetDirectionalLight(DirectionalLight& light) { directionalLight = light; }
 
@@ -63,5 +68,6 @@ public:
 private:
 	DirectionalLight	directionalLight;
 	std::vector<PointLight> pointLights;
+	std::vector<PointLight> framePointLights;
 	std::vector<SpotLight> spotLights;
 };

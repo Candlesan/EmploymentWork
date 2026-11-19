@@ -28,7 +28,7 @@
                 0.0,
                 0.0
             ],
-            "bobHeight": 0.10000000149011612,
+            "bobHeight": 0.0,
             "bobSpeed": 0.10000000149011612,
             "collision": false,
             "path": "Data\\Model\\Stage\\Props\\MoonStorn\\Moonstone_07.gltf",
@@ -139,7 +139,7 @@
                 0.0
             ],
             "bobHeight": 0.0,
-            "bobSpeed": 1.0,
+            "bobSpeed": 0.0,
             "collision": false,
             "path": "Data\\Model\\Stage\\Props\\Moon\\SM_Moon.gltf",
             "position": [
