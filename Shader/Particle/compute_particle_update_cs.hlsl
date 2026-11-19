@@ -116,9 +116,13 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         
         // サイン波とコサイン波を異なる軸や倍率を組み合わせることで
         // 単純な往復運動ではない複雑で自然な「うねり（疑似ノイズベクトル）」を表現
-        float n = float3(sin(q.y) + cos(q.z * 1.3f),
-                         sin(q.z) + cos(q.x * 1.7f),
-                         sin(q.x) + cos(q.y * 1.1f));
+        float3 n = float3(sin(q.y) + cos(q.z * 1.3f),
+                          sin(q.z) + cos(q.x * 1.7f),
+                          sin(q.x) + cos(q.y * 1.1f));
+        if (trail_align == 1)
+        {
+            n.y = 0.0f; // 床モードは横にだけうねらせる
+        }
         data.posVelocity.xyz += n * force_noise.x * elapsed_time;
     }
     

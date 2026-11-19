@@ -24,7 +24,7 @@ cbuffer CbLight : register(b12)
     int spotLightCount;
     int2 lightpad;
     PointLightData pointLights[MAX_POINT_LIGHTS];
-    SpotLightData spotLights[MAX_POINT_LIGHTS];
+    SpotLightData spotLights[MAX_SPOT_LIGHTS];
 }
 
 // ‹——£Œ¸ŠFrange ‚Å‚¿‚å‚¤‚Ç0B2æ‚Å‹«–Ú‚ğ‚È‚ß‚ç‚©‚É‚·‚é

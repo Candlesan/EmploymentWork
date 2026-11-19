@@ -39,9 +39,9 @@ public:
 		if (system)system->set_dissolve(mode, value);
 	}
 
-	void SetTrail(bool enable, float width, float interval)
+	void SetTrail(bool enable, float width, float interval, int align)
 	{
-		if (system) system->set_trail(enable, width, interval);
+		if (system) system->set_trail(enable, width, interval, align);
 	}
 
 	void SetForces(const DirectX::XMFLOAT4& vortex,

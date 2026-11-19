@@ -375,7 +375,7 @@ void CustomEffect::Update(float elapsedTime)
 
         // 軌跡と力
         const auto& c = node.config;
-        node.particleManager->SetTrail(c.trailEnable, c.trailWidth, c.trailInterval);
+        node.particleManager->SetTrail(c.trailEnable, c.trailWidth, c.trailInterval, c.trailAlign);
 
         // 相対位置モードじゃなかったらワールド座標を渡す
         DirectX::XMFLOAT3 center = local

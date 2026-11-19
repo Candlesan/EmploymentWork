@@ -160,6 +160,7 @@ struct NodeConfig
 
 	// [Particle用]軌跡
 	bool trailEnable = false;											// トレイルを使うか
+	int trailAlign = 0;													// 0:カメラを向く 1:床に寝かせる
 	float trailWidth = 0.3f;											// トレイルの幅
 	float trailInterval = 0.02f;										// 点の配置間隔
 

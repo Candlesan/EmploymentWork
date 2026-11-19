@@ -30,7 +30,7 @@ PS_IN main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
     particle_header header = particle_header_buffer[instance_id];
     if (header.alive == 0)
     {
-        vout.position = float4(0, 0, -1, -1); // z < 0 なのでクリップされる
+        vout.position = float4(0, 0, -1, 1); // z < 0 なのでクリップされる
         return vout;
     }
     
@@ -47,11 +47,24 @@ PS_IN main(uint vertex_id : SV_VertexID, uint instance_id : SV_InstanceID)
     float3 older = LoadTrailPoint(id, min(i + 1, trail_points - 1));
     float3 tangent = newer - older; // 進む向き
     
-    // 帯の横方向 = 進む向きとカメラへの向きの外積
-    float3 cameraPos = inverseView._41_42_43;
-    float3 right = cross(tangent, cameraPos - pos);
+    // 帯の方向
+    float3 right;
+    if (trail_align == 1)
+    {
+        // 床に寝かせる：進む向き×上方向
+        // 相対位置モードでは親が傾いていてむ上に添わせる
+        float3 up = (local_space != 0) ? normalize(parent_world._21_22_23) : float3(0, 1, 0);
+        tangent -= up * dot(tangent, up); // 上下の成分を消して床と平行にする
+        right = cross(tangent, up);
+    }
+    else
+    {
+        // カメラを向く
+        float3 cameraPos = inverseView._41_42_43;
+        right = cross(tangent, cameraPos - pos);
+    }
     float len = length(right);
-    right = (len > 1e-6f) ? right / len : float3(0, 0, 0); // 長さ0の区間はつぶす
+    right = (len > 1e-6f) ? right / len : float3(0, 0, 0);
     
     // 幅：粒の大きさ×設定値×先細り
     float width = trail_width * p.renderScale.x * (1.0f - t);

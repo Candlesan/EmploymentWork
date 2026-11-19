@@ -132,7 +132,7 @@ cbuffer COMPUTE_PARTICLE_COMMON_CONSTANT_BUFFER : register(b10)
     uint trail_points;
     float trail_width;
     uint trail_enable;
-    uint trail_padding;
+    uint trail_align; // 0:カメラ 1:床
     
     float4 force_vortex;    // xyz:軸, w:強さ
     float4 force_attract;   // xyz:中心(ローカル), w:強さ(負で反発)

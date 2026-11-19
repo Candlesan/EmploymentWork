@@ -128,7 +128,7 @@ public:
         UINT  trail_points;      // １本あたりの点の数
         float trail_width;       // 帯の幅
         UINT  trail_enable;      // １＝ 履歴を書く
-        UINT  trail_padding;
+        UINT  trail_align;       // 0:カメラを向く 1:床に寝かせる
 
         DirectX::XMFLOAT4 force_vortex;   // xyz:軸, w:強さ
         DirectX::XMFLOAT4 force_attract;  // xyz:中心(ローカル), w:強さ(負で反発)
@@ -219,11 +219,12 @@ public:
         dissolve_softness = value;
     }
 
-    void set_trail(bool enable, float width, float interval)
+    void set_trail(bool enable, float width, float interval, int align)
     {
         trail_enable = enable;
         trail_width = width;
         trail_interval = (std::max)(interval, 0.0001f); // 0だとupdate()のwhileが止まらない
+        trail_align = static_cast<UINT>(align);
     }
 
     void set_forces(const DirectX::XMFLOAT4& vortex,
@@ -286,6 +287,7 @@ private:
     float trail_interval = 0.02f; // 何秒ごとに点を固定するか
     float trail_width = 0.3f;
     bool  trail_enable = false;
+    UINT trail_align = 0;
 
     DirectX::XMFLOAT4 force_vortex = {0, 1, 0, 0};   // xyz:軸, w:強さ
     DirectX::XMFLOAT4 force_attract = {0, 0, 0, 0};  // xyz:中心(ローカル), w:強さ(負で反発)

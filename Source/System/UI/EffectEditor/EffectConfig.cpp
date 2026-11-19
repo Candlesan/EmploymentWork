@@ -146,6 +146,7 @@ void EffectConfig::Save(const std::string& filePath)
         n["stretchScale"] = node.stretchScale;
 
         n["trailEnable"] = node.trailEnable;
+        n["trailAlign"] = node.trailAlign;
         n["trailWidth"] = node.trailWidth;
         n["trailInterval"] = node.trailInterval;
         n["vortexAxis"] = { node.vortexAxis.x, node.vortexAxis.y, node.vortexAxis.z };
@@ -327,6 +328,7 @@ void EffectConfig::Load(const std::string& filePath)
                 node.stretchScale = nodeJson.value("stretchScale", 0.1f);
 
                 node.trailEnable = nodeJson.value("trailEnable", false);
+                node.trailAlign = nodeJson.value("trailAlign", 0);
                 node.trailWidth = nodeJson.value("trailWidth", 0.3f);
                 node.trailInterval = nodeJson.value("trailInterval", 0.02f);
                 if (nodeJson.find("vortexAxis") != nodeJson.end()) node.vortexAxis = { nodeJson["vortexAxis"][0], nodeJson["vortexAxis"][1], nodeJson["vortexAxis"][2] };

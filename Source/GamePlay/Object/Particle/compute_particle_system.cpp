@@ -247,6 +247,7 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		constant.trail_points = TrailPoints;
 		constant.trail_width = trail_width;
 		constant.trail_enable = trail_enable ? 1 : 0;
+		constant.trail_align = trail_align;
 		constant.force_vortex = force_vortex;
 		constant.force_attract = force_attract;
 		constant.force_noise = force_noise;
