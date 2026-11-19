@@ -71,6 +71,10 @@ void Player::LoadResources()
 	player->GetNodePoses(initialNodePoses);
 
 	InitializeHeadDirection(); // 頭の向きを初期化（初期姿勢で計算する必要がある）
+
+	CustomEffectManager::Instance().LoadEffectConfig("testEffect", "Data/Json/Effect/testCharacterEffect.json");
+	followEffect  =CustomEffectManager::Instance().PlayEffect(
+	"testEffect", { position.x, position.y, position.z }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 }
 
 // ゲームが始まるたびに状態を戻す
@@ -424,6 +428,17 @@ void Player::Update(float elapsedTime)
 
 	// 武器のアタッチメント処理
 	UpdateWeaponAttachment("hand_r");
+
+	auto& effectManager = CustomEffectManager::Instance();
+	if (!effectManager.Exists(followEffect))
+	{
+		// 何かの理由で消えていたら出し直す
+		followEffect = effectManager.PlayEffect("testEffect", position, { 0, 0, 0 }, { 1, 1, 1 });
+	}
+	else
+	{
+		effectManager.SetPosition(followEffect, position);
+	}
 }
 
 // 描画処理
@@ -1548,7 +1563,7 @@ TransitionContext Player::InputTransitionContext(float elapsedTime)
 	ctx.inputDir = CalculateRelativeInputDir();
 	ctx.IsDead = IsDead();
 	ctx.currentHP = status.currentHp;
-	ctx.IsAiming = status.isIntercept || IsFacingEnemy();
+	ctx.IsAiming = lockOn.IsHardLock() || status.isIntercept || IsFacingEnemy();
 	ctx.IsFlying = flightController.IsFlying();
 
 	// 移動速度を計算する

@@ -73,8 +73,8 @@ void SceneGame::Initialize()
 	// ステージの常時エフェクト（StopAllの後で再生する）
 	CustomEffectManager::Instance().LoadEffectConfig("StageMana", "Data/Json/Effect/StageMana.json");
 	CustomEffectManager::Instance().LoadEffectConfig("MoonStone_Light", "Data/Json/Effect/MoonStone_Light.json");
-	//CustomEffectManager::Instance().PlayEffect(
-	//	"StageMana", { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
+	CustomEffectManager::Instance().PlayEffect(
+		"StageMana", { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 	CustomEffectManager::Instance().PlayEffect(
 		"MoonStone_Light", { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 

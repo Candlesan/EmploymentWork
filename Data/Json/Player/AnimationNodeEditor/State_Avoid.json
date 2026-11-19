@@ -13,6 +13,13 @@
                     "targetDir": 0,
                     "threshold": 0.10000000149011612,
                     "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 1,
+                    "threshold": 0.0,
+                    "type": 8
                 }
             ],
             "fromState": "Entry",
@@ -33,6 +40,13 @@
                     "targetDir": 0,
                     "threshold": 0.6000000238418579,
                     "type": 6
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": true,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 11
                 }
             ],
             "fromState": "Entry",
@@ -53,6 +67,13 @@
                     "targetDir": 0,
                     "threshold": 0.0,
                     "type": 10
+                },
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 1,
+                    "threshold": 0.0,
+                    "type": 8
                 }
             ],
             "fromState": "Entry",

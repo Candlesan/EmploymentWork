@@ -235,4 +235,6 @@ private:
 	bool isTyping = false;
 
 	float interceptDistanceStopSeconds = 0.348f;
+
+	EffectHandle followEffect = InvalidEffect;   // 追従エフェクトのハンドル
 };
