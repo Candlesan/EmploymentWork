@@ -15,7 +15,7 @@ void RapidMagic::Initialize()
 	auto& effectManager = CustomEffectManager::Instance();
 
 	// ˜AŽË–‚–@
-	effectManager.LoadEffectConfig("RapidMagic", "Data/Json/Effect/RapidFireMagic.json");
+	effectManager.LoadEffectConfig("RapidMagic", "Data/Json/Effect/RapidFireMagic2.json");
 	effectManager.LoadEffectConfig("RapidHit", "Data/Json/Effect/RapidHit.json");
 	effectManager.GetOrCreateResident("RapidHit");
 

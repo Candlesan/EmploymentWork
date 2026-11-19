@@ -295,6 +295,9 @@
     <Filter Include="Shader\Light">
       <UniqueIdentifier>{36aadbc1-1b94-4c2b-b835-a3cbefe7c0c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GamepPlay\Object\Magic\MagicMove\CurveMagic">
+      <UniqueIdentifier>{119704a8-ee01-42cd-bb63-ddf4a087da77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -701,6 +704,9 @@
     </ClInclude>
     <ClInclude Include="Source\GamePlay\Scene\scene\Retry\RetryMenu.h">
       <Filter>Source\GamepPlay\Scene\Scene\Retry</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\CurveMagic\CurveMove.h">
+      <Filter>Source\GamepPlay\Object\Magic\MagicMove\CurveMagic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

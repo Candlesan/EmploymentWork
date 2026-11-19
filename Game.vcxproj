@@ -168,6 +168,7 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicContext.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicInfor.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicManager.h" />
+    <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\CurveMagic\CurveMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\HommingMagic\HomingMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\StraightMagic\StraightMove.h" />
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicProjectile.h" />
