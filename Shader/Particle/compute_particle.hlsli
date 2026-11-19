@@ -127,7 +127,16 @@ cbuffer COMPUTE_PARTICLE_COMMON_CONSTANT_BUFFER : register(b10)
     uint dissolve_mode; // ディゾルブ処理をするか
     float dissolve_softness; // 輪郭の暈し幅
     
-    uint common_padding;
+    uint trail_head;
+    
+    uint trail_points;
+    float trail_width;
+    uint trail_enable;
+    uint trail_padding;
+    
+    float4 force_vortex;    // xyz:軸, w:強さ
+    float4 force_attract;   // xyz:中心(ローカル), w:強さ(負で反発)
+    float4 force_noise;     // x:強さ, y:周波数, z:時間, w:空き
 };
 
 //=========================================================================================

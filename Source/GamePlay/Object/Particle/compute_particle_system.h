@@ -5,6 +5,7 @@
 #include <directxmath.h>
 
 #include <vector>
+#include <algorithm>
 
 #include "System/Core/Misc.h"
 #include "System/Graphic/GpuResourceUtils.h"
@@ -123,7 +124,15 @@ public:
         UINT dissolve_mode;
         float dissolve_softness;
 
-        UINT padding[1];
+        UINT  trail_head;        // 今書いているスロット
+        UINT  trail_points;      // １本あたりの点の数
+        float trail_width;       // 帯の幅
+        UINT  trail_enable;      // １＝ 履歴を書く
+        UINT  trail_padding;
+
+        DirectX::XMFLOAT4 force_vortex;   // xyz:軸, w:強さ
+        DirectX::XMFLOAT4 force_attract;  // xyz:中心(ローカル), w:強さ(負で反発)
+        DirectX::XMFLOAT4 force_noise;    // x:強さ, y:周波数, z:時間, w:空き
     };
 
     //	DispatchIndirect用構造体
@@ -187,6 +196,7 @@ public:
     void emit(const emit_particle_data& data);
     void update(ID3D11DeviceContext* immdiate_context, DirectX::XMFLOAT3 parent_delta, float elapsedtime);
     void render(ID3D11DeviceContext* immdiate_context);
+    void render_trail(ID3D11DeviceContext* immediate_context);
 
     void clear(ID3D11DeviceContext* immediate_context);
 
@@ -207,6 +217,22 @@ public:
     {
         dissolve_mode = mode;
         dissolve_softness = value;
+    }
+
+    void set_trail(bool enable, float width, float interval)
+    {
+        trail_enable = enable;
+        trail_width = width;
+        trail_interval = (std::max)(interval, 0.0001f); // 0だとupdate()のwhileが止まらない
+    }
+
+    void set_forces(const DirectX::XMFLOAT4& vortex,
+        const DirectX::XMFLOAT4& attract,
+        const DirectX::XMFLOAT4& noise)
+    {
+        force_vortex = vortex;
+        force_attract = attract;
+        force_noise = noise;
     }
 
 private:
@@ -241,9 +267,31 @@ private:
     static Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometry_shader;
     static Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader;
 
+    // 親子関係
     DirectX::XMFLOAT4X4 parent_world = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
     bool local_space = false;
 
+    // ディゾルブ
     int dissolve_mode = 0;
     float dissolve_softness = 0.05f;
+
+    // トレイル
+    static constexpr UINT TrailPoints = 24;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> trail_history_buffer;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> trail_history_srv;
+    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> trail_history_uav;
+    
+    UINT  trail_head = 0;        // 今書いているスロット
+    float trail_timer = 0.0f;
+    float trail_interval = 0.02f; // 何秒ごとに点を固定するか
+    float trail_width = 0.3f;
+    bool  trail_enable = false;
+
+    DirectX::XMFLOAT4 force_vortex = {0, 1, 0, 0};   // xyz:軸, w:強さ
+    DirectX::XMFLOAT4 force_attract = {0, 0, 0, 0};  // xyz:中心(ローカル), w:強さ(負で反発)
+    DirectX::XMFLOAT4 force_noise = {0, 1, 0, 0};    // x:強さ, y:周波数, z:時間, w:空き
+    float noise_time = 0.0f;
+
+    static Microsoft::WRL::ComPtr<ID3D11VertexShader> trail_vertex_shader;
+    static Microsoft::WRL::ComPtr<ID3D11PixelShader>  trail_pixel_shader;
 };

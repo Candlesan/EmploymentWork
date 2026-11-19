@@ -39,6 +39,18 @@ public:
 		if (system)system->set_dissolve(mode, value);
 	}
 
+	void SetTrail(bool enable, float width, float interval)
+	{
+		if (system) system->set_trail(enable, width, interval);
+	}
+
+	void SetForces(const DirectX::XMFLOAT4& vortex,
+		const DirectX::XMFLOAT4& attract,
+		const DirectX::XMFLOAT4& noise)
+	{
+		if (system) system->set_forces(vortex, attract, noise);
+	}
+
 private:
 	ID3D11Device* device = nullptr; // テクスチャ再ロード用に保持
 

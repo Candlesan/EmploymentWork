@@ -373,6 +373,20 @@ void CustomEffect::Update(float elapsedTime)
         node.particleManager->SetBlendMode(node.config.blendMode);
         node.particleManager->SetDissolve(node.config.dissolveMode, node.config.dissolveSoftness);
 
+        // 軌跡と力
+        const auto& c = node.config;
+        node.particleManager->SetTrail(c.trailEnable, c.trailWidth, c.trailInterval);
+
+        // 相対位置モードじゃなかったらワールド座標を渡す
+        DirectX::XMFLOAT3 center = local
+            ? DirectX::XMFLOAT3{ 0, 0, 0 }
+        : DirectX::XMFLOAT3{ node.worldTransform._41, node.worldTransform._42, node.worldTransform._43 };
+
+        node.particleManager->SetForces(
+            { c.vortexAxis.x, c.vortexAxis.y, c.vortexAxis.z, c.vortexStrength },
+            { center.x, center.y, center.z, c.attractStrength },
+            { c.noiseStrength, c.noiseFrequency, 0.0f, 0.0f });
+
         // 相対位置モードは行列でついていくので移動差分は計算しない
         DirectX::XMFLOAT3 d = local ? DirectX::XMFLOAT3{ 0, 0, 0 } : delta;
         node.particleManager->Update(dc, d, elapsedTime);

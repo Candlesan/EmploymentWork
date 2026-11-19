@@ -145,6 +145,15 @@ void EffectConfig::Save(const std::string& filePath)
         n["billboardType"] = node.billboardType;
         n["stretchScale"] = node.stretchScale;
 
+        n["trailEnable"] = node.trailEnable;
+        n["trailWidth"] = node.trailWidth;
+        n["trailInterval"] = node.trailInterval;
+        n["vortexAxis"] = { node.vortexAxis.x, node.vortexAxis.y, node.vortexAxis.z };
+        n["vortexStrength"] = node.vortexStrength;
+        n["attractStrength"] = node.attractStrength;
+        n["noiseStrength"] = node.noiseStrength;
+        n["noiseFrequency"] = node.noiseFrequency;
+
         // [Mesh—p]
         n["meshPath"] = node.meshPath;
         n["noisePath"] = node.noisePath;
@@ -316,6 +325,15 @@ void EffectConfig::Load(const std::string& filePath)
                 else
                     node.billboardType = nodeJson.value("isBillboard", true) ? 1 : 0;
                 node.stretchScale = nodeJson.value("stretchScale", 0.1f);
+
+                node.trailEnable = nodeJson.value("trailEnable", false);
+                node.trailWidth = nodeJson.value("trailWidth", 0.3f);
+                node.trailInterval = nodeJson.value("trailInterval", 0.02f);
+                if (nodeJson.find("vortexAxis") != nodeJson.end()) node.vortexAxis = { nodeJson["vortexAxis"][0], nodeJson["vortexAxis"][1], nodeJson["vortexAxis"][2] };
+                node.vortexStrength = nodeJson.value("vortexStrength", 0.0f);
+                node.attractStrength = nodeJson.value("attractStrength", 0.0f);
+                node.noiseStrength = nodeJson.value("noiseStrength", 0.0f);
+                node.noiseFrequency = nodeJson.value("noiseFrequency", 1.0f);
 
                 // [Mesh—p]
                 node.meshPath = nodeJson.value("meshPath", "");

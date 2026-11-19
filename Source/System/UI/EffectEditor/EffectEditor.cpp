@@ -462,6 +462,23 @@ void EffectEditor::DrawNodeInspector(NodeConfig& node)
             }
             ImGui::Separator();
 
+            ImGui::Checkbox(u8"‹OÕ‚ğo‚·##Trail", &node.trailEnable);
+            if (node.trailEnable)
+            {
+                ImGui::DragFloat(u8"‹OÕ‚Ì•##Trail", &node.trailWidth, 0.01f, 0.0f, 10.0f);
+                ImGui::DragFloat(u8"‹L˜^ŠÔŠu(•b)##Trail", &node.trailInterval, 0.001f, 0.001f, 0.2f, "%.3fs");
+                ImGui::TextDisabled(u8"‹OÕ‚Ì’·‚³ à %.2f •b", node.trailInterval * 24.0f);
+            }
+            ImGui::Separator();
+
+            ImGui::Text(u8"—Í");
+            ImGui::DragFloat3(u8"‰Q‚Ì²##Force", &node.vortexAxis.x, 0.01f, -1.0f, 1.0f);
+            ImGui::DragFloat(u8"‰Q‚Ì‹­‚³##Force", &node.vortexStrength, 0.05f, -50.0f, 50.0f);
+            ImGui::DragFloat(u8"ˆø—Í(•‰‚Å”½”­)##Force", &node.attractStrength, 0.1f, -200.0f, 200.0f);
+            ImGui::DragFloat(u8"ƒmƒCƒY‚Ì‹­‚³##Force", &node.noiseStrength, 0.05f, 0.0f, 100.0f);
+            ImGui::DragFloat(u8"ƒmƒCƒY‚Ì×‚©‚³##Force", &node.noiseFrequency, 0.01f, 0.01f, 10.0f);
+            ImGui::Separator();
+
             const char* blendItems[] = { u8"’Êí”¼“§–¾ (Alpha)", u8"‰ÁZ (Additive)" };
             ImGui::Combo(u8"ƒuƒŒƒ“ƒhƒ‚[ƒh##Mesh", &node.blendMode, blendItems, IM_ARRAYSIZE(blendItems));
             ImGui::Separator();

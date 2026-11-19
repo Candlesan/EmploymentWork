@@ -8,21 +8,15 @@ RWByteAddressBuffer indirect_data_buffer : register(u2); //  ƒCƒ“ƒ_ƒCƒŒƒNƒg—pƒoƒ
 
 RWStructuredBuffer<particle_header> particle_header_buffer : register(u3); //  ƒp[ƒeƒBƒNƒ‹ƒwƒbƒ_[ŠÇ—ƒoƒbƒtƒ@
 
+RWStructuredBuffer<float4> trail_history : register(u4); //  ƒgƒŒƒCƒ‹‚ÌˆÊ’u—š—ğ
+
+
 [numthreads(1, 1, 1)]
 void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 {
     //  –¢g—pƒŠƒXƒg‚Ì––”ö‚©‚ç–¢g—pƒp[ƒeƒBƒNƒ‹‚ÌƒCƒ“ƒfƒbƒNƒX‚ğæ“¾
     uint particle_index = parcile_pool_buffer.Consume();
     uint emit_index = dispatch_thread_id.x;
-
-    ////  ƒGƒ~ƒbƒ^[‚Ì––’[‚©‚ç”Ô†æ“¾
-    //indirect_data_buffer.InterlockedAdd(IndirectArgumentsNumEmitParticleIndex, 1, particle_index);
-
-    ////  ƒp[ƒeƒBƒNƒ‹¶¬ˆ—
-    //particle_data_buffer[particle_index].parameter.x = emit_particle_butter[emit_index].parameter.x;
-    //particle_data_buffer[particle_index].parameter.y = emit_particle_butter[emit_index].parameter.y;
-    //particle_data_buffer[particle_index].parameter.z = 1.0f;
-    //particle_data_buffer[particle_index].parameter.w = 0.0f;
 
      //  ƒwƒbƒ_[‚Ì––’[‚©‚çæ“¾
     uint header_index = 0;
@@ -65,8 +59,6 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     particle_data_buffer[particle_index].scaleUniformEnd = emit_particle_butter[emit_index].scaleUniformEnd;
     particle_data_buffer[particle_index].scaleUniformEndRandom = emit_particle_butter[emit_index].scaleUniformEndRandom;
     particle_data_buffer[particle_index].scale_param = emit_particle_butter[emit_index].scale_param;
-
-    
     
     //Fƒpƒ‰ƒ[ƒ^[
     particle_data_buffer[particle_index].color = emit_particle_butter[emit_index].color;
@@ -81,4 +73,12 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     
     particle_data_buffer[particle_index].texcoord.xy = uv;
     particle_data_buffer[particle_index].texcoord.zw = float2(w, h);
+    
+    // ƒgƒŒƒCƒ‹—š—ğ‚ğ”­¶ˆÊ’u‚Å–„‚ß‚é
+    float4 spawn = float4(emit_particle_butter[emit_index].position.xyz, 1.0f);
+    for (int i = 0; i < trail_points; ++i)
+    {
+        // trail_enable‚ª0‚Ì‚à–„‚ß‚Ä‚¨‚­B‚È‚º‚È‚çA“r’†‚ÅƒGƒfƒBƒ^[‚ÅON‚É‚µ‚½‚Æ‚«‚ÉŠù‚É¶‚«‚Ä‚¢‚é‚Æ‚±‚ë‚Ö”ò‚Î‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß
+        trail_history[particle_index * trail_points + i] = spawn;
+    }
 }

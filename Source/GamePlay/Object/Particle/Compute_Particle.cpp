@@ -58,6 +58,7 @@ void Compute_Particle::Render(const RenderContext& rc)
     dc->UpdateSubresource(sceneConstantBuffer.Get(), 0, nullptr, &cbScene, 0, 0);
 
     dc->GSSetConstantBuffers(7, 1, sceneConstantBuffer.GetAddressOf());
+    dc->VSSetConstantBuffers(7, 1, sceneConstantBuffer.GetAddressOf());
 
 
     dc->OMSetDepthStencilState(
@@ -76,6 +77,7 @@ void Compute_Particle::Render(const RenderContext& rc)
     }
 
     // •`‰æ
+    system->render_trail(dc); // ‘Ñ‚ðæ‚É
     system->render(dc);
 
     dc->OMSetDepthStencilState(

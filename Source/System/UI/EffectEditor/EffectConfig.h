@@ -158,6 +158,18 @@ struct NodeConfig
 	int billboardType = 1;												// 0:なし 1:ビルボード 2:速度方向に伸ばす
 	float stretchScale = 0.1f;											// 速度方向に伸ばす量
 
+	// [Particle用]軌跡
+	bool trailEnable = false;											// トレイルを使うか
+	float trailWidth = 0.3f;											// トレイルの幅
+	float trailInterval = 0.02f;										// 点の配置間隔
+
+	// [Particle用]
+	DirectX::XMFLOAT3 vortexAxis = { 0.0f, 1.0f, 0.0f };				// 渦の軸
+	float vortexStrength = 0.0f;										// 渦の強さ（負で逆回り）
+	float attractStrength = 0.0f;										// 引力（負で反発）
+	float noiseStrength = 0.0f;											// ノイズの強さ
+	float noiseFrequency = 1.0f;
+
 	// [Mesh用]
 	std::string meshPath = "";											// モデルパス
 	std::string noisePath = "";											// ノイズテクスチャパス

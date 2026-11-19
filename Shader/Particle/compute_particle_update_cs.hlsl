@@ -4,6 +4,7 @@ RWStructuredBuffer<particle_data> particle_data_buffer : register(u0); //  ƒp[ƒ
 AppendStructuredBuffer<uint> particle_unused_buffer : register(u1); //  ƒp[ƒeƒBƒNƒ‹”Ô†ŠÇ—ƒoƒbƒtƒ@(––”ö‚Ö‚Ì’Ç‰Áê—p)
 RWByteAddressBuffer indirect_data_buffer : register(u2); //  ƒCƒ“ƒ_ƒCƒŒƒNƒg—pƒoƒbƒtƒ@
 RWStructuredBuffer<particle_header> particle_header_buffer : register(u3); //  ƒp[ƒeƒBƒNƒ‹ƒwƒbƒ_[ŠÇ—ƒoƒbƒtƒ@
+RWStructuredBuffer<float4> trail_history : register(u4); //  ƒgƒŒƒCƒ‹ˆÊ’u‚Ì—š—ğ
 
 // ‘¬“xID (0:’á‘¬3 ` 3:“™‘¬ ` 6:‚‘¬3) ‚ğ‹Èü‚ÌŒX‚«ƒEƒFƒCƒg‚É•ÏŠ·
 float SpeedToWeight(uint speed)
@@ -83,10 +84,48 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     }
 
     // --- ˆÊ’u ---
+    
+    // —Í(‰QEˆø—ÍEƒmƒCƒY)
+    {
+        float3 pos = data.position.xyz;
+        float3 toP = pos - force_attract.xyz; // ’†S¨—±‚ÌƒxƒNƒgƒ‹‚ğZo
+        float dist = length(toP); // ’†S“_‚©‚çƒp[ƒeƒBƒNƒ‹‚Ü‚Å‚Ì’¼ü‹——£‚ğ‹‚ß‚é
+        
+        // ‰QF²‚Ìü‚è‚ğ‰ñ‚é“®‚«
+        float3 axis = normalize(force_vortex.xyz + float3(0, 1e-5f, 0)); // ²‚ÌŒü‚«‚ğ³‹K‰»
+        data.posVelocity.xyz += cross(axis, toP) * force_vortex.w * elapsed_time; // Úü•ûŒü‚ÌƒxƒNƒgƒ‹‚ğZo
+
+        // ˆø—ÍF’†S‚ÉŒü‚©‚¤—Í
+        if (dist > 0.0001f)
+        {
+            // toP‚Éƒ}ƒCƒiƒX‚ğ•t‚¯‚é‚±‚Æ‚Å—±‚©‚ç’†S‚ÉŒü‚©‚¤ƒxƒNƒgƒ‹‚É‚µ‚ÄA
+            // dist‚ÅŠ„‚Á‚Ä•ûŒüƒxƒNƒgƒ‹‚É‚·‚éB
+            // force_attract.w(Œo‰ßŠÔ)‚ğ‘‚¯‚é‚±‚Æ‚Å‘¬“x‚É‘«‚µ’†S‚É‹z‚¢Šñ‚¹‚é“®‚«‚É‚·‚é
+            data.posVelocity.xyz += (-toP / dist) * force_attract.w * elapsed_time;
+        }
+        
+        // ƒmƒCƒYFêŠ‚ÅŒˆ‚Ü‚é•—i—±‚²‚Æ‚ÉˆÊ‘Š‚ğ‚¸‚ç‚µ‚ÄA‚P–{‚¸‚Âˆá‚¤Œ`‚É‚·‚éj
+        // ‰©‹à”ä‚Ì‹t”:0.6180339f‚ğŠ|‚¯‚Äufracv‚Å­”•”•ª‚ğæ‚èo‚µ‚Ä100”{‚·‚é‚±‚Æ‚Å
+        // •Î‚è‚Ì‚È‚¢ƒ‰ƒ“ƒ_ƒ€‚È”’l‚ğ•\Œ»
+        float phase = frac(data_index * 0.6180339f) * 100.0f; 
+        
+        // ƒmƒCƒY‚ğŒvZ‚·‚é‚½‚ß‚ÌŠî€À•W‚ğŒvZ‚µ‚Ä‚¢‚é
+        // Œo‰ßŠÔ‚È‚Ç‚ÌƒXƒNƒ[ƒ‹’l‚Æ—±‚²‚Æ‚ÌƒYƒŒ‚ğ‘«‚·‚±‚Æ‚Å
+        // ˆÙ‚È‚é”g‚Ìƒ^ƒCƒ~ƒ“ƒO‚ğ•\Œ»‚µ‚Ä‚¢‚é
+        float3 q = pos * force_noise.y + force_noise.z + phase;
+        
+        // ƒTƒCƒ“”g‚ÆƒRƒTƒCƒ“”g‚ğˆÙ‚È‚é²‚â”{—¦‚ğ‘g‚İ‡‚í‚¹‚é‚±‚Æ‚Å
+        // ’Pƒ‚È‰•œ‰^“®‚Å‚Í‚È‚¢•¡G‚Å©‘R‚Èu‚¤‚Ë‚èi‹^—ƒmƒCƒYƒxƒNƒgƒ‹jv‚ğ•\Œ»
+        float n = float3(sin(q.y) + cos(q.z * 1.3f),
+                         sin(q.z) + cos(q.x * 1.7f),
+                         sin(q.x) + cos(q.y * 1.1f));
+        data.posVelocity.xyz += n * force_noise.x * elapsed_time;
+    }
+    
     // ‘¬“xXV
     data.posVelocity.xyz += data.posAcceleration.xyz * elapsed_time;
     data.posVelocity.xyz *= exp(-data.posAcceleration.w * elapsed_time); // ‹ó‹C’ïR
-
+    
     // ˆÊ’uXV
     data.position.xyz += data.posVelocity.xyz * elapsed_time;
     
@@ -194,8 +233,14 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         worldPos = mul(float4(worldPos, 1), parent_world).xyz;
     }
     header.depth = mul(float4(worldPos, 1), viewProjection).w;
+    
+    // ƒgƒŒƒCƒ‹‚Ìƒwƒbƒh‚ğ¡‚ÌˆÊ’u‚É‘‚­
+    if (trail_enable != 0)
+    {
+        trail_history[data_index * trail_points + trail_head] = float4(data.position.xyz, 1.0f);
+    }
 
     //  XVî•ñ‚ğŠi”[
-    particle_header_buffer[header_index] = header;
+        particle_header_buffer[header_index] = header;
     particle_data_buffer[data_index] = data;
 }

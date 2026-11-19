@@ -11,6 +11,8 @@ Microsoft::WRL::ComPtr<ID3D11ComputeShader>  compute_particle_system::sort_c2_sh
 Microsoft::WRL::ComPtr<ID3D11VertexShader>   compute_particle_system::vertex_shader;
 Microsoft::WRL::ComPtr<ID3D11GeometryShader> compute_particle_system::geometry_shader;
 Microsoft::WRL::ComPtr<ID3D11PixelShader>    compute_particle_system::pixel_shader;
+Microsoft::WRL::ComPtr<ID3D11VertexShader> compute_particle_system::trail_vertex_shader;
+Microsoft::WRL::ComPtr<ID3D11PixelShader> compute_particle_system::trail_pixel_shader;
 
 compute_particle_system::compute_particle_system(ID3D11Device* device, UINT particles_count,
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_view, DirectX::XMUINT2 split_count)
@@ -18,7 +20,7 @@ compute_particle_system::compute_particle_system(ID3D11Device* device, UINT part
 	HRESULT hr;
 	// パーティクル数をスレッド数に合わせて制限
 	num_particles = ((particles_count + (NumParticleThread - 1)) / NumParticleThread) * NumParticleThread;
-	num_emit_particles = min(num_particles, 10000); // 1Fでの生成制限数はテキトーに決めているのでここは要調整
+	num_emit_particles = min(num_particles, 10000);
 	texture_split_count = split_count;
 	one_shot_initialize = false;
 
@@ -120,6 +122,24 @@ compute_particle_system::compute_particle_system(ID3D11Device* device, UINT part
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
+	// トレイルの位置履歴バッファ
+	{
+		D3D11_BUFFER_DESC desc = {};
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+		desc.ByteWidth = sizeof(DirectX::XMFLOAT4) * num_particles * TrailPoints; // パーティクルの数×点の数
+		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		desc.StructureByteStride = sizeof(DirectX::XMFLOAT4);
+		desc.Usage = D3D11_USAGE_DEFAULT;
+
+		hr = device->CreateBuffer(&desc, nullptr, trail_history_buffer.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		hr = device->CreateShaderResourceView(trail_history_buffer.Get(), nullptr, trail_history_srv.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		hr = device->CreateUnorderedAccessView(trail_history_buffer.Get(), nullptr, trail_history_uav.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+
 	//	パーティクルの更新・描画数の削減のためのバッファ
 	{
 		D3D11_BUFFER_DESC desc = {};
@@ -166,7 +186,6 @@ compute_particle_system::compute_particle_system(ID3D11Device* device, UINT part
 		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_begin_frame_cs.cso", begin_frame_shader.GetAddressOf());
 		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_end_frame_cs.cso", end_frame_shader.GetAddressOf());
 
-		//create_cs_from_cso(device, "compute_particle_sort_cs.cso", sort_shader.GetAddressOf());
 		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_bitonic_sort_b2_cs.cso", sort_b2_shader.GetAddressOf());
 		GpuResourceUtils::LoadComputShader(device, "Data/Shader/compute_particle_bitonic_sort_c2_cs.cso", sort_c2_shader.GetAddressOf());
 
@@ -174,6 +193,9 @@ compute_particle_system::compute_particle_system(ID3D11Device* device, UINT part
 		GpuResourceUtils::LoadVertexShader(device, "Data/Shader/compute_particle_render_vs.cso", nullptr, 0, 0, vertex_shader.GetAddressOf());
 		GpuResourceUtils::LoadGeometryShader(device, "Data/Shader/compute_particle_render_gs.cso", geometry_shader.GetAddressOf());
 		GpuResourceUtils::LoadPixelShader(device, "Data/Shader/compute_particle_render_ps.cso", pixel_shader.GetAddressOf());
+
+		GpuResourceUtils::LoadVertexShader(device, "Data/Shader/compute_particle_trail_vs.cso", nullptr, 0, 0, trail_vertex_shader.GetAddressOf());
+		GpuResourceUtils::LoadPixelShader(device, "Data/Shader/compute_particle_trail_ps.cso", trail_pixel_shader.GetAddressOf());
 	}
 
 	this->shader_resource_view = shader_resource_view;
@@ -200,8 +222,17 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		immediate_context->CSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
 		immediate_context->CSSetConstantBuffers(11, 1, bitonic_sort_constant_buffer.GetAddressOf());
 
+		// トレイルのヘッドを一定間隔で進める
+		trail_timer += elapsed_time;
+		while (trail_timer >= trail_interval)
+		{
+			trail_timer -= trail_interval;
+			trail_head = (trail_head + 1) % TrailPoints;
+		}
+		noise_time += elapsed_time;
+
 		//	定数バッファ更新
-		common_constants constant;
+		common_constants constant{};
 		constant.elapsed_time = elapsed_time;
 		constant.texture_split_count = texture_split_count;
 		constant.system_num_particles = num_particles;
@@ -211,6 +242,17 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		constant.local_space = local_space;
 		constant.dissolve_mode = dissolve_mode;
 		constant.dissolve_softness = dissolve_softness;
+
+		constant.trail_head = trail_head;
+		constant.trail_points = TrailPoints;
+		constant.trail_width = trail_width;
+		constant.trail_enable = trail_enable ? 1 : 0;
+		constant.force_vortex = force_vortex;
+		constant.force_attract = force_attract;
+		constant.force_noise = force_noise;
+		constant.force_noise.z = noise_time; // zは時間として使う
+
+
 		immediate_context->UpdateSubresource(common_constant_buffer.Get(), 0, nullptr, &constant, 0, 0);
 	}
 
@@ -233,6 +275,7 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 			particle_append_consume_unordered_access_view.Get(),
 			indirect_data_unordered_access_view.Get(),
 			particle_header_unordered_access_view.Get(),
+			trail_history_uav.Get()
 		};
 		immediate_context->CSSetUnorderedAccessViews(0, ARRAYSIZE(uavs), uavs, nullptr);
 	}
@@ -322,7 +365,7 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 
 	//	UAV設定
 	{
-		ID3D11UnorderedAccessView* uavs[] = { nullptr, nullptr, nullptr, nullptr, };
+		ID3D11UnorderedAccessView* uavs[] = { nullptr, nullptr, nullptr, nullptr, nullptr, };
 		immediate_context->CSSetUnorderedAccessViews(0, ARRAYSIZE(uavs), uavs, nullptr);
 	}
 }
@@ -368,6 +411,45 @@ void compute_particle_system::render(ID3D11DeviceContext* immediate_context)
 	ID3D11ShaderResourceView* clear_shader_resource_views[] = { nullptr, nullptr };
 	immediate_context->PSSetShaderResources(0, 1, clear_shader_resource_views);
 	immediate_context->GSSetShaderResources(0, 2, clear_shader_resource_views);
+}
+
+// トレイルを描く関数
+void compute_particle_system::render_trail(ID3D11DeviceContext* immediate_context)
+{
+	if (!trail_enable) return;
+
+	// 帯は三角形ストリップ。インスタンスごとに切れるので、粒同士は繋がらない
+	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	immediate_context->IASetInputLayout(nullptr);
+
+	ID3D11Buffer* clear_buffer[] = { nullptr };
+	UINT strides[] = { 0 };
+	UINT offsets[] = { 0 };
+	immediate_context->IASetVertexBuffers(0, 1, clear_buffer, strides, offsets);
+	immediate_context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+
+	immediate_context->VSSetShader(trail_vertex_shader.Get(), nullptr, 0);
+	immediate_context->GSSetShader(nullptr, nullptr, 0);
+	immediate_context->PSSetShader(trail_pixel_shader.Get(), nullptr, 0);
+
+	ID3D11ShaderResourceView* srvs[] =
+	{
+		particle_data_shader_resource_view.Get(),   // t0
+		particle_header_shader_resource_view.Get(), // t1
+		trail_history_srv.Get(),					// t2
+	};
+	immediate_context->VSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
+	immediate_context->VSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
+	immediate_context->PSSetConstantBuffers(10, 1, common_constant_buffer.GetAddressOf());
+
+	// 頂点数 = 点の数×2(左右)、インスタンス数 = 粒の最大数
+	immediate_context->DrawInstanced(TrailPoints * 2, num_particles, 0, 0);
+
+	// 後片付け
+	ID3D11ShaderResourceView* null_srvs[] = { nullptr, nullptr, nullptr };
+	immediate_context->VSSetShaderResources(0, ARRAYSIZE(null_srvs), null_srvs);
+	immediate_context->VSSetShader(nullptr, nullptr, 0);
+	immediate_context->PSSetShader(nullptr, nullptr, 0);
 }
 
 void compute_particle_system::clear(ID3D11DeviceContext* immediate_context)

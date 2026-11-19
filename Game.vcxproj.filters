@@ -1225,5 +1225,11 @@
     <FxCompile Include="Shader\PBR\PBRShader_ps.hlsl">
       <Filter>Shader\PBR</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_trail_vs.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Particle\compute_particle_trail_ps.hlsl">
+      <Filter>Shader\Particle</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
