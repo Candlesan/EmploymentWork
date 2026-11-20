@@ -37,7 +37,7 @@
             "conditions": [
                 {
                     "compareType": 4,
-                    "conditionType": "IsBurst",
+                    "conditionType": "None",
                     "judgmentValue": 0.0
                 },
                 {
@@ -48,7 +48,7 @@
                 {
                     "compareType": 0,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 30.0
+                    "judgmentValue": 20.0
                 }
             ],
             "config": {

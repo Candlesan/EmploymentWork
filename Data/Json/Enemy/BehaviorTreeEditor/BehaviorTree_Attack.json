@@ -52,11 +52,6 @@
                     "compareType": 3,
                     "conditionType": "AttackCoolDown",
                     "judgmentValue": 0.0
-                },
-                {
-                    "compareType": 4,
-                    "conditionType": "IsPlayerDefending",
-                    "judgmentValue": 0.0
                 }
             ],
             "config": {
@@ -82,7 +77,7 @@
             "conditions": [
                 {
                     "compareType": 4,
-                    "conditionType": "IsBurst",
+                    "conditionType": "None",
                     "judgmentValue": 0.0
                 },
                 {
@@ -120,7 +115,7 @@
                 {
                     "compareType": 2,
                     "conditionType": "IncomingMagicCount",
-                    "judgmentValue": 1.0
+                    "judgmentValue": 10.0
                 },
                 {
                     "compareType": 0,

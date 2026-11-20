@@ -208,27 +208,45 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
         owner->StartOverlayAnimation(stateName);
         hasFired = false;
         magicConfig.Load();
+        magicConfig.chargeTimeThreshold = 0.0f;
         phase = Phase::Attacking;
         return State::Run;
 
     case Phase::Attacking:
         normalMagic.Update(elapsedTime, owner, magicConfig, true);
 
-        if(!hasFired && owner->GetAnimSequence().GetEvent("Eshot"))
+        if (!hasFired && owner->GetAnimSequence().GetEvent("Eshot"))
         {
-            // 魔法を設定する
+            // 狙う位置 ＝ 今のプレイヤー位置（胸のあたりを狙うなら y を少し足す）
+            DirectX::XMFLOAT3 aimPos = playerPos;
+
+            // 距離に比例した誤差を入れる
+            float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(
+                DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&aimPos), EPos)));
+
+            const float errorAngle =1.0f; // 最大誤差（度）
+            float leadError = distance * std::tanf(DirectX::XMConvertToRadians(errorAngle));
+
+            aimPos.x += Mathf::RandomRange(-leadError, leadError);
+            aimPos.y += Mathf::RandomRange(-leadError, leadError);
+            aimPos.z += Mathf::RandomRange(-leadError, leadError);
+
+            // 誤差込みの位置から向きを作り直す
+            DirectX::XMFLOAT3 dir;
+            DirectX::XMStoreFloat3(&dir, DirectX::XMVector3Normalize(
+                DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&aimPos), EPos)));
+
             MagicSpawnInfo info;
             info.angleY = owner->GetAngle().y;
-            info.direction = shotVec;
+            info.direction = dir;          // ← shotVec から dir に変える
             info.position = owner->GetPosition();
             info.holdTime = 0.0f;
             info.owner = owner;
             info.target = &Player::Instance();
 
-            magicConfig.chargeTimeThreshold = 0.0f;
-
             normalMagic.Emit(&owner->GetMagicManager(), info, magicConfig);
-            owner->SetAttackCoolTimer(1.0f);
+            normalMagic.ResetCharge();
+            owner->SetAttackCoolTimer(3.0f);
 
             hasFired = true;
         }
@@ -276,7 +294,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
             DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&aimPos), MyPos)));
 
         // 角度で誤差を決める（距離に比例させる）
-        const float errorAngle = 2.0f; // 最大誤差（度）
+        const float errorAngle = 3.0f; // 最大誤差（度）
         float leadError = distance * std::tanf(DirectX::XMConvertToRadians(errorAngle));
 
         aimPos.x += Mathf::RandomRange(-leadError, leadError);
@@ -309,7 +327,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
         fireTimer -= elapsedTime;
 
         // 射撃時間が終わったまたは魔力が足りなくなったら終了
-        if (fireTimer <= 0.0f || owner->GetCurrentMagic() <= magicConfig.magicCost)
+        if (fireTimer <= 0.0f || owner->GetCurrentMagic() <= 30)
         {
             //owner->SetAttackCoolTimer(Mathf::RandomRange(2.0f, 5.0f));
             owner->SetIsRapidFire(false);

@@ -605,6 +605,10 @@ void UICanvas::SetHighlight(UIElement* e, bool on)
 				ResetAnimation(c.get()); // アニメーション停止
 			}
 		}
+		else if (c->name == "info")
+		{
+			c->visible = on;   // 選ばれてるボタンの info だけ表示
+		}
 		else if (c->focusIndex >= 0) // 選べる子（＝タブの中の魔法ボタン）
 		{
 			c->visible = on;

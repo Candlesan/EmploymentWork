@@ -199,16 +199,28 @@ void Enemy::Update(float elapsedTime)
 	// ステータス更新
 	UpdateStatus(elapsedTime);
 
-	// ホバー中はプレイヤーの高さに少しずつ合わせる
-	if (flightController.GetFlightMode() == FlightMode::Hover)
-	{
-		float targetY = Player::Instance().GetPosition().y + hoverHeightOffset; // 例: 0〜2 くらい
-		float diff = targetY - position.y;
-		velocity.y = diff * hoverFollowRate; // 例: 2.0f（大きいほど早く合わせる）
-	}
-
 	// 飛行更新
 	flightController.Update(this, elapsedTime);
+
+	// ホバー中は目標の高さを揺らしながら追いかける
+	// ※ FlightController の Hover が velocity.y を 0 にするので、必ずその後で上書きする
+	if (flightController.GetFlightMode() == FlightMode::Hover)
+	{
+		// 一定時間ごとに揺れ量を振り直す
+		hoverSwingTimer -= elapsedTime;
+		if (hoverSwingTimer <= 0.0f)
+		{
+			hoverSwing = Mathf::RandomRange(-hoverSwingRange, hoverSwingRange);
+			hoverSwingTimer = Mathf::RandomRange(hoverSwingIntervalMin, hoverSwingIntervalMax);
+		}
+
+		// プレイヤーの高さ + オフセット + 揺れ量 を目標にする
+		float targetY = Player::Instance().GetPosition().y + hoverHeightOffset + hoverSwing;
+		if (targetY < hoverMinHeight) targetY = hoverMinHeight;
+
+		// 差に比例した速度で近づく（大きいほど早く合わせる）
+		velocity.y = (targetY - position.y) * hoverFollowRate;
+	}
 
 	// 速力更新処理
 	UpdateVelocity(elapsedTime);
@@ -342,6 +354,19 @@ void Enemy::DrawGUI()
 
 			// クールダウン・ステート情報
 			ImGui::Text(u8"魔法クールダウン: %f", magicCoolDownTimer);
+			ImGui::Separator();
+
+			// ホバー中の上下移動
+			if (ImGui::CollapsingHeader(u8"ホバーの上下移動"))
+			{
+				ImGui::Text(u8"今の揺れ量: %.2f  次の変更まで: %.2f", hoverSwing, hoverSwingTimer);
+				ImGui::DragFloat(u8"プレイヤーからの高さ", &hoverHeightOffset, 0.1f);
+				ImGui::DragFloat(u8"揺れ幅 (±)", &hoverSwingRange, 0.1f, 0.0f, 20.0f);
+				ImGui::DragFloat(u8"変更間隔 最短", &hoverSwingIntervalMin, 0.05f, 0.1f, 10.0f);
+				ImGui::DragFloat(u8"変更間隔 最長", &hoverSwingIntervalMax, 0.05f, 0.1f, 10.0f);
+				ImGui::DragFloat(u8"追従の強さ", &hoverFollowRate, 0.05f, 0.0f, 10.0f);
+				ImGui::DragFloat(u8"最低の高さ", &hoverMinHeight, 0.1f);
+			}
 			ImGui::Separator();
 
 			// トランスフォーム情報

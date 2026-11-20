@@ -91,7 +91,7 @@
                 {
                     "compareType": 1,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 45.0
+                    "judgmentValue": 20.0
                 }
             ],
             "config": {
@@ -124,11 +124,6 @@
                     "compareType": 0,
                     "conditionType": "EnemyCurrentMagic",
                     "judgmentValue": 40.0
-                },
-                {
-                    "compareType": 4,
-                    "conditionType": "IsPlayerDefending",
-                    "judgmentValue": 0.0
                 }
             ],
             "config": {
@@ -156,11 +151,6 @@
                     "compareType": 4,
                     "conditionType": "IsPlayerDefending",
                     "judgmentValue": 1.0
-                },
-                {
-                    "compareType": 3,
-                    "conditionType": "Random",
-                    "judgmentValue": 60.0
                 },
                 {
                     "compareType": 0,
@@ -197,7 +187,7 @@
                 {
                     "compareType": 0,
                     "conditionType": "EnemyCurrentMagic",
-                    "judgmentValue": 35.0
+                    "judgmentValue": 30.0
                 }
             ],
             "config": {
@@ -211,8 +201,8 @@
             "name": "通常攻撃魔法",
             "parentName": "Root",
             "position": [
-                160.0,
-                280.0
+                154.0,
+                276.0
             ],
             "priority": 5,
             "selectRule": 0

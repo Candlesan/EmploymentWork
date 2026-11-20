@@ -38,13 +38,6 @@ void NormalMagic::Update(float elapsedTime, Character* owner, const NormalMagicC
 	{
 		isFullCharged = true;
 	}
-
-	// 最大チャージ維持中は魔力を減らす
-	if (isFullCharged)
-	{
-		owner->ConsumMagic(config.chargeHoldMagicCost * elapsedTime);
-		//　Player側で移動速度を低下させる
-	}
 }
 
 void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const NormalMagicConfig& config)

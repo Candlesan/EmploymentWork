@@ -551,6 +551,11 @@ void Player::DrawGUI()
 				ImGui::DragFloat(u8"スティック補間速度", &lerpSpeed, 0.1f);
 				ImGui::Text(u8"滑らかな入力強度: %f.1", smoothMoveLength);
 
+				// デバッグ：今のアニメと再生速度
+				ImGui::Text(u8"現在のステート: %s", currentState.c_str());
+				ImGui::Text(u8"再生速度: %.2f  経過: %.2f / %.2f", animSequence.GetSpeed(), GetCurrentAnimationSeconds(), GetCurrentAnimationLength());
+				ImGui::Text(u8"IsAiming: %d  HardLock: %d  空中: %d", lockOn.IsHardLock() || status.isIntercept || IsFacingEnemy(), lockOn.IsHardLock(), flightController.IsFlying());
+
 				if (status.isAvoid) {
 					ImGui::Text(u8"アクション状態: 回避中");
 				}

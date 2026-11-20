@@ -161,7 +161,7 @@ private:
 	BehaviorTreeRunner attackBT; // 攻撃用
 	BehaviorTreeRunner defenseBT; // 防御用
 	float runTimer = 0.0f;
-	bool AISwitch = false;
+	bool AISwitch = true;
 
 	// ── ビヘイビアツリーエディタ ──
 	BehaviorTreeGraph moveGraph;
@@ -195,6 +195,12 @@ private:
 	// ── 飛行関係 ──
 	float hoverHeightOffset = 5.0f;
 	float hoverFollowRate = 1.0f;
+	float hoverSwingRange = 3.0f;        // 目標の高さを上下に揺らす幅（±）
+	float hoverSwingIntervalMin = 1.0f;  // 揺らす目標を変えるまでの最短時間
+	float hoverSwingIntervalMax = 3.0f;  // 揺らす目標を変えるまでの最長時間
+	float hoverMinHeight = 2.0f;         // これより下には降りない
+	float hoverSwing = 0.0f;             // 今の揺れ量
+	float hoverSwingTimer = 0.0f;        // 次に揺れ量を変えるまでの時間
 
 	// ── デバッグ発射用フラグ ──
 	bool onNormalMagic = false;
