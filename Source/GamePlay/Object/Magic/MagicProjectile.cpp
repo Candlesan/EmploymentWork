@@ -1,6 +1,9 @@
 ﻿#include "MagicProjectile.h"
 #include "System/Effect/EffectManager.h"
 #include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
+#include "System/Core/Mathf.h"
+
+#include <algorithm>
 
 // コンストラクタ
 MagicProjectile::MagicProjectile(MagicManager* manager, const std::string& effectPath)
@@ -53,13 +56,23 @@ void MagicProjectile::Update(float elapsedTime)
 	case ProjectileState::Fire:
 		prevPosition = position;
 
-		if (moveComponent)
+		if (useGrow)
+		{
+			growTimer += elapsedTime;
+			float t = (std::min)(growTimer / growDuration, 1.0f);
+			float len = Mathf::Lerp(0.0f, maxRange, t);
+
+			height = len;
+			position.x = launchPos.x + direction.x * (len * 0.5f);
+			position.y = launchPos.y + direction.y * (len * 0.5f);
+			position.z = launchPos.z + direction.z * (len * 0.5f);
+		}
+		else if (moveComponent)
 		{
 			moveComponent->UpdateMove(position, direction, speed, elapsedTime);
 		}
 
 		// エフェクトの位置を更新
-
 		if (customEffect)
 		{
 			effectManager.SetPosition(customEffect, position);
@@ -82,8 +95,8 @@ void MagicProjectile::Update(float elapsedTime)
 		break;
 	}
 
-	//オブジェクト行列を更新
-	UpdateTransform();
+	////オブジェクト行列を更新
+	//UpdateTransform();
 }
 
 // 描画処理
@@ -168,6 +181,7 @@ void MagicProjectile::Launch(const DirectX::XMFLOAT3& dir, const DirectX::XMFLOA
 	this->direction = dir;
 	this->position = pos;
 	this->prevPosition = pos;
+	this->launchPos = pos;
 	this->waitTimer = waitTime;
 	this->state = ProjectileState::Wait;
 }

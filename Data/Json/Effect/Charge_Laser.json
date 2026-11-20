@@ -4,7 +4,11 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
+            "attractStrength": 0.0,
+            "billboardType": 1,
             "blendMode": 1,
+            "burstSpeedMax": 1.0,
+            "burstSpeedMin": 0.0,
             "color": [
                 0.36347106099128723,
                 0.6029399037361145,
@@ -51,25 +55,38 @@
             ],
             "colorStartSpeed": 0,
             "delayTime": 0.0,
+            "delayTimeRandom": 0.0,
+            "dissolveMode": 0,
+            "dissolveSoftness": 0.05000000074505806,
             "distortionPower": 0.0,
+            "drag": 0.0,
             "duration": 0.0,
             "emitCount": 1,
+            "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
             "fadeInTime": 0.0,
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": true,
+            "id": 1,
             "isLoop": false,
             "lifeTime": 5.0,
+            "lifeTimeRandom": 0.0,
+            "lightIntensity": 1.0,
+            "lightRange": 1.0,
+            "maxParticle": 128,
             "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
             "name": "Laser",
+            "noiseFrequency": 1.0,
             "noisePath": "",
+            "noiseStrength": 0.0,
             "noiseUvOffset": [
                 0.0,
                 0.0
             ],
+            "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 0.0,
@@ -100,6 +117,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -132,7 +178,7 @@
             ],
             "scale": [
                 1.0,
-                150.0,
+                0.0,
                 1.0
             ],
             "scaleAcceleration": [
@@ -159,7 +205,7 @@
             "scaleUniformStartSpeed": 1,
             "scaleVelocity": [
                 -0.800000011920929,
-                -0.800000011920929,
+                180.0,
                 -0.800000011920929
             ],
             "scaleVelocityRange": [
@@ -168,19 +214,32 @@
                 0.0
             ],
             "spawnInterval": 5.0,
-            "spawnTimer": 0.0,
+            "spawnIntervalRandom": 0.0,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
+            "stretchScale": 0.10000000149011612,
             "texturePath": "Data\\Sprite\\Particle\\texture\\aurora01.png",
+            "trailAlign": 0,
+            "trailEnable": false,
+            "trailInterval": 0.019999999552965164,
+            "trailLength": 0.30000001192092896,
+            "trailPoints": 24,
+            "trailWidth": 0.30000001192092896,
             "type": 1,
             "uvScrollSpeed": [
                 1.0,
                 0.0
             ],
             "visible": true,
+            "vortexAxis": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "vortexStrength": 0.0,
             "width": 1.0,
             "widthEnd": 0.0,
             "widthMiddle": 1.0,
@@ -189,7 +248,11 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
+            "attractStrength": 0.0,
+            "billboardType": 1,
             "blendMode": 0,
+            "burstSpeedMax": 1.0,
+            "burstSpeedMin": 0.0,
             "color": [
                 1.0,
                 0.9999899864196777,
@@ -236,25 +299,38 @@
             ],
             "colorStartSpeed": 0,
             "delayTime": 0.0,
+            "delayTimeRandom": 0.0,
+            "dissolveMode": 0,
+            "dissolveSoftness": 0.05000000074505806,
             "distortionPower": 0.0,
+            "drag": 0.0,
             "duration": 0.0,
             "emitCount": 1,
+            "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
             "fadeInTime": 0.0,
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": true,
+            "id": 2,
             "isLoop": false,
             "lifeTime": 5.0,
+            "lifeTimeRandom": 0.0,
+            "lightIntensity": 1.0,
+            "lightRange": 1.0,
+            "maxParticle": 128,
             "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
             "name": "Laser2",
+            "noiseFrequency": 1.0,
             "noisePath": "",
+            "noiseStrength": 0.0,
             "noiseUvOffset": [
                 0.0,
                 0.0
             ],
+            "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 28.399999618530273,
@@ -285,6 +361,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -317,7 +422,7 @@
             ],
             "scale": [
                 0.5,
-                150.0,
+                0.0,
                 0.5
             ],
             "scaleAcceleration": [
@@ -344,7 +449,7 @@
             "scaleUniformStartSpeed": 1,
             "scaleVelocity": [
                 -0.5,
-                -0.5,
+                180.0,
                 -0.5
             ],
             "scaleVelocityRange": [
@@ -353,19 +458,32 @@
                 0.0
             ],
             "spawnInterval": 5.0,
-            "spawnTimer": 0.0,
+            "spawnIntervalRandom": 0.0,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
+            "stretchScale": 0.10000000149011612,
             "texturePath": "",
+            "trailAlign": 0,
+            "trailEnable": false,
+            "trailInterval": 0.019999999552965164,
+            "trailLength": 0.30000001192092896,
+            "trailPoints": 24,
+            "trailWidth": 0.30000001192092896,
             "type": 1,
             "uvScrollSpeed": [
                 5.0,
                 0.0
             ],
             "visible": true,
+            "vortexAxis": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "vortexStrength": 0.0,
             "width": 1.0,
             "widthEnd": 0.0,
             "widthMiddle": 1.0,
@@ -374,7 +492,11 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
+            "attractStrength": 0.0,
+            "billboardType": 1,
             "blendMode": 1,
+            "burstSpeedMax": 1.0,
+            "burstSpeedMin": 0.0,
             "color": [
                 0.9999899864196777,
                 0.9999912977218628,
@@ -421,25 +543,38 @@
             ],
             "colorStartSpeed": 0,
             "delayTime": 0.0,
+            "delayTimeRandom": 0.0,
+            "dissolveMode": 0,
+            "dissolveSoftness": 0.05000000074505806,
             "distortionPower": 0.0,
+            "drag": 0.0,
             "duration": 0.0,
             "emitCount": 1,
+            "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
             "fadeInTime": 0.0,
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": true,
+            "id": 3,
             "isLoop": false,
             "lifeTime": 5.0,
+            "lifeTimeRandom": 0.0,
+            "lightIntensity": 1.0,
+            "lightRange": 1.0,
+            "maxParticle": 128,
             "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
             "name": "Laser3",
+            "noiseFrequency": 1.0,
             "noisePath": "",
+            "noiseStrength": 0.0,
             "noiseUvOffset": [
                 -1.0,
                 1.0
             ],
+            "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 0.0,
@@ -470,6 +605,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -502,7 +666,7 @@
             ],
             "scale": [
                 0.6000000238418579,
-                150.0,
+                0.0,
                 0.6000000238418579
             ],
             "scaleAcceleration": [
@@ -529,7 +693,7 @@
             "scaleUniformStartSpeed": 1,
             "scaleVelocity": [
                 -0.5,
-                -0.5,
+                180.0,
                 -0.5
             ],
             "scaleVelocityRange": [
@@ -538,19 +702,32 @@
                 0.0
             ],
             "spawnInterval": 5.0,
-            "spawnTimer": 0.0,
+            "spawnIntervalRandom": 0.0,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
+            "stretchScale": 0.10000000149011612,
             "texturePath": "Data\\Sprite\\Particle\\texture\\T_Random_53.png",
+            "trailAlign": 0,
+            "trailEnable": false,
+            "trailInterval": 0.019999999552965164,
+            "trailLength": 0.30000001192092896,
+            "trailPoints": 24,
+            "trailWidth": 0.30000001192092896,
             "type": 1,
             "uvScrollSpeed": [
                 -1.0,
                 1.0
             ],
             "visible": true,
+            "vortexAxis": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "vortexStrength": 0.0,
             "width": 1.0,
             "widthEnd": 0.0,
             "widthMiddle": 1.0,
@@ -559,7 +736,11 @@
         {
             "IsFadeIn": false,
             "IsFadeOut": false,
+            "attractStrength": 0.0,
+            "billboardType": 1,
             "blendMode": 1,
+            "burstSpeedMax": 1.0,
+            "burstSpeedMin": 0.0,
             "color": [
                 0.4040488302707672,
                 0.9343629479408264,
@@ -606,25 +787,38 @@
             ],
             "colorStartSpeed": 0,
             "delayTime": 0.0,
+            "delayTimeRandom": 0.0,
+            "dissolveMode": 0,
+            "dissolveSoftness": 0.05000000074505806,
             "distortionPower": 0.0,
+            "drag": 0.0,
             "duration": 0.0,
             "emitCount": 1,
+            "emitShape": 0,
             "fadeInEndSpeed": 3,
             "fadeInStartSpeed": 3,
             "fadeInTime": 0.0,
             "fadeOutEndSpeed": 3,
             "fadeOutStartSpeed": 3,
             "fadeOutTime": 0.0,
-            "isBillboard": true,
+            "id": 4,
             "isLoop": false,
             "lifeTime": 5.0,
+            "lifeTimeRandom": 0.0,
+            "lightIntensity": 1.0,
+            "lightRange": 1.0,
+            "maxParticle": 128,
             "meshPath": "Data\\Sprite\\Particle\\model\\Tube_PointDown.gltf",
             "name": "Node 4",
+            "noiseFrequency": 1.0,
             "noisePath": "",
+            "noiseStrength": 0.0,
             "noiseUvOffset": [
                 1.0,
                 1.0
             ],
+            "parentId": -1,
+            "particleFollowMode": 0,
             "position": [
                 0.0,
                 1.0,
@@ -655,6 +849,35 @@
                 0.0,
                 0.0
             ],
+            "ringCenterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringDivision": 32,
+            "ringEndAngle": 360.0,
+            "ringInner": [
+                0.5,
+                0.0
+            ],
+            "ringInnerColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringOuter": [
+                1.0,
+                1.0
+            ],
+            "ringOuterColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ringStartAngle": 0.0,
             "rotation": [
                 0.0,
                 0.0,
@@ -687,7 +910,7 @@
             ],
             "scale": [
                 0.800000011920929,
-                150.0,
+                0.0,
                 0.800000011920929
             ],
             "scaleAcceleration": [
@@ -714,7 +937,7 @@
             "scaleUniformStartSpeed": 1,
             "scaleVelocity": [
                 -0.5,
-                -0.5,
+                180.0,
                 -0.5
             ],
             "scaleVelocityRange": [
@@ -723,19 +946,32 @@
                 0.0
             ],
             "spawnInterval": 5.0,
-            "spawnTimer": 0.0,
+            "spawnIntervalRandom": 0.0,
             "splitCount": [
                 1,
                 1
             ],
             "spriteType": 0,
+            "stretchScale": 0.10000000149011612,
             "texturePath": "",
+            "trailAlign": 0,
+            "trailEnable": false,
+            "trailInterval": 0.019999999552965164,
+            "trailLength": 0.30000001192092896,
+            "trailPoints": 24,
+            "trailWidth": 0.30000001192092896,
             "type": 1,
             "uvScrollSpeed": [
                 -1.0,
                 0.0
             ],
             "visible": true,
+            "vortexAxis": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "vortexStrength": 0.0,
             "width": 1.0,
             "widthEnd": 0.0,
             "widthMiddle": 1.0,

@@ -31,6 +31,13 @@ public:
 	void SetWaitTimer(float timer) { waitTimer = timer; }
 	void SetLifeTimer(float timer) { lifeTimer = timer; }
 	void SetSpeed(float s) { speed = s; }
+	void SetGrow(float range, float duration)
+	{
+		useGrow = true;
+		maxRange = range;
+		growDuration = duration;
+		growTimer = 0.0f;
+	}
 
 	// ‹——£Œ¸Š‚Ìİ’èig‚í‚ñ’e‚ÍŒÄ‚Î‚ñ‚©‚Á‚½‚ç¡‚Ü‚Å’Ê‚èj
 	void SetFalloff(float start, float end, float minRate)
@@ -52,6 +59,11 @@ private:
 	float falloffStart = 0.0f;   // ‚±‚±‚Ü‚Å‚Í100%
 	float falloffEnd = 0.0f;     // ‚±‚±‚ÅÅ’á‚Ì”{—¦‚É‚È‚é
 	float falloffMinRate = 1.0f; // Å’á‚Ì”{—¦
+
+	float growTimer = 0.0f;    // Œo‰ßŠÔ
+	float growDuration = 1.0f; // ‚Ç‚ê‚¾‚¯ŠÔ‚ğ‚©‚¯‚é‚©
+	float maxRange = 1.0f; // Ë’ö
+	bool useGrow = false; // L‚Î‚·‹…‚©
 
 	Effect* Magic = nullptr;
 	int magicHandle = -1;

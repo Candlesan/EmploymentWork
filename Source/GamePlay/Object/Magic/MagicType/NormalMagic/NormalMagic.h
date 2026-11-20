@@ -134,4 +134,5 @@ private:
     float chargeTimer = 0.0f; // 現在のチャージした時間
     bool isCharging = false; // チャージ中か
     bool isFullCharged = false; // フルチャージか
+    float rangeDuration = 0.5f;
 };

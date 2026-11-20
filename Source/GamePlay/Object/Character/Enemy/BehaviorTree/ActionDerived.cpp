@@ -212,7 +212,7 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
         return State::Run;
 
     case Phase::Attacking:
-        normalMagic.Update(elapsedTime, owner, magicConfig, false);
+        normalMagic.Update(elapsedTime, owner, magicConfig, true);
 
         if(!hasFired && owner->GetAnimSequence().GetEvent("Eshot"))
         {
@@ -224,6 +224,8 @@ ActionBase::State NormalMagicAttack::Run(float elapsedTime)
             info.holdTime = 0.0f;
             info.owner = owner;
             info.target = &Player::Instance();
+
+            magicConfig.chargeTimeThreshold = 0.0f;
 
             normalMagic.Emit(&owner->GetMagicManager(), info, magicConfig);
             owner->SetAttackCoolTimer(1.0f);

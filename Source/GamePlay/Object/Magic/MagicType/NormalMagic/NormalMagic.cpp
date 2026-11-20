@@ -164,7 +164,7 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 
 	// 基本パラメーター
 	magic->SetRadius(radius);
-	magic->SetHeight(range);
+	magic->SetGrow(range, rangeDuration);
 	magic->SetDamage(damage); // 生身へのダメージ
 	magic->SetGuardDamage(config.guardDamage); // 防御魔法へのダメージ
 	magic->SetHitEffect("NormalMagicHit");
@@ -189,10 +189,10 @@ void NormalMagic::Emit(MagicManager* manager, const MagicSpawnInfo& info, const 
 	// 発射遅延/寿命
 	magic->SetIsAlive(true);
 	magic->SetWaitTimer(0.01f);
-	magic->SetLifeTimer(0.1f);
+	magic->SetLifeTimer(0.5f);
 
 	// 発射
-	magic->Launch(info.direction, centerPos, 0.0f);
+	magic->Launch(info.direction, startPos, 0.0f);
 
 	// エフェクトの再生
 	if (!isFullCharged)
