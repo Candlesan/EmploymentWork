@@ -229,15 +229,6 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 			trail_points_dirty = false;
 		}
 
-		// トレイルのヘッドを一定間隔で進める
-		trail_timer += elapsed_time;
-		while (trail_timer >= trail_interval)
-		{
-			trail_timer -= trail_interval;
-			trail_head = (trail_head + 1) % MaxTrailPoints;
-		}
-		noise_time += elapsed_time;
-
 		//	定数バッファ更新
 		common_constants constant{};
 		constant.elapsed_time = elapsed_time;
@@ -250,7 +241,15 @@ void compute_particle_system::update(ID3D11DeviceContext* immediate_context, Dir
 		constant.dissolve_mode = dissolve_mode;
 		constant.dissolve_softness = dissolve_softness;
 
-		trail_head = (trail_head + 1) % trail_point_count;
+		// トレイルのヘッドを一定間隔で進める
+		trail_timer += elapsed_time;
+		while (trail_interval > 0.0f && trail_timer >= trail_interval)
+		{
+			trail_timer -= trail_interval;
+			trail_head = (trail_head + 1) % trail_point_count;
+		}
+		noise_time += elapsed_time;
+
 		constant.trail_head = trail_head;
 		constant.trail_points = trail_point_count;
 		constant.trail_width = trail_width;

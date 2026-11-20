@@ -294,7 +294,7 @@ ActionBase::State RapidFireMagic::Run(float elapsedTime)
             DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&aimPos), MyPos)));
 
         // 角度で誤差を決める（距離に比例させる）
-        const float errorAngle = 3.0f; // 最大誤差（度）
+        const float errorAngle = 2.0f; // 最大誤差（度）
         float leadError = distance * std::tanf(DirectX::XMConvertToRadians(errorAngle));
 
         aimPos.x += Mathf::RandomRange(-leadError, leadError);

@@ -224,9 +224,10 @@
             "texturePath": "Data\\Sprite\\Particle\\texture\\symbol_02.png",
             "trailAlign": 0,
             "trailEnable": true,
-            "trailInterval": 0.012000000104308128,
+            "trailInterval": 0.023000000044703484,
             "trailLength": 0.30000001192092896,
-            "trailWidth": 4.590000152587891,
+            "trailPoints": 24,
+            "trailWidth": 4.0,
             "type": 0,
             "uvScrollSpeed": [
                 0.0,

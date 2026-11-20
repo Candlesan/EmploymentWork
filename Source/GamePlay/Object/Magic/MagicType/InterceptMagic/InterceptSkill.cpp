@@ -65,7 +65,7 @@ void InterceptSkill::OnHold(const MagicContext& ctx, float elapsedTime)
 	{
 		ctx.base.owner->RecoverMagic(targetMagic->GetMagicmagicRefund());
 		CustomEffectManager::Instance().PlayBurst("Intercept", targetMagic->GetPosition(), { 0, 0, 0 }, { 1, 1, 1 });
-		CameraShakeManager::Instance().Add(targetMagic->GetPosition(), 10.0f, 0.5f, 0.1f);
+		CameraShakeManager::Instance().Add(targetMagic->GetPosition(), 30.0f, 0.8f, 0.1f);
 		targetMagic->OnTerminate();
 	}
 }

@@ -113,7 +113,7 @@ void LaserShotSkill::Fire(const MagicContext& ctx)
 	normalMagic.Emit(ctx.magicManager, spawnInfo, config);
 
 	normalMagic.ResetCharge();
-	CameraShakeManager::Instance().Add(0.05f, 0.15f);
+	CameraShakeManager::Instance().Add(0.05f, 1.0f);
 
 	coolDownTimer = coolDown;
 }
