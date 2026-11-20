@@ -203,7 +203,6 @@ void Enemy::Update(float elapsedTime)
 	flightController.Update(this, elapsedTime);
 
 	// ホバー中は目標の高さを揺らしながら追いかける
-	// ※ FlightController の Hover が velocity.y を 0 にするので、必ずその後で上書きする
 	if (flightController.GetFlightMode() == FlightMode::Hover)
 	{
 		// 一定時間ごとに揺れ量を振り直す
