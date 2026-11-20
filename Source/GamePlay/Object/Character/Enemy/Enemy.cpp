@@ -116,6 +116,10 @@ void Enemy::Initialize()
 	defenseMagic.Initialize(this); // 防御魔法の設定の読み込み
 
 	lockOn.Initialize(this, &Player::Instance());
+
+	CustomEffectManager::Instance().LoadEffectConfig("enemyStar", "Data/Json/Effect/enemyStar.json");
+	followEffect = CustomEffectManager::Instance().PlayEffect(
+		"enemyStar", { position.x, position.y, position.z }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 }
 
 
@@ -230,6 +234,17 @@ void Enemy::Update(float elapsedTime)
 	// モデル更新処理
 	UpdateTransform();
 	enemy->UpdateTransform(transform);
+
+	auto& effectManager = CustomEffectManager::Instance();
+	if (!effectManager.Exists(followEffect))
+	{
+		// 何かの理由で消えていたら出し直す
+		followEffect = effectManager.PlayEffect("enemyStar", position, { 0, 0, 0 }, { 1, 1, 1 });
+	}
+	else
+	{
+		effectManager.SetPosition(followEffect, position);
+	}
 }
 
 // 描画処理

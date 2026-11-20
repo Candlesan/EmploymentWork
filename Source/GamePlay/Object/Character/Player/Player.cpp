@@ -424,17 +424,6 @@ void Player::Update(float elapsedTime)
 
 	// 武器のアタッチメント処理
 	UpdateWeaponAttachment("hand_r");
-
-	auto& effectManager = CustomEffectManager::Instance();
-	if (!effectManager.Exists(followEffect))
-	{
-		// 何かの理由で消えていたら出し直す
-		followEffect = effectManager.PlayEffect("testEffect", position, { 0, 0, 0 }, { 1, 1, 1 });
-	}
-	else
-	{
-		effectManager.SetPosition(followEffect, position);
-	}
 }
 
 // 描画処理

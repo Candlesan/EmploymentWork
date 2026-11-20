@@ -8,7 +8,7 @@
     "hitRadius": 0.25,
     "interval": 0.800000011920929,
     "lifeTimer": 0.5,
-    "magicCost": 1.274999976158142,
+    "magicCost": 0.875,
     "pelletCount": 12,
     "scale": 1.0,
     "spawnOffsetX": 0.0,

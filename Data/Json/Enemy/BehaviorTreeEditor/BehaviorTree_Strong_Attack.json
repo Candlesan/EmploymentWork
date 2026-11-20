@@ -198,11 +198,6 @@
                     "compareType": 0,
                     "conditionType": "EnemyCurrentMagic",
                     "judgmentValue": 35.0
-                },
-                {
-                    "compareType": 4,
-                    "conditionType": "IsPlayerDefending",
-                    "judgmentValue": 0.0
                 }
             ],
             "config": {

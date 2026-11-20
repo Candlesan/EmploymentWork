@@ -6,6 +6,7 @@
 #include "System/UI/AnimationSequence/AnimationSequencerEditor.h"
 #include "System/UI/BehaviorTreeEditor/BehaviorTreeEditor.h"
 #include "System/Audio/AudioSource.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
 
 // ゲームオブジェクト
 #include "GamePlay/Object/Character/Animation/AnimationCharacter.h"
@@ -207,4 +208,6 @@ private:
 	bool showbtEditor = true;
 	bool showEnemyParameter = true;
 	bool showEnemy = true;
+
+	EffectHandle followEffect = InvalidEffect;   // 追従エフェクトのハンドル
 };
