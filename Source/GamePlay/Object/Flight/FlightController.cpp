@@ -31,7 +31,7 @@ void FlightController::ProcessInput(const FlightInput& input, float elapsedTime)
 		// ƒ{ƒ^ƒ“‚ğ—£‚µ‚½‚ç~‰º‚Ö
 		if (input.isAButtonUp)
 		{
-			currentMode = FlightMode::Down;
+			currentMode = FlightMode::Hover;
 		}
 
 		break;

@@ -78,7 +78,7 @@
             "maxParticle": 128,
             "meshPath": "",
             "name": "Node 2",
-            "noiseFrequency": 0.0,
+            "noiseFrequency": 1.0,
             "noisePath": "",
             "noiseStrength": 0.0,
             "noiseUvOffset": [
@@ -224,9 +224,9 @@
             "texturePath": "Data\\Sprite\\Particle\\texture\\circle_05.png",
             "trailAlign": 0,
             "trailEnable": true,
-            "trailInterval": 1.0,
+            "trailInterval": 0.024000000208616257,
             "trailLength": 0.30000001192092896,
-            "trailPoints": 19,
+            "trailPoints": 10,
             "trailWidth": 1.0,
             "type": 0,
             "uvScrollSpeed": [

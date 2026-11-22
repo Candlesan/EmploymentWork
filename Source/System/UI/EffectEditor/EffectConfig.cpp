@@ -337,7 +337,7 @@ void EffectConfig::Load(const std::string& filePath)
                 node.vortexStrength = nodeJson.value("vortexStrength", 0.0f);
                 node.attractStrength = nodeJson.value("attractStrength", 0.0f);
                 node.noiseStrength = nodeJson.value("noiseStrength", 0.0f);
-                node.noiseFrequency = nodeJson.value("noiseFrequency", 1.0f);
+                node.noiseFrequency = nodeJson.value("noiseFrequency", 0.0f);
 
                 // [Mesh—p]
                 node.meshPath = nodeJson.value("meshPath", "");
