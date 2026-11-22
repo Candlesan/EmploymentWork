@@ -357,10 +357,17 @@ void Player::Update(float elapsedTime)
 		UpdateStateTransitions(elapsedTime);
 
 		// 迎撃の構え：0.348秒で止める
-		if (currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
-			&& animator->GetUpperCurrentSeconds() >= interceptDistanceStopSeconds && !status.isAvoid)
+		if (!status.isAvoid)
 		{
-			animator->SetUpperSpeed(0.0f);
+			if (currentOverlayState == "AS_Combo_Attack_04_01_Seq_0"
+				&& animator->GetUpperCurrentSeconds() >= interceptDistanceStopSeconds && !status.isAvoid)
+			{
+				animator->SetUpperSpeed(0.0f);
+			}
+			else
+			{
+				animator->SetUpperSpeed(1.0f);
+			}
 		}
 		else
 		{
@@ -762,7 +769,7 @@ void Player::MagicInput(float elapsedTime)
 	}
 
 	// 迎撃の構え（撃つ処理は InterceptSkill に移動）
-	if (status.isIntercept && CanControl() && flightController.IsFlying() && !isNormalAttack)
+	if (status.isIntercept && CanControl() && flightController.IsFlying() && !isNormalAttack && !status.isAvoid)
 		PlayActionGraph("Intercept");
 
 	// スロットに入っている技を動かす

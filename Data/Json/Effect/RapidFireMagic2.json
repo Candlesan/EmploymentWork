@@ -78,7 +78,7 @@
             "maxParticle": 128,
             "meshPath": "",
             "name": "Node 2",
-            "noiseFrequency": 1.0,
+            "noiseFrequency": 0.0,
             "noisePath": "",
             "noiseStrength": 0.0,
             "noiseUvOffset": [

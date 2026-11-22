@@ -28,6 +28,7 @@ void AnimationSequencer::Update(const std::string& animName, float animTime)
     if (!data)
     {
         prevAnimTime = animTime;
+        currentSpeed = 1.0f;
         return;
     }
 
@@ -169,6 +170,7 @@ AnimationSequencer::AnimationData* AnimationSequencer::FindAnimationData(const s
     return nullptr;
 }
 
+// Save
 void AnimationSequencer::Save(const std::string& filepath)
 {
     // フォルダが無ければ作る
@@ -239,7 +241,7 @@ void AnimationSequencer::Save(const std::string& filepath)
     if (file.is_open()) file << root.dump(4);
 }
 
-// ★君のnlohmann::jsonを使った最強のLoad処理
+// Load
 void AnimationSequencer::Load(const std::string& filepath)
 {
     std::ifstream file(filepath);
