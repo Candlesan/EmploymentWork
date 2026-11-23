@@ -93,7 +93,7 @@ private:
 	DirectX::XMFLOAT3 cameraAngle = { 0, 0, 0 };
 
 	LightManager lightManager;
-	float lightYaw = 0.0f;   // 方位角（度）  0〜360
+	float lightYaw = 36.0f;   // 方位角（度）  0〜360
 	float lightPitch = 40.0;  // 仰角（度）   0=地平線, 90=真上
 
 	PointLight playerLight; // 周りを照らす用の弱い照明
