@@ -75,6 +75,7 @@ void Compute_Particle::Render(const RenderContext& rc)
     {
         dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
     }
+    dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 
     // •`‰æ
     system->render_trail(dc); // ‘Ñ‚ğæ‚É

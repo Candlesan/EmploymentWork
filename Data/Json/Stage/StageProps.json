@@ -153,6 +153,182 @@
                 80.0,
                 80.0
             ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                -6.099999904632568,
+                4.400000095367432,
+                -96.55000305175781
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                6.099999904632568,
+                4.400000095367432,
+                -96.55000305175781
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                3.1415927410125732,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                6.099999904632568,
+                4.400000095367432,
+                96.55000305175781
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                3.1415927410125732,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                -6.099999904632568,
+                4.400000095367432,
+                96.55000305175781
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                -1.5707963705062866,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                96.55000305175781,
+                4.400000095367432,
+                -6.099999904632568
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                -1.5707963705062866,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                96.55000305175781,
+                4.400000095367432,
+                6.099999904632568
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                1.5707963705062866,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                -96.55000305175781,
+                4.400000095367432,
+                6.099999904632568
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "angle": [
+                0.0,
+                1.5707963705062866,
+                0.0
+            ],
+            "bobHeight": 0.0,
+            "bobSpeed": 1.0,
+            "collision": false,
+            "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
+            "position": [
+                -96.55000305175781,
+                4.400000095367432,
+                -6.099999904632568
+            ],
+            "rotateSpeed": 0.0,
+            "scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
         }
     ]
 }

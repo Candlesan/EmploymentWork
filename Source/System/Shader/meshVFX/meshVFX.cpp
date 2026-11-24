@@ -47,6 +47,7 @@ void meshVFX::Begin(const RenderContext& rc)
 	dc->PSSetShader(pixelShader.Get(), nullptr, 0);
 
 	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestOnly), 0);
+	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
 
 	// 定数バッファ
 	ID3D11Buffer* cbs[] =

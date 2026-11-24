@@ -49,14 +49,16 @@ void Stage::Update(float elapsedTime)
 // 描画処理
 void Stage::Render(const RenderContext& rc, ModelRenderer* renderer)
 {
-	if(drawStage)
-	// Drawで描画をためてRenderで描画する
-	renderer->Draw(ShaderId::PBR, stage);
-
-	// 装飾物を描画する
-	for (auto& p : props)
+	if (drawStage)
 	{
-		renderer->Draw(ShaderId::PBR, p.model);
+		// ステージを描画する
+		renderer->Draw(ShaderId::PBR, stage);
+
+		// 装飾物を描画する
+		for (auto& p : props)
+		{
+			renderer->Draw(ShaderId::PBR, p.model);
+		}
 	}
 }
 

@@ -193,6 +193,8 @@ void Trail::Render(const RenderContext& rc)
 		dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Transparency), nullptr, 0xFFFFFFFF);
 	}
 
+	dc->RSSetState(rc.renderState->GetRasterizerState(RasterizerState::SolidCullNone));
+
 	// •`‰æ
 	dc->Draw(MAX_POLYGON * 2, 0);
 
