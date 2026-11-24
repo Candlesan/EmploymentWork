@@ -1,8 +1,8 @@
 #ifndef LIGHTS_HLSLI
 #define LIGHTS_HLSLI
 
-#define MAX_POINT_LIGHTS 16
-#define MAX_SPOT_LIGHTS 8
+#define MAX_POINT_LIGHTS 32
+#define MAX_SPOT_LIGHTS 16
 
 struct PointLightData
 {

@@ -40,8 +40,8 @@ class LightManager
 {
 public:
 	// シェーダー側の配列サイズと必ず合わせる
-	static constexpr int MaxPointLights = 16;
-	static constexpr int MaxSpotLights = 8;
+	static constexpr int MaxPointLights = 32;
+	static constexpr int MaxSpotLights = 16;
 
 	// Jsonの保存場所
 	static constexpr const char* LightsFilePath = "Data/Json/Stage/Light/StageLight.json";

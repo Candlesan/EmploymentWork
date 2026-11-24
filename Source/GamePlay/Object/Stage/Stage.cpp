@@ -1,4 +1,5 @@
 ﻿#include "Stage.h"
+
 #include "System/Graphic/Graphics.h"
 #include "System/Renderer/ShapeRenderer/ShapeRenderer.h"
 #include "System/UI/Dialog/Dialog.h"
@@ -20,8 +21,23 @@ Stage::Stage()
 	stage = std::make_shared<Model>(device, "Data/Model/Stage/Stage/circle_of_death.gltf");
 	scale.x = scale.y = scale.z = 0.025f;
 
+	// 装飾物を読み込む
 	LoadProps(PropsFilePath);
+
+	// 当たり判定を作る
 	BuildCollision();
+
+	CustomEffectManager::Instance().LoadEffectConfig("Lamp", "Data/Json/Effect/LampLight.json");
+}
+
+Stage::~Stage()
+{
+	// エフェクトを停止する
+	CustomEffectManager::Instance().StopAll();
+	for (auto& prop : props)
+	{
+		prop.LampLight = InvalidEffect;
+	}
 }
 
 // 更新処理
@@ -31,6 +47,7 @@ void Stage::Update(float elapsedTime)
 	stage->UpdateTransform(transform); // モデルの行列を更新する
 
 	time += elapsedTime;
+
 
 	// 各装飾の行列を更新する
 	for (auto& prop : props)
@@ -43,6 +60,13 @@ void Stage::Update(float elapsedTime)
 
 		prop.transform = MakeTransform(pos, angle, prop.scale);
 		prop.model->UpdateTransform(prop.transform);
+
+		if (prop.name == u8"ランプ" && prop.LampLight == InvalidEffect)
+		{
+			prop.LampLight = CustomEffectManager::Instance().PlayEffect("Lamp", { prop.position.x + prop.effectOffset.x, prop.position.y + prop.effectOffset.y, prop.position.z + prop.effectOffset.z }, { 0, 0, 0 }, { 1, 1, 1 });
+		}
+
+		CustomEffectManager::Instance().SetPosition(prop.LampLight, { prop.position.x + prop.effectOffset.x, prop.position.y + prop.effectOffset.y, prop.position.z + prop.effectOffset.z });
 	}
 }
 
@@ -122,7 +146,7 @@ void Stage::DrawGUI()
 			for (int i = 0; i < static_cast<int>(props.size()); ++i)
 			{
 				std::string label = std::to_string(i) + ": "
-					+ std::filesystem::path(props[i].path).stem().string();
+					+ props[i].name.c_str();
 
 				ImGui::PushID(i);
 				if (ImGui::Selectable(label.c_str(), selectedProp == i))
@@ -138,6 +162,15 @@ void Stage::DrawGUI()
 		if (selectedProp >= 0 && selectedProp < static_cast<int>(props.size()))
 		{
 			StageProp& prop = props[selectedProp];
+
+			char nameBuffer[128];
+			strcpy_s(nameBuffer, prop.name.c_str());
+			if (ImGui::InputText(u8"名前", nameBuffer, sizeof(nameBuffer)))
+			{
+				prop.name = nameBuffer;
+			}
+			ImGui::Separator();
+
 			ImGui::DragFloat3(u8"位置", &prop.position.x, 0.1f);
 			DirectX::XMFLOAT3 deg = {
 				DirectX::XMConvertToDegrees(prop.angle.x),
@@ -158,6 +191,8 @@ void Stage::DrawGUI()
 			ImGui::DragFloat(u8"上下の振れ幅", &prop.bobHeight, 0.001f);
 			ImGui::DragFloat(u8"上下の速さ", &prop.bobSpeed, 0.001f);
 			ImGui::Separator();
+
+			ImGui::DragFloat3(u8"ランプエフェクトオフセット", &prop.effectOffset.x, 0.1f);
 
 			ImGui::Checkbox(u8"当たり判定", &prop.hasCollision);
 
@@ -347,6 +382,7 @@ void Stage::SaveProps(const std::string& path)
 	{
 		j["props"].push_back({
 			{ "path",      p.path },
+			{ "name",      p.name },
 			{ "position",  { p.position.x, p.position.y, p.position.z } },
 			{ "angle",     { p.angle.x,    p.angle.y,    p.angle.z } },
 			{ "scale",     { p.scale.x,    p.scale.y,    p.scale.z } },
@@ -354,6 +390,7 @@ void Stage::SaveProps(const std::string& path)
 			{ "bobHeight",      p.bobHeight },
 			{ "bobSpeed",      p.bobSpeed },
 			{ "collision", p.hasCollision },
+			{ "effectOffset",  { p.effectOffset.x, p.effectOffset.y, p.effectOffset.z } },
 			});
 	}
 
@@ -385,12 +422,15 @@ void Stage::LoadProps(const std::string& path)
 		StageProp* p = AddProp(jp.value("path", ""));
 		if (!p) continue;          // モデルが見つからないものは飛ばす
 
+		p->name = jp.value("name", "");
+
 		auto readFloat3 = [&](const char* key, DirectX::XMFLOAT3& out)
 			{
 				if (jp.find(key) != jp.end())
 					out = { jp[key][0].get<float>(), jp[key][1].get<float>(), jp[key][2].get<float>() };
 			};
 		readFloat3("position", p->position);
+		readFloat3("effectOffset", p->effectOffset);
 		readFloat3("angle", p->angle);
 		readFloat3("scale", p->scale);
 		p->hasCollision = jp.value("collision", false);

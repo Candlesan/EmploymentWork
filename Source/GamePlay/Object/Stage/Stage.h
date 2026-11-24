@@ -1,5 +1,7 @@
 #pragma once
 #include "System/Renderer/ModelRenderer/ModelRenderer.h"
+#include "System/UI/EffectEditor/EffectManager/CustomEffectManager.h"
+
 #include "GamePlay/Object/Collision/Collision.h"
 
 #include <memory>
@@ -17,6 +19,7 @@ public:
 	struct StageProp
 	{
 		std::string path; // モデルのパス
+		std::string name; // ノードごとの名前
 		std::shared_ptr<Model> model;
 		DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT3 angle = { 0.0f, 0.0f, 0.0f };
@@ -26,9 +29,12 @@ public:
 		float bobSpeed = 1.0f;   // 上下の速さ（往復/秒）
 		DirectX::XMFLOAT4X4 transform{};
 		bool hasCollision = false; // 分割レイキャストのフラグ
+		EffectHandle LampLight = InvalidEffect; // ランプライト
+		DirectX::XMFLOAT3 effectOffset = { 0.0f, 0.0f, 0.0f };
 	};
 public:
 	Stage();
+	~Stage();
 
 	// 更新処理
 	void Update(float elapsedTime);
@@ -97,6 +103,6 @@ private:
 
 	std::vector<StageProp> props; // モデルの装飾
 	int selectedProp = -1; // 選択中のインデックス
-	char propPathBuffer[256] = "Data/Model/Stage/";
+	char propPathBuffer[256] = "Data/Model/Stage/"; // 保存・読み込みのパス
 	float time = 0.0f;
 };

@@ -100,7 +100,7 @@ void SceneGame::Initialize()
 	// ここに ImGui で決めた数値をそのまま入れる
 	light.direction = CalcLightDirection(); // 例：斜め上から
 	light.color = { 0.25f, 0.8f, 0.9f }; // 青白い色
-	light.intensity = 5.0f;
+	light.intensity = 0.7f;
 
 	lightManager.SetDirectionalLight(light);
 	lightManager.Load(LightManager::LightsFilePath);

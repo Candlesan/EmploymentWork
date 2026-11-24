@@ -9,6 +9,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 0.0,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "台座",
             "path": "Data\\Model\\Stage\\Props\\pedestal\\sm_plinthprickett.gltf",
             "position": [
                 0.0,
@@ -31,6 +37,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 0.10000000149011612,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "月の石",
             "path": "Data\\Model\\Stage\\Props\\MoonStorn\\Moonstone_07.gltf",
             "position": [
                 0.0,
@@ -53,6 +65,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": true,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "柱1",
             "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
             "position": [
                 18.299999237060547,
@@ -75,6 +93,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": true,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "柱2",
             "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
             "position": [
                 18.299999237060547,
@@ -97,6 +121,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": true,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "柱3",
             "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
             "position": [
                 -18.299999237060547,
@@ -119,6 +149,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": true,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "柱4",
             "path": "Data\\Model\\Stage\\Props\\Pillar\\dwarven_pillar.gltf",
             "position": [
                 -18.299999237060547,
@@ -141,6 +177,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 0.0,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "月",
             "path": "Data\\Model\\Stage\\Props\\Moon\\SM_Moon.gltf",
             "position": [
                 -486.79998779296875,
@@ -163,6 +205,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.699999988079071,
+                0.20000000298023224
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 -6.099999904632568,
@@ -185,6 +233,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.699999988079071,
+                0.20000000298023224
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 6.099999904632568,
@@ -207,6 +261,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.699999988079071,
+                -0.20000000298023224
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 6.099999904632568,
@@ -229,6 +289,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                0.0,
+                0.699999988079071,
+                -0.20000000298023224
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 -6.099999904632568,
@@ -251,6 +317,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                -0.20000000298023224,
+                0.699999988079071,
+                0.0
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 96.55000305175781,
@@ -273,6 +345,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                -0.20000000298023224,
+                0.699999988079071,
+                0.0
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 96.55000305175781,
@@ -295,6 +373,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                0.20000000298023224,
+                0.699999988079071,
+                0.0
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 -96.55000305175781,
@@ -317,6 +401,12 @@
             "bobHeight": 0.0,
             "bobSpeed": 1.0,
             "collision": false,
+            "effectOffset": [
+                0.20000000298023224,
+                0.699999988079071,
+                0.0
+            ],
+            "name": "ランプ",
             "path": "Data\\Model\\Stage\\Props\\Lamp\\stylized_gothic_wall_torch.gltf",
             "position": [
                 -96.55000305175781,
