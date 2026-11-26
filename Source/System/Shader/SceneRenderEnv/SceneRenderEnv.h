@@ -18,7 +18,7 @@ public:
 	~SceneRenderEnv();
 
 	void Initialize();
-	void Render(const RenderContext& rc);
+	void SkyRender(const RenderContext& rc);
 
 	void RenderStageShadow(const DirectX::XMFLOAT3& volumeMin,
 						   const DirectX::XMFLOAT3& volumeMax,

@@ -475,7 +475,7 @@ void SceneGame::Render()
 
 		// ===== シェーダー =====
 		
-		sceneRender.Render(rc);
+		sceneRender.SkyRender(rc);
 
 		// エフェクト描画 (Effekseer)
 		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());

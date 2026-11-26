@@ -52,7 +52,7 @@ void SceneRenderEnv::Initialize()
 }
 
 // 描画
-void SceneRenderEnv::Render(const RenderContext& rc)
+void SceneRenderEnv::SkyRender(const RenderContext& rc)
 {
 	skyMap->Draw(rc); // スカイマップ描画
 }

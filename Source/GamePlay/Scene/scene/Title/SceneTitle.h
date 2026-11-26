@@ -3,6 +3,10 @@
 
 #include "System/UI/UIEditor/UIEditor.h"
 #include "System/UI/UIEditor/UICanvas.h"
+#include "System/Shader/SceneRenderEnv/SceneRenderEnv.h"
+
+#include "GamePlay/Object/Camera/DebugCamera/DebugCamera.h"
+#include "Gameplay/Object/Stage/Stage.h"
 
 #include <memory>
 
@@ -20,7 +24,7 @@ public:
 	void Initialize() override;
 
 	//èIóπâª
-	void Finalize() override {};
+	void Finalize() override;
 
 	//çXêVèàóù
 	void Update(float elapsedTime) override;
@@ -30,7 +34,13 @@ public:
 
 	//GUIï`âÊ
 	void DrawGUI() override;
+
+	void OnResize(float w, float h);
 private:
+	SceneRenderEnv sceneRender;
+	std::unique_ptr<Stage> stage;
+	std::unique_ptr<DebugCamera> debugCamera;
+
 	UIEditor uiEditor;
 	UICanvas uiCanvas;
 

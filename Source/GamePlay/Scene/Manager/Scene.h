@@ -35,7 +35,7 @@ public:
 	{
 		if (w <= 0.0f || h <= 0.0f) return;
 		Camera& camera = CameraManager::Instance().GetMainCamera();
-		camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45.0f), w / h, 0.1f, 1000.0f);
+		camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45.0f), w / h, 0.1f, 1500.0f);
 		OnResize(w, h);
 	}
 protected:

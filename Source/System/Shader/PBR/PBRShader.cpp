@@ -125,9 +125,12 @@ void PBRShader::Update(const RenderContext& rc, const Model::Mesh& mesh)
     // -------------------------------------------------------
     // シャドウマップ用定数バッファ更新
     // -------------------------------------------------------
-    if (!rc.isShadowPass && (rc.stageShadowMapData || rc.characterShadowMapData))
+    if (!rc.isShadowPass)
     {
         shadowmap_constants cbShadow{};
+        cbShadow.stage_shadow_attenuation = 1.0f;   // 影データがない＝影の影響なし
+        cbShadow.character_shadow_attenuation = 1.0f;
+
         if (rc.stageShadowMapData)
         {
             cbShadow.stage_light_view_projection = rc.stageShadowMapData->lightViewProjection;
