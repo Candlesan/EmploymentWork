@@ -24,6 +24,7 @@
 #include "System/Shader/fullscreen_quad/fullscreen_quad.h"
 #include "System/Shader/SkyMap/SkyMap.h"
 #include "System/Shader/bloom/bloom.h"
+#include "System/Shader/SceneRenderEnv/SceneRenderEnv.h"
 
 // エディター
 #include "System/UI/EffectEditor/EffectEditor.h"
@@ -32,6 +33,7 @@
 
 #include <memory>
 #include <string>
+
 
 // ゲームシーン
 class SceneGame : public Scene
@@ -52,8 +54,6 @@ public:
 	// 描画処理
 	void Render() override;
 
-	// シャドウマップ描画
-	void RenderStageShadowMap();
 	void RenderCharacterShadowMap();
 
 	// GUI描画
@@ -71,8 +71,6 @@ private:
 
 	// デバック表示のON/OFFを切り替える関数
 	void ShowDebugSwitch();
-
-	DirectX::XMFLOAT3 CalcLightDirection() const;
 private:
 	// 3Dモデル
 	std::unique_ptr<Stage> stage;
@@ -81,6 +79,8 @@ private:
 	// カメラ
 	std::unique_ptr<GameCamera> gameCamera;
 	std::unique_ptr<DebugCamera> debugCamera;
+
+	SceneRenderEnv sceneRender;
 
 	// カメラのモード定義
 	enum class CameraMode
@@ -92,10 +92,6 @@ private:
 	float cameraRange = 7.0f;
 	DirectX::XMFLOAT3 cameraAngle = { 0, 0, 0 };
 
-	LightManager lightManager;
-	float lightYaw = 36.0f;   // 方位角（度）  0〜360
-	float lightPitch = 40.0;  // 仰角（度）   0=地平線, 90=真上
-
 	PointLight playerLight; // 周りを照らす用の弱い照明
 	PointLight enemyLight;
 	PointLight playerFaceLight; // キャラクターの顔を照らすライト
@@ -105,20 +101,11 @@ private:
 
 	std::unique_ptr<SkyMap> skyMap; // スカイマップ
 
-	// PBR調整用
-	float pbrMetalness = 0.0f;
-	float pbrRoughness = 0.0f;
-	float ambientIntensity = 0.01f;
-
-	// シャドウマップ調整用
-	float stageShadowAttenuation = 0.0f;
-	float stageShadowBias = 0.006f;
+	// キャラクターの影
 	float characterShadowAttenuation = 0.0f;
 	float characterShadowBias = 0.000f;
-	DirectX::XMFLOAT4X4 stageLightViewProjection;
-	DirectX::XMFLOAT4X4 characterLightViewProjection;
-	float stageRadius = 0.0f;
-	bool stageShadowRendered = false;
+	DirectX::XMFLOAT4X4 characterLightViewProjection{};
+
 
 	// ブルーム調整用
 	std::unique_ptr<bloom> bloomer;
