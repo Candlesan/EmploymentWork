@@ -24,15 +24,8 @@ public:
 	//描画処理
 	void Render() override;
 
-	// シャドウマップ描画
-	void RenderShadowMap();
-
 	//GUI描画
 	void DrawGUI() override;
-
-	// 画面比率修正関数
-	void OnResize(float width, float height);
-
 private:
 	// ローディングスレッド
 	static void LoadingThread(SceneLoad* scene);

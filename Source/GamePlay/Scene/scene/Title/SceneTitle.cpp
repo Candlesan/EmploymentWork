@@ -114,13 +114,3 @@ void SceneTitle::DrawGUI()
 {
 	uiEditor.DrawGUI();
 }
-
-// ‰æ–Ê”ä—¦C³ŠÖ”
-void SceneTitle::OnResize(float width, float height)
-{
-	// ƒJƒƒ‰‚Ì”ä—¦‚ğ’¼‚·
-	Camera& camera = CameraManager::Instance().GetMainCamera();
-	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45), width / height, 0.1f, 1000.0f);
-
-	ID3D11Device* device = Graphics::Instance().GetDevice();
-}

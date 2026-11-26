@@ -92,25 +92,6 @@ void SceneLoad::DrawGUI()
 	uiEditor.DrawGUI();
 }
 
-// 画面比率修正関数
-void SceneLoad::OnResize(float width, float height)
-{
-	// カメラの比率を直す
-	Camera& camera = CameraManager::Instance().GetMainCamera();
-	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45), width / height, 0.1f, 1000.0f);
-
-	ID3D11Device* device = Graphics::Instance().GetDevice();
-
-	//framebuffers[0] = std::make_unique<framebuffer>(device, width, height, true);
-
-	//// ブルームを新しいサイズで丸ごと生成し直す
-	//bloomer = std::make_unique<bloom>(device, width, height);
-
-	//// 初期化時に設定していたパラメータを再設定
-	//bloomer->bloom_intensity = bloom_intensity;
-	//bloomer->bloom_extraction_threshold = bloom_extraction;
-}
-
 //ローディングスレッド
 void SceneLoad::LoadingThread(SceneLoad* scene)
 {

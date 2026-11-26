@@ -30,9 +30,6 @@ public:
 
 	//GUI•`‰æ
 	void DrawGUI() override;
-
-	// ‰æ–Ê”ä—¦C³ŠÖ”
-	void OnResize(float width, float height);
 private:
 	UIEditor uiEditor;
 	UICanvas uiCanvas;

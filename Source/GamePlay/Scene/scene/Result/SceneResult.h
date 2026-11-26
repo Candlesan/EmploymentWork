@@ -29,9 +29,6 @@ public:
 	//GUI•`‰æ
 	void DrawGUI() override;
 
-	// ‰æ–Ê”ä—¦C³ŠÖ”
-	void OnResize(float width, float height);
-
 	// 1•¶š‚ğØ‚è”²‚¢‚Ä•\¦‚·‚é
 	void SetDigit(const char* name, int number);
 

@@ -1148,10 +1148,6 @@ void SceneGame::Load(const std::string& path, Character* character)
 // 画面比率修正関数
 void SceneGame::OnResize(float width, float height)
 {
-	// カメラの比率を直す
-	Camera& camera = CameraManager::Instance().GetMainCamera();
-	camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45), width / height, 0.1f, 1000.0f);
-
 	ID3D11Device* device = Graphics::Instance().GetDevice();
 
 	framebuffers[0] = std::make_unique<framebuffer>(device, width, height, true);

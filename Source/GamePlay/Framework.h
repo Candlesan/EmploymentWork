@@ -18,7 +18,7 @@ private:
 
 	void CalculateFrameStats();
 	void ToggleFullscreen();
-
+	void HandleResize(float w, float h);
 public:
 	int Run();
 	LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

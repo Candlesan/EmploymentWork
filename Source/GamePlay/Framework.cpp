@@ -45,21 +45,8 @@ Framework::Framework(HWND hWnd)
 	// シーン初期化
 	SceneManager::Instance().ChangeScene(new SceneTitle);
 
-
 	// 最初にボーダーレスのフルスクリーンを作る
 	ToggleFullscreen();
-
-	// グラフィック基盤をリサイズする
-	Graphics::Instance().OnResize();
-
-	float w = Graphics::Instance().GetScreenWidth();
-	float h = Graphics::Instance().GetScreenHeight();
-
-	Scene* currentScene = SceneManager::Instance().GetCurrentScene();
-	if (currentScene != nullptr)
-	{
-		currentScene->OnResize(w, h);
-	}
 
 	srand(static_cast<unsigned int>(time(nullptr)));
 }
@@ -194,12 +181,7 @@ void Framework::ToggleFullscreen()
 			mi.rcMonitor.left, mi.rcMonitor.top, w, h,
 			SWP_FRAMECHANGED);
 
-		// GraphicsのOnResizeではなく、確定したw, hを直接シーンに伝える！
-		Scene* currentScene = SceneManager::Instance().GetCurrentScene();
-		if (currentScene != nullptr)
-		{
-			currentScene->OnResize(static_cast<float>(w), static_cast<float>(h));
-		}
+		HandleResize(w, h);
 	}
 	else
 	{
@@ -214,12 +196,18 @@ void Framework::ToggleFullscreen()
 			windowedRect.left, windowedRect.top, w, h,
 			SWP_FRAMECHANGED);
 
-		// ウィンドウモードに戻ったときも、元のサイズ（w, h）を直接伝える！
-		Scene* currentScene = SceneManager::Instance().GetCurrentScene();
-		if (currentScene != nullptr)
-		{
-			currentScene->OnResize(static_cast<float>(w), static_cast<float>(h));
-		}
+		HandleResize(w, h);
+	}
+}
+
+void Framework::HandleResize(float w, float h)
+{
+	// グラフィック基盤をリサイズする
+	Graphics::Instance().OnResize();
+
+	if (Scene* s = SceneManager::Instance().GetCurrentScene())
+	{
+		s->Resize(w, h);
 	}
 }
 
@@ -276,17 +264,10 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 	case WM_SIZE:
 		if (wParam != SIZE_MINIMIZED)
 		{
-			// グラフィック基盤をリサイズする
-			Graphics::Instance().OnResize();
-
 			float w = Graphics::Instance().GetScreenWidth();
 			float h = Graphics::Instance().GetScreenHeight();
 
-			Scene* currentScene = SceneManager::Instance().GetCurrentScene();
-			if (currentScene != nullptr)
-			{
-				currentScene->OnResize(w, h);
-			}
+			HandleResize(static_cast<float>(w), static_cast<float>(h));
 		}
 		break;
 	case WM_ENTERSIZEMOVE:

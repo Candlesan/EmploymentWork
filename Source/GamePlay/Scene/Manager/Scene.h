@@ -1,4 +1,7 @@
 #pragma once
+#include "GamePlay/Object/Camera/Camera.h"
+#include <DirectXMath.h>
+
 
 //ƒV[ƒ“
 class Scene
@@ -28,7 +31,16 @@ public:
 	//€”õŠ®—¹İ’è
 	void SetReady() { ready = true; }
 
+	void Resize(float w, float h)
+	{
+		if (w <= 0.0f || h <= 0.0f) return;
+		Camera& camera = CameraManager::Instance().GetMainCamera();
+		camera.SetPerspectiveFov(DirectX::XMConvertToRadians(45.0f), w / h, 0.1f, 1000.0f);
+		OnResize(w, h);
+	}
+protected:
 	virtual void OnResize(float width, float height) {}
+
 private:
 	bool ready = false;
 };

@@ -298,6 +298,9 @@
     <Filter Include="Source\GamepPlay\Object\Magic\MagicMove\CurveMagic">
       <UniqueIdentifier>{119704a8-ee01-42cd-bb63-ddf4a087da77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Shader\SceneRenderEnv">
+      <UniqueIdentifier>{7d5cde04-1dca-402c-ad01-de3aeeb8974f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -708,6 +711,9 @@
     <ClInclude Include="Source\GamePlay\Object\Magic\MagicMove\CurveMagic\CurveMove.h">
       <Filter>Source\GamepPlay\Object\Magic\MagicMove\CurveMagic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\System\Shader\SceneRenderEnv\SceneRenderEnv.h">
+      <Filter>Source\System\Shader\SceneRenderEnv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui-docking\imgui.cpp">
@@ -1057,6 +1063,9 @@
     </ClCompile>
     <ClCompile Include="Source\System\Renderer\Light\Light.cpp">
       <Filter>Source\System\Renderer\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\System\Shader\SceneRenderEnv\SceneRenderEnv.cpp">
+      <Filter>Source\System\Shader\SceneRenderEnv</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

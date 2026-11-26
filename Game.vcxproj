@@ -231,6 +231,7 @@
     <ClInclude Include="Source\System\Shader\Lambert\LambertShader.h" />
     <ClInclude Include="Source\System\Shader\meshVFX\meshVFX.h" />
     <ClInclude Include="Source\System\Shader\PBR\PBRShader.h" />
+    <ClInclude Include="Source\System\Shader\SceneRenderEnv\SceneRenderEnv.h" />
     <ClInclude Include="Source\System\Shader\Shader.h" />
     <ClInclude Include="Source\System\Shader\ShadowMap\ShadowMap.h" />
     <ClInclude Include="Source\System\Shader\SkyMap\SkyMap.h" />
@@ -352,6 +353,7 @@
     <ClCompile Include="Source\System\Shader\Lambert\LambertShader.cpp" />
     <ClCompile Include="Source\System\Shader\meshVFX\meshVFX.cpp" />
     <ClCompile Include="Source\System\Shader\PBR\PBRShader.cpp" />
+    <ClCompile Include="Source\System\Shader\SceneRenderEnv\SceneRenderEnv.cpp" />
     <ClCompile Include="Source\System\Shader\ShadowMap\ShadowMap.cpp" />
     <ClCompile Include="Source\System\Shader\SkyMap\SkyMap.cpp" />
     <ClCompile Include="Source\System\UI\AnimationNodeEditor\AnimationTransitionEditor.cpp" />
