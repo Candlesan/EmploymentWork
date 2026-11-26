@@ -73,7 +73,7 @@ bloom::bloom(ID3D11Device* device, uint32_t width, uint32_t height)
 
 }
 
-void bloom::make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView* color_map, RenderState* render_state)
+void bloom::make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView* color_map, const RenderState* render_state)
 {
 	// Store current states
 	ID3D11ShaderResourceView* null_shader_resource_view{};

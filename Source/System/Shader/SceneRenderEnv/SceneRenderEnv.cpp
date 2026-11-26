@@ -1,6 +1,13 @@
 #include "SceneRenderEnv.h"
+
 #include "System/Graphic/Graphics.h"
+#include "System/Graphic/GpuResourceUtils.h"
+
+#include "System/Shader/fullscreen_quad/fullscreen_quad.h"
+#include "System/Shader/FrameBuffer/FrameBuffer.h"
 #include "System/Shader/SkyMap/SkyMap.h"
+#include "System/Shader/bloom/bloom.h"
+
 
 #include <imgui.h>
 
@@ -8,8 +15,13 @@
 SceneRenderEnv::SceneRenderEnv() = default;
 SceneRenderEnv::~SceneRenderEnv() = default;
 
+// 初期化
 void SceneRenderEnv::Initialize()
 {
+	ID3D11Device* device = Graphics::Instance().GetDevice();
+	float screenWidth = Graphics::Instance().GetScreenWidth();
+	float screenHeight = Graphics::Instance().GetScreenHeight();
+
 	// ライト設定
 	DirectionalLight light;
 
@@ -26,6 +38,17 @@ void SceneRenderEnv::Initialize()
 	// ステージの影の設定
 	stageShadowAttenuation = 0;
 	stageShadowBias = 0.001f;
+
+	// フレームバッファ
+	framebuffers[0] = std::make_unique<framebuffer>(device, screenWidth, screenHeight, true);
+	bit_block_transfer = std::make_unique<fullscreen_quad>(device);
+
+	// ブルーム関連
+	bloomer = std::make_unique<bloom>(device, screenWidth, screenHeight);
+	GpuResourceUtils::LoadPixelShader(device, "Data/Shader/final_pass_ps.cso", pixel_shaders[0].ReleaseAndGetAddressOf());
+	bloomer->bloom_intensity = bloom_intensity;
+	bloomer->bloom_extraction_threshold = bloom_extraction;
+	bloomer->exposure = bloom_exposure;
 }
 
 // 描画
@@ -63,7 +86,7 @@ void SceneRenderEnv::RenderStageShadow(
 	rc.lightManager = &lightManager;
 	rc.isShadowPass = true;
 
-	//１カメラをライトから見た情報に変更
+	// カメラをライトから見た情報に変更
 	{
 		// 最初のカメラの情報を保存する
 		camera.SaveCamera();
@@ -94,7 +117,7 @@ void SceneRenderEnv::RenderStageShadow(
 		camera.SetOrthographic(
 			stageRadius * 1.8f,   // 横幅：アリーナの直径
 			stageRadius * 1.8f,   // 高さ
-			0.0f,            // 近平面：ライト位置から
+			0.0f,				  // 近平面：ライト位置から
 			stageRadius * 1.8f    // 遠平面：アリーナの反対側まで
 		);
 
@@ -115,10 +138,11 @@ void SceneRenderEnv::RenderStageShadow(
 	}
 	shadowMap->Deactive(dc);
 
-	//２変更したカメラの情報を元に戻すこと
+	//変更したカメラの情報を元に戻す
 	camera.ResetCamera();
 }
 
+// GUI描画
 void SceneRenderEnv::DrawGUI()
 {
 	Graphics& graphics = Graphics::Instance();
@@ -227,7 +251,7 @@ void SceneRenderEnv::DrawGUI()
 		ImGui::DragFloat(u8"空の明るさ", &skyMap->sky_intensity, 0.001f, 0.0f, 1.0f);
 	}
 
-	if (ImGui::CollapsingHeader(u8"ステージ用", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(u8"ステージの影", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::DragFloat(u8"影の減衰##stage", &stageShadowAttenuation, 0.001f, 0.0f, 1.0f);
 		ImGui::DragFloat(u8"シャドウバイアス##stage", &stageShadowBias, 0.001f, 0.0f, 1.0f);
@@ -235,17 +259,96 @@ void SceneRenderEnv::DrawGUI()
 		ImGui::Text(u8"テクスチャ##stage");
 		ImGui::Image(stageShadowMap->GetShaderResourceView(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 	}
+
+	if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::DragFloat(u8"ブローム抽出閾値", &bloom_extraction, 0.01f, +0.0f, +5.0f);
+		ImGui::DragFloat(u8"ブローム強度", &bloom_intensity, 0.01f, +0.0f, +5.0f);
+		ImGui::DragFloat(u8"露出", &bloom_exposure, 0.01f, 0.0f, 1.0f);
+
+		bloomer->bloom_extraction_threshold = bloom_extraction;
+		bloomer->bloom_intensity = bloom_intensity;
+		bloomer->exposure = bloom_exposure;
+
+		ImGui::Separator();
+
+		// グロー抽出
+		ImGui::Text(u8"グロー抽出");
+		ImGui::Image((ImTextureID)bloomer->get_glkow_extraction(), ImVec2(256, 256));
+
+		// ガウシアンブラー各段階
+		for (size_t i = 0; i < bloom::downsampled_count; ++i)
+		{
+			ImGui::Text(u8"ガウシアンブラー [%zu][0]", i);
+			ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 0), ImVec2(256, 256));
+			ImGui::Text(u8"ガウシアンブラー [%zu][1]", i);
+			ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
+		}
+	}
 }
 
+// 画面比率修正
 void SceneRenderEnv::OnResize(float w, float h)
 {
+	ID3D11Device* device = Graphics::Instance().GetDevice();
+
+	framebuffers[0] = std::make_unique<framebuffer>(device, w, h, true);
+
+	// ブルームを新しいサイズで丸ごと生成し直す
+	bloomer = std::make_unique<bloom>(device, w, h);
+
+	// 初期化時に設定していたパラメータを再設定
+	bloomer->bloom_intensity = bloom_intensity;
+	bloomer->bloom_extraction_threshold = bloom_extraction;
+	bloomer->exposure = bloom_exposure;
 }
 
+// ポストエフェクト開始
+void SceneRenderEnv::BeginScene(const RenderContext& rc)
+{
+	framebuffers[0]->clear(rc.deviceContext);
+	framebuffers[0]->activate(rc.deviceContext);
+}
+
+// ポストエフェクト終了
+void SceneRenderEnv::EndScene(const RenderContext& rc)
+{
+	ID3D11DeviceContext* dc = rc.deviceContext;
+
+	framebuffers[0]->deactivate(dc);
+	bloomer->make(dc, framebuffers[0]->shader_resource_views[0].Get(), rc.renderState);
+}
+
+// 2枚のテクスチャを送る
+void SceneRenderEnv::Present(const RenderContext& rc)
+{
+	ID3D11DeviceContext* dc = rc.deviceContext;
+
+	// ブルーム設定
+	ID3D11ShaderResourceView* shader_resource_views[] =
+	{
+		framebuffers[0]->shader_resource_views[0].Get(),
+		bloomer->shader_resource_view(),
+	};
+
+	Graphics::Instance().SetRenderTargets();
+
+	dc->OMSetBlendState(rc.renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
+	dc->OMSetDepthStencilState(rc.renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
+
+	bloomer->set_constant_buffer(dc);
+	bit_block_transfer->blit(dc, shader_resource_views, 0, 2, pixel_shaders[0].Get());
+}
+
+// 描画情報を設定
 void SceneRenderEnv::SetupRenderContext(RenderContext& rc)
 {
+	// PBR
 	rc.pbrMetalness = pbrMetalness;
 	rc.pbrRoughness = pbrRoughness;
 	rc.ambientIntensity = ambientIntensity;
+
+	// ライト
 	rc.lightManager = &lightManager;
 
 	// stage用のャドウマップ準備
@@ -259,6 +362,7 @@ void SceneRenderEnv::SetupRenderContext(RenderContext& rc)
 	rc.stageShadowMapData = &stageShadowData;
 }
 
+// 光の方向を計算
 DirectX::XMFLOAT3 SceneRenderEnv::CalcLightDirection() const
 {
 	float Yaw = DirectX::XMConvertToRadians(lightYaw);

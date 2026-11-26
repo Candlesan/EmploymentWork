@@ -1,4 +1,3 @@
-// UNIT.32
 #include "fullscreen_quad.h"
 #include "System/Graphic/GpuResourceUtils.h"
 #include "System/Core/Misc.h"

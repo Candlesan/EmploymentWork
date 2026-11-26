@@ -7,6 +7,9 @@
 #include <DirectXMath.h>
 
 class SkyMap;
+class fullscreen_quad;
+class framebuffer;
+class bloom;
 
 class SceneRenderEnv
 {
@@ -24,6 +27,10 @@ public:
 
 	void OnResize(float w, float h);
 	void InvalidateShadow() { stageShadowRendered = false; }
+
+	void BeginScene(const RenderContext& rc);
+	void EndScene(const RenderContext& rc);
+	void Present(const RenderContext& rc);
 
 	void SetupRenderContext(RenderContext& rc);
 	LightManager& GetLightManager() { return lightManager; }
@@ -51,4 +58,15 @@ private:
 	DirectX::XMFLOAT4X4 stageLightViewProjection{};
 	float stageRadius = 0.0f;
 	bool stageShadowRendered = false;
+
+	// ポストエフェクト
+	std::unique_ptr<framebuffer> framebuffers[3];
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[3];
+	std::unique_ptr<fullscreen_quad> bit_block_transfer;
+
+	// ブルーム
+	std::unique_ptr<bloom> bloomer;
+	float bloom_extraction = 1.87f;
+	float bloom_intensity = 1.79f;
+	float bloom_exposure = 0.45;
 };

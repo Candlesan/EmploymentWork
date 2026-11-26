@@ -106,16 +106,6 @@ void SceneGame::Initialize()
 	enemyLight.intensity = 18.75;
 	enemyLight.range = 7.8;
 
-	// フレームバッファ
-	framebuffers[0] = std::make_unique<framebuffer>(device, screenWidth, screenHeight, true);
-	bit_block_transfer = std::make_unique<fullscreen_quad>(device);
-
-	// ブルーム関連
-	bloomer = std::make_unique<bloom>(device, screenWidth, screenHeight);
-	GpuResourceUtils::LoadPixelShader(device, "Data/Shader/final_pass_ps.cso", pixel_shaders[0].ReleaseAndGetAddressOf());
-	bloomer->bloom_intensity = bloom_intensity;
-	bloomer->bloom_extraction_threshold = bloom_extraction;
-
 	// キャラクターの影の設定
 	characterShadowAttenuation = 0;
 	characterShadowBias = 0.000f;
@@ -419,9 +409,9 @@ void SceneGame::Render()
 	rc.deviceContext = dc;
 	rc.renderState = renderState;
 	rc.camera = &camera;
-	rc.isShadowPass = false;
 
 	sceneRender.SetupRenderContext(rc);
+	rc.isShadowPass = false;
 
 	RenderCharacterShadowMap();
 	ShadowMapData characterShadowData;
@@ -470,9 +460,7 @@ void SceneGame::Render()
 
 	// 3Dモデル描画
 	{
-		framebuffers[0]->clear(dc);
-		framebuffers[0]->activate(dc);
-
+		sceneRender.BeginScene(rc);
 		// ===== モデル =====
 		if (showModel)
 		{
@@ -488,7 +476,6 @@ void SceneGame::Render()
 		// ===== シェーダー =====
 		
 		sceneRender.Render(rc);
-		//skyMap->Draw(rc); // スカイマップ描画
 
 		// エフェクト描画 (Effekseer)
 		EffectManager::Instance().Render(camera.GetView(), camera.GetProjection());
@@ -501,31 +488,14 @@ void SceneGame::Render()
 		CustomEffectManager::Instance().Render(rc);
 		CustomEffectManager::Instance().RenderMeshVFX(modelRenderer);
 
+		sceneRender.EndScene(rc);
+		sceneRender.Present(rc);
+
 		// シェイプ描画
 		if (showDebugPrimitive)
 		{
 			shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
 		}
-
-		framebuffers[0]->deactivate(dc);
-
-		// ブルーム描画
-		bloomer->make(dc, framebuffers[0]->shader_resource_views[0].Get(), renderState);
-
-		// ブルーム設定
-		ID3D11ShaderResourceView* shader_resource_views[] =
-		{
-			framebuffers[0]->shader_resource_views[0].Get(),
-			bloomer->shader_resource_view(),
-		};
-
-		Graphics::Instance().SetRenderTargets();
-
-		dc->OMSetBlendState(renderState->GetBlendState(BlendState::Opaque), nullptr, 0xFFFFFFFF);
-		dc->OMSetDepthStencilState(renderState->GetDepthStencilState(DepthState::TestAndWrite), 0);
-
-		bloomer->set_constant_buffer(dc);
-		bit_block_transfer->blit(dc, shader_resource_views, 0, 2, pixel_shaders[0].Get());
 	}
 
 	// 2Dスプライト描画
@@ -549,6 +519,7 @@ void SceneGame::Render()
 	}
 }
 
+// キャラクターの影
 void SceneGame::RenderCharacterShadowMap()
 {
 	ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
@@ -769,31 +740,6 @@ void SceneGame::DrawGUI()
 
 			sceneRender.DrawGUI();
 
-			if (ImGui::CollapsingHeader(u8"ブルーム", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::DragFloat(u8"ブローム抽出閾値", &bloom_extraction, 0.01f, +0.0f, +5.0f);
-				ImGui::DragFloat(u8"ブローム強度", &bloom_intensity, 0.01f, +0.0f, +5.0f);
-				ImGui::DragFloat(u8"露出", &bloomer->exposure, 0.01f, 0.0f, 1.0f);
-
-				bloomer->bloom_extraction_threshold = bloom_extraction;
-				bloomer->bloom_intensity = bloom_intensity;
-
-				ImGui::Separator();
-
-				// グロー抽出
-				ImGui::Text(u8"グロー抽出");
-				ImGui::Image((ImTextureID)bloomer->get_glkow_extraction(), ImVec2(256, 256));
-
-				// ガウシアンブラー各段階
-				for (size_t i = 0; i < bloom::downsampled_count; ++i)
-				{
-					ImGui::Text(u8"ガウシアンブラー [%zu][0]", i);
-					ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 0), ImVec2(256, 256));
-					ImGui::Text(u8"ガウシアンブラー [%zu][1]", i);
-					ImGui::Image((ImTextureID)bloomer->get_gaussian_blur(i, 1), ImVec2(256, 256));
-				}
-			}
-
 			ImGui::Separator();
 			ImGui::Text(u8"---- マテリアル リアルタイム編集 ----");
 
@@ -933,16 +879,7 @@ void SceneGame::Load(const std::string& path, Character* character)
 // 画面比率修正関数
 void SceneGame::OnResize(float width, float height)
 {
-	ID3D11Device* device = Graphics::Instance().GetDevice();
-
-	framebuffers[0] = std::make_unique<framebuffer>(device, width, height, true);
-
-	// ブルームを新しいサイズで丸ごと生成し直す
-	bloomer = std::make_unique<bloom>(device, width, height);
-
-	// 初期化時に設定していたパラメータを再設定
-	bloomer->bloom_intensity = bloom_intensity;
-	bloomer->bloom_extraction_threshold = bloom_extraction;
+	sceneRender.OnResize(width, height);
 }
 
 // デバック表示のON/OFFを切り替える関数

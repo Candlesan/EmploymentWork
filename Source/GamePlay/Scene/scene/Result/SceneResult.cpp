@@ -4,6 +4,9 @@
 #include "System/Graphic/Graphics.h"
 #include "System/Core/Input/Input.h"
 
+// シェーダー
+#include "System/Resource/Sprite/Sprite.h"
+
 // ゲーム
 #include "GamePlay/Session/GameSession.h"
 

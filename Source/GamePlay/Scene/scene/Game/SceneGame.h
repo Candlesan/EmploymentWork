@@ -20,10 +20,6 @@
 #include "GamePlay/Object/Character/Enemy/EnemyUI.h"
 
 // シェーダー
-#include "System/Shader/FrameBuffer/FrameBuffer.h"
-#include "System/Shader/fullscreen_quad/fullscreen_quad.h"
-#include "System/Shader/SkyMap/SkyMap.h"
-#include "System/Shader/bloom/bloom.h"
 #include "System/Shader/SceneRenderEnv/SceneRenderEnv.h"
 
 // エディター
@@ -99,21 +95,10 @@ private:
 	DirectX::XMFLOAT3 playerLightPos = { 1, 2.02f, 0.76f };
 	DirectX::XMFLOAT3 enemyLightPos  = { 1, 2.02f, 0.76f };
 
-	std::unique_ptr<SkyMap> skyMap; // スカイマップ
-
 	// キャラクターの影
 	float characterShadowAttenuation = 0.0f;
 	float characterShadowBias = 0.000f;
 	DirectX::XMFLOAT4X4 characterLightViewProjection{};
-
-
-	// ブルーム調整用
-	std::unique_ptr<bloom> bloomer;
-	std::unique_ptr<framebuffer> framebuffers[8];
-	std::unique_ptr<fullscreen_quad> bit_block_transfer;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shaders[8];
-	float bloom_extraction = 1.87f;
-	float bloom_intensity = 1.79f;
 
 	// パーティクル
 	std::unique_ptr<Compute_Particle> particleManager;

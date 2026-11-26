@@ -19,7 +19,7 @@ public:
 	bloom(bloom&&) noexcept = delete;
 	bloom& operator =(bloom&&) noexcept = delete;
 
-	void bloom::make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView* color_map, RenderState* render_state);
+	void make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView* color_map, const RenderState* render_state);
 	ID3D11ShaderResourceView* shader_resource_view() const
 	{
 		return glow_extraction->shader_resource_views[0].Get();
@@ -41,7 +41,7 @@ public:
 public:
 	float bloom_extraction_threshold = 0.57f;
 	float bloom_intensity = 1.0f;
-	float exposure = 0.45;
+	float exposure = 0.45f;
 	static const size_t downsampled_count = 3;
 
 private:
