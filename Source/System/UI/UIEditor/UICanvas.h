@@ -34,8 +34,10 @@ struct UIAnimSet
 struct UIElement
 {
 	std::string name = "name";			// UI名(Findとかで探すよう)
-	std::string texturePath;	// テクスチャパス
+	std::string texturePath;			// テクスチャパス
+	std::string maskTexturePath;		// マスク用のテクスチャパス
 	DirectX::XMFLOAT4 uvRect = { 0.0f, 0.0f, 0.0f, 0.0f };	// 画像の切り抜き範囲
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> maskSRV;
 
 	// Transform
 	DirectX::XMFLOAT2 position = { 0.0f, 0.0f };			// 位置(アンカーからの位置)
@@ -69,6 +71,12 @@ struct UIElement
 	// 塗りつぶし
 	FillMethod fillMethod = FillMethod::None;
 	float fillAmount = 1.0f;
+
+	// ハイライト
+	float highlight = 0.0f; // 今の値
+	float highlightTarget = 0.0f; // 目標の値
+	DirectX::XMFLOAT4 glowColor = { 1, 1, 1, 1 };
+
 
 	// フォーカス
 	UIAnimSet focusAnim; // 選ばれたとき
@@ -174,5 +182,5 @@ private:
 	FocusGroup tabFocus;
 	FocusGroup itemFocus;
 	bool stickNeutral = true; // スティックを倒していない
-
+	float time = 0.0f; // 経過時間
 };

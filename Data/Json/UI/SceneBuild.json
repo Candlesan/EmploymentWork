@@ -104,6 +104,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "BuildFrame",
             "pivot": [
                 0.0,
@@ -429,14 +436,21 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        0.9372549057006836,
+                                        0.9764705896377563,
+                                        0.6352941393852234,
+                                        5.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "Equipped",
                                     "pivot": [
                                         0.0,
                                         0.0
                                     ],
                                     "position": [
-                                        0.0,
-                                        0.0
+                                        1290.0,
+                                        111.0
                                     ],
                                     "rotation": 0.0,
                                     "scale": [
@@ -444,8 +458,8 @@
                                         1.0
                                     ],
                                     "size": [
-                                        45.0,
-                                        45.0
+                                        240.0,
+                                        240.0
                                     ],
                                     "texturePath": "Data\\Sprite\\Texture\\Equipment\\Equipment.PNG",
                                     "unfocusAnim": {
@@ -507,181 +521,6 @@
                                     ],
                                     "animations": {
                                         "fade": {
-                                            "duration": 1.0,
-                                            "ease": 0,
-                                            "enabled": true,
-                                            "from": 0.0,
-                                            "loop": 2,
-                                            "loopCount": -1,
-                                            "to": 0.5
-                                        },
-                                        "move": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": [
-                                                0.0,
-                                                0.0
-                                            ],
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": [
-                                                0.0,
-                                                0.0
-                                            ]
-                                        },
-                                        "rotation": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        },
-                                        "scale": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        }
-                                    },
-                                    "children": [],
-                                    "color": [
-                                        1.0,
-                                        1.0,
-                                        1.0,
-                                        1.0
-                                    ],
-                                    "fillMethod": 0,
-                                    "focusAnim": {
-                                        "fade": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        },
-                                        "move": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": [
-                                                0.0,
-                                                0.0
-                                            ],
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": [
-                                                0.0,
-                                                0.0
-                                            ]
-                                        },
-                                        "rotation": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        },
-                                        "scale": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        }
-                                    },
-                                    "focusHorizontal": false,
-                                    "focusIndex": -1,
-                                    "focusLoop": false,
-                                    "name": "Highlight",
-                                    "pivot": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "position": [
-                                        1.2000000476837158,
-                                        0.800000011920929
-                                    ],
-                                    "rotation": 0.0,
-                                    "scale": [
-                                        1.0,
-                                        1.0
-                                    ],
-                                    "size": [
-                                        411.70001220703125,
-                                        155.39999389648438
-                                    ],
-                                    "texturePath": "Data\\Sprite\\Texture\\HightLight\\Highlight_1.PNG",
-                                    "unfocusAnim": {
-                                        "fade": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        },
-                                        "move": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": [
-                                                0.0,
-                                                0.0
-                                            ],
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": [
-                                                0.0,
-                                                0.0
-                                            ]
-                                        },
-                                        "rotation": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        },
-                                        "scale": {
-                                            "duration": 0.0,
-                                            "ease": 0,
-                                            "enabled": false,
-                                            "from": 0.0,
-                                            "loop": 0,
-                                            "loopCount": -1,
-                                            "to": 0.0
-                                        }
-                                    },
-                                    "uvRect": [
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "visible": false
-                                },
-                                {
-                                    "anchor": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "animations": {
-                                        "fade": {
                                             "duration": 0.0,
                                             "ease": 0,
                                             "enabled": false,
@@ -779,6 +618,13 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        1.0,
+                                        1.0,
+                                        1.0,
+                                        1.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "info",
                                     "pivot": [
                                         0.0,
@@ -905,6 +751,13 @@
                             "focusHorizontal": false,
                             "focusIndex": 0,
                             "focusLoop": false,
+                            "glowColor": [
+                                0.9372549057006836,
+                                0.9764705896377563,
+                                0.6352941393852234,
+                                5.0
+                            ],
+                            "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Laser\\Laser_Build.PNG",
                             "name": "Laser",
                             "pivot": [
                                 0.0,
@@ -1031,6 +884,13 @@
                     "focusHorizontal": true,
                     "focusIndex": 0,
                     "focusLoop": true,
+                    "glowColor": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        5.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "List_RB",
                     "pivot": [
                         0.0,
@@ -1306,14 +1166,21 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        0.9372549057006836,
+                                        0.9764705896377563,
+                                        0.6352941393852234,
+                                        5.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "Equipped",
                                     "pivot": [
                                         0.0,
                                         0.0
                                     ],
                                     "position": [
-                                        0.0,
-                                        0.0
+                                        1290.0,
+                                        111.0
                                     ],
                                     "rotation": 0.0,
                                     "scale": [
@@ -1321,8 +1188,8 @@
                                         1.0
                                     ],
                                     "size": [
-                                        45.0,
-                                        45.0
+                                        240.0,
+                                        240.0
                                     ],
                                     "texturePath": "Data\\Sprite\\Texture\\Equipment\\Equipment.PNG",
                                     "unfocusAnim": {
@@ -1481,6 +1348,13 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        1.0,
+                                        1.0,
+                                        1.0,
+                                        1.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "info",
                                     "pivot": [
                                         0.0,
@@ -1607,6 +1481,13 @@
                             "focusHorizontal": false,
                             "focusIndex": 0,
                             "focusLoop": true,
+                            "glowColor": [
+                                0.9372549057006836,
+                                0.9764705896377563,
+                                0.6352941393852234,
+                                5.0
+                            ],
+                            "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\RapidFire\\Rapid_Build.PNG",
                             "name": "Rapid",
                             "pivot": [
                                 0.0,
@@ -1832,14 +1713,21 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        0.9372549057006836,
+                                        0.9764705896377563,
+                                        0.6352941393852234,
+                                        5.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "Equipped",
                                     "pivot": [
                                         0.0,
                                         0.0
                                     ],
                                     "position": [
-                                        0.0,
-                                        0.0
+                                        1290.0,
+                                        111.0
                                     ],
                                     "rotation": 0.0,
                                     "scale": [
@@ -1847,8 +1735,8 @@
                                         1.0
                                     ],
                                     "size": [
-                                        45.0,
-                                        45.0
+                                        240.0,
+                                        240.0
                                     ],
                                     "texturePath": "Data\\Sprite\\Texture\\Equipment\\Equipment.PNG",
                                     "unfocusAnim": {
@@ -2007,6 +1895,13 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        1.0,
+                                        1.0,
+                                        1.0,
+                                        1.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "info",
                                     "pivot": [
                                         0.0,
@@ -2133,6 +2028,13 @@
                             "focusHorizontal": false,
                             "focusIndex": 1,
                             "focusLoop": false,
+                            "glowColor": [
+                                0.9372549057006836,
+                                0.9764705896377563,
+                                0.6352941393852234,
+                                5.0
+                            ],
+                            "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Shotgun\\Shotgun_Build.PNG",
                             "name": "Burst",
                             "pivot": [
                                 0.0,
@@ -2259,6 +2161,13 @@
                     "focusHorizontal": true,
                     "focusIndex": 1,
                     "focusLoop": true,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "List_RT",
                     "pivot": [
                         0.0,
@@ -2534,14 +2443,21 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        0.9372549057006836,
+                                        0.9764705896377563,
+                                        0.6352941393852234,
+                                        5.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "Equipped",
                                     "pivot": [
                                         0.0,
                                         0.0
                                     ],
                                     "position": [
-                                        0.0,
-                                        0.0
+                                        1290.0,
+                                        111.0
                                     ],
                                     "rotation": 0.0,
                                     "scale": [
@@ -2549,8 +2465,8 @@
                                         1.0
                                     ],
                                     "size": [
-                                        45.0,
-                                        45.0
+                                        240.0,
+                                        240.0
                                     ],
                                     "texturePath": "Data\\Sprite\\Texture\\Equipment\\Equipment.PNG",
                                     "unfocusAnim": {
@@ -2709,6 +2625,13 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        1.0,
+                                        1.0,
+                                        1.0,
+                                        1.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "info",
                                     "pivot": [
                                         0.0,
@@ -2835,6 +2758,13 @@
                             "focusHorizontal": false,
                             "focusIndex": 0,
                             "focusLoop": false,
+                            "glowColor": [
+                                0.9372549057006836,
+                                0.9764705896377563,
+                                0.6352941393852234,
+                                5.0
+                            ],
+                            "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Defense\\Defense_Build.PNG",
                             "name": "Defense",
                             "pivot": [
                                 0.0,
@@ -2961,6 +2891,13 @@
                     "focusHorizontal": true,
                     "focusIndex": 2,
                     "focusLoop": true,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "List_LB",
                     "pivot": [
                         0.0,
@@ -3236,14 +3173,21 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        0.9372549057006836,
+                                        0.9764705896377563,
+                                        0.6352941393852234,
+                                        5.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "Equipped",
                                     "pivot": [
                                         0.0,
                                         0.0
                                     ],
                                     "position": [
-                                        0.0,
-                                        0.0
+                                        1290.0,
+                                        111.0
                                     ],
                                     "rotation": 0.0,
                                     "scale": [
@@ -3251,8 +3195,8 @@
                                         1.0
                                     ],
                                     "size": [
-                                        45.0,
-                                        45.0
+                                        240.0,
+                                        240.0
                                     ],
                                     "texturePath": "Data\\Sprite\\Texture\\Equipment\\Equipment.PNG",
                                     "unfocusAnim": {
@@ -3411,6 +3355,13 @@
                                     "focusHorizontal": false,
                                     "focusIndex": -1,
                                     "focusLoop": false,
+                                    "glowColor": [
+                                        1.0,
+                                        1.0,
+                                        1.0,
+                                        1.0
+                                    ],
+                                    "maskTexturePath": "",
                                     "name": "info",
                                     "pivot": [
                                         0.0,
@@ -3537,6 +3488,13 @@
                             "focusHorizontal": false,
                             "focusIndex": 0,
                             "focusLoop": false,
+                            "glowColor": [
+                                0.9372549057006836,
+                                0.9764705896377563,
+                                0.6352941393852234,
+                                5.0
+                            ],
+                            "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Intercept\\Intercept_Build.PNG",
                             "name": "Intercept",
                             "pivot": [
                                 0.0,
@@ -3663,6 +3621,13 @@
                     "focusHorizontal": true,
                     "focusIndex": 3,
                     "focusLoop": true,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "List_LT",
                     "pivot": [
                         0.0,
@@ -3838,6 +3803,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 4,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\BuildScene\\GameStart.png",
                     "name": "gameStart",
                     "pivot": [
                         0.0,
@@ -3964,6 +3936,13 @@
             "focusHorizontal": true,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Slot",
             "pivot": [
                 0.0,
@@ -4139,6 +4118,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Guide",
             "pivot": [
                 0.0,
@@ -4314,6 +4300,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "fade",
             "pivot": [
                 0.0,

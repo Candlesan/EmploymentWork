@@ -91,6 +91,7 @@ void UICanvas::Initialize(ID3D11Device* device)
 // 更新処理
 void UICanvas::Update(float elapsedTime)
 {
+	time += elapsedTime;
 	for (auto& e : canvas.elements)
 	{
 		UpdateElement(e.get(), elapsedTime);
@@ -122,6 +123,8 @@ void UICanvas::UpdateElement(UIElement* e, float elapsedTime)
 		e->anim.scale.Update(elapsedTime);
 		e->scaleValue = e->anim.scale.GetValue();
 	}
+
+	e->highlight += (e->highlightTarget - e->highlight) * (std::min)(1.0f, elapsedTime * 12.0f);
 
 	// 子を更新する
 	for (auto& child : e->children)
@@ -227,7 +230,7 @@ void UICanvas::RenderElement(ID3D11DeviceContext* dc, UIElement* e, const Direct
 		DirectX::XMFLOAT2 tex = e->sprite->GetTextureSize();
 		uifillRenderer.Apply(dc,
 			{ uv.x / tex.x, uv.y / tex.y, uv.z / tex.x, uv.w / tex.y },
-			e->fillAmount, e->fillMethod);
+			e->fillAmount, e->fillMethod, e->maskSRV.Get(), e->highlight, time, e->glowColor);
 
 		e->sprite->Render(dc,
 			cornners,
@@ -277,6 +280,7 @@ nlohmann::json UICanvas::SaveElement(const UIElement* e)
 	json j = {
 			{"name",e->name},
 			{"texturePath", e->texturePath},
+			{"maskTexturePath", e->maskTexturePath},
 			{"uvRect", { e->uvRect.x, e->uvRect.y, e->uvRect.z, e->uvRect.w }},
 			{"position", {e->position.x, e->position.y}},
 			{"rotation", e->rotation},
@@ -290,6 +294,7 @@ nlohmann::json UICanvas::SaveElement(const UIElement* e)
 			{"focusIndex",      e->focusIndex},
 			{"focusHorizontal", e->focusHorizontal},
 			{"focusLoop",       e->focusLoop}, 
+			{"glowColor",       {e->glowColor.x, e->glowColor.y, e->glowColor.z, e->glowColor.w}},
 	};
 
 	j["animations"] = SaveAnimSet(e->anim);
@@ -344,6 +349,7 @@ std::unique_ptr<UIElement> UICanvas::LoadElement(const nlohmann::json& je, UIEle
 	// 自分自身の中身
 	element->name = je.value("name", "");
 	element->texturePath = je.value("texturePath", "");
+	element->maskTexturePath = je.value("maskTexturePath", "");
 	if (je.find("uvRect") != je.end())   element->uvRect = { je["uvRect"][0], je["uvRect"][1], je["uvRect"][2], je["uvRect"][3] };
 	if (je.find("position") != je.end()) element->position = { je["position"][0], je["position"][1] };
 	element->rotation = je.value("rotation", 0.0f);
@@ -352,6 +358,7 @@ std::unique_ptr<UIElement> UICanvas::LoadElement(const nlohmann::json& je, UIEle
 	if (je.find("pivot") != je.end())    element->pivot = { je["pivot"][0], je["pivot"][1] };
 	if (je.find("anchor") != je.end())   element->anchor = { je["anchor"][0], je["anchor"][1] };
 	if (je.find("color") != je.end())    element->color = { je["color"][0], je["color"][1], je["color"][2], je["color"][3] };
+	if (je.find("glowColor") != je.end())    element->glowColor = { je["glowColor"][0], je["glowColor"][1], je["glowColor"][2], je["glowColor"][3] };
 	element->visible = je.value("visible", true);
 	element->fillMethod = static_cast<FillMethod>(je.value("fillMethod", FillMethod::None));
 	element->focusIndex = je.value("focusIndex", -1);
@@ -362,6 +369,11 @@ std::unique_ptr<UIElement> UICanvas::LoadElement(const nlohmann::json& je, UIEle
 	if (!element->texturePath.empty())
 	{
 		element->sprite = CreateSprite(element->texturePath.c_str());;
+	}
+
+	if (!element->maskTexturePath.empty())
+	{
+		element->maskSRV = TextureResourceManager::Instance().GetOrLoad(device, element->maskTexturePath);
 	}
 
 	if (je.find("animations") != je.end()) LoadAnimSet(je["animations"], element->anim);
@@ -589,11 +601,12 @@ void UICanvas::SelectTab(int newPos)
 void UICanvas::SetHighlight(UIElement* e, bool on)
 {
 	if (!e) return;
+	e->highlightTarget = on ? 1 : 0;
 
 	// 選ばれたタブを表示
 	for (auto& c : e->children)
 	{
-		if (c->name == "Highlight")
+		if (c->name == "highlight")
 		{
 			c->visible = on;
 			if (on)

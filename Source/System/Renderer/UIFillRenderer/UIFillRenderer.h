@@ -1,7 +1,8 @@
 #pragma once
-#include <d3d11.h>
-#include <DirectXMath.h>
 #include <wrl.h>
+#include <d3d11.h>
+#include <string>
+#include <DirectXMath.h>
 
 enum class FillMethod
 {
@@ -21,7 +22,8 @@ public:
 	void Initialize(ID3D11Device* device);
 
 	// CB更新＆バインド
-	void Apply(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4& uvRect, float fillAmount, FillMethod fillMethod);
+	void Apply(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4& uvRect, float fillAmount, FillMethod fillMethod,
+		ID3D11ShaderResourceView* maskTexture, float highlight, float time, const DirectX::XMFLOAT4& glowColor);
 
 	ID3D11PixelShader* GetPixelShader() const { return pixelShader.Get(); }
 private:
@@ -30,7 +32,11 @@ private:
 		DirectX::XMFLOAT4 uvRect;	// 切り抜き範囲
 		float fillAmount;			// 塗り割合
 		int fillMethod;				// None, 左右, 時計回り
-		DirectX::XMFLOAT2 dummy;
+		float highlight;
+		float time;
+		DirectX::XMFLOAT4 glowColor;
+		int useMask;
+		DirectX::XMFLOAT3 pad;
 	};
 
 	Microsoft::WRL::ComPtr<ID3D11PixelShader>        pixelShader;

@@ -504,6 +504,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\PauseScene\\resume.png",
                     "name": "resume",
                     "pivot": [
                         0.5,
@@ -679,6 +686,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 1,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\PauseScene\\config.png",
                     "name": "config",
                     "pivot": [
                         0.5,
@@ -854,6 +868,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 2,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\PauseScene\\toTitle.png",
                     "name": "toTitle",
                     "pivot": [
                         0.5,

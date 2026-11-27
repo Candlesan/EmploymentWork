@@ -104,6 +104,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Title",
             "pivot": [
                 0.5,
@@ -329,6 +336,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\TitleScene\\gameStart.png",
                     "name": "gameStart",
                     "pivot": [
                         0.0,
@@ -504,6 +518,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 1,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\TitleScene\\config.png",
                     "name": "config",
                     "pivot": [
                         0.0,
@@ -679,6 +700,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 2,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\TitleScene\\gameEnd.png",
                     "name": "gameEnd",
                     "pivot": [
                         0.0,
@@ -805,6 +833,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": true,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Slot",
             "pivot": [
                 0.0,
@@ -1080,6 +1115,13 @@
                             "focusHorizontal": false,
                             "focusIndex": -1,
                             "focusLoop": false,
+                            "glowColor": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "maskTexturePath": "",
                             "name": "colon",
                             "pivot": [
                                 0.0,
@@ -1255,6 +1297,13 @@
                             "focusHorizontal": false,
                             "focusIndex": -1,
                             "focusLoop": false,
+                            "glowColor": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "maskTexturePath": "",
                             "name": "Select",
                             "pivot": [
                                 0.0,
@@ -1381,6 +1430,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "Button_A",
                     "pivot": [
                         0.0,
@@ -1507,6 +1563,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Guide",
             "pivot": [
                 0.0,
@@ -1682,6 +1745,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "fade",
             "pivot": [
                 0.0,

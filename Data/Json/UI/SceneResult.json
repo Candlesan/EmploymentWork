@@ -504,6 +504,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\RetryScene\\retry.png",
                     "name": "reTry",
                     "pivot": [
                         0.0,
@@ -679,6 +686,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 1,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\RetryScene\\Rebuild.png",
                     "name": "reBulid",
                     "pivot": [
                         0.0,
@@ -854,6 +868,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 2,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\Scene\\RetryScene\\toTitle.png",
                     "name": "toTitle",
                     "pivot": [
                         0.0,
@@ -1205,6 +1226,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\RapidFire\\Rapid_Build.PNG",
                     "name": "rapid",
                     "pivot": [
                         0.0,
@@ -1380,6 +1408,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 1,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Shotgun\\Shotgun_Build.PNG",
                     "name": "burst",
                     "pivot": [
                         0.0,
@@ -1731,6 +1766,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Laser\\Laser_Build.PNG",
                     "name": "laser",
                     "pivot": [
                         0.0,
@@ -2082,6 +2124,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Intercept\\Intercept_Build.PNG",
                     "name": "Intercept",
                     "pivot": [
                         0.0,
@@ -2433,6 +2482,13 @@
                     "focusHorizontal": false,
                     "focusIndex": 0,
                     "focusLoop": false,
+                    "glowColor": [
+                        0.9372549057006836,
+                        0.9764705896377563,
+                        0.6352941393852234,
+                        5.0
+                    ],
+                    "maskTexturePath": "Data\\Sprite\\Texture\\MagicIcon\\Defense\\Defense_Build.PNG",
                     "name": "Defense",
                     "pivot": [
                         0.0,

@@ -428,6 +428,43 @@ void UIEditor::DrawInspector()
 				ImGui::EndTabItem();
 			}
 
+			if (ImGui::BeginTabItem(u8"ハイライト"))
+			{
+				if (ImGui::Button(u8"マスク読み込み"))
+				{
+					char filePath[MAX_PATH] = { 0 };
+					HWND hwnd = Graphics::Instance().GetWindowHandle();
+					if (Dialog::OpenFileName(filePath, MAX_PATH,
+						"PNG File\0*.png\0All Files\0*.*\0\0", "マスク選択", hwnd) == DialogResult::OK)
+					{
+						std::string pathStr = filePath;
+						size_t pos = pathStr.find("Data");
+						if (pos != std::string::npos) pathStr = pathStr.substr(pos);
+
+						selectedElement.maskTexturePath = pathStr;
+						selectedElement.maskSRV = TextureResourceManager::Instance().GetOrLoad(device, pathStr);
+					}
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(u8"外す"))
+				{
+					selectedElement.maskTexturePath.clear();
+					selectedElement.maskSRV.Reset();
+				}
+				ImGui::Text(u8": %s", selectedElement.maskTexturePath.c_str());
+
+				if (selectedElement.maskSRV)
+				{
+					// 色(rgb)と強さ(a)。強さは1を超えてもいいので別のスライダーにする
+					ImGui::ColorEdit3(u8"光の色", &selectedElement.glowColor.x);
+					ImGui::DragFloat(u8"光の強さ", &selectedElement.glowColor.w, 0.05f, 0.0f, 5.0f);
+
+					// 確認用（保存しない）：エディタでは選択されないので、手で光らせて見る
+					ImGui::SliderFloat(u8"ハイライト(確認用)", &selectedElement.highlightTarget, 0.0f, 1.0f);
+				}
+
+				ImGui::EndTabItem();
+			}
 			ImGui::EndTabBar();
 		}
 	}
@@ -466,7 +503,7 @@ void UIEditor::SetTexture(UIElement& e, const std::string& path)
 
 	// キャッシュ済みならそれを使い回す
 	auto srv = TextureResourceManager::Instance().GetOrLoad(device, path);
-	e.sprite = std::make_shared<Sprite>(device, srv);
+	e.sprite = uiCanvas.CreateSprite(path);
 
 	DirectX::XMFLOAT2 texSize = e.sprite->GetTextureSize();
 	e.size = texSize; // 画像のサイズで表示する
