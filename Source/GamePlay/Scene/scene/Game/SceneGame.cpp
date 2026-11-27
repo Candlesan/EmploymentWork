@@ -99,12 +99,12 @@ void SceneGame::Initialize()
 
 	// ライト設定
 	playerLight.color = { 1, 1, 1 };   // 白色
-	playerLight.intensity = 23.25f;
-	playerLight.range = 6.65;
+	playerLight.intensity = 5.0f;
+	playerLight.range = 6.65f;
 
 	enemyLight.color = { 1, 1, 1 }; // 黄色
-	enemyLight.intensity = 18.75;
-	enemyLight.range = 7.8;
+	enemyLight.intensity = 5.0f;
+	enemyLight.range = 6.65f;
 
 	// キャラクターの影の設定
 	characterShadowAttenuation = 0;

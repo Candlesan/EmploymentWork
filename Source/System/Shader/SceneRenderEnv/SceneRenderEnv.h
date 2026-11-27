@@ -68,5 +68,5 @@ private:
 	std::unique_ptr<bloom> bloomer;
 	float bloom_extraction = 1.87f;
 	float bloom_intensity = 1.79f;
-	float bloom_exposure = 0.45;
+	float bloom_exposure = 0.8f;
 };

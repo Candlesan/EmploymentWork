@@ -27,7 +27,7 @@ void SceneRenderEnv::Initialize()
 
 	light.direction = CalcLightDirection(); // Î‚ßã‚©‚ç
 	light.color = { 0.25f, 0.8f, 0.9f }; // Â”’‚¢F
-	light.intensity = 0.7f;
+	light.intensity = 1.0f;
 
 	lightManager.SetDirectionalLight(light);
 	lightManager.Load(LightManager::LightsFilePath);
