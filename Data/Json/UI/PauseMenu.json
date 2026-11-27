@@ -449,183 +449,7 @@
                             "to": 0.0
                         }
                     },
-                    "children": [
-                        {
-                            "anchor": [
-                                0.0,
-                                0.0
-                            ],
-                            "animations": {
-                                "fade": {
-                                    "duration": 1.0,
-                                    "ease": 0,
-                                    "enabled": true,
-                                    "from": 0.0,
-                                    "loop": 2,
-                                    "loopCount": -1,
-                                    "to": 0.5
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "children": [],
-                            "color": [
-                                0.9999899864196777,
-                                1.0,
-                                0.9999977946281433,
-                                1.0
-                            ],
-                            "fillMethod": 0,
-                            "focusAnim": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "focusHorizontal": false,
-                            "focusIndex": -1,
-                            "focusLoop": false,
-                            "name": "Highlight",
-                            "pivot": [
-                                0.0,
-                                0.0
-                            ],
-                            "position": [
-                                5.0,
-                                4.900000095367432
-                            ],
-                            "rotation": 0.0,
-                            "scale": [
-                                1.0,
-                                1.0
-                            ],
-                            "size": [
-                                420.20001220703125,
-                                113.4000015258789
-                            ],
-                            "texturePath": "Data\\Sprite\\Texture\\HightLight\\Highlight_3.PNG",
-                            "unfocusAnim": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "uvRect": [
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "visible": false
-                        }
-                    ],
+                    "children": [],
                     "color": [
                         1.0,
                         1.0,
@@ -800,183 +624,7 @@
                             "to": 0.0
                         }
                     },
-                    "children": [
-                        {
-                            "anchor": [
-                                0.0,
-                                0.0
-                            ],
-                            "animations": {
-                                "fade": {
-                                    "duration": 1.0,
-                                    "ease": 0,
-                                    "enabled": true,
-                                    "from": 0.0,
-                                    "loop": 2,
-                                    "loopCount": -1,
-                                    "to": 0.5
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "children": [],
-                            "color": [
-                                1.0,
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "fillMethod": 0,
-                            "focusAnim": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "focusHorizontal": false,
-                            "focusIndex": -1,
-                            "focusLoop": false,
-                            "name": "Highlight",
-                            "pivot": [
-                                0.0,
-                                0.0
-                            ],
-                            "position": [
-                                4.400000095367432,
-                                4.400000095367432
-                            ],
-                            "rotation": 0.0,
-                            "scale": [
-                                1.0,
-                                1.0
-                            ],
-                            "size": [
-                                420.70001220703125,
-                                114.5999984741211
-                            ],
-                            "texturePath": "Data\\Sprite\\Texture\\HightLight\\Highlight_3.PNG",
-                            "unfocusAnim": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "uvRect": [
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "visible": false
-                        }
-                    ],
+                    "children": [],
                     "color": [
                         1.0,
                         1.0,
@@ -1151,183 +799,7 @@
                             "to": 0.0
                         }
                     },
-                    "children": [
-                        {
-                            "anchor": [
-                                0.0,
-                                0.0
-                            ],
-                            "animations": {
-                                "fade": {
-                                    "duration": 1.0,
-                                    "ease": 0,
-                                    "enabled": true,
-                                    "from": 0.0,
-                                    "loop": 2,
-                                    "loopCount": -1,
-                                    "to": 0.5
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "children": [],
-                            "color": [
-                                1.0,
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "fillMethod": 0,
-                            "focusAnim": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "focusHorizontal": false,
-                            "focusIndex": -1,
-                            "focusLoop": false,
-                            "name": "Highlight",
-                            "pivot": [
-                                0.0,
-                                0.0
-                            ],
-                            "position": [
-                                4.5,
-                                4.699999809265137
-                            ],
-                            "rotation": 0.0,
-                            "scale": [
-                                1.0,
-                                1.0
-                            ],
-                            "size": [
-                                420.5,
-                                114.69999694824219
-                            ],
-                            "texturePath": "Data\\Sprite\\Texture\\HightLight\\Highlight_3.PNG",
-                            "unfocusAnim": {
-                                "fade": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "move": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": [
-                                        0.0,
-                                        0.0
-                                    ],
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": [
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "rotation": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                },
-                                "scale": {
-                                    "duration": 0.0,
-                                    "ease": 0,
-                                    "enabled": false,
-                                    "from": 0.0,
-                                    "loop": 0,
-                                    "loopCount": -1,
-                                    "to": 0.0
-                                }
-                            },
-                            "uvRect": [
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "visible": false
-                        }
-                    ],
+                    "children": [],
                     "color": [
                         1.0,
                         1.0,
@@ -2337,6 +1809,54 @@
                 1.0,
                 1.0
             ],
+            "fillMethod": 0,
+            "focusAnim": {
+                "fade": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                },
+                "move": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": [
+                        0.0,
+                        0.0
+                    ],
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                "rotation": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                },
+                "scale": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                }
+            },
+            "focusHorizontal": false,
+            "focusIndex": -1,
+            "focusLoop": false,
             "name": "fade",
             "pivot": [
                 0.0,
@@ -2356,6 +1876,50 @@
                 1080.0
             ],
             "texturePath": "Data\\Sprite\\Texture\\Fade\\Fade.png",
+            "unfocusAnim": {
+                "fade": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                },
+                "move": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": [
+                        0.0,
+                        0.0
+                    ],
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                "rotation": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                },
+                "scale": {
+                    "duration": 0.0,
+                    "ease": 0,
+                    "enabled": false,
+                    "from": 0.0,
+                    "loop": 0,
+                    "loopCount": -1,
+                    "to": 0.0
+                }
+            },
             "uvRect": [
                 0.0,
                 0.0,

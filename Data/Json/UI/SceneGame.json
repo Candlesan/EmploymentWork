@@ -75,7 +75,7 @@
                 215.0,
                 212.0
             ],
-            "texturePath": "Data\\Sprite\\Texture\\Cosshair\\Crosshair.PNG",
+            "texturePath": "Data\\Sprite\\Texture\\Cosshair\\Crosshair.png",
             "uvRect": [
                 0.0,
                 0.0,
@@ -247,8 +247,8 @@
                                 0.5
                             ],
                             "position": [
-                                2.5999999046325684,
-                                19.899999618530273
+                                92.0,
+                                35.0
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -256,10 +256,10 @@
                                 1.0
                             ],
                             "size": [
-                                578.5999755859375,
-                                30.799999237060547
+                                516.0,
+                                22.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerHP.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerHP.png",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -331,8 +331,8 @@
                                 0.5
                             ],
                             "position": [
-                                2.430000066757202,
-                                43.79999923706055
+                                92.0,
+                                66.0
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -340,10 +340,10 @@
                                 1.0
                             ],
                             "size": [
-                                577.5,
-                                31.0
+                                516.0,
+                                16.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerMP.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerMP.png",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -415,8 +415,8 @@
                                 0.5
                             ],
                             "position": [
-                                3.5,
-                                68.80000305175781
+                                92.0,
+                                92.0
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -424,10 +424,10 @@
                                 1.0
                             ],
                             "size": [
-                                576.9000244140625,
-                                32.400001525878906
+                                516.0,
+                                12.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerGU.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerGU.png",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -459,10 +459,10 @@
                         1.0
                     ],
                     "size": [
-                        586.0,
-                        87.0
+                        640.0,
+                        118.0
                     ],
-                    "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerFrame.PNG",
+                    "texturePath": "Data\\Sprite\\Texture\\StatusUI\\PlayerFrame.png",
                     "uvRect": [
                         0.0,
                         0.0,
@@ -669,8 +669,8 @@
                                 0.5
                             ],
                             "position": [
-                                1.899999976158142,
-                                16.299999237060547
+                                112.0,
+                                60.0
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -678,10 +678,10 @@
                                 1.0
                             ],
                             "size": [
-                                880.0,
-                                31.0
+                                816.0,
+                                24.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyHP.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyHP.png",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -753,8 +753,8 @@
                                 0.5
                             ],
                             "position": [
-                                5.099999904632568,
-                                43.0
+                                112.0,
+                                91.0
                             ],
                             "rotation": 0.0,
                             "scale": [
@@ -762,10 +762,10 @@
                                 1.0
                             ],
                             "size": [
-                                874.7999877929688,
-                                34.0
+                                816.0,
+                                14.0
                             ],
-                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyGU.PNG",
+                            "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyGU.png",
                             "uvRect": [
                                 0.0,
                                 0.0,
@@ -788,8 +788,8 @@
                         0.0
                     ],
                     "position": [
-                        494.79998779296875,
-                        22.299999237060547
+                        480.0,
+                        0.0
                     ],
                     "rotation": 0.0,
                     "scale": [
@@ -797,10 +797,10 @@
                         1.0
                     ],
                     "size": [
-                        885.0,
-                        60.0
+                        960.0,
+                        116.0
                     ],
-                    "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyFrame.PNG",
+                    "texturePath": "Data\\Sprite\\Texture\\StatusUI\\EnemyFrame.png",
                     "uvRect": [
                         0.0,
                         0.0,
