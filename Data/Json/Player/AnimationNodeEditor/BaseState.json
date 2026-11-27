@@ -1124,6 +1124,46 @@
             "priority": 0,
             "toSlot": 0,
             "toState": "Walk"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 64,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 3
+                }
+            ],
+            "fromState": "State_Idle",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "jump"
+        },
+        {
+            "Actions": [],
+            "colorA": 1.0,
+            "colorB": 1.0,
+            "colorG": 1.0,
+            "colorR": 1.0,
+            "conditions": [
+                {
+                    "buttonMask": 0,
+                    "negate": false,
+                    "targetDir": 0,
+                    "threshold": 0.0,
+                    "type": 0
+                }
+            ],
+            "fromState": "jump",
+            "priority": 0,
+            "toSlot": 0,
+            "toState": "State_Idle"
         }
     ],
     "nodes": [
@@ -1425,6 +1465,26 @@
                 473.0
             ],
             "subGraphPath": "Data/Json/Player/AnimationNodeEditor/Walk.json",
+            "type": 1
+        },
+        {
+            "StateName": "jump",
+            "assetName": "",
+            "config": {
+                "animationName": "",
+                "bakeTranslationY": true,
+                "blendTime": 0.20000000298023224,
+                "loop": false,
+                "targetBoneName": "",
+                "useRootMotion": false,
+                "useRootMotionEx": false
+            },
+            "mixRate": 0.0,
+            "position": [
+                -975.0,
+                185.0
+            ],
+            "subGraphPath": "Data/Json/Player/AnimationNodeEditor/jump.json",
             "type": 1
         }
     ]

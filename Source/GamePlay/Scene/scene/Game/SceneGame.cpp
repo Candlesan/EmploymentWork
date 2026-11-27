@@ -488,14 +488,15 @@ void SceneGame::Render()
 		CustomEffectManager::Instance().Render(rc);
 		CustomEffectManager::Instance().RenderMeshVFX(modelRenderer);
 
-		sceneRender.EndScene(rc);
-		sceneRender.Present(rc);
 
 		// シェイプ描画
 		if (showDebugPrimitive)
 		{
 			shapeRenderer->Render(dc, camera.GetView(), camera.GetProjection());
 		}
+
+		sceneRender.EndScene(rc);
+		sceneRender.Present(rc);
 	}
 
 	// 2Dスプライト描画

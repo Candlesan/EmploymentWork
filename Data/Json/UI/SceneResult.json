@@ -104,6 +104,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "ListBackGround",
             "pivot": [
                 0.0,
@@ -279,6 +286,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Result",
             "pivot": [
                 0.0,
@@ -1001,6 +1015,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": true,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Slot",
             "pivot": [
                 0.0,
@@ -1248,8 +1269,8 @@
                         1.0
                     ],
                     "size": [
-                        414.0,
-                        156.0
+                        489.0,
+                        136.39999389648438
                     ],
                     "texturePath": "Data\\Sprite\\Texture\\MagicIcon\\RapidFire\\Rapid_Build.PNG",
                     "unfocusAnim": {
@@ -1430,8 +1451,8 @@
                         1.0
                     ],
                     "size": [
-                        413.0,
-                        157.0
+                        490.1000061035156,
+                        142.1999969482422
                     ],
                     "texturePath": "Data\\Sprite\\Texture\\MagicIcon\\Shotgun\\Shotgun_Build.PNG",
                     "unfocusAnim": {
@@ -1541,6 +1562,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "slot_RT",
             "pivot": [
                 0.0,
@@ -1779,7 +1807,7 @@
                         0.0
                     ],
                     "position": [
-                        576.2999877929688,
+                        557.5,
                         613.7999877929688
                     ],
                     "rotation": 0.0,
@@ -1788,7 +1816,7 @@
                         1.0
                     ],
                     "size": [
-                        414.0,
+                        462.79998779296875,
                         157.0
                     ],
                     "texturePath": "Data\\Sprite\\Texture\\MagicIcon\\Laser\\Laser_Build.PNG",
@@ -1899,6 +1927,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "slot_RB",
             "pivot": [
                 0.0,
@@ -2146,7 +2181,7 @@
                         1.0
                     ],
                     "size": [
-                        414.0,
+                        483.8999938964844,
                         156.0
                     ],
                     "texturePath": "Data\\Sprite\\Texture\\MagicIcon\\Intercept\\Intercept_Build.PNG",
@@ -2257,6 +2292,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "slot_LT",
             "pivot": [
                 0.0,
@@ -2495,8 +2537,8 @@
                         0.0
                     ],
                     "position": [
-                        578.4000244140625,
-                        828.0999755859375
+                        562.5999755859375,
+                        824.2999877929688
                     ],
                     "rotation": 0.0,
                     "scale": [
@@ -2504,7 +2546,7 @@
                         1.0
                     ],
                     "size": [
-                        414.0,
+                        453.79998779296875,
                         156.0
                     ],
                     "texturePath": "Data\\Sprite\\Texture\\MagicIcon\\Defense\\Defense_Build.PNG",
@@ -2615,6 +2657,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "slot_LB",
             "pivot": [
                 0.0,
@@ -2840,6 +2889,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "digit_0",
                     "pivot": [
                         0.0,
@@ -3015,6 +3071,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "digit_1",
                     "pivot": [
                         0.0,
@@ -3190,6 +3253,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "colon",
                     "pivot": [
                         0.0,
@@ -3365,6 +3435,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "digit_2",
                     "pivot": [
                         0.0,
@@ -3540,6 +3617,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "digit_3",
                     "pivot": [
                         0.0,
@@ -3666,6 +3750,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "ClearTime",
             "pivot": [
                 0.0,
@@ -3941,6 +4032,13 @@
                             "focusHorizontal": false,
                             "focusIndex": -1,
                             "focusLoop": false,
+                            "glowColor": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "maskTexturePath": "",
                             "name": "colon",
                             "pivot": [
                                 0.0,
@@ -4116,6 +4214,13 @@
                             "focusHorizontal": false,
                             "focusIndex": -1,
                             "focusLoop": false,
+                            "glowColor": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "maskTexturePath": "",
                             "name": "Select",
                             "pivot": [
                                 0.0,
@@ -4242,6 +4347,13 @@
                     "focusHorizontal": false,
                     "focusIndex": -1,
                     "focusLoop": false,
+                    "glowColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "maskTexturePath": "",
                     "name": "Button_A",
                     "pivot": [
                         0.0,
@@ -4368,6 +4480,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "Guide",
             "pivot": [
                 0.0,
@@ -4543,6 +4662,13 @@
             "focusHorizontal": false,
             "focusIndex": -1,
             "focusLoop": false,
+            "glowColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "maskTexturePath": "",
             "name": "fade",
             "pivot": [
                 0.0,
